@@ -1,0 +1,97 @@
+import express from "express";
+import path from "path";
+import dotenv from "dotenv";
+import { createServer as createViteServer } from "vite";
+
+// Routes & Controllers
+import { githubRouter } from "./server/routes/github.routes.ts";
+import { adminRouter } from "./server/routes/admin.routes.ts";
+import { agentExecutionRouter } from "./server/routes/agent-execution.routes.ts";
+import { systemTelemetryRouter } from "./server/routes/system-telemetry.routes.ts";
+import { hqRouter } from "./server/routes/hq.routes.ts";
+import { webExplorerRouter } from "./server/routes/web-explorer.routes.ts";
+import { enterpriseControlRouter } from "./server/routes/enterprise-control.routes.ts";
+import { cseMlRouter } from "./server/routes/cse-ml.routes.ts";
+import { engineeringAdvancedRouter } from "./server/routes/engineering-advanced.routes.ts";
+import { knowledgeRouter } from "./server/routes/knowledge.routes.ts";
+
+dotenv.config();
+
+const app = express();
+const PORT = 3000;
+
+// Body Parsers
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// Health Check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+// OAuth Callback handlers for social plugins
+app.get(["/auth/callback/instagram", "/auth/callback/linkedin", "/auth/callback/instagram/", "/auth/callback/linkedin/"], (req, res) => {
+  const provider = req.path.includes("instagram") ? "Instagram" : "LinkedIn";
+  res.send(`
+    <html>
+      <body style="font-family: monospace; background: #181615; color: #ebdbb2; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+        <div style="text-align: center; border: 2px solid #3c3836; padding: 40px; border-radius: 24px; background: #282828; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+          <div style="font-size: 44px; margin-bottom: 20px;">🎉</div>
+          <h2 style="color: #fabd2f; margin-bottom: 10px; font-weight: 800;">OAuth Authorized!</h2>
+          <p style="font-size: 13px; line-height: 1.6; color: #b8bb26; margin-bottom: 24px;">Connected ${provider} account successfully to Rufflo OS.</p>
+          <p style="font-size: 11px; color: #928374;">This authentication window is closing automatically...</p>
+        </div>
+        <script>
+          if (window.opener) {
+            window.opener.postMessage({ 
+              type: 'OAUTH_AUTH_SUCCESS', 
+              provider: '${provider}' 
+            }, '*');
+            setTimeout(() => {
+              window.close();
+            }, 1600);
+          } else {
+            window.location.href = '/';
+          }
+        </script>
+      </body>
+    </html>
+  `);
+});
+
+// Mount Modular API Routers
+app.use("/api/github", githubRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/cse-ml", cseMlRouter);
+app.use("/api/engineering", engineeringAdvancedRouter);
+app.use("/api/knowledge", knowledgeRouter);
+
+// Root /api scoped domain routers
+app.use("/api", agentExecutionRouter);
+app.use("/api", systemTelemetryRouter);
+app.use("/api", hqRouter);
+app.use("/api", webExplorerRouter);
+app.use("/api", enterpriseControlRouter);
+
+// Start Server with Vite Dev/Prod Middleware
+async function startServer() {
+  if (process.env.NODE_ENV !== "production") {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`[Rufflo Server] Running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();

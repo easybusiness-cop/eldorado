@@ -1,0 +1,6 @@
+{
+  "name": "Rufflo Agent Fleet - Munderdiffl.in Command Center",
+  "description": "Interactive autonomous multi-agent simulation and command center inspired by Rufflo and Munderdiffl.in with user auth, voice interactions, 24/7 background debuggers, and dynamic coding agents.",
+  "requestFramePermissions": ["microphone", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

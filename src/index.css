@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #3b82f6;
+  --secondary: #8b5cf6;
+  --accent: #fabd2f;
+  --bg-retro: #fbf1c7;
+  --surface-retro: #ebdbb2;
+  --border-retro: #d5c4a1;
+  --text-retro: #3c3836;
+}
+
+.dark {
+  --primary: #60a5fa;
+  --secondary: #a78bfa;
+  --accent: #fabd2f;
+  --bg-retro: #1d2021;
+  --surface-retro: #282828;
+  --border-retro: #3c3836;
+  --text-retro: #ebdbb2;
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .vibrant-background {
+    background-color: #7d8a7f;
+  }
+  
+  /* Interactive theme additions */
+  .colorful-theme {
+    --primary: #3b82f6;
+    --secondary: #f472b6;
+    --accent: #fbbf24;
+  }
+  
+  .interactive-glow:hover {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+  }
+
+  /* Human Walking Animations & Biomechanical Gait */
+  @keyframes bounce-human {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    25% { transform: translateY(-2.5px) rotate(0deg); }
+    50% { transform: translateY(-4.5px) rotate(1deg); }
+    75% { transform: translateY(-2.5px) rotate(0deg); }
+  }
+  .animate-bounce-human {
+    animation: bounce-human 0.42s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes idle-human {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    50% { transform: translateY(1.2px) scaleY(0.98); }
+  }
+  .animate-idle-human {
+    animation: idle-human 3.2s ease-in-out infinite;
+  }
+
+  @keyframes leg-left {
+    0% { transform: rotate(22deg) translateY(-1px) scaleY(0.95); }
+    50% { transform: rotate(-22deg) translateY(0) scaleY(1.02); }
+    100% { transform: rotate(22deg) translateY(-1px) scaleY(0.95); }
+  }
+  .animate-leg-left {
+    animation: leg-left 0.42s ease-in-out infinite;
+    transform-origin: top center;
+  }
+
+  @keyframes leg-right {
+    0% { transform: rotate(-22deg) translateY(0) scaleY(1.02); }
+    50% { transform: rotate(22deg) translateY(-1px) scaleY(0.95); }
+    100% { transform: rotate(-22deg) translateY(0) scaleY(1.02); }
+  }
+  .animate-leg-right {
+    animation: leg-right 0.42s ease-in-out infinite;
+    transform-origin: top center;
+  }
+
+  @keyframes arm-left {
+    0% { transform: rotate(-18deg); }
+    50% { transform: rotate(18deg); }
+    100% { transform: rotate(-18deg); }
+  }
+  .animate-arm-left {
+    animation: arm-left 0.42s ease-in-out infinite;
+    transform-origin: top center;
+  }
+
+  @keyframes arm-right {
+    0% { transform: rotate(18deg); }
+    50% { transform: rotate(-18deg); }
+    100% { transform: rotate(18deg); }
+  }
+  .animate-arm-right {
+    animation: arm-right 0.42s ease-in-out infinite;
+    transform-origin: top center;
+  }
+}
+
+/* Custom retro scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #181615;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3c3836;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #fabd2f;
+}
+
