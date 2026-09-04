@@ -97,5 +97,46 @@ export const riskRules: RiskRule[] = [
     triggersApproval: true,
     destructive: false,
     spendingLimitDollars: 500,
-  }
+  },
+  // ---------- Code Execution Sandbox ----------
+  {
+    id: "rr-code-run-js",
+    tool: "code-execution",
+    action: "run_javascript",
+    baseRisk: "MEDIUM",
+    triggersApproval: false,
+    destructive: false,
+  },
+  {
+    id: "rr-code-run-ts",
+    tool: "code-execution",
+    action: "run_typescript",
+    baseRisk: "MEDIUM",
+    triggersApproval: false,
+    destructive: false,
+  },
+  {
+    id: "rr-code-write-temp",
+    tool: "code-execution",
+    action: "write_temp_file",
+    baseRisk: "LOW",
+    triggersApproval: false,
+    destructive: false,
+  },
+  {
+    id: "rr-code-read-temp",
+    tool: "code-execution",
+    action: "read_temp_file",
+    baseRisk: "LOW",
+    triggersApproval: false,
+    destructive: false,
+  },
+  {
+    id: "rr-code-list-temp",
+    tool: "code-execution",
+    action: "list_temp_files",
+    baseRisk: "LOW",
+    triggersApproval: false,
+    destructive: false,
+  },
 ];

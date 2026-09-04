@@ -6,6 +6,7 @@ import { DatabaseAdapter } from "../adapters/database.adapter";
 import { GitAdapter } from "../adapters/git.adapter";
 import { StorageAdapter } from "../adapters/storage.adapter";
 import { WebResearchAdapter } from "../adapters/web.adapter";
+import { CodeExecutionAdapter } from "../adapters/code-execution.adapter";
 import { RiskCalculator } from "../../../../risk-engine/risk.calculator";
 import { PolicyEngine } from "./policy.middleware";
 import { ApprovalService } from "../../approvals/approval.service";
@@ -76,6 +77,7 @@ export class ToolGateway {
     this.registerAdapter(new GitAdapter());
     this.registerAdapter(new StorageAdapter());
     this.registerAdapter(new WebResearchAdapter());
+    this.registerAdapter(new CodeExecutionAdapter());
   }
 
   public registerAdapter(adapter: BaseAdapter): void {
@@ -117,7 +119,8 @@ export class ToolGateway {
       const agentRoleCapabilities: Record<string, string[]> = {
         "david": [
           "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
-          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema"
+          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
+          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
         ],
         "oscar": [
           "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query",
@@ -134,7 +137,8 @@ export class ToolGateway {
         "pete": [
           "github.list_repositories", "github.create_branch", "github.create_commit", "github.create_pull_request",
           "postgresql.select", "postgresql.execute_query",
-          "google-search.search", "google-search.fetch_public_page"
+          "google-search.search", "google-search.fetch_public_page",
+          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
         ],
         "michael": [
           "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
@@ -142,7 +146,8 @@ export class ToolGateway {
           "stripe.create_invoice", "stripe.inspect_balance",
           "slack.post_message", "cloud_storage.upload", "cloud_storage.download", "cloud_storage.list",
           "google-search.search", "google-search.fetch_public_page", "google-search.search",
-          "http.fetch_endpoint"
+          "http.fetch_endpoint",
+          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
         ],
         "kevin": [
           "postgresql.select", "postgresql.execute_query",
@@ -152,7 +157,14 @@ export class ToolGateway {
         "ruflo": [
           "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
           "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
-          "http.fetch_endpoint"
+          "http.fetch_endpoint",
+          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
+        ],
+        "cline": [
+          "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
+          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
+          "http.fetch_endpoint",
+          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
         ],
         "ryan": [
           "postgresql.select", "postgresql.execute_query",
