@@ -44,8 +44,15 @@ export const IdeModal: React.FC<IdeModalProps> = ({
   onSaveFeature,
   onExecuteCode,
 }) => {
-  const [activeTab, setActiveTab] = useState<'ide' | 'website_builder' | 'self_healing' | 'cloudrun'>('ide');
+  const [activeTab, setActiveTab] = useState<'ide' | 'website_builder' | 'software_builder' | 'self_healing' | 'cloudrun'>('ide');
   const [featureName, setFeatureName] = useState(featureToEdit?.name || 'Autonomous Fleet Pipeline');
+
+  // Autonomous Software Builder UI State
+  const [builderObjective, setBuilderObjective] = useState('Create a TokenRateLimiter utility that tracks requests per minute and auto-resets windows');
+  const [builderLanguage, setBuilderLanguage] = useState<'typescript' | 'javascript' | 'react'>('typescript');
+  const [builderTargetDir, setBuilderTargetDir] = useState('modules/security');
+  const [isBuildingSoftware, setIsBuildingSoftware] = useState(false);
+  const [builderResult, setBuilderResult] = useState<any>(null);
   const [code, setCode] = useState(
     featureToEdit?.code ||
       `// Ruflo Autonomous Dynamic Feature Sandbox
@@ -210,6 +217,35 @@ return runAutonomousPipeline();`
     }
   };
 
+  const handleBuildSoftware = async () => {
+    if (!builderObjective.trim()) return;
+    soundFx.playClick();
+    setIsBuildingSoftware(true);
+    setBuilderResult(null);
+    try {
+      const res = await fetch('/api/engineering/builder/build', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          objective: builderObjective,
+          language: builderLanguage,
+          targetDir: builderTargetDir
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.result) {
+        setBuilderResult(data.result);
+        soundFx.playSuccessChime();
+      } else {
+        setBuilderResult({ status: 'failed', error: data.error || 'Build failed' });
+      }
+    } catch (err: any) {
+      setBuilderResult({ status: 'failed', error: err.message || 'Network build error' });
+    } finally {
+      setIsBuildingSoftware(false);
+    }
+  };
+
   const handleSave = async () => {
     soundFx.playNotification();
     if (autoApplyBackend) {
@@ -327,6 +363,18 @@ return generateCloudRunRoute();`
             >
               <Layout className="w-3.5 h-3.5" />
               <span>UI Builder</span>
+            </button>
+
+            <button
+              onClick={() => { soundFx.playClick(); setActiveTab('software_builder'); }}
+              className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                activeTab === 'software_builder'
+                  ? 'bg-purple-500 text-white'
+                  : 'text-[#a89984] hover:text-[#ebdbb2]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Software Builder</span>
             </button>
 
             <button
@@ -639,6 +687,121 @@ return generateCloudRunRoute();`
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* TAB: AUTONOMOUS SOFTWARE BUILDER */}
+        {activeTab === 'software_builder' && (
+          <div className="flex-1 p-6 overflow-y-auto bg-[#181615] space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#3c3836]">
+              <div>
+                <h3 className="text-sm font-bold text-[#ebdbb2] flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  <span>LLM-Powered Autonomous Software Builder</span>
+                </h3>
+                <p className="text-xs text-[#928374] mt-1">
+                  Generates production-ready TypeScript/React files via Gemini, writes them safely under target directory, creates index barrel files, and executes smoke tests.
+                </p>
+              </div>
+
+              <button
+                onClick={handleBuildSoftware}
+                disabled={isBuildingSoftware || !builderObjective.trim()}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center gap-2 transition-colors cursor-pointer shadow-md"
+              >
+                <Zap className={`w-3.5 h-3.5 ${isBuildingSoftware ? 'animate-spin' : ''}`} />
+                <span>{isBuildingSoftware ? 'Building Software...' : 'Build Real Software'}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-xs font-bold text-[#ebdbb2]">Objective / Request:</label>
+                <textarea
+                  value={builderObjective}
+                  onChange={(e) => setBuilderObjective(e.target.value)}
+                  rows={3}
+                  className="w-full p-3 rounded-lg bg-[#282828] border border-[#3c3836] text-xs text-[#ebdbb2] focus:border-purple-400 focus:outline-none"
+                  placeholder="e.g. Build a TokenRateLimiter utility class with sliding window..."
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-[#ebdbb2]">Language / Framework:</label>
+                  <select
+                    value={builderLanguage}
+                    onChange={(e: any) => setBuilderLanguage(e.target.value)}
+                    className="w-full mt-1.5 p-2.5 rounded-lg bg-[#282828] border border-[#3c3836] text-xs text-[#ebdbb2] focus:border-purple-400 focus:outline-none"
+                  >
+                    <option value="typescript">TypeScript</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="react">React Component</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-[#ebdbb2]">Target Directory:</label>
+                  <input
+                    type="text"
+                    value={builderTargetDir}
+                    onChange={(e) => setBuilderTargetDir(e.target.value)}
+                    className="w-full mt-1.5 p-2 rounded-lg bg-[#282828] border border-[#3c3836] text-xs text-[#ebdbb2] focus:border-purple-400 focus:outline-none"
+                    placeholder="modules/security"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Results Display */}
+            {builderResult && (
+              <div className="p-5 rounded-xl bg-[#282828] border border-[#3c3836] space-y-4">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#ebdbb2] flex items-center gap-2">
+                    <CheckCircle2 className={`w-4 h-4 ${builderResult.status === 'success' ? 'text-emerald-400' : 'text-rose-400'}`} />
+                    <span>Build Result ({builderResult.id || 'Failed'})</span>
+                  </span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    builderResult.status === 'success' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  }`}>
+                    {builderResult.status?.toUpperCase()}
+                  </span>
+                </div>
+
+                {builderResult.error && (
+                  <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+                    {builderResult.error}
+                  </div>
+                )}
+
+                {builderResult.files && builderResult.files.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="text-xs font-bold text-purple-300">Generated & Saved Files ({builderResult.files.length}):</div>
+                    {builderResult.files.map((file: any, idx: number) => (
+                      <div key={idx} className="p-3 rounded-lg bg-[#1d2021] border border-[#3c3836] text-xs space-y-2">
+                        <div className="flex items-center justify-between font-bold text-purple-300">
+                          <span className="flex items-center gap-1.5">
+                            <FileCode className="w-3.5 h-3.5" />
+                            {file.path}
+                          </span>
+                          <span className="text-[10px] text-[#928374]">{file.description}</span>
+                        </div>
+                        <pre className="p-2.5 rounded bg-black/40 text-[11px] text-[#ebdbb2] overflow-x-auto max-h-48">
+                          {file.content}
+                        </pre>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {builderResult.integrationNotes && (
+                  <div className="text-xs text-[#928374]">
+                    <span className="font-bold text-[#ebdbb2]">Integration Notes: </span>
+                    {builderResult.integrationNotes.join(' • ')}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

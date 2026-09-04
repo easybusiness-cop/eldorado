@@ -2,6 +2,7 @@ import { Router } from "express";
 import { callGeminiResilient } from "../ai/geminiService.ts";
 import { SecurityAuthorizationService } from "../security/secrets.ts";
 import { SecurityAuditLedger } from "../security/auditLedger.ts";
+import { CapabilityRegistry } from "../../apps/control-plane/integrations/registry/capability.registry";
 
 export const adminRouter = Router();
 
@@ -272,3 +273,94 @@ adminRouter.get("/security-ledger", SecurityAuthorizationService.enforceClearanc
     res.status(500).json({ error: "Failed to load secure audit ledger" });
   }
 });
+
+// GET /api/admin/capabilities - list all capability definitions
+adminRouter.get("/capabilities", (req, res) => {
+  try {
+    const defs = CapabilityRegistry.listAllDefinitions();
+    res.json({ success: true, definitions: defs });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to list capabilities" });
+  }
+});
+
+// GET /api/admin/capabilities/agent/:agentId - list active capabilities for an agent
+adminRouter.get("/capabilities/agent/:agentId", (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const caps = CapabilityRegistry.getCapabilitiesForAgent(agentId);
+    res.json({ success: true, agentId, capabilities: caps });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to get agent capabilities" });
+  }
+});
+
+// GET /api/admin/capabilities/requests - list all capability requests (pending & historical)
+adminRouter.get("/capabilities/requests", (req, res) => {
+  try {
+    const requests = CapabilityRegistry.listAllRequests();
+    res.json({ success: true, requests });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to get requests" });
+  }
+});
+
+// POST /api/admin/capabilities/request - agents can request a power
+adminRouter.post("/capabilities/request", (req, res) => {
+  try {
+    const { agentId, capabilityId, reason } = req.body;
+    if (!agentId || !capabilityId || !reason) {
+      return res.status(400).json({ error: "agentId, capabilityId, and reason are required" });
+    }
+    const request = CapabilityRegistry.requestCapability(agentId, capabilityId, reason);
+    res.json({ success: true, request });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to submit request" });
+  }
+});
+
+// POST /api/admin/capabilities/resolve - approve or reject a capability request
+adminRouter.post("/capabilities/resolve", SecurityAuthorizationService.enforceClearance('ADMIN'), (req, res) => {
+  try {
+    const { requestId, decision } = req.body;
+    if (!requestId || !decision) {
+      return res.status(400).json({ error: "requestId and decision are required" });
+    }
+    const resolved = CapabilityRegistry.resolveRequest(requestId, decision, "admin");
+    if (!resolved) {
+      return res.status(404).json({ error: "Request not found or already resolved" });
+    }
+    res.json({ success: true, request: resolved });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to resolve request" });
+  }
+});
+
+// POST /api/admin/capabilities/grant - manually grant a capability
+adminRouter.post("/capabilities/grant", SecurityAuthorizationService.enforceClearance('ADMIN'), (req, res) => {
+  try {
+    const { agentId, capabilityId, notes } = req.body;
+    if (!agentId || !capabilityId) {
+      return res.status(400).json({ error: "agentId and capabilityId are required" });
+    }
+    const success = CapabilityRegistry.grantCapability(agentId, capabilityId, "admin", notes);
+    res.json({ success });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to grant capability" });
+  }
+});
+
+// POST /api/admin/capabilities/revoke - manually revoke a capability
+adminRouter.post("/capabilities/revoke", SecurityAuthorizationService.enforceClearance('ADMIN'), (req, res) => {
+  try {
+    const { agentId, capabilityId } = req.body;
+    if (!agentId || !capabilityId) {
+      return res.status(400).json({ error: "agentId and capabilityId are required" });
+    }
+    const success = CapabilityRegistry.revokeCapability(agentId, capabilityId);
+    res.json({ success });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to revoke capability" });
+  }
+});
+

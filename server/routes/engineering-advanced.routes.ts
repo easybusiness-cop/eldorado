@@ -3,6 +3,7 @@ import { MasterProposalService } from '../agents/capabilities/master-self-improv
 import { RepoLearningEngine } from '../knowledge/repositories/repo-learning-engine.ts';
 import { FailureSchoolService } from '../training/failures/failure-school.service.ts';
 import { LabRunner } from '../training/labs/lab-runner.ts';
+import { SoftwareBuilder } from '../core/builder/software-builder.ts';
 
 export const engineeringAdvancedRouter = Router();
 
@@ -137,3 +138,29 @@ engineeringAdvancedRouter.post('/training/labs/:labId/run', (req, res) => {
   const result = LabRunner.executeLab(req.params.labId, agentId);
   res.json({ success: true, labResult: result });
 });
+
+// ==========================================
+// AUTONOMOUS SOFTWARE BUILDER SERVICE
+// ==========================================
+
+// POST /api/engineering/builder/build
+engineeringAdvancedRouter.post('/builder/build', async (req, res) => {
+  try {
+    const { objective, language = 'typescript', targetDir = 'modules' } = req.body;
+    if (!objective) {
+      return res.status(400).json({ error: 'objective parameter is required' });
+    }
+
+    const result = await SoftwareBuilder.build({
+      objective,
+      language,
+      targetDir,
+      agentId: 'ruflo',
+    });
+
+    res.json({ success: true, result });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || String(err) });
+  }
+});
+

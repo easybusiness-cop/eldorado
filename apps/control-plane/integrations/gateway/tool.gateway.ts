@@ -7,6 +7,8 @@ import { GitAdapter } from "../adapters/git.adapter";
 import { StorageAdapter } from "../adapters/storage.adapter";
 import { WebResearchAdapter } from "../adapters/web.adapter";
 import { CodeExecutionAdapter } from "../adapters/code-execution.adapter";
+import { ComputerUseAdapter } from "../adapters/computer-use.adapter";
+import { ProjectWriterAdapter } from "../adapters/project-writer.adapter";
 import { CapabilityRegistry } from "../registry/capability.registry";
 import { RiskCalculator } from "../../../../risk-engine/risk.calculator";
 import { PolicyEngine } from "./policy.middleware";
@@ -79,6 +81,8 @@ export class ToolGateway {
     this.registerAdapter(new StorageAdapter());
     this.registerAdapter(new WebResearchAdapter());
     this.registerAdapter(new CodeExecutionAdapter());
+    this.registerAdapter(new ComputerUseAdapter());
+    this.registerAdapter(new ProjectWriterAdapter());
   }
 
   public registerAdapter(adapter: BaseAdapter): void {

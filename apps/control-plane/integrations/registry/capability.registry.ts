@@ -85,6 +85,23 @@ export class CapabilityRegistry {
       { id: "cloud_storage.upload", tool: "cloud_storage", action: "upload", description: "Upload a file", category: "storage", baseRisk: "MEDIUM" },
       { id: "cloud_storage.download", tool: "cloud_storage", action: "download", description: "Download a file", category: "storage", baseRisk: "LOW" },
       { id: "cloud_storage.list", tool: "cloud_storage", action: "list", description: "List storage objects", category: "storage", baseRisk: "LOW" },
+
+      // Computer Use / Browser
+      { id: "computer-use.navigate", tool: "computer-use", action: "navigate", description: "Navigate browser to URL", category: "system", baseRisk: "MEDIUM" },
+      { id: "computer-use.click", tool: "computer-use", action: "click", description: "Click an element", category: "system", baseRisk: "MEDIUM" },
+      { id: "computer-use.type", tool: "computer-use", action: "type", description: "Type text into an element", category: "system", baseRisk: "MEDIUM" },
+      { id: "computer-use.extract_text", tool: "computer-use", action: "extract_text", description: "Extract text from page", category: "system", baseRisk: "LOW" },
+      { id: "computer-use.screenshot", tool: "computer-use", action: "screenshot", description: "Take a screenshot", category: "system", baseRisk: "LOW" },
+      { id: "computer-use.evaluate", tool: "computer-use", action: "evaluate", description: "Evaluate JS in page", category: "system", baseRisk: "HIGH" },
+      { id: "computer-use.close", tool: "computer-use", action: "close", description: "Close the browser", category: "system", baseRisk: "LOW" },
+
+      // Project Writer
+      { id: "project-writer.write_file", tool: "project-writer", action: "write_file", description: "Write a source file", category: "development", baseRisk: "MEDIUM", requiresEngineeringRole: true },
+      { id: "project-writer.read_file", tool: "project-writer", action: "read_file", description: "Read a source file", category: "development", baseRisk: "LOW", requiresEngineeringRole: true },
+      { id: "project-writer.list_files", tool: "project-writer", action: "list_files", description: "List project files", category: "development", baseRisk: "LOW", requiresEngineeringRole: true },
+      { id: "project-writer.append_file", tool: "project-writer", action: "append_file", description: "Append to a file", category: "development", baseRisk: "MEDIUM", requiresEngineeringRole: true },
+      { id: "project-writer.delete_file", tool: "project-writer", action: "delete_file", description: "Delete a file", category: "development", baseRisk: "HIGH", requiresEngineeringRole: true },
+      { id: "project-writer.create_directory", tool: "project-writer", action: "create_directory", description: "Create a directory", category: "development", baseRisk: "LOW", requiresEngineeringRole: true },
     ];
 
     for (const d of defs) {
@@ -111,6 +128,19 @@ export class CapabilityRegistry {
       "code-execution.run_javascript", "code-execution.run_typescript",
       "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files",
       "http.fetch_endpoint",
+      "computer-use.navigate",
+      "computer-use.click",
+      "computer-use.type",
+      "computer-use.extract_text",
+      "computer-use.screenshot",
+      "computer-use.evaluate",
+      "computer-use.close",
+      "project-writer.write_file",
+      "project-writer.read_file",
+      "project-writer.list_files",
+      "project-writer.append_file",
+      "project-writer.delete_file",
+      "project-writer.create_directory",
     ];
 
     const researchHeavy = [
@@ -133,6 +163,8 @@ export class CapabilityRegistry {
       "google-search.search", "google-search.fetch_public_page", "google-search.extract_text", "google-search.multi_hop_research",
       "code-execution.run_javascript", "code-execution.run_typescript",
       "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files",
+      "project-writer.write_file", "project-writer.read_file", "project-writer.list_files",
+      "project-writer.append_file", "project-writer.delete_file", "project-writer.create_directory",
     ]);
     grant("stanley", researchHeavy);
     grant("ryan", researchHeavy);
@@ -247,6 +279,10 @@ export class CapabilityRegistry {
 
   static listPendingRequests(): CapabilityRequest[] {
     return Array.from(this.requests.values()).filter((r) => r.status === "PENDING");
+  }
+
+  static listAllRequests(): CapabilityRequest[] {
+    return Array.from(this.requests.values());
   }
 
   static listRequestsForAgent(agentId: string): CapabilityRequest[] {

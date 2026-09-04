@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { knowledgeGraph } from "../core/memory/knowledge-graph";
 
 export const knowledgeRouter = Router();
 
@@ -146,3 +147,53 @@ knowledgeRouter.post("/learn", (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+// GET /api/knowledge/graph - retrieve complete Knowledge Graph data (nodes, edges, episodes)
+knowledgeRouter.get("/graph", (req, res) => {
+  try {
+    const data = knowledgeGraph.getGraphData();
+    res.json({ success: true, ...data });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Failed to retrieve knowledge graph data" });
+  }
+});
+
+// POST /api/knowledge/graph/node - create a node in Knowledge Graph
+knowledgeRouter.post("/graph/node", (req, res) => {
+  try {
+    const { type, label, content, tags, metadata, importance } = req.body;
+    if (!type || !label || !content) {
+      return res.status(400).json({ success: false, error: "type, label, and content are required" });
+    }
+    const node = knowledgeGraph.addNode({ type, label, content, tags, metadata, importance });
+    res.json({ success: true, node });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Failed to add node" });
+  }
+});
+
+// POST /api/knowledge/graph/edge - create a relation/edge in Knowledge Graph
+knowledgeRouter.post("/graph/edge", (req, res) => {
+  try {
+    const { from, to, relation, weight } = req.body;
+    if (!from || !to || !relation) {
+      return res.status(400).json({ success: false, error: "from, to, and relation are required" });
+    }
+    const edge = knowledgeGraph.addEdge(from, to, relation, weight);
+    res.json({ success: true, edge });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Failed to add edge" });
+  }
+});
+
+// GET /api/knowledge/graph/search - search nodes
+knowledgeRouter.get("/graph/search", (req, res) => {
+  try {
+    const { q, limit } = req.query;
+    const nodes = knowledgeGraph.searchNodes(String(q || ""), limit ? Number(limit) : undefined);
+    res.json({ success: true, nodes });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Search failed" });
+  }
+});
+
