@@ -56,19 +56,66 @@ Provides administrators complete visibility and control over all software module
 
 ---
 
-## 🚀 Newly Implemented System Modules
+## 📋 Granular Feature Directory & Function Walkthrough
 
-### 🌐 Live Public API Integrator Hub & Pipeline Workbench
-An interactive API testing terminal and live data routing engine designed to fetch live public datasets and pipe them seamlessly into the autonomous workspace agent queues.
-- **Preconfigured Endpoints**: Includes real-time **Open-Meteo Weather forecasts** (Tokyo & New York), live **CoinGecko Crypto Market rates** (BTC, ETH, SOL), and structured **JSONPlaceholder database resources** (Users & Posts).
-- **Dynamic Parameter Builder**: Modifies API search queries on-the-fly and displays real-time HTTP response status, headers, and formatted JSON payloads.
-- **Agent Pipeline Piping**: Enables users to assign any active agent (Dwight, Michael, Jim, etc.) to immediately parse the live API response payload, verify business rule compliance thresholds, and update local logs.
+Below is a detailed guide specifying every visual module, button action, input field, and output response integrated into the Rufflo Command Network.
 
-### 🎓 Autonomous Task Training & Publishing Workstation (Agent Academy L3)
-Integrated deep training and curation pipeline situated inside the CSE Agent Academy.
-- **Specification Coder**: Lets administrators build customized, high-priority task specifications and operational instructions for specialized agents.
-- **Sandboxed Compilation Simulation**: Simulates abstract syntax tree (AST) code scanning, safety temperature adjustments, zero-trust validation checks, and dry-run compilations.
-- **One-Click Dispatch Gateway**: Seamlessly registers the verified task template directly into the live company queue for immediate autonomous execution.
+### 1. ⌨️ Global Command Palette (`Cmd + K` or `Ctrl + K`)
+A keyboard-driven command-center shortcut that allows instant directory traversal and application routing:
+- **`Search Input Field`**: Uses fuzzy search to index active agent employee cards, running tasks, standard operating procedures, and 13-floor building department layouts.
+- **`Navigation List`**: Selectable list items displaying direct navigation tags. Supports arrow keys (`↑` / `↓`) and `Enter` keys to run actions without mouse clicks.
+- **`Quick Commands`**: Triggers quick functions including mounting a sandbox terminal, checking real-time database connections, opening the Agent Academy, or launching Toby’s Self-Healer.
+
+### 🏢 2. Munder Diffl.in Enterprise Dashboard & Agent Roster
+The central control panel tracking fleet performance, authority levels, and quantum superposition alignment:
+- **`Agent Card Grid`**: Renders 16 specialized corporate employees (Michael, Dwight, Jim, Pam, Angela, Creed, etc.) with:
+  - **`Authority Level Meter`**: Visual meter displaying authorization scale (Level 1 to Level 100).
+  - **`Clearance Level Badge`**: Tags displaying permissions classifications (`ADMIN`, `SECURE`, or `PUBLIC`).
+  - **`Quantum Alignment Button`**: Triggers a simulated quantum phase coherence calculation, plotting the agent's wavefunction superposition probability.
+- **`Voice Speech Toggle`**: Dynamically toggles speech synthesis, allowing agent diagnostic descriptions and logs to be spoken aloud.
+- **`Task Dispatch Panel`**: Input fields to assign tasks to specific agents, set high/low priority, and track execution percentage loops.
+
+### 🌐 3. Live Public API Integrator Hub & workbench
+An interactive data engine built to feed live public APIs directly into employee agent reasoning matrices:
+- **`Endpoint Selector Tab`**: Switch between preconfigured live external routes:
+  - **Open-Meteo Weather**: Live weather and atmospheric forecasts for New York or Tokyo.
+  - **CoinGecko Crypto**: Live cryptocurrency market rates for BTC, ETH, and SOL.
+  - **JSONPlaceholder DB**: Static mock tables for testing users, posts, and directories.
+- **`Query Parameters Overrider`**: Text fields to append custom search parameters or API headers on-the-fly.
+- **`Send HTTP Request Button`**: Fires real-time API fetches, printing visual status codes (e.g., `200 OK`), response header parameters, and formatted JSON data blocks.
+- **`Agent Pipeline Director`**: Dropdown selectors that pipe the fetched JSON payload to any active agent (Dwight, Creed, etc.) to run compliance scans and append reports.
+
+### 🎓 4. Autonomous CSE Agent Academy & Task Compiler (L3)
+An isolated workspace built to design, compile, and publish new operational instructions to the fleet queue:
+- **`Specification Input Forms`**: Fields to write high-priority task rules, define clearance categories, and configure instruction prompt structures.
+- **`Dry-Run Compiler Simulation Button`**: Starts a multi-phase precheck scanning Abstract Syntax Tree (AST) integrity, safety levels, and security boundaries.
+- **`One-Click Dispatch Gateway`**: Registers the fully verified, compiled playbooks directly into the company queue for autonomous execution.
+
+### 🛡️ 5. DevOps SRE Telemetry & Self-Healing Terminal
+A real-time control console designed to monitor system health and resolve execution failures:
+- **`Start Compiler Loop Button`**: Initiates a dynamic compilation run, stepping through stateful phases: `writing`, `security_audit`, `lint_compile`, and `completed`.
+- **`Monospace Compiler Log Stream`**: Live terminal printout rendering raw system compilation outputs.
+- **`Fault Injection Dropdown`**: Allows administrators to intentionally trigger synthetic errors to test system resiliency:
+  - **Hook Loop Leaks**: Infinite state-mutation loops inside components.
+  - **AST Tokenizer Crashes**: Corrupt JSX formatting or broken delimiters.
+  - **Sandbox Security Violations**: Unsafe global process/window memory write attempts.
+- **`Agent Dialogue Speech Bubble`**: Upon fault detection, the linter catches it, flag-lights the corresponding AST diagram node in vibrant crimson red, and presents a **meaningful, highly contextual dialogue speech bubble** from the responsible diagnostic agent (Ruflo Coder, Dwight Schrute, or Toby Flenderson) explaining the precise root cause and proposing clear solutions.
+- **`Self-Heal Daemon Button`**: Executes Toby's automated healer script, hot-patches memory references, restores stable AST nodes, and triggers celebration effects upon recovery.
+
+### 🗄️ 6. Interactive Code Artifact Vault & Sandboxed Testbed
+Provides absolute visibility and local download handlers for compiled software files:
+- **`Artifact Selection Dropdown`**: Instantly switches code viewer contexts between `App.tsx` (Core Frontend), `TelemetryDashboard.tsx` (Telemetry metrics), and `ComplianceAudit.ts` (SecOps policies).
+- **`Quick Copy Button`**: Copies the compiled code block directly to the system clipboard.
+- **`Download Anchor Link`**: Synthesizes a local data-URI script and starts an instant standalone file download directly to the desktop.
+- **`Execute VM Test-Suite Button`**: Simulates sandboxed V8 execution checks and prints compilation validation checklists.
+
+### 🔌 7. Workspace & Social Media Connectors
+Simulates corporate SaaS connections to sync organizational data and automate promotional posts:
+- **`Google Workspace Tab`**:
+  - **`Gmail Client Fetcher`**: Pulls simulated inbox payloads and email threads.
+  - **`Calendar Sync Panel`**: Connects and schedules corporate calendar events.
+  - **`Sheets Exporter`**: Outputs current fleet logs into spreadsheet structures.
+- **`Social Media Tab`**: Handles automated marketing campaigns, allowing users to write promotional copy and schedule instant campaigns across Instagram and LinkedIn channels.
 
 ---
 
@@ -115,17 +162,6 @@ Integrated deep training and curation pipeline situated inside the CSE Agent Aca
 │   └── constants/                # Department budgets, policies, and pipelines
 │   └── tsconfig.json             # Root TypeScript options
 ```
-
----
-
-## ⌨️ Keyboard Shortcuts & Features
-
-- **Quick Search Command Palette (`Cmd + K` or `Ctrl + K`)**:
-  - Quickly search across all **Agents & Employees** (Michael, Dwight, Jim, Pam, Angela, Toby, Kelly, Ruflo Coder, etc.).
-  - Search and inspect **Fleet Tasks & Standups**.
-  - Search across **Corporate Departments & Floorplans**.
-  - Trigger System Tools: Sandboxed Node VM / IDE, 24/7 Self-Healing Cockpit, CSE Agent Academy, Repos Hub, View Switcher.
-  - Arrow key (`↑` / `↓`) and `Enter` keyboard navigation with instant fuzzy search.
 
 ---
 
