@@ -117,6 +117,22 @@ Simulates corporate SaaS connections to sync organizational data and automate pr
   - **`Sheets Exporter`**: Outputs current fleet logs into spreadsheet structures.
 - **`Social Media Tab`**: Handles automated marketing campaigns, allowing users to write promotional copy and schedule instant campaigns across Instagram and LinkedIn channels.
 
+### 6. 🚀 Autonomous Software Construction & LLM Builder Engine
+Allows the fleet to dynamically write real, production-ready code files, assemble barrel exports, and run live smoke tests.
+- **Project Writer Adapter (`apps/control-plane/integrations/adapters/project-writer.adapter.ts`)**: Safe file creation and directory management with strict path-traversal prevention.
+- **LLM Software Builder (`server/core/builder/software-builder.ts`)**: Gemini-driven code generation that plans, creates source files, generates module index barrel files, and executes smoke tests.
+- **Master Orchestrator Integration (`server/core/orchestration/master-orchestrator.ts`)**: Automatically routes structural build objectives directly to the `SoftwareBuilder`.
+- **Dev Suite UI (`src/components/IdeModal.tsx`)**: An interactive **Software Builder** tab inside the IDE Dev Suite allowing team members to initiate builds, select target frameworks, inspect generated code previews, and examine execution notes.
+
+### 7. 🌐 Computer Use & Headless Browser Automation (Playwright)
+Enables agent fleet members to interact with live web applications and desktop workflows:
+- **Playwright-Powered Automation**: Supports `navigate`, `click`, `type`, `extract_text`, `screenshot`, and `evaluate` actions.
+- **Visual Capture**: Takes live viewport screenshots and feeds extracted DOM text into agent memory context windows.
+
+### 8. 🧠 Persistent Knowledge Graph & Dynamic Capability Registry
+- **Knowledge Graph**: Tracks concepts, relationships, and episodic memory histories across sessions (`.rufflo-memory/knowledge-graph.json`).
+- **Dynamic Capability Registry**: Fine-grained role-based capability grants (`CapabilityRegistry`) and risk rules (`RiskCalculator`) enforcing human-in-the-loop approvals for destructive operations.
+
 ---
 
 ## 🗺️ Master Open-Source Repository Integration Map
