@@ -7,6 +7,7 @@ import { GitAdapter } from "../adapters/git.adapter";
 import { StorageAdapter } from "../adapters/storage.adapter";
 import { WebResearchAdapter } from "../adapters/web.adapter";
 import { CodeExecutionAdapter } from "../adapters/code-execution.adapter";
+import { CapabilityRegistry } from "../registry/capability.registry";
 import { RiskCalculator } from "../../../../risk-engine/risk.calculator";
 import { PolicyEngine } from "./policy.middleware";
 import { ApprovalService } from "../../approvals/approval.service";
@@ -115,72 +116,21 @@ export class ToolGateway {
         throw new Error(`Capabilities Violation: Engineering tool capabilities (${normalizedTool}.${req.action}) are strictly restricted to Software Engineer agents. Employee '${employee.name}' (${employee.role}) in department '${employee.department}' is not a Software Engineer.`);
       }
 
-      // 3. Load capabilities and verify Agent Tool declaration registration (Least privilege check)
-      const agentRoleCapabilities: Record<string, string[]> = {
-        "david": [
-          "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
-          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
-          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
-        ],
-        "oscar": [
-          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query",
-          "stripe.create_invoice", "stripe.inspect_balance"
-        ],
-        "dwight": [
-          "postgresql.select", "postgresql.insert", "postgresql.execute_query",
-          "slack.post_message", "cloud_storage.upload", "cloud_storage.download"
-        ],
-        "toby": [
-          "postgresql.select", "postgresql.execute_query",
-          "cloud_storage.list", "cloud_storage.upload"
-        ],
-        "pete": [
-          "github.list_repositories", "github.create_branch", "github.create_commit", "github.create_pull_request",
-          "postgresql.select", "postgresql.execute_query",
-          "google-search.search", "google-search.fetch_public_page",
-          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
-        ],
-        "michael": [
-          "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
-          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
-          "stripe.create_invoice", "stripe.inspect_balance",
-          "slack.post_message", "cloud_storage.upload", "cloud_storage.download", "cloud_storage.list",
-          "google-search.search", "google-search.fetch_public_page", "google-search.search",
-          "http.fetch_endpoint",
-          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
-        ],
-        "kevin": [
-          "postgresql.select", "postgresql.execute_query",
-          "stripe.inspect_balance",
-          "http.fetch_endpoint"
-        ],
-        "ruflo": [
-          "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
-          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
-          "http.fetch_endpoint",
-          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
-        ],
-        "cline": [
-          "github.list_repositories", "github.inspect_repository", "github.create_branch", "github.create_commit", "github.create_pull_request", "github.inspect_pull_request", "github.comment_on_pull_request", "github.merge_pull_request", "github.trigger_workflow",
-          "postgresql.select", "postgresql.insert", "postgresql.update", "postgresql.execute_query", "postgresql.alter_schema",
-          "http.fetch_endpoint",
-          "code-execution.run_javascript", "code-execution.run_typescript", "code-execution.write_temp_file", "code-execution.read_temp_file", "code-execution.list_temp_files"
-        ],
-        "ryan": [
-          "postgresql.select", "postgresql.execute_query",
-          "google-search.search", "google-search.fetch_public_page"
-        ],
-        "stanley": [
-          "postgresql.select", "postgresql.execute_query",
-          "google-search.search", "google-search.fetch_public_page"
-        ]
-      };
-
-      const allowedCaps = agentRoleCapabilities[employee.id] || ["google-search.search", "google-search.fetch_public_page", "postgresql.select", "postgresql.execute_query"];
+      // 3. Dynamic Capability Check (via CapabilityRegistry)
       const requestedCap = `${normalizedTool}.${req.action}`;
 
-      if (!allowedCaps.includes(requestedCap)) {
-        throw new Error(`Capabilities Violation: Employee / Agent '${employee.name}' does not possess explicit registration for capability: "${requestedCap}".`);
+      if (!CapabilityRegistry.hasCapability(employee.id, requestedCap)) {
+        // Allow the agent to formally request the missing capability
+        const request = CapabilityRegistry.requestCapability(
+          employee.id,
+          requestedCap,
+          req.reason || `Agent attempted to use ${requestedCap}`
+        );
+
+        throw new Error(
+          `Capabilities Violation: Employee / Agent '${employee.name}' does not possess capability "${requestedCap}". ` +
+          `A formal request has been created (ID: ${request.id}). An administrator can approve it.`
+        );
       }
 
       // 4. Calculate Risk through Risk Engine
