@@ -69,9 +69,15 @@ export const MasterSelfEvolutionModal: React.FC<MasterSelfEvolutionModalProps> =
 
   const fetchFailures = async () => {
     try {
-      const res = await fetch('/api/v2/training/failures');
+      const res = await fetch('/api/autonomy/failures');
       const data = await res.json();
-      if (data.success) setFailures(data.failures);
+      if (data.success && data.records) {
+        setFailures(data.records);
+      } else {
+        const fallbackRes = await fetch('/api/v2/training/failures');
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success) setFailures(fallbackData.failures);
+      }
     } catch (e) {
       console.error('Fetch failures error:', e);
     }
@@ -129,20 +135,32 @@ export const MasterSelfEvolutionModal: React.FC<MasterSelfEvolutionModalProps> =
   };
 
   const handleIngestRepo = async () => {
-    if (!newRepoUrl || !newRepoName) return;
+    if (!newRepoUrl) return;
     soundFx.playClick();
     setRepoLoading(true);
     try {
-      const res = await fetch('/api/v2/repositories/ingest', {
+      const res = await fetch('/api/autonomy/ingest-repo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repoUrl: newRepoUrl, name: newRepoName }),
+        body: JSON.stringify({ repository: newRepoUrl }),
       });
       const data = await res.json();
       if (data.success) {
         setNewRepoUrl('');
         setNewRepoName('');
         fetchRepositories();
+      } else {
+        const fallbackRes = await fetch('/api/v2/repositories/ingest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repoUrl: newRepoUrl, name: newRepoName || 'Repository Knowledge' }),
+        });
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success) {
+          setNewRepoUrl('');
+          setNewRepoName('');
+          fetchRepositories();
+        }
       }
     } catch (e) {
       console.error('Ingest repo error:', e);

@@ -1,4 +1,4 @@
-import vm from "vm";
+import { runInIsolatedProcess } from "../security/isolatedRunner.ts";
 import { debugTelemetry } from "../telemetry/debugTelemetry.ts";
 import { ServerSecurityBroker, PolicyContext } from "../security/executionBroker.ts";
 
@@ -56,65 +56,9 @@ export function executeAndApplySystemCode(
     resource: target,
   };
 
-  // 2. Define standard VM execution block
+  // 2. Define isolated container / microVM worker execution pattern
   const actualRunner = (cleanScriptCode: string) => {
-    const localLogs: string[] = [];
-    const sandbox = {
-      console: {
-        log: (...args: any[]) => localLogs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-        error: (...args: any[]) => localLogs.push("[ERROR] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-        warn: (...args: any[]) => localLogs.push("[WARN] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-      },
-      Math,
-      Date,
-      JSON,
-      parseInt,
-      parseFloat,
-      Array,
-      Object,
-      String,
-      Number,
-      Boolean,
-      RegExp,
-      systemRuntime: {
-        activeWorkers: 9,
-        hotPatchVersion: debugTelemetry.patchesApplied + 1,
-        fleetState: "OPERATIONAL",
-      },
-      userContext: context,
-    };
-
-    let scriptResult: any = null;
-    let runStatus: "active" | "error" = "active";
-
-    try {
-      const vmContext = vm.createContext(sandbox);
-      const script = new vm.Script(`
-        (() => {
-          try {
-            ${cleanScriptCode}
-          } catch (e) {
-            console.error(e.message);
-            return { error: e.message };
-          }
-        })()
-      `);
-
-      scriptResult = script.runInContext(vmContext, { timeout: 3500 });
-      if (scriptResult && scriptResult.error) {
-        runStatus = "error";
-      }
-    } catch (err: any) {
-      runStatus = "error";
-      localLogs.push(`[FATAL] ${err.message}`);
-      scriptResult = { error: err.message };
-    }
-
-    return {
-      status: runStatus,
-      output: scriptResult,
-      logs: localLogs,
-    };
+    return runInIsolatedProcess(cleanScriptCode, context, debugTelemetry.patchesApplied + 1);
   };
 
   // 3. Dispatch to Server-side Security Broker (evaluating policy, scanning risk, isolated workers compilation)

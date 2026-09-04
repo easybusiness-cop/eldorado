@@ -1,7 +1,6 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
-import vm from "vm";
 import { hqService } from "../../src/services/hqService.ts";
 import { companyDb } from "../../src/db/companyDb.ts";
 import { eventBus } from "../events/eventBus.ts";

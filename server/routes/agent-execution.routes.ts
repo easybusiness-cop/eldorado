@@ -1,7 +1,7 @@
 import { Router } from "express";
 import express from "express";
 import { BrowserUseEngine } from "../tools/browser/browser-use.ts";
-import vm from "vm";
+import { runInIsolatedProcess } from "../security/isolatedRunner.ts";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { Octokit } from "@octokit/rest";
@@ -68,41 +68,10 @@ export const handleSandboxedCodeExecution = async (req: express.Request, res: ex
       });
     }
 
-    // 2. Sandboxed V8 Context Execution
-    const consoleLogs: string[] = [];
-    const sandbox = {
-      console: {
-        log: (...args: any[]) => consoleLogs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-        error: (...args: any[]) => consoleLogs.push("[ERR] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-        warn: (...args: any[]) => consoleLogs.push("[WARN] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-      },
-      Math,
-      Date,
-      JSON,
-      parseInt,
-      parseFloat,
-      Array,
-      Object,
-      String,
-      Number,
-      Boolean,
-      RegExp,
-      context,
-    };
-
-    const vmContext = vm.createContext(sandbox);
-    const script = new vm.Script(`
-      (() => {
-        try {
-          ${code}
-        } catch (e) {
-          console.error(e.message);
-          return { error: e.message };
-        }
-      })()
-    `);
-
-    const result = script.runInContext(vmContext, { timeout: 4000 });
+    // 2. Ephemeral Container / MicroVM Worker Sandbox Execution
+    const execution = runInIsolatedProcess(code, context);
+    const consoleLogs = execution.logs;
+    const result = execution.output;
     const executionTimeMs = Date.now() - startTime;
 
     res.json({

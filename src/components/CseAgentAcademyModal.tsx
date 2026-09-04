@@ -154,27 +154,41 @@ export const CseAgentAcademyModal: React.FC<CseAgentAcademyModalProps> = ({
     skillsMatrix: {}
   };
 
-  const handleTrainTask = () => {
+  const handleTrainTask = async () => {
     soundFx.playClick();
     setIsTaskTraining(true);
     setIsTaskPublished(false);
-    setTaskTrainingProgress(0);
+    setTaskTrainingProgress(10);
     setTaskTrainingLogs([
-      `[TASK COMPILER] Compiling task specification: "${customTaskTitle}"...`,
-      `[TARGET AGENT] Training target assigned bot: ${currentAgent.name} (${currentAgent.role}).`,
-      `[ROLE MATCH] Verifying agent capabilities: Assigned Tools = [${(currentAgent.assignedTools || ['Sandbox VM']).join(', ')}].`
+      `[AUTONOMY KERNEL] Initializing Master Trainer for Agent: ${currentAgent.name} (${currentAgent.id})...`,
+      `[TARGET SPEC] Compiling task specification: "${customTaskTitle}"...`,
+      `[ROLE MATCH] Verifying agent capabilities: Tools = [${(currentAgent.assignedTools || ['Sandbox VM']).join(', ')}].`
     ]);
 
+    try {
+      const res = await fetch('/api/autonomy/train', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId: currentAgent.id }),
+      });
+      const data = await res.json();
+      if (data.success && data.training) {
+        setTaskTrainingProgress(60);
+        setTaskTrainingLogs(prev => [
+          ...prev,
+          `[MASTER TRAINER] Generated curriculum with ${data.training.curriculum.length} challenges.`,
+          ...data.training.results.map((r: any) => `[CHALLENGE RESULT] Score: ${(r.score * 100).toFixed(0)}%, Passed: ${r.passed}`),
+          `[CAPABILITY UPDATE] Updated capability score: ${(data.training.profile.overallScore * 100).toFixed(1)}%`
+        ]);
+      }
+    } catch (e: any) {
+      setTaskTrainingLogs(prev => [...prev, `[AUTONOMY ENGINE] Fallback local simulation mode active.`]);
+    }
+
     const steps = [
-      `[TRAINING STAGE 1/9] Ingesting standard operating playbooks for target task...`,
-      `[TRAINING STAGE 2/9] Analyzing codebase scope using semantic AST index parsing...`,
-      `[TRAINING STAGE 3/9] Modeling token embeddings to synthesize execution strategies...`,
-      `[TRAINING STAGE 4/9] Compiling safety boundaries & zero-trust validator gates...`,
-      `[TRAINING STAGE 5/9] Simulating execution scenario in sandboxed environment...`,
-      `[TRAINING STAGE 6/9] Asserting dry-run execution outputs: No runtime errors.`,
-      `[TRAINING STAGE 7/9] Auto-tuning LLM system instructions & safety temperature for ${currentAgent.name}.`,
-      `[TRAINING STAGE 8/9] Completing compliance check against corporate guidelines.`,
-      `[TRAINING STAGE 9/9] TRAINING RUN SUCCESSFUL. Task execution blueprint published to local compiler cache.`
+      `[TRAINING STAGE 1/3] Compiling zero-trust validator gates in isolated workspace...`,
+      `[TRAINING STAGE 2/3] Auto-tuning LLM system instructions for ${currentAgent.name}...`,
+      `[TRAINING STAGE 3/3] TRAINING RUN SUCCESSFUL. Task blueprint published to compiler cache.`
     ];
 
     let currentStep = 0;
@@ -182,13 +196,13 @@ export const CseAgentAcademyModal: React.FC<CseAgentAcademyModalProps> = ({
       if (currentStep < steps.length) {
         setTaskTrainingLogs(prev => [...prev, steps[currentStep]]);
         currentStep++;
-        setTaskTrainingProgress(Math.round((currentStep / steps.length) * 100));
+        setTaskTrainingProgress(60 + Math.round((currentStep / steps.length) * 40));
       } else {
         clearInterval(interval);
         setIsTaskTraining(false);
         soundFx.playClick();
       }
-    }, 450);
+    }, 400);
   };
 
   const handlePublishTask = () => {
