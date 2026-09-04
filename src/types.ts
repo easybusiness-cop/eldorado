@@ -604,6 +604,8 @@ export interface AppliedSystemModule {
   logs: string[];
   output?: any;
   target: 'system_runtime' | 'fleet_engine' | 'website_dom';
+  riskScore?: number;
+  riskLevel?: string;
 }
 
 // ==========================================

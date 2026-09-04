@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { callGeminiResilient } from "../ai/geminiService.ts";
+import { SecurityAuthorizationService } from "../security/secrets.ts";
+import { SecurityAuditLedger } from "../security/auditLedger.ts";
 
 export const adminRouter = Router();
 
 // API: Administrator Task Orchestration & Multi-Employee Delegation
-adminRouter.post("/orchestrate-task", async (req, res) => {
+adminRouter.post("/orchestrate-task", SecurityAuthorizationService.enforceClearance('ADMIN'), async (req, res) => {
   try {
     const {
       prompt,
@@ -134,7 +136,7 @@ Respond in pure valid JSON matching this schema:
 });
 
 // API: Analyze Task Outcome & Generate Strategic Corporate Executive Report
-adminRouter.post("/analyze-task-outcome", async (req, res) => {
+adminRouter.post("/analyze-task-outcome", SecurityAuthorizationService.enforceClearance('SECURE'), async (req, res) => {
   try {
     const {
       prompt,
@@ -255,5 +257,18 @@ Respond in pure, valid JSON matching this schema:
   } catch (err: any) {
     console.error("Task Analysis Error:", err);
     res.status(500).json({ error: err.message || "Failed to analyze task outcome" });
+  }
+});
+
+// GET /api/admin/security-ledger (Harden security audit trail, enforce high clearance level)
+adminRouter.get("/security-ledger", SecurityAuthorizationService.enforceClearance('ADMIN'), (req, res) => {
+  try {
+    const logs = SecurityAuditLedger.getLedger();
+    res.json({
+      success: true,
+      ledger: logs,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load secure audit ledger" });
   }
 });

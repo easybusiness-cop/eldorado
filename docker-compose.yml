@@ -7,8 +7,8 @@ services:
     container_name: munderdifflin-postgres
     environment:
       POSTGRES_DB: munderdifflin
-      POSTGRES_USER: munder_admin
-      POSTGRES_PASSWORD: munder_secure_password_9901
+      POSTGRES_USER: ${POSTGRES_USER:-munder_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-munder_secure_password_9901}
     ports:
       - "5432:5432"
     volumes:
@@ -51,7 +51,7 @@ services:
     image: hashicorp/vault:1.13
     container_name: munderdifflin-vault
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "munder_root_token_2026"
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID:-munder_root_token_2026}
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
     ports:
       - "8200:8200"
@@ -86,8 +86,8 @@ services:
       - NODE_ENV=development
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - WEBHOOK_SECRET=whsec_default_munder_sig
-      - DATABASE_URL=postgresql://munder_admin:munder_secure_password_9901@postgres:5432/munderdifflin
-      - VAULT_TOKEN=munder_root_token_2026
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munder_admin:munder_secure_password_9901@postgres:5432/munderdifflin}
+      - VAULT_TOKEN=${VAULT_TOKEN:-munder_root_token_2026}
     ports:
       - "3000:3000"
     depends_on:

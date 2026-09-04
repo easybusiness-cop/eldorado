@@ -6,6 +6,7 @@ import { hqService } from "../../src/services/hqService.ts";
 import { companyDb } from "../../src/db/companyDb.ts";
 import { eventBus } from "../events/eventBus.ts";
 import { callGeminiResilient, getGeminiClient } from "../ai/geminiService.ts";
+import { SecurityAuditLedger } from "../security/auditLedger.ts";
 
 export const hqRouter = Router();
 
@@ -311,6 +312,21 @@ hqRouter.get("/hq/cross-workflows", (req, res) => {
 // Entire Company OS details
 hqRouter.get("/company/details", (req, res) => {
   try {
+    const dbAudits = companyDb.getAudits() || [];
+    const secureLogs = SecurityAuditLedger.getLedger().map(log => ({
+      id: log.eventId,
+      agentId: log.actor || "sec-ops",
+      tool: "execution-broker",
+      action: `${log.action} on [${log.resource}] - Sandbox: ${log.isolationLevel}`,
+      inputHash: "sha256",
+      result: `${log.policyDecision.toUpperCase()} (Score: ${log.riskScore}, Stripped: ${log.credentialsStripped})`,
+      timestamp: log.timestamp,
+      riskLevel: log.riskLevel.toLowerCase(),
+      approvalRequired: log.riskLevel === "HIGH" || log.riskLevel === "CRITICAL",
+      approvedBy: log.policyDecision === "allow" ? "system-policy" : undefined,
+      executionId: log.eventId,
+    }));
+
     res.json({
       success: true,
       company: companyDb.getCompany(),
@@ -319,7 +335,7 @@ hqRouter.get("/company/details", (req, res) => {
       projects: companyDb.getProjects(),
       missions: companyDb.getMissions(),
       tasks: companyDb.getTasks(),
-      audits: companyDb.getAudits(),
+      audits: [...secureLogs, ...dbAudits],
       accounts: companyDb.getAccounts(),
     });
   } catch (err: any) {

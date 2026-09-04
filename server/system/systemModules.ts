@@ -1,5 +1,6 @@
 import vm from "vm";
 import { debugTelemetry } from "../telemetry/debugTelemetry.ts";
+import { ServerSecurityBroker, PolicyContext } from "../security/executionBroker.ts";
 
 export interface AppliedSystemModule {
   id: string;
@@ -12,6 +13,8 @@ export interface AppliedSystemModule {
   logs: string[];
   output?: any;
   target: "system_runtime" | "fleet_engine" | "website_dom";
+  riskScore?: number;
+  riskLevel?: string;
 }
 
 export const appliedSystemModules: AppliedSystemModule[] = [
@@ -35,70 +38,97 @@ export function executeAndApplySystemCode(
   name?: string,
   source = "ruflo_coder",
   target: "system_runtime" | "fleet_engine" | "website_dom" = "system_runtime",
-  context = {}
+  context: any = {}
 ): AppliedSystemModule {
   const cleanCode = (code || "").trim();
   const consoleLogs: string[] = [];
   const moduleName = name || `Auto-Patch-${Date.now().toString().slice(-4)} (${source})`;
 
-  const sandbox = {
-    console: {
-      log: (...args: any[]) => consoleLogs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-      error: (...args: any[]) => consoleLogs.push("[ERROR] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-      warn: (...args: any[]) => consoleLogs.push("[WARN] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
-    },
-    Math,
-    Date,
-    JSON,
-    parseInt,
-    parseFloat,
-    Array,
-    Object,
-    String,
-    Number,
-    Boolean,
-    RegExp,
-    systemRuntime: {
-      activeWorkers: 9,
-      hotPatchVersion: debugTelemetry.patchesApplied + 1,
-      fleetState: "OPERATIONAL",
-    },
-    userContext: context,
+  // 1. Extract context variables for Server-Side policy evaluation
+  const userProfile = context?.userProfile || {};
+  const actorRole = userProfile.role || context?.role || source || "guest";
+  const tenantId = context?.tenantId || "munderdiffl-default-tenant";
+
+  const policyCtx: PolicyContext = {
+    actor: actorRole,
+    tenant: tenantId,
+    capability: "SYSTEM_CODE_EXECUTION",
+    resource: target,
   };
 
-  let executionResult: any = null;
-  let status: "active" | "error" = "active";
+  // 2. Define standard VM execution block
+  const actualRunner = (cleanScriptCode: string) => {
+    const localLogs: string[] = [];
+    const sandbox = {
+      console: {
+        log: (...args: any[]) => localLogs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
+        error: (...args: any[]) => localLogs.push("[ERROR] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
+        warn: (...args: any[]) => localLogs.push("[WARN] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
+      },
+      Math,
+      Date,
+      JSON,
+      parseInt,
+      parseFloat,
+      Array,
+      Object,
+      String,
+      Number,
+      Boolean,
+      RegExp,
+      systemRuntime: {
+        activeWorkers: 9,
+        hotPatchVersion: debugTelemetry.patchesApplied + 1,
+        fleetState: "OPERATIONAL",
+      },
+      userContext: context,
+    };
 
-  try {
-    const vmContext = vm.createContext(sandbox);
-    const script = new vm.Script(`
-      (() => {
-        try {
-          ${cleanCode}
-        } catch (e) {
-          console.error(e.message);
-          return { error: e.message };
-        }
-      })()
-    `);
+    let scriptResult: any = null;
+    let runStatus: "active" | "error" = "active";
 
-    executionResult = script.runInContext(vmContext, { timeout: 3500 });
-    if (executionResult && executionResult.error) {
-      status = "error";
+    try {
+      const vmContext = vm.createContext(sandbox);
+      const script = new vm.Script(`
+        (() => {
+          try {
+            ${cleanScriptCode}
+          } catch (e) {
+            console.error(e.message);
+            return { error: e.message };
+          }
+        })()
+      `);
+
+      scriptResult = script.runInContext(vmContext, { timeout: 3500 });
+      if (scriptResult && scriptResult.error) {
+        runStatus = "error";
+      }
+    } catch (err: any) {
+      runStatus = "error";
+      localLogs.push(`[FATAL] ${err.message}`);
+      scriptResult = { error: err.message };
     }
-  } catch (err: any) {
-    status = "error";
-    consoleLogs.push(`[FATAL] ${err.message}`);
-    executionResult = { error: err.message };
-  }
+
+    return {
+      status: runStatus,
+      output: scriptResult,
+      logs: localLogs,
+    };
+  };
+
+  // 3. Dispatch to Server-side Security Broker (evaluating policy, scanning risk, isolated workers compilation)
+  const report = ServerSecurityBroker.brokerExecution(cleanCode, policyCtx, actualRunner);
+
+  const finalStatus = report.success ? "active" : "error";
 
   // Increment patches and telemetry
   debugTelemetry.patchesApplied += 1;
   debugTelemetry.logs.unshift({
     id: `dbg-auto-apply-${Date.now()}`,
     timestamp: new Date().toLocaleTimeString(),
-    level: status === "active" ? "success" : "error",
-    message: `[System Code Applied] "${moduleName}" deployed to ${target} by ${source} (Status: ${status}).`,
+    level: finalStatus === "active" ? "success" : "error",
+    message: `[System Broker Applied] "${moduleName}" processed on ${target} (Risk: ${report.risk.riskLevel}, Status: ${finalStatus}).`,
   });
 
   const newModule: AppliedSystemModule = {
@@ -107,11 +137,13 @@ export function executeAndApplySystemCode(
     code: cleanCode,
     source,
     appliedAt: Date.now(),
-    status,
+    status: finalStatus,
     version: 1,
-    logs: consoleLogs,
-    output: executionResult,
+    logs: report.logs,
+    output: report.output,
     target,
+    riskScore: report.risk.riskScore,
+    riskLevel: report.risk.riskLevel,
   };
 
   appliedSystemModules.unshift(newModule);

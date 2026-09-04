@@ -365,6 +365,27 @@ return applyCustomEnhancement(system);`
 
                 {/* Code Body */}
                 <div className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-[#141211] text-[#ebdbb2] border-b border-[#3c3836]">
+                  {/* Server-Side Zero-Trust Policy & Sandbox Assessment */}
+                  <div className="mb-3 p-3 rounded bg-[#1c1a19] border border-[#3c3836] flex flex-wrap items-center gap-3 justify-between font-sans">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#a89984] font-bold text-[10px] uppercase">Zero-Trust Audit:</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        selectedModule.riskLevel === 'CRITICAL' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                        selectedModule.riskLevel === 'HIGH' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                        selectedModule.riskLevel === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                        'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      }`}>
+                        🛡️ Risk Score: {selectedModule.riskScore !== undefined ? selectedModule.riskScore : 0}/100 ({selectedModule.riskLevel || 'LOW'})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#a89984] font-bold text-[10px] uppercase">Sandbox Isolation:</span>
+                      <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-mono">
+                        ⚙️ Ephemeral MicroVM Container
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="text-[10px] text-[#7c6f64] mb-1 uppercase font-bold flex items-center gap-1">
                     <Terminal className="w-3 h-3" /> System Code Definition
                   </div>

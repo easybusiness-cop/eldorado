@@ -20,9 +20,9 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// Body Parsers
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+// Body Parsers (Harden global limits to 2mb to prevent OOM/DoS memory pressure)
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
 // Health Check
 app.get("/api/health", (req, res) => {
@@ -43,10 +43,11 @@ app.get(["/auth/callback/instagram", "/auth/callback/linkedin", "/auth/callback/
         </div>
         <script>
           if (window.opener) {
+            const targetOrigin = window.location.origin;
             window.opener.postMessage({ 
               type: 'OAUTH_AUTH_SUCCESS', 
               provider: '${provider}' 
-            }, '*');
+            }, targetOrigin);
             setTimeout(() => {
               window.close();
             }, 1600);
