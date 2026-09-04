@@ -30,27 +30,12 @@ export interface AuthenticatedRequest extends Request {
 interface OrganizationMembership {
   organization_id: string;
   role: string;
-  capabilities: string[];
+  capabilities: string[] | null;
 }
 
-function getSupabaseAuthClient() {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://placeholder.supabase.co";
-  const publishableKey =
-    process.env.SUPABASE_PUBLISHABLE_KEY ??
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-    "placeholder-key";
-
-  return createClient(url, publishableKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
-
-const DEFAULT_DEV_IDENTITY: RuffloIdentity = {
+const DEV_IDENTITY: RuffloIdentity = {
   userId: "dev-admin-user",
-  email: "easybusiness.cop@gmail.com",
+  email: null,
   organizationId: "org-default",
   role: "admin",
   capabilities: [
@@ -68,20 +53,54 @@ const DEFAULT_DEV_IDENTITY: RuffloIdentity = {
   ],
 };
 
+function isDevelopmentAuthEnabled(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    process.env.RUFFLO_DEV_AUTH === "true"
+  );
+}
+
+function getSupabaseAuthClient() {
+  const url =
+    process.env.SUPABASE_URL ||
+    process.env.VITE_SUPABASE_URL;
+
+  const key =
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!url || !key) {
+    throw new Error("Supabase authentication is not configured.");
+  }
+
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
 export async function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
+    /*
+     * Development bypass is explicit.
+     *
+     * NEVER enable this implicitly just because Supabase
+     * configuration is missing.
+     */
+    if (isDevelopmentAuthEnabled()) {
+      req.identity = DEV_IDENTITY;
+      return next();
+    }
+
     const authorization = req.header("authorization");
 
     if (!authorization?.startsWith("Bearer ")) {
-      if (!process.env.SUPABASE_URL && !process.env.VITE_SUPABASE_URL) {
-        req.identity = DEFAULT_DEV_IDENTITY;
-        return next();
-      }
-
       return res.status(401).json({
         error: "Authentication required.",
         code: "AUTH_TOKEN_MISSING",
@@ -90,14 +109,19 @@ export async function requireAuth(
 
     const token = authorization.slice("Bearer ".length).trim();
 
-    const { data, error } = await getSupabaseAuthClient().auth.getUser(token);
+    if (!token) {
+      return res.status(401).json({
+        error: "Authentication token is empty.",
+        code: "AUTH_TOKEN_EMPTY",
+      });
+    }
+
+    const authClient = getSupabaseAuthClient();
+
+    const { data, error } =
+      await authClient.auth.getUser(token);
 
     if (error || !data.user) {
-      if (!process.env.SUPABASE_URL && !process.env.VITE_SUPABASE_URL) {
-        req.identity = DEFAULT_DEV_IDENTITY;
-        return next();
-      }
-
       return res.status(401).json({
         error: "Your login session is invalid or expired.",
         code: "AUTH_TOKEN_INVALID",
@@ -105,81 +129,98 @@ export async function requireAuth(
     }
 
     const requestedOrganizationId =
-      req.header("x-rufflo-organization-id")?.trim() ?? "";
+      req.header("x-rufflo-organization-id")?.trim() || null;
 
-    try {
-      const { data: memberships, error: membershipError } =
-        await getSupabaseAdmin()
-          .from("organization_memberships")
-          .select("organization_id, role, capabilities")
-          .eq("user_id", data.user.id)
-          .eq("is_active", true);
+    const { data: memberships, error: membershipError } =
+      await getSupabaseAdmin()
+        .from("organization_memberships")
+        .select("organization_id, role, capabilities")
+        .eq("user_id", data.user.id)
+        .eq("is_active", true);
 
-      if (membershipError || !memberships?.length) {
-        req.identity = {
-          userId: data.user.id,
-          email: data.user.email ?? null,
-          organizationId: requestedOrganizationId || "org-default",
-          role: "admin",
-          capabilities: DEFAULT_DEV_IDENTITY.capabilities,
-        };
-        return next();
-      }
+    /*
+     * Fail closed.
+     *
+     * Authentication succeeded but authorization data could
+     * not be verified. The user receives NO organization
+     * privileges.
+     */
+    if (membershipError) {
+      console.error(
+        "[AUTH] Membership lookup failed:",
+        membershipError.message,
+      );
 
-      const validMemberships = memberships as OrganizationMembership[];
-
-      const membership = requestedOrganizationId
-        ? validMemberships.find(
-            (item) => item.organization_id === requestedOrganizationId
-          )
-        : validMemberships.length === 1
-          ? validMemberships[0]
-          : validMemberships[0];
-
-      if (!membership) {
-        return res.status(403).json({
-          error: "Choose an organization that you belong to.",
-          code: "ORGANIZATION_SELECTION_REQUIRED",
-        });
-      }
-
-      req.identity = {
-        userId: data.user.id,
-        email: data.user.email ?? null,
-        organizationId: membership.organization_id,
-        role: membership.role,
-        capabilities: (membership.capabilities || DEFAULT_DEV_IDENTITY.capabilities) as RuffloCapability[],
-      };
-
-      return next();
-    } catch {
-      req.identity = {
-        userId: data.user.id,
-        email: data.user.email ?? null,
-        organizationId: requestedOrganizationId || "org-default",
-        role: "admin",
-        capabilities: DEFAULT_DEV_IDENTITY.capabilities,
-      };
-      return next();
-    }
-  } catch {
-    if (!process.env.SUPABASE_URL && !process.env.VITE_SUPABASE_URL) {
-      req.identity = DEFAULT_DEV_IDENTITY;
-      return next();
+      return res.status(503).json({
+        error: "Authorization service is temporarily unavailable.",
+        code: "AUTHORIZATION_LOOKUP_FAILED",
+      });
     }
 
-    return res.status(500).json({
+    const validMemberships =
+      (memberships ?? []) as OrganizationMembership[];
+
+    if (validMemberships.length === 0) {
+      return res.status(403).json({
+        error: "Your account is not a member of a Rufflo organization.",
+        code: "ORGANIZATION_MEMBERSHIP_REQUIRED",
+      });
+    }
+
+    const membership = requestedOrganizationId
+      ? validMemberships.find(
+          (item) =>
+            item.organization_id === requestedOrganizationId,
+        )
+      : validMemberships.length === 1
+        ? validMemberships[0]
+        : null;
+
+    if (!membership) {
+      return res.status(403).json({
+        error: requestedOrganizationId
+          ? "You do not belong to the requested organization."
+          : "Choose an organization before executing this operation.",
+        code: "ORGANIZATION_SELECTION_REQUIRED",
+      });
+    }
+
+    const capabilities = Array.isArray(membership.capabilities)
+      ? membership.capabilities.filter(
+          (value): value is RuffloCapability =>
+            typeof value === "string",
+        )
+      : [];
+
+    req.identity = {
+      userId: data.user.id,
+      email: data.user.email ?? null,
+      organizationId: membership.organization_id,
+      role: membership.role,
+      capabilities,
+    };
+
+    return next();
+  } catch (error) {
+    console.error("[AUTH] Authentication failure:", error);
+
+    /*
+     * NEVER turn an authentication failure into admin access.
+     */
+    return res.status(503).json({
       error: "Authentication service is unavailable.",
       code: "AUTH_SERVICE_ERROR",
     });
   }
 }
 
-export function requireCapability(capability: RuffloCapability) {
+export function requireCapability(
+  capability: RuffloCapability,
+) {
   return (
     req: AuthenticatedRequest,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     if (!req.identity) {
       return res.status(401).json({

@@ -59,6 +59,64 @@ export class EvaluationEngine {
       ],
     };
   }
+
+  evaluateStep(params: {
+    expected?: string;
+    artifacts?: string[];
+    testResults?: any;
+  }): {
+    passed: boolean;
+    scores: {
+      correctness: number;
+      reliability: number;
+      security: number;
+      performance: number;
+    };
+    failures: string[];
+  } {
+    const failures: string[] = [];
+    const scores = {
+      correctness: 1.0,
+      reliability: 1.0,
+      security: 1.0,
+      performance: 1.0,
+    };
+
+    const actual = typeof params.testResults === "string"
+      ? params.testResults
+      : JSON.stringify(params.testResults ?? "");
+
+    // 1. Expected match check
+    if (params.expected && params.expected.trim()) {
+      if (!actual.includes(params.expected)) {
+        scores.correctness = 0.4;
+        failures.push(`Expected pattern "${params.expected}" not found in testResults.`);
+      }
+    }
+
+    // 2. Check general failures in testResults
+    if (
+      actual.toLowerCase().includes("fail") ||
+      actual.toLowerCase().includes("error") ||
+      actual.toLowerCase().includes("exception")
+    ) {
+      scores.reliability = 0.5;
+      failures.push("An error or failure was detected in the execution output.");
+    }
+
+    // 3. Artifact verification
+    if (!params.artifacts || params.artifacts.length === 0) {
+      scores.performance = 0.8;
+    }
+
+    const passed = failures.length === 0;
+
+    return {
+      passed,
+      scores,
+      failures,
+    };
+  }
 }
 
 export const evaluationEngine = new EvaluationEngine();

@@ -44,7 +44,7 @@ export class CodingAgent {
     }
 
     // 4. Edit
-    const editRes = await CodeEditor.applyEdits(params.filePath, params.targetContent, params.replacementContent);
+    const editRes = await CodeEditor.applyEdits(process.cwd(), params.filePath, params.targetContent, params.replacementContent);
     if (!editRes.success) {
       trace.push('FAILED: Target content modification mismatch.');
       return { success: false, pipelineTrace: trace, details: null };

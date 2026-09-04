@@ -7,9 +7,15 @@ export interface IsolatedExecutionResult {
 }
 
 /**
- * Executes dynamic system code or user scripts in an ephemeral, isolated subprocess.
- * Crucially, it completely strips all host credentials (env: {}) and disables 
- * core network and filesystem modules.
+ * Executes dynamic system code in a restricted Node.js subprocess.
+ *
+ * IMPORTANT:
+ * This is process-level isolation only.
+ * It is NOT a MicroVM and must not be treated as
+ * an OS-level security boundary.
+ *
+ * Production deployments should replace this runner
+ * with a real container/VM/WASM isolation boundary.
  */
 export function runInIsolatedProcess(
   code: string,
@@ -19,20 +25,19 @@ export function runInIsolatedProcess(
   const serializedContext = JSON.stringify(context || {});
 
   // JavaScript wrapper payload sent to Node subprocess
-  const workerScript = `
-const fs = require('fs');
+  const workerScript = `const fs = require('fs');
 
 // Intercept module require to block network/file access modules
 const originalRequire = module.constructor.prototype.require;
 module.constructor.prototype.require = function(id) {
   if (['http', 'https', 'net', 'dgram', 'dns', 'child_process', 'fs', 'fs/promises', 'tls', 'cluster'].includes(id)) {
-    throw new Error("Access denied: Module '" + id + "' is blocked within the Ephemeral MicroVM Sandbox.");
+    throw new Error("Access denied: Module '" + id + "' is blocked within the Restricted Node Worker.");
   }
   return originalRequire.apply(this, arguments);
 };
 
 // Intercept global fetch and other network helpers
-const blockMessage = "Access denied: Host network access is blocked within the Ephemeral MicroVM Sandbox.";
+const blockMessage = "Access denied: Host network access is blocked within the Restricted Node Worker.";
 globalThis.fetch = () => Promise.reject(new Error(blockMessage));
 
 // Block host process control operations
@@ -55,7 +60,6 @@ const systemRuntime = {
 
 const context = ${serializedContext};
 const userContext = context;
-
 let output = null;
 let runStatus = "active";
 
@@ -91,7 +95,7 @@ process.stdout.write(JSON.stringify({
     if (run.error) {
       return {
         status: "error",
-        output: { error: `MicroVM spawn failure: ${run.error.message}` },
+        output: { error: `Restricted Node Worker spawn failure: ${run.error.message}` },
         logs: [`[FATAL] Sandboxed worker process could not be launched: ${run.error.message}`],
       };
     }
@@ -100,7 +104,7 @@ process.stdout.write(JSON.stringify({
       const stderr = run.stderr ? run.stderr.toString().trim() : "";
       return {
         status: "error",
-        output: { error: `MicroVM worker crashed with status ${run.status}` },
+        output: { error: `Restricted Node Worker crashed with status ${run.status}` },
         logs: [
           `[FATAL] Sandboxed process terminated with exit code ${run.status}.`,
           ...(stderr ? stderr.split("\n").map(line => `[STDERR] ${line}`) : []),
@@ -112,7 +116,7 @@ process.stdout.write(JSON.stringify({
     if (!stdoutStr) {
       return {
         status: "error",
-        output: { error: "MicroVM returned empty response" },
+        output: { error: "Restricted Node Worker returned empty response" },
         logs: ["[FATAL] Sandboxed execution did not produce standard output telemetry."],
       };
     }

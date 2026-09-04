@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { agentFleetRegistry } from '../agents/registry.ts';
 import { agentRuntime } from '../agents/runtime.ts';
 import { mastra } from '../ai/mastra/index.ts';
+import { requireAuth, AuthenticatedRequest } from '../security/auth.middleware.ts';
 
 export const agentRouter = Router();
 
@@ -20,13 +21,32 @@ agentRouter.get('/:id', (req, res) => {
   res.json({ success: true, agent });
 });
 
-agentRouter.post('/:id/execute', async (req, res) => {
+agentRouter.post('/:id/execute', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const identity = req.identity;
+
+    if (!identity) {
+      return res.status(401).json({
+        error: "Authentication required.",
+        code: "AUTH_REQUIRED",
+      });
+    }
+
+    const organizationId = identity.organizationId;
+
+    if (!organizationId) {
+      return res.status(401).json({
+        error: "Authenticated organization is required.",
+        code: "ORGANIZATION_REQUIRED",
+      });
+    }
+
     const { title, description } = req.body;
     const result = await agentRuntime.executeAgentTask(req.params.id, {
       id: `task-${Date.now()}`,
       title: title || 'Task Execution',
       description: description || 'Execute agent capabilities',
+      organizationId,
     });
     res.json({ success: true, ...result });
   } catch (err: any) {

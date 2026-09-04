@@ -42,14 +42,12 @@ export const AgentWorkstationModal: React.FC<AgentWorkstationModalProps> = ({
   onClose,
   logs = [],
 }) => {
-  if (!isOpen || !agent) return null;
-
   const [activeTab, setActiveTab] = useState<'workflow' | 'browser' | 'ide' | 'database' | 'software' | 'quantum'>('workflow');
-  const [browserUrl, setBrowserUrl] = useState<string>(`https://github.com/dunder-mifflin/${agent.id}-workspace`);
+  const [browserUrl, setBrowserUrl] = useState<string>(() => agent ? `https://github.com/dunder-mifflin/${agent.id}-workspace` : '');
   const [browserSearchQuery, setBrowserSearchQuery] = useState<string>('TypeScript async optimization guidelines');
   const [isExecuting, setIsExecuting] = useState(false);
   const [workflowState, setWorkflowState] = useState<WorkflowExecutionState | null>(null);
-  const [customDirective, setCustomDirective] = useState<string>(`Optimize ${agent.role} pipeline and run 5-step standard engineering workflow.`);
+  const [customDirective, setCustomDirective] = useState<string>(() => agent ? `Optimize ${agent.role} pipeline and run 5-step standard engineering workflow.` : '');
   
   // Quantum Search Architecture States
   const [quantumQuery, setQuantumQuery] = useState<string>('Find optimized corporate security vector & memory indices');
@@ -62,11 +60,13 @@ export const AgentWorkstationModal: React.FC<AgentWorkstationModalProps> = ({
     { state: '|1010⟩', probability: 0.82, match: 'Optimal Quantum Index Match: Target Pattern Found', amplitude: 0.90 },
     { state: '|1111⟩', probability: 0.06, match: 'System backup heartbeat', amplitude: 0.25 },
   ]);
-  const [quantumLogs, setQuantumLogs] = useState<string[]>([
+  const [quantumLogs, setQuantumLogs] = useState<string[]>(() => agent ? [
     `[QUANTUM ENGINE] Initialized 4-Qubit Superposition Register for ${agent.name}`,
     `[GROVER ORACLE] State space size N = 16. Optimal iterations k = 2`,
     `[ENTANGLEMENT] Linked with multi-agent neural mesh network. Ready for query.`,
-  ]);
+  ] : []);
+
+  if (!isOpen || !agent) return null;
 
   const handleRunQuantumSearch = () => {
     if (isQuantumSearching) return;
@@ -103,12 +103,12 @@ export const AgentWorkstationModal: React.FC<AgentWorkstationModalProps> = ({
       ]);
     }, 1400);
   };
-  const [terminalOutput, setTerminalOutput] = useState<string[]>([
-    `[WORKSTATION BOOT] All-in-One AI Workstation initialized for ${agent.name}`,
+  const [terminalOutput, setTerminalOutput] = useState<string[]>(() => [
+    `[WORKSTATION BOOT] All-in-One AI Workstation initialized for ${agent?.name || 'Agent'}`,
     `[CPU ENGINE] 16-Core Neural Processing Unit active @ 3.8GHz`,
-    `[NETWORK] Internal Fiber Mesh connected - IP: 192.168.1.${10 + agent.authorityLevel}`,
+    `[NETWORK] Internal Fiber Mesh connected - IP: 192.168.1.${10 + (agent?.authorityLevel || 1)}`,
     `[RUNTIME] Node.js v20.11.0 / Vite 5.0 Dev Server on port 3000 (0.0.0.0)`,
-    `[AGENT SESSION] Logged in as: ${agent.name} (${agent.role})`,
+    `[AGENT SESSION] Logged in as: ${agent?.name || 'Agent'} (${agent?.role || 'Autonomous Worker'})`,
     `[WORKFLOW PIPELINE] 5-Step Engineering Standard ready for execution...`,
   ]);
 

@@ -6,6 +6,8 @@ import { FleetD3PerformanceChart } from './FleetD3PerformanceChart';
 import { FleetTaskCompletionBarChart } from './FleetTaskCompletionBarChart';
 import { FleetTokenTrendsLineChart } from './FleetTokenTrendsLineChart';
 import { FleetHealthMonitor } from './FleetHealthMonitor';
+import { RuffloObjectivesPanel } from './RuffloObjectivesPanel';
+import { RuffloLoopPanel } from './RuffloLoopPanel';
 import confetti from 'canvas-confetti';
 import { runAgentStandardWorkflow, STANDARD_WORKFLOW_STAGES, WorkflowExecutionState } from '../utils/agentWorkflowEngine';
 import {
@@ -70,6 +72,7 @@ interface CommandCenterProps {
 }
 
 type TabType =
+  | 'loop'
   | 'terminal'
   | 'task-rates'
   | 'token-trends'
@@ -87,7 +90,8 @@ type TabType =
   | 'graph'
   | 'activity'
   | 'commands'
-  | 'workers';
+  | 'workers'
+  | 'rufflo';
 
 export const CommandCenter: React.FC<CommandCenterProps> = ({
   agents,
@@ -110,7 +114,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   audits = [],
   accounts = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('terminal');
+  const [activeTab, setActiveTab] = useState<TabType>('loop');
   const [inputPrompt, setInputPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [fontSize, setFontSize] = useState(12);
@@ -674,6 +678,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
+    { id: 'loop', label: 'loop', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'terminal', label: 'terminal', icon: <Terminal className="w-3.5 h-3.5" /> },
     { id: 'task-rates', label: 'task rates', icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-400" /> },
     { id: 'token-trends', label: 'token trends', icon: <TrendingUp className="w-3.5 h-3.5 text-[#fabd2f]" /> },
@@ -692,33 +697,45 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     { id: 'activity', label: 'activity', icon: <ListFilter className="w-3.5 h-3.5" /> },
     { id: 'commands', label: 'commands', icon: <Command className="w-3.5 h-3.5" /> },
     { id: 'workers', label: 'workers', icon: <Cpu className="w-3.5 h-3.5" /> },
+    { id: 'rufflo', label: 'Rufflo Loop', icon: <Target className="w-3.5 h-3.5 text-rose-500" /> },
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#fbf1c7] dark:bg-[#1d2021] text-[#3c3836] dark:text-[#ebdbb2] border-2 border-[#d5c4a1] dark:border-[#3c3836] rounded-lg overflow-hidden font-mono shadow-2xl">
+    <div
+      className="flex flex-col h-full overflow-hidden animate-in"
+      style={{
+        background: 'var(--bg-1)',
+        color: 'var(--text-0)',
+        border: '1px solid var(--border-0)',
+        borderRadius: 'var(--radius-lg)',
+        fontFamily: 'var(--font-sans)',
+      }}
+    >
       {/* Command Center Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#ebdbb2] dark:bg-[#282828] border-b border-[#d5c4a1] dark:border-[#3c3836]">
+      <div
+        className="flex items-center justify-between gap-3 px-3"
+        style={{
+          height: 48,
+          borderBottom: '1px solid var(--border-0)',
+          background: 'rgba(255,255,255,0.02)',
+        }}
+      >
         {/* Agent Info & Status */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-7 h-7 rounded bg-[#d5c4a1] dark:bg-[#3c3836] border border-[#bdae93] dark:border-[#504945] text-base">
-            {selectedAgent.avatar}
+        <div className="flex items-center gap-2 min-w-0">
+          <div
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 99,
+              background: 'var(--status-running)',
+            }}
+            className="animate-pulse-soft"
+          />
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-2)' }}>
+            Command Center
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-xs tracking-wider uppercase">COMMAND CENTER</span>
-              <span
-                className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
-                  selectedAgent.status === 'working'
-                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/40'
-                    : 'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/40'
-                }`}
-              >
-                ■ {selectedAgent.status}
-              </span>
-            </div>
-            <p className="text-[11px] text-[#7c6f64] dark:text-[#a89984] truncate max-w-xs">
-              {selectedAgent.name} - {selectedAgent.currentTask || selectedAgent.title}
-            </p>
+          <div style={{ fontSize: 12, color: 'var(--text-1)' }} className="truncate">
+            {selectedAgent.name} - {selectedAgent.currentTask || selectedAgent.title}
           </div>
         </div>
 
@@ -773,23 +790,29 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
       </div>
 
-      {/* Tabs Bar */}
-      <div className="flex items-center gap-1 px-2 py-1 bg-[#d5c4a1]/50 dark:bg-[#1d2021] border-b border-[#d5c4a1] dark:border-[#3c3836] overflow-x-auto text-[11px] no-scrollbar">
+      {/* Tab rail */}
+      <div
+        className="flex items-center gap-1 px-2 py-1.5 overflow-x-auto no-scrollbar"
+        style={{ borderBottom: '1px solid var(--border-0)', background: 'var(--bg-2)' }}
+      >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              id={`tab-${tab.id.replace(/\s+/g, '-')}`}
+              type="button"
+              id={`tab-${String(tab.id).replace(/\s+/g, '-')}`}
               onClick={() => {
                 soundFx.playClick();
                 setActiveTab(tab.id);
               }}
-              className={`px-2 py-1 rounded flex items-center gap-1 whitespace-nowrap transition-colors font-medium ${
-                isActive
-                  ? 'bg-[#fabd2f] text-[#1d2021] font-bold shadow-sm'
-                  : 'text-[#665c54] dark:text-[#a89984] hover:bg-[#ebdbb2] dark:hover:bg-[#282828] hover:text-[#282828] dark:hover:text-[#ebdbb2]'
-              }`}
+              className="rufflo-btn"
+              style={{
+                height: 30,
+                background: isActive ? 'var(--accent-dim)' : 'transparent',
+                borderColor: isActive ? 'var(--border-accent)' : 'transparent',
+                color: isActive ? 'var(--accent)' : 'var(--text-2)',
+              }}
             >
               {tab.icon}
               <span>{tab.label}</span>
@@ -798,8 +821,15 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         })}
       </div>
 
-      {/* Tab Content Display */}
-      <div className="flex-1 overflow-y-auto p-3 text-xs bg-[#fbf1c7] dark:bg-[#181615]">
+      {/* Canvas */}
+      <div className="flex-1 min-h-0 overflow-auto p-3" style={{ background: 'var(--bg-1)' }}>
+        {activeTab === 'loop' && (
+          <RuffloLoopPanel />
+        )}
+
+        {/* Tab Content Display */}
+        {activeTab !== 'loop' && (
+          <div className="animate-in space-y-4">
         {/* 1. Projects Portfolio View */}
         {activeTab === 'projects' && (
           <div className="space-y-4">
@@ -2294,6 +2324,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               </div>
             ))}
           </div>
+        )}
+
+        {/* 11. Rufflo Loop Dashboard */}
+        {activeTab === 'rufflo' && (
+          <RuffloObjectivesPanel />
+        )}
+        </div>
         )}
       </div>
 

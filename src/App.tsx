@@ -101,100 +101,26 @@ function Tool({ name, icon, active = false }: { name: string; icon: string; acti
 }
 
 export default function App() {
-  const [agents, setAgents] = useState<Agent[]>(() => {
-    let list = INITIAL_AGENTS.map((a) => ({ ...a, quantumState: initializeAgentQuantumState(a) }));
-    try {
-      const saved = localStorage.getItem('munderdiffl_custom_agents');
-      if (saved) {
-        const custom: Agent[] = JSON.parse(saved);
-        if (Array.isArray(custom) && custom.length > 0) {
-          const formatted = custom.map((a) => ({ ...a, quantumState: a.quantumState || initializeAgentQuantumState(a) }));
-          list = [...formatted, ...list];
-        }
-      }
-    } catch (e) {}
-    return list;
-  });
-  const [selectedAgentId, setSelectedAgentId] = useState<string>('michael');
-  const [logs, setLogs] = useState<AgentLog[]>([
-    {
-      id: 'log-0',
-      timestamp: new Date().toLocaleTimeString(),
-      level: 'info',
-      agentId: 'michael',
-      message: 'Both are routine hourly standups (17:48, 18:48). The roster confirms all 9 agents reconnected cleanly after the session restart — healthy, on standby, none stalled. Nothing substantive changed; concise log + archive.\n\nRan 1 shell command.',
-    },
-    {
-      id: 'log-1',
-      timestamp: new Date().toLocaleTimeString(),
-      level: 'success',
-      agentId: 'dwight',
-      message: 'Zero-trust perimeter scan completed: 0 active vulnerabilities, root access verified, defensive firewalls locked.',
-    },
-    {
-      id: 'log-2',
-      timestamp: new Date().toLocaleTimeString(),
-      level: 'info',
-      agentId: 'ruflo-coder',
-      message: 'Dynamic feature engine online. Sandboxed VM ready for hot-reload tool mounting.',
-      codeSnippet: `// Ruflo Fleet Orchestrator Initialized\nconst fleet = new AgentFleet({ autoMode: true, debugWorkers: 4 });\nfleet.bootstrap();`,
-    },
-  ]);
-
-  const [tasks, setTasks] = useState<FleetTask[]>([
-    {
-      id: 'tsk-1',
-      title: 'Hourly Fleet Standup & Delegation',
-      description: 'Michael coordinates with all 9 department agents.',
-      assignedTo: 'michael',
-      status: 'completed',
-      progress: 100,
-      priority: 'high',
-      createdAt: Date.now() - 3600000,
-      completedAt: Date.now() - 3500000,
-    },
-    {
-      id: 'tsk-2',
-      title: 'Zero-Trust Cyber Defense Scan',
-      description: 'Audit network perimeter, tokens, and access policies.',
-      assignedTo: 'dwight',
-      status: 'completed',
-      progress: 100,
-      priority: 'critical',
-      createdAt: Date.now() - 1800000,
-      completedAt: Date.now() - 1700000,
-    },
-    {
-      id: 'tsk-3',
-      title: 'Continuous 24*7 Memory Sweep',
-      description: 'Automated garbage collection & self-healing patch monitor.',
-      assignedTo: 'toby',
-      status: 'running',
-      progress: 75,
-      priority: 'medium',
-      createdAt: Date.now() - 600000,
-    },
-  ]);
-
-  const [dynamicFeatures, setDynamicFeatures] = useState<DynamicFeature[]>(INITIAL_DYNAMIC_FEATURES);
+  const [agents, setAgents] = useState<Agent[]>(() => INITIAL_AGENTS);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(() => INITIAL_AGENTS[0]?.id || 'michael');
+  const [logs, setLogs] = useState<AgentLog[]>([]);
+  const [tasks, setTasks] = useState<FleetTask[]>([]);
+  const [dynamicFeatures, setDynamicFeatures] = useState<DynamicFeature[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('munderdiffl_user_profile');
     return saved ? JSON.parse(saved) : DEFAULT_USER;
   });
 
   const [telemetry, setTelemetry] = useState<SystemTelemetry>({
-    uptime: 120,
-    cyclesRun: 15,
-    healthScore: 99.8,
-    patchesApplied: 14,
-    activeWorkers: 4,
-    heapUsedMB: 28.4,
-    heapTotalMB: 48.0,
-    rssMB: 62.1,
-    logs: [
-      { id: '1', timestamp: '17:48', level: 'info', message: 'Toby 24/7 background daemon active.' },
-      { id: '2', timestamp: '17:49', level: 'success', message: 'Telemetry health: 99.8% optimal.' },
-    ],
+    uptime: 0,
+    cyclesRun: 0,
+    healthScore: 100,
+    patchesApplied: 0,
+    activeWorkers: 0,
+    heapUsedMB: 0,
+    heapTotalMB: 0,
+    rssMB: 0,
+    logs: [],
   });
 
   const [autoMode, setAutoMode] = useState<boolean>(true);
@@ -226,6 +152,7 @@ export default function App() {
     isDeploymentPipelineOpen: false,
     isMunderdifflinDashboardOpen: false,
     isDynamicKbOpen: false,
+    isSupabaseDiagnosticOpen: false,
   });
 
   const openModal = (key: keyof ModalManagerState) => {
@@ -261,6 +188,7 @@ export default function App() {
       isDeploymentPipelineOpen: false,
       isMunderdifflinDashboardOpen: false,
       isDynamicKbOpen: false,
+      isSupabaseDiagnosticOpen: false,
     });
   };
 
@@ -651,6 +579,7 @@ export default function App() {
 
   // Execute Prompt via Express Server-Side Gemini API with Quantum Multi-Path Evaluation
   const handleExecutePrompt = async (prompt: string, attachedFile?: AttachedFile) => {
+    if (!selectedAgent) return;
     // 1. Mark selected agent as working
     setAgents((prev) =>
       prev.map((a) => (a.id === selectedAgentId ? { ...a, status: 'working' } : a))
@@ -923,6 +852,7 @@ export default function App() {
   };
 
   
+  const [workspaceTab, setWorkspaceTab] = useState<'command' | 'fleet' | 'network'>('command');
   const [activeDepartment, setActiveDepartment] = useState("Overview");
   const [command, setCommand] = useState("");
 
@@ -956,88 +886,98 @@ export default function App() {
 
 
   return (
-    <div className="rufflo-app">
+    <div className="rufflo-shell rufflo-app" style={{ minHeight: '100vh' }}>
       {/* BACKGROUND */}
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
       <div className="ambient ambient-three" />
 
-      {/* TOP BAR */}
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-mark">R</div>
-          <div>
-            <div className="brand-name">RUFFLO</div>
-            <div className="brand-subtitle">AUTONOMOUS COMPANY OS</div>
-          </div>
-        </div>
-
-        <div className="global-search" onClick={() => { closeAllModals(); setIsSearchOpen(true); }}>
-          <Icon>⌕</Icon>
-          <input placeholder="Search agents, projects, knowledge..." readOnly />
-          <kbd>⌘ K</kbd>
-        </div>
-
-        <div className="top-actions">
-          <div className="system-health">
-            <span className="health-pulse" />
-            All systems operational
-          </div>
-          <button className="top-button bg-[#b57614]/30 hover:bg-[#b57614]/50 text-[#fabd2f] border border-[#fabd2f]/50 font-bold" title="Munder Diffl.in Agents Dashboard" onClick={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); setIsMunderdifflinDashboardOpen(true); }}>📋 Dashboard</button>
-          <button className="top-button bg-[#fabd2f]/30 hover:bg-[#fabd2f]/50 text-[#fabd2f] border border-[#d79921]/50 font-bold" title="Visual Messaging Threads & Quantum Alignment" onClick={() => { closeAllModals(); setDashboardInitialTab('communication'); setIsMunderdifflinDashboardOpen(true); }}>💬 Communication</button>
-          <button className="top-button bg-[#427b58]/30 hover:bg-[#427b58]/50 text-[#b8bb26] border border-[#427b58]/50 font-bold" title="Agent Skill Matrix & Personalized Learning Modules" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); setIsMunderdifflinDashboardOpen(true); }}>🎯 Skill Matrix</button>
-          <button className="top-button bg-[#076678]/30 hover:bg-[#076678]/50 text-[#fbf1c7] border border-[#076678]/50 font-bold" title="Agent Standard Operating Procedures & Verified Data Clearance" onClick={() => { closeAllModals(); setDashboardInitialTab('sops'); setIsMunderdifflinDashboardOpen(true); }}>📁 SOPs & Data</button>
-          <button className="top-button bg-[#b8bb26]/30 hover:bg-[#b8bb26]/50 text-[#b8bb26] border border-[#b8bb26]/50 font-bold" title="Dynamic Knowledge Base for AI Agents" onClick={() => { closeAllModals(); setIsDynamicKbOpen(true); }}>🧠 Knowledge Base</button>
-          <button className="top-button" title="Company Database (Supabase)" onClick={() => { closeAllModals(); setIsCompanyDbOpen(true); }}>🗄️ DB</button>
-          <button className="top-button" title="Executive Analytics & Fleet Intelligence" onClick={() => { closeAllModals(); setIsAnalyticsOpen(true); }}>📊 Analytics</button>
-          <button className="top-button bg-red-600/20 text-red-400 border border-red-500/30" title="Google Workspace (Gmail, Calendar, Docs, Sheets)" onClick={() => { closeAllModals(); setIsWorkspaceOpen(true); }}>📁 Workspace</button>
-          <button className="top-button bg-cyan-600/20 text-cyan-400 border border-cyan-500/30" title="Live Public API Integrator Hub" onClick={() => { closeAllModals(); setIsPublicApiOpen(true); }}>🌐 API Hub</button>
-          <button className="top-button bg-pink-600/20 text-pink-400 border border-pink-500/30" title="Instagram & LinkedIn Social Connector Plugins" onClick={() => { closeAllModals(); setIsSocialPluginOpen(true); }}>🔌 Social Plugins</button>
-          <button className="top-button bg-[#fabd2f]/20 text-[#fabd2f] border border-[#fabd2f]/40 font-bold animate-pulse" title="Automated Deployment & Testing Pipeline" onClick={() => { closeAllModals(); setIsDeploymentPipelineOpen(true); }}>🚀 Deploy & Publish</button>
-          <button className="top-button" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>◉ {agents.length}</button>
-          <button className="top-button" onClick={() => { closeAllModals(); setIsSystemModulesOpen(true); }}>⚡</button>
-          <VoiceWaveform />
-          <div className="user-avatar" onClick={() => { closeAllModals(); setIsPreferencesOpen(true); }} style={{cursor: 'pointer'}}>{userProfile.displayName[0]}</div>
-        </div>
-      </header>
+      {/* TOP NAVIGATION */}
+      <TopNavigation
+        userProfile={userProfile}
+        onOpenSearch={() => { closeAllModals(); openModal('isSearchOpen'); }}
+        onOpenAuth={() => { closeAllModals(); openModal('isAuthOpen'); }}
+        onOpenPreferences={() => { closeAllModals(); openModal('isPreferencesOpen'); }}
+        onOpenAdminOrchestrator={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}
+        onOpenIde={() => { closeAllModals(); openModal('isIdeOpen'); }}
+        onOpenDynamicFeatures={() => { closeAllModals(); openModal('isDynamicFeaturesOpen'); }}
+        onOpenCall={() => { closeAllModals(); openModal('isCallOpen'); }}
+        onOpenWeb={() => { closeAllModals(); openModal('isWebOpen'); }}
+        onOpenRepos={() => { closeAllModals(); openModal('isReposOpen'); }}
+        onOpenDebugger={() => { closeAllModals(); openModal('isDebuggerOpen'); }}
+        onOpenSystemModules={() => { closeAllModals(); openModal('isSystemModulesOpen'); }}
+        onOpenDb={() => { closeAllModals(); openModal('isCompanyDbOpen'); }}
+        onOpenAnalytics={() => { closeAllModals(); openModal('isAnalyticsOpen'); }}
+        onOpenAcademy={() => { closeAllModals(); openModal('isAcademyOpen'); }}
+        onOpenMasterEvolution={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}
+        onOpenWorkspace={() => { closeAllModals(); openModal('isWorkspaceOpen'); }}
+        onOpenPublicApiHub={() => { closeAllModals(); openModal('isPublicApiOpen'); }}
+        onOpenMunderdifflinDashboard={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); openModal('isMunderdifflinDashboardOpen'); }}
+        onOpenAgentCommunication={() => { closeAllModals(); setDashboardInitialTab('communication'); openModal('isMunderdifflinDashboardOpen'); }}
+        onOpenAgentSkillMatrix={() => { closeAllModals(); setDashboardInitialTab('skills'); openModal('isMunderdifflinDashboardOpen'); }}
+        onOpenAgentSops={() => { closeAllModals(); setDashboardInitialTab('sops'); openModal('isMunderdifflinDashboardOpen'); }}
+        onOpenDynamicKnowledgeBase={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}
+        onOpenSupabaseDiagnostic={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}
+        dynamicFeatureCount={dynamicFeatures.length}
+        systemModulesCount={32}
+        autoMode={autoMode}
+        onToggleAutoMode={() => setAutoMode(!autoMode)}
+        theme={theme}
+        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={() => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen?.().catch(() => {});
+            setIsFullscreen(true);
+          } else {
+            document.exitFullscreen?.().catch(() => {});
+            setIsFullscreen(false);
+          }
+        }}
+      />
 
       {/* MAIN */}
-      <main className="main-grid">
+      <div className="rufflo-main">
+        <main className="main-grid rufflo-content animate-in">
         {/* LEFT SIDEBAR */}
-                <aside className="sidebar">
+        <aside className="sidebar">
           <div className="sidebar-section">
             <div className="section-label">COMMAND</div>
-            <button className={`nav-item ${activeDepartment === "Overview" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); }}>
-              <Icon>⌂</Icon>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "command" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('command'); }}>
+              <Icon>⚡</Icon>
               <span>Command Center</span>
+            </button>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "fleet" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('fleet'); }}>
+              <Icon>👥</Icon>
+              <span>Fleet Telemetry</span>
+            </button>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "network" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('network'); }}>
+              <Icon>🌐</Icon>
+              <span>Company Network</span>
             </button>
             <button className={`nav-item ${activeDepartment === "Munderdifflin" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Munderdifflin'); }}>
               <Icon>📋</Icon>
               <span>Munderdiffl.in Agents</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('communication'); setIsMunderdifflinDashboardOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('communication'); openModal('isMunderdifflinDashboardOpen'); }}>
               <Icon>💬</Icon>
               <span>Agent Communication</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); setIsMunderdifflinDashboardOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); openModal('isMunderdifflinDashboardOpen'); }}>
               <Icon>🎯</Icon>
               <span>Skill Matrix</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('sops'); setIsMunderdifflinDashboardOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('sops'); openModal('isMunderdifflinDashboardOpen'); }}>
               <Icon>📁</Icon>
               <span>Agent SOPs & Data</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsDynamicKbOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}>
               <Icon>🧠</Icon>
               <span>Knowledge Base</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>
               <Icon>◉</Icon>
               <span>Mission Control</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>
-              <Icon>▶</Icon>
-              <span>Live Operations</span>
             </button>
           </div>
 
@@ -1058,11 +998,11 @@ export default function App() {
 
           <div className="sidebar-section">
             <div className="section-label">INTELLIGENCE</div>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsSearchOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSearchOpen'); }}>
               <Icon>⌘</Icon>
               <span>Memory</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsAcademyOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAcademyOpen'); }}>
               <Icon>◇</Icon>
               <span>Knowledge</span>
             </button>
@@ -1070,27 +1010,23 @@ export default function App() {
 
           <div className="sidebar-section">
             <div className="section-label">DEVELOPMENT</div>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>
               <Icon>▣</Icon>
               <span>Projects</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsIdeOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isIdeOpen'); }}>
               <Icon>&lt;/&gt;</Icon>
               <span>Code</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsDebuggerOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}>
               <Icon>_</Icon>
               <span>Terminal</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsReposOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isReposOpen'); }}>
               <Icon>⌥</Icon>
               <span>GitHub</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsDebuggerOpen(true); }}>
-              <Icon>✓</Icon>
-              <span>Testing</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsSystemModulesOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDeploymentPipelineOpen'); }}>
               <Icon>↗</Icon>
               <span>Deployments</span>
             </button>
@@ -1098,19 +1034,23 @@ export default function App() {
 
           <div className="sidebar-section bottom-section">
             <div className="section-label">SYSTEM</div>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsSystemModulesOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}>
+              <Icon>⚡</Icon>
+              <span className="text-[#38bdf8] font-bold">Supabase Sync</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSystemModulesOpen'); }}>
               <Icon>⚡</Icon>
               <span>Integrations</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsDebuggerOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}>
               <Icon>◈</Icon>
               <span>Security</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>
               <Icon>≡</Icon>
               <span>Logs</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setIsPreferencesOpen(true); }}>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isPreferencesOpen'); }}>
               <Icon>⚙</Icon>
               <span>Settings</span>
             </button>
@@ -1118,41 +1058,102 @@ export default function App() {
         </aside>
 
         {/* CENTER */}
-        <section className="workspace overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        <section className="workspace" style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
           <div className="flex-1 flex flex-col min-h-0">
                   <div className="workspace-header">
                     <div>
-                      <div className="eyebrow">RUFFLO / {activeDepartment === "Munderdifflin" ? "SCRANTON BRANCH" : "COMMAND NETWORK"}</div>
-                      <h1>{activeDepartment === "Overview" ? "Company Intelligence" : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
+                      <div className="eyebrow">RUFFLO / {activeDepartment === "Munderdifflin" ? "SCRANTON BRANCH" : activeDepartment === "Overview" ? "COMMAND NETWORK" : activeDepartment.toUpperCase()}</div>
+                      <h1>{activeDepartment === "Overview" ? (workspaceTab === 'command' ? "Command Center" : workspaceTab === 'fleet' ? "Agent Fleet Telemetry" : "Company Intelligence Network") : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
                       <p>{activeDepartment === "Munderdifflin" ? "Autonomous task dispatch, live telemetry, and agent output memos." : "Coordinate autonomous agents, missions, knowledge and software operations."}</p>
                     </div>
                     <div className="workspace-actions">
+                      {activeDepartment === 'Overview' && (
+                        <div className="flex items-center gap-1 bg-[#121216] p-1 rounded-lg border border-white/10 mr-2">
+                          <button
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'command' ? 'bg-[#fabd2f]/20 text-[#fabd2f] border border-[#fabd2f]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
+                            onClick={() => setWorkspaceTab('command')}
+                          >
+                            ⚡ Command
+                          </button>
+                          <button
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'fleet' ? 'bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
+                            onClick={() => setWorkspaceTab('fleet')}
+                          >
+                            👥 Fleet
+                          </button>
+                          <button
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'network' ? 'bg-[#a78bfa]/20 text-[#a78bfa] border border-[#a78bfa]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
+                            onClick={() => setWorkspaceTab('network')}
+                          >
+                            🌐 Network
+                          </button>
+                        </div>
+                      )}
                       <button
                         className="secondary-button"
                         style={{ borderColor: '#fabd2f', color: '#fabd2f' }}
                         onClick={() => setActiveDepartment(activeDepartment === 'Munderdifflin' ? 'Overview' : 'Munderdifflin')}
                       >
-                        {activeDepartment === 'Munderdifflin' ? '← Overview Grid' : '📋 Munderdiffl.in Agents'}
+                        {activeDepartment === 'Munderdifflin' ? '← Overview Grid' : '📋 Munderdiffl.in'}
                       </button>
                       <button
                         className="secondary-button"
                         style={{ borderColor: '#b8bb26', color: '#b8bb26' }}
-                        onClick={() => { closeAllModals(); setIsDynamicKbOpen(true); }}
+                        onClick={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}
                       >
-                        🧠 Knowledge Base
+                        🧠 Knowledge
                       </button>
-                      <button className="secondary-button" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>+ New Mission</button>
+                      <button className="secondary-button" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>+ New Mission</button>
                       <button className="primary-button" onClick={handleTriggerStandup}><span>▶</span> Run Operation</button>
                     </div>
                   </div>
 
                   {activeDepartment === "Munderdifflin" ? (
-                    <div className="flex-1 min-h-0 overflow-y-auto mt-4 rounded-xl border-2 border-[#bdae93] shadow-lg">
+                    <div className="flex-1 min-h-0 mt-4 rounded-xl border border-white/10 shadow-lg overflow-hidden">
                       <MunderdifflinDashboard
                         agents={agents}
                         tasks={tasks}
                         onAddTask={handleAddTask}
                         onAddAgent={handleAddAgent}
+                      />
+                    </div>
+                  ) : activeDepartment !== "Overview" ? (
+                    <div style={{ marginBottom: 24 }}>
+                      <DepartmentHubView
+                        departmentName={activeDepartment}
+                        departmentKey={departmentsList.find(d => d[0] === activeDepartment)?.[3] || 'executive'}
+                        departmentColor={getAgentColor(departmentsList.find(d => d[0] === activeDepartment)?.[3] || '')}
+                        departmentSymbol={departmentsList.find(d => d[0] === activeDepartment)?.[1] || '⌘'}
+                        agents={agents}
+                        tasks={tasks}
+                        onSelectAgent={(id) => {
+                          setSelectedAgentId(id);
+                        }}
+                        onOpenAgentDetail={(id) => {
+                          setSelectedAgentId(id);
+                          openModal('isAgentDetailOpen');
+                        }}
+                        onExecutePrompt={handleExecutePrompt}
+                        onBackToOverview={() => setActiveDepartment('Overview')}
+                      />
+                    </div>
+                  ) : workspaceTab === 'command' ? (
+                    <div className="flex-1 min-h-0 flex flex-col">
+                      <CommandCenter
+                        agents={agents}
+                        selectedAgent={selectedAgent}
+                        onSelectAgent={setSelectedAgentId}
+                        logs={logs}
+                        tasks={tasks}
+                        onAddTask={handleAddTask}
+                        onExecutePrompt={handleExecutePrompt}
+                        onExecuteCode={handleExecuteCode}
+                        onOpenIde={() => { closeAllModals(); openModal('isIdeOpen'); }}
+                        autoMode={autoMode}
+                        onToggleAutoMode={() => setAutoMode(!autoMode)}
+                        userProfile={userProfile}
+                        telemetry={telemetry}
+                        departments={departments}
                       />
                     </div>
                   ) : (
@@ -1180,7 +1181,7 @@ export default function App() {
                         </div>
                       </div>
 
-                  {activeDepartment === 'Overview' && (
+                  {workspaceTab === 'network' && (
                     <div className="panel company-panel" style={{ marginBottom: 24 }}>
                       <div className="panel-header">
                         <div><span className="panel-kicker">LIVE ORGANISATION</span><h2>Autonomous Company Network</h2></div>
@@ -1217,52 +1218,29 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* Fleet Health & Real-Time Throughput Monitor - Only visible on Overview, hidden on organization tabs */}
-                  {activeDepartment === 'Overview' && (
-                    <div style={{ marginBottom: 20 }}>
-                      <FleetHealthMonitor
-                        agents={agents}
-                        tasks={tasks}
-                        logs={logs}
-                        selectedAgentId={selectedAgent?.id}
-                        onSelectAgent={(agentId) => {
-                          setSelectedAgentId(agentId);
-                        }}
-                      />
-                    </div>
-                  )}
+                  {/* Fleet Health & Real-Time Throughput Monitor */}
+                  <div style={{ marginBottom: 20 }}>
+                    <FleetHealthMonitor
+                      agents={agents}
+                      tasks={tasks}
+                      logs={logs}
+                      selectedAgentId={selectedAgent?.id}
+                      onSelectAgent={(agentId) => {
+                        setSelectedAgentId(agentId);
+                      }}
+                    />
+                  </div>
 
-                  {/* When an organization tab is clicked, show clean Department Hub and hide excessive agent cards */}
-                  {activeDepartment !== 'Overview' ? (
-                    <div style={{ marginBottom: 24 }}>
-                      <DepartmentHubView
-                        departmentName={activeDepartment}
-                        departmentKey={departmentsList.find(d => d[0] === activeDepartment)?.[3] || 'executive'}
-                        departmentColor={getAgentColor(departmentsList.find(d => d[0] === activeDepartment)?.[3] || '')}
-                        departmentSymbol={departmentsList.find(d => d[0] === activeDepartment)?.[1] || '⌘'}
-                        agents={agents}
-                        tasks={tasks}
-                        onSelectAgent={(id) => {
-                          setSelectedAgentId(id);
-                        }}
-                        onOpenAgentDetail={(id) => {
-                          setSelectedAgentId(id);
-                          openModal('isAgentDetailOpen');
-                        }}
-                        onExecutePrompt={handleExecutePrompt}
-                        onBackToOverview={() => setActiveDepartment('Overview')}
-                      />
-                    </div>
-                  ) : (
-                    <div className="agents-section" style={{ marginTop: 0 }}>
-                      <div className="section-heading">
-                        <div>
-                          <span className="panel-kicker">AGENT FLEET TELEMETRY</span>
-                          <h2>Active Workforce & Pulse Intensity ({agents.length} Agents)</h2>
-                        </div>
-                        <button className="text-button" onClick={() => { closeAllModals(); openModal('isSearchOpen'); }}>View all agents →</button>
+                  {/* Agent Fleet Telemetry Grid */}
+                  <div className="agents-section" style={{ marginTop: 0 }}>
+                    <div className="section-heading">
+                      <div>
+                        <span className="panel-kicker">AGENT FLEET TELEMETRY</span>
+                        <h2>Active Workforce & Pulse Intensity ({agents.length} Agents)</h2>
                       </div>
-                      <div className="agent-grid">
+                      <button className="text-button" onClick={() => { closeAllModals(); openModal('isSearchOpen'); }}>View all agents →</button>
+                    </div>
+                    <div className="agent-grid">
                         {visibleAgents.map((agent) => {
                           const agentColor = getAgentColor(agent.department);
                           const isWorking = agent.status === 'working' || agent.status === 'thinking';
@@ -1390,9 +1368,8 @@ export default function App() {
                         })}
                       </div>
                     </div>
-                  )}
 
-                  <div className="panel activity-panel">
+                    <div className="panel activity-panel">
                     <div className="panel-header">
                       <div><span className="panel-kicker">REAL-TIME TELEMETRY & QUANTUM ALIGNMENT</span><h2>Agent Activity & Communication</h2></div>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -1419,7 +1396,7 @@ export default function App() {
         </section>
 
         {/* RIGHT COPILOT: RUFFLO INTELLIGENCE CHATBOT */}
-        <aside className="copilot flex flex-col h-full overflow-hidden p-0 border-l border-[#3c3836]">
+        <aside className="copilot flex flex-col   p-0 border-l border-[#3c3836]">
           <RuffloIntelligenceChatbot
             agents={agents}
             tasks={tasks}
@@ -1430,6 +1407,7 @@ export default function App() {
           />
         </aside>
       </main>
+    </div>
 
       {/* BOTTOM STATUS BAR */}
       <footer className="statusbar">

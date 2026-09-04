@@ -20,7 +20,7 @@ interface AgentCallModalProps {
   isOpen: boolean;
   onClose: () => void;
   agents: Agent[];
-  currentAgent: Agent;
+  currentAgent?: Agent | null;
   onSelectAgent: (agentId: string) => void;
   onExecutePrompt: (prompt: string) => Promise<void>;
   userDisplayName: string;
@@ -35,13 +35,13 @@ export const AgentCallModal: React.FC<AgentCallModalProps> = ({
   onExecutePrompt,
   userDisplayName,
 }) => {
-  const [session, setSession] = useState<AgentCallSession>({
-    agentId: currentAgent.id,
+  const [session, setSession] = useState<AgentCallSession>(() => ({
+    agentId: currentAgent?.id || '',
     status: 'ringing',
     durationSeconds: 0,
     isMuted: false,
     transcripts: [],
-  });
+  }));
 
   const [isListening, setIsListening] = useState(false);
   const [spokenTranscript, setSpokenTranscript] = useState('');
@@ -52,7 +52,7 @@ export const AgentCallModal: React.FC<AgentCallModalProps> = ({
 
   // Sync session when agent changes or modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && currentAgent) {
       soundFx.playNotification();
       setSession({
         agentId: currentAgent.id,
@@ -93,10 +93,10 @@ export const AgentCallModal: React.FC<AgentCallModalProps> = ({
       }, 1500);
 
       return () => clearTimeout(pickupTimer);
-    } else {
+    } else if (!isOpen) {
       handleEndCall();
     }
-  }, [isOpen, currentAgent.id]);
+  }, [isOpen, currentAgent?.id]);
 
   // Duration timer
   useEffect(() => {
@@ -179,7 +179,7 @@ export const AgentCallModal: React.FC<AgentCallModalProps> = ({
   };
 
   const handleSendUserVoice = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || !currentAgent) return;
 
     soundFx.playNotification();
     const userMsg = text.trim();
@@ -261,7 +261,7 @@ export const AgentCallModal: React.FC<AgentCallModalProps> = ({
     }, 400);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !currentAgent) return null;
 
   const formatDuration = (sec: number) => {
     const m = Math.floor(sec / 60);

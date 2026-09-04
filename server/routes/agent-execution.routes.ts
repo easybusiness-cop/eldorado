@@ -127,26 +127,38 @@ agentExecutionRouter.get("/deployment/cloudrun", (req, res) => {
   });
 });
 
-agentExecutionRouter.post("/deployment/cloudrun/trigger", async (req, res) => {
-  const { releaseTag = "v2.5.0-autonomous", author = "Roy Anderson / Operator" } = req.body;
-  debugTelemetry.logs.unshift({
-    id: `dbg-cloudrun-deploy-${Date.now()}`,
-    timestamp: new Date().toLocaleTimeString(),
-    level: "success",
-    message: `[Cloud Run Production Rollout] Single-file bundle dist/server.cjs compiled & deployed successfully by ${author}. Release: ${releaseTag}`,
-  });
+agentExecutionRouter.post(
+  "/deployment/cloudrun/trigger",
+  async (req, res) => {
+    const {
+      releaseTag = "unreleased",
+      author = "Rufflo",
+    } = req.body ?? {};
 
-  res.json({
-    success: true,
-    releaseTag,
-    deployedBy: author,
-    status: "DEPLOYED_LIVE",
-    artifact: "dist/server.cjs",
-    endpoint: "https://ais-dev-xpys5ljnalinrfzoy2omyc-458062693402.asia-southeast1.run.app",
-    healthCheck: "PASS (200 OK)",
-    timestamp: new Date().toISOString(),
-  });
-});
+    debugTelemetry.logs.unshift({
+      id: `dbg-cloudrun-deploy-${Date.now()}`,
+      timestamp:
+        new Date().toLocaleTimeString(),
+      level: "warn",
+      message:
+        `[Cloud Run] Deployment request received by ${author}. ` +
+        `Release: ${releaseTag}. ` +
+        `No production deployment was executed by this endpoint.`,
+    });
+
+    return res.status(202).json({
+      success: true,
+      status: "DEPLOYMENT_REQUESTED",
+      releaseTag,
+      requestedBy: author,
+      deployed: false,
+      message:
+        "Deployment request recorded. Production rollout requires the deployment pipeline and approval gate.",
+      timestamp:
+        new Date().toISOString(),
+    });
+  },
+);
 
 // ==========================================
 // QUANTUM-INSPIRED WORKFLOW & MEMORY

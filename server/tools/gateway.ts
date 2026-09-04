@@ -2,6 +2,7 @@ import { ToolExecutionRequest, ToolExecutionResult } from '../../shared/types/in
 import { mastraToolRegistry } from '../ai/mastra/tools/index.ts';
 import { composioToolGateway } from '../integrations/composio/tools.ts';
 import { riskEngine } from '../ai/runtime/risk-engine.ts';
+import { executionKernel } from "../core/execution/execution.kernel.ts";
 
 export class ToolAuditLogger {
   private static instance: ToolAuditLogger;
@@ -52,7 +53,6 @@ export const toolAuditLogger = ToolAuditLogger.getInstance();
 
 export class ToolGateway {
   private static instance: ToolGateway;
-
   private constructor() {}
 
   public static getInstance(): ToolGateway {
@@ -78,6 +78,7 @@ export class ToolGateway {
 
     // 2. Risk Engine Assessment
     const assessment = await riskEngine.assessRisk(req.toolName, req.parameters, { agentId: req.agentId, orgId: req.organizationId });
+
     if (assessment.requiresApproval) {
       const auditId = toolAuditLogger.logExecution(req.toolName, req.agentId, req.organizationId, false, 0, assessment.riskLevel);
       return {
@@ -92,6 +93,138 @@ export class ToolGateway {
     }
 
     try {
+      // -------------------------------------------------------
+      // Canonical Rufflo execution tool
+      // -------------------------------------------------------
+      if (req.toolName === "terminal.execute") {
+        const command = req.parameters.command;
+
+        if (
+          typeof command !== "string" ||
+          command.trim().length === 0
+        ) {
+          const durationMs =
+            Date.now() - startTime;
+
+          const auditId =
+            toolAuditLogger.logExecution(
+              req.toolName,
+              req.agentId,
+              req.organizationId,
+              false,
+              durationMs,
+              assessment.riskLevel,
+            );
+
+          return {
+            success: false,
+            error: {
+              code: "INVALID_TERMINAL_COMMAND",
+              message:
+                "terminal.execute requires a non-empty command.",
+            },
+            auditId,
+            executionTimeMs: durationMs,
+          };
+        }
+
+        const execution =
+          await executionKernel.execute({
+            taskId:
+              String(
+                req.parameters.taskId ??
+                `tool-${Date.now()}`,
+              ),
+
+            agentId:
+              req.agentId,
+
+            organizationId:
+              req.organizationId,
+
+            mode: "SANDBOX",
+
+            command,
+
+            cwd:
+              typeof req.parameters.cwd === "string"
+                ? req.parameters.cwd
+                : undefined,
+
+            workspace:
+              typeof req.parameters.workspace === "string"
+                ? req.parameters.workspace
+                : undefined,
+
+            timeoutMs:
+              typeof req.parameters.timeoutMs === "number"
+                ? req.parameters.timeoutMs
+                : 120_000,
+
+            networkAccess: false,
+          });
+
+        const durationMs =
+          Date.now() - startTime;
+
+        const success =
+          execution.success;
+
+        const auditId =
+          toolAuditLogger.logExecution(
+            req.toolName,
+            req.agentId,
+            req.organizationId,
+            success,
+            durationMs,
+            assessment.riskLevel,
+          );
+
+        if (!success) {
+          return {
+            success: false,
+            error: {
+              code:
+                execution.error?.code ??
+                "TERMINAL_EXECUTION_FAILED",
+
+              message:
+                execution.error?.message ??
+                execution.stderr ??
+                "Terminal execution failed.",
+            },
+
+            auditId,
+
+            executionTimeMs:
+              durationMs,
+          };
+        }
+
+        return {
+          success: true,
+
+          data: {
+            exitCode:
+              execution.exitCode,
+
+            stdout:
+              execution.stdout,
+
+            stderr:
+              execution.stderr,
+
+            timedOut:
+              execution.timedOut,
+          },
+
+          auditId,
+
+          executionTimeMs:
+            durationMs,
+        };
+      }
+
       // Check built-in Mastra tools
       const mastraTool = mastraToolRegistry.getTool(req.toolName);
       if (mastraTool) {

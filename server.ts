@@ -20,6 +20,8 @@ import { knowledgeRouter } from "./server/routes/knowledge.routes.ts";
 import { autonomyRouter } from "./server/routes/autonomy.routes.ts";
 import { evolutionRouter } from "./server/routes/evolution.routes.ts";
 import { repositoryRouter } from "./server/routes/repository.routes.ts";
+import { supabaseRouter } from "./server/routes/supabase.routes.ts";
+import { objectivesRouter } from "./server/routes/objectives.routes.ts";
 
 dotenv.config();
 
@@ -105,6 +107,8 @@ app.use("/api", enterpriseControlRouter);
 app.use("/api", autonomyRouter);
 app.use("/api/evolution", evolutionRouter);
 app.use("/api/repository", repositoryRouter);
+app.use("/api/supabase", supabaseRouter);
+app.use("/api", objectivesRouter);
 
 // Start Server with Vite Dev/Prod Middleware
 async function startServer() {

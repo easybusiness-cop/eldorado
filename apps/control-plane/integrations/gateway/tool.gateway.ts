@@ -190,6 +190,45 @@ export class ToolGateway {
 
       const approvalRequired = riskEvaluation.approvalRequired || policyEvaluation.requiresApproval;
 
+      // merge_pull_request must only enqueue ApprovalService; never merge directly.
+      if (req.action === "merge_pull_request") {
+        const approvalReq = ApprovalService.createRequest({
+          executionId,
+          requestedBy: employee.id,
+          agentId: employee.id,
+          action: requestedCap,
+          parameters: req.parameters,
+          riskLevel: riskEvaluation.riskLevel,
+          reason: req.reason || `Automated request for high-risk action: ${requestedCap}`,
+        });
+
+        companyDb.logAudit({
+          id: auditId,
+          agentId: employee.id,
+          projectId: "prj-alpha",
+          taskId: "gw-halt",
+          tool: normalizedTool,
+          action: req.action,
+          inputHash: Buffer.from(JSON.stringify(req.parameters)).toString("base64").slice(0, 20),
+          result: `BLOCKED: merge_pull_request is strictly gated. Enqueued in ApprovalService. Request ID: ${approvalReq.id}`,
+          timestamp: new Date().toISOString(),
+          riskLevel: riskEvaluation.riskLevel.toLowerCase() as "low" | "medium" | "high" | "critical",
+          approvalRequired: true,
+          executionId,
+        });
+
+        return {
+          success: false,
+          data: null,
+          error: `Execution Halted: Action "${requestedCap}" strictly requires human-in-the-loop approval. Enqueued in ApprovalService successfully.`,
+          executionId,
+          riskLevel: riskEvaluation.riskLevel,
+          approvalRequired: true,
+          auditId,
+          approvalId: approvalReq.id,
+        };
+      }
+
       // 6. Handle Human Approval Gate if triggered
       if (approvalRequired && !req.bypassApprovalId) {
         // Enforce approval system trigger (halt execution, save state)

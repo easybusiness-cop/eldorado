@@ -1,0 +1,163 @@
+{
+  "obj-1788510985581": {
+    "id": "obj-1788510985581",
+    "goal": "Run compliance checks, verify environment variables, and audit folder permissions",
+    "constraints": [
+      "Execution limit 30 seconds",
+      "Strict local mode"
+    ],
+    "successCriteria": [
+      "Audit logs generated",
+      "Status is COMPLETED"
+    ],
+    "status": "NEEDS_HUMAN",
+    "steps": [
+      {
+        "id": "replan-step-obj-1788510985581-2-0",
+        "name": "Run Compliance and Environment Verification via Test Script",
+        "type": "TEST",
+        "status": "PENDING",
+        "command": "npm run test:objective",
+        "expected": "PASSED",
+        "artifacts": []
+      }
+    ],
+    "currentStepIndex": 0,
+    "failures": [
+      "Step [Audit Folder Permissions and Environment Variables] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered.",
+      "Step [Audit Permissions and Environment Variables] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered.",
+      "Execution aborted: Wall time budget exhausted (106490ms elapsed, limit 60000ms)."
+    ],
+    "recoveryAttempts": 2,
+    "maxRecoveryAttempts": 2,
+    "maxWallTimeMs": 60000,
+    "budgetExhausted": true,
+    "evidence": [
+      "Objective initialized successfully.",
+      "Planner successfully mapped objective execution plan.",
+      "Failure occurred. Activating Replan recovery attempt 1/2...",
+      "Failure occurred. Activating Replan recovery attempt 2/2...",
+      "Execution aborted: Wall time budget exhausted (106490ms elapsed, limit 60000ms)."
+    ],
+    "createdAt": "2026-09-04T08:36:25.581Z",
+    "updatedAt": "2026-09-04T08:38:20.578Z"
+  },
+  "obj-1788511563111": {
+    "id": "obj-1788511563111",
+    "goal": "Run compliance checks, verify environment variables, and audit folder permissions",
+    "constraints": [
+      "Execution limit 30 seconds",
+      "Strict local mode"
+    ],
+    "successCriteria": [
+      "Audit logs generated",
+      "Status is COMPLETED"
+    ],
+    "status": "RUNNING",
+    "steps": [
+      {
+        "id": "replan-step-obj-1788511563111-2-0",
+        "name": "Verify Environment Variables",
+        "type": "SECURITY",
+        "status": "RUNNING",
+        "command": "tsx -e \"import fs from 'fs'; console.log('ENV_CHECK:', fs.existsSync('.env.example') ? 'SUCCESS' : 'FAILURE');\"",
+        "expected": "ENV_CHECK: SUCCESS",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1788511563111-2-1",
+        "name": "Audit Folder Permissions and Structure",
+        "type": "SECURITY",
+        "status": "PENDING",
+        "command": "tsx -e \"import fs from 'fs'; const dirs = ['secrets', 'server', 'shared', 'src']; console.log('PERMS_AUDIT:', dirs.every(d => fs.existsSync(d)) ? 'SUCCESS' : 'FAILURE');\"",
+        "expected": "PERMS_AUDIT: SUCCESS",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1788511563111-2-2",
+        "name": "Run Compliance Checks",
+        "type": "TEST",
+        "status": "PENDING",
+        "command": "npm test",
+        "expected": "\"passed\": true",
+        "artifacts": []
+      }
+    ],
+    "currentStepIndex": 0,
+    "failures": [
+      "Step [Verify Environment Configuration] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered.",
+      "Step [Verify Environment Variables] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered."
+    ],
+    "recoveryAttempts": 2,
+    "maxRecoveryAttempts": 2,
+    "maxWallTimeMs": 60000,
+    "budgetExhausted": false,
+    "evidence": [
+      "Objective initialized successfully.",
+      "Planner successfully mapped objective execution plan.",
+      "Failure occurred. Activating Replan recovery attempt 1/2...",
+      "Failure occurred. Activating Replan recovery attempt 2/2..."
+    ],
+    "createdAt": "2026-09-04T08:46:03.111Z",
+    "updatedAt": "2026-09-04T08:46:32.984Z"
+  },
+  "obj-1788512162612": {
+    "id": "obj-1788512162612",
+    "goal": "Run compliance checks, verify environment variables, and audit folder permissions",
+    "constraints": [
+      "Execution limit 30 seconds",
+      "Strict local mode"
+    ],
+    "successCriteria": [
+      "Audit logs generated",
+      "Status is COMPLETED"
+    ],
+    "status": "RUNNING",
+    "steps": [
+      {
+        "id": "replan-step-obj-1788512162612-2-0",
+        "name": "Verify Environment Variables Configuration",
+        "type": "SECURITY",
+        "status": "RUNNING",
+        "command": "node -e \"const fs = require('fs'); console.log(fs.existsSync('.env.example') ? 'ENV_VERIFY: COMPLETED' : 'FAILED');\"",
+        "expected": "ENV_VERIFY: COMPLETED",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1788512162612-2-1",
+        "name": "Audit Directory and Folder Permissions",
+        "type": "SECURITY",
+        "status": "PENDING",
+        "command": "node -e \"const fs = require('fs'); const dirs = ['secrets', 'server', 'src']; const ok = dirs.every(d => fs.existsSync(d)); console.log(ok ? 'AUDIT_PERMISSIONS: COMPLETED' : 'FAILED');\"",
+        "expected": "AUDIT_PERMISSIONS: COMPLETED",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1788512162612-2-2",
+        "name": "Run Compliance and Security Checks",
+        "type": "TEST",
+        "status": "PENDING",
+        "command": "npm test",
+        "expected": "\"passed\": true",
+        "artifacts": []
+      }
+    ],
+    "currentStepIndex": 0,
+    "failures": [
+      "Step [Verify Environment Variables Configuration] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered.",
+      "Step [Verify Environment Variables Configuration] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered."
+    ],
+    "recoveryAttempts": 2,
+    "maxRecoveryAttempts": 2,
+    "maxWallTimeMs": 60000,
+    "budgetExhausted": false,
+    "evidence": [
+      "Objective initialized successfully.",
+      "Planner successfully mapped objective execution plan.",
+      "Failure occurred. Activating Replan recovery attempt 1/2...",
+      "Failure occurred. Activating Replan recovery attempt 2/2..."
+    ],
+    "createdAt": "2026-09-04T08:56:02.612Z",
+    "updatedAt": "2026-09-04T08:56:38.277Z"
+  }
+}

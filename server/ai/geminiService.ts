@@ -87,24 +87,27 @@ export async function callGeminiResilient(options: CallGeminiOptions): Promise<s
     }
   }
 
-  // If quota or rate limit exceeded, return intelligent offline fallback response
-  const lastMsg = lastError?.message || "";
-  if (lastMsg.includes("resource_exhausted") || lastMsg.includes("QUOTA_EXCEEDED") || lastMsg.includes("429") || lastMsg.includes("quota")) {
-    console.warn("[Gemini Quota Exceeded] Falling back to robust local enterprise simulation mode.");
-    if (options.responseMimeType === "application/json") {
-      return JSON.stringify({
-        status: "success",
-        summary: "Completed via Enterprise Local Rule-Based Engine (API Quota Exceeded fallback active)",
-        outputSummary: "Executed task successfully using local resilient simulation engine.",
-        tasks: [{ title: "Analyzed Directive", status: "completed", assignedTo: "Autonomous Agent" }],
-        metrics: { productivity: 95, velocity: 4.8 },
-        github_action: null
-      });
-    }
-    return `[System Notice: Gemini API Quota temporarily exceeded. Operating in High-Reliability Local Enterprise Simulation Mode]\n\nTask processed successfully by local agent runner. All system modules, database records, and workspace integrations remain fully operational.`;
+  const lastMsg =
+    lastError?.message || "";
+
+  const isQuotaError =
+    lastMsg.includes("resource_exhausted") ||
+    lastMsg.includes("QUOTA_EXCEEDED") ||
+    lastMsg.includes("429") ||
+    lastMsg.toLowerCase().includes("quota");
+
+  if (isQuotaError) {
+    throw new Error(
+      "Gemini quota/rate limit exceeded. " +
+      "Autonomous execution was stopped because Rufflo cannot " +
+      "claim successful code generation without a verified model result.",
+    );
   }
 
-  throw lastError || new Error("All Gemini models temporarily unavailable");
+  throw lastError ||
+    new Error(
+      "All configured Gemini models are unavailable.",
+    );
 }
 
 // Local Persona Engine Fallback when remote services experience high demand

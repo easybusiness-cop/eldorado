@@ -13,13 +13,12 @@ declare global {
   }
 }
 
-// Initialize Client System Runtime Object
+// Initialize Client System Runtime Object (Without arbitrary browser code execution)
 export function initializeSystemRuntime() {
   if (typeof window === 'undefined') return;
-
   if (!window.__MUNDERDIFFL_SYSTEM__) {
     window.__MUNDERDIFFL_SYSTEM__ = {
-      version: '0.4.0-auto-patch',
+      version: '0.4.0-hardened',
       activeModules: [],
       systemState: {
         fleetSize: 9,
@@ -28,49 +27,19 @@ export function initializeSystemRuntime() {
         mountedFeatures: 0,
         lastPatchTime: Date.now(),
       },
-      applyClientPatch: (code: string, meta: any = {}) => {
-        try {
-          // Safe evaluation in browser context with exposed runtime
-          const runtimeFn = new Function(
-            'system',
-            'state',
-            'meta',
-            `"use strict";
-            try {
-              ${code}
-            } catch (err) {
-              console.error("[System Code Runtime Error]:", err);
-              return { error: err.message };
-            }`
-          );
-
-          const result = runtimeFn(
-            window.__MUNDERDIFFL_SYSTEM__,
-            window.__MUNDERDIFFL_SYSTEM__?.systemState,
-            meta
-          );
-
-          window.dispatchEvent(
-            new CustomEvent('munderdiffl-system-code-applied', {
-              detail: { code, meta, result, timestamp: Date.now() },
-            })
-          );
-
-          return result;
-        } catch (err: any) {
-          console.error('[System Patch Execution Failed]:', err);
-          return { error: err.message };
-        }
-      },
-      executeModule: (nameOrId: string, ...args: any[]) => {
-        const found = window.__MUNDERDIFFL_SYSTEM__?.activeModules.find(
-          (m) => m.id === nameOrId || m.name.toLowerCase().includes(nameOrId.toLowerCase())
+      applyClientPatch: (_code: string, _meta: any = {}) => {
+        console.warn(
+          "[SECURITY REJECTED] Rufflo does not execute agent-generated JavaScript in the browser. Agent code must execute through the server-side harness and approved execution sandbox."
         );
-        if (!found) {
-          console.warn(`[System Runtime] Module "${nameOrId}" not found in active registry.`);
-          return null;
-        }
-        return window.__MUNDERDIFFL_SYSTEM__?.applyClientPatch(found.code, { args });
+        return {
+          error: "CLIENT_CODE_EXECUTION_DISABLED: Agent code must execute through the server-side harness.",
+        };
+      },
+      executeModule: (nameOrId: string, ..._args: any[]) => {
+        console.warn(
+          `[SECURITY REJECTED] Client dynamic module execution is disabled for "${nameOrId}".`
+        );
+        return null;
       },
       dispatchFleetEvent: (eventName: string, payload: any = {}) => {
         window.dispatchEvent(new CustomEvent(`munderdiffl-${eventName}`, { detail: payload }));
@@ -79,7 +48,21 @@ export function initializeSystemRuntime() {
   }
 }
 
-// Send Code to Backend and Apply to Both System Runtime and Website
+export async function executeSystemCode(
+  _code: string,
+  _context?: unknown,
+) {
+  return {
+    success: false,
+    error: {
+      code: "CLIENT_CODE_EXECUTION_DISABLED",
+      message:
+        "Rufflo does not execute agent-generated JavaScript in the browser. Agent code must execute through the server-side harness and approved execution sandbox.",
+    },
+  };
+}
+
+// Send Code to Backend to execute, validate and register in backend runtime
 export async function sendAndApplySystemCode(
   code: string,
   name?: string,
@@ -88,7 +71,6 @@ export async function sendAndApplySystemCode(
   context: any = {}
 ): Promise<{ success: boolean; module?: AppliedSystemModule; error?: string; output?: any }> {
   try {
-    // 1. Send to Express Backend to execute, validate and register in backend runtime
     const response = await fetch('/api/system/apply-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -104,10 +86,8 @@ export async function sendAndApplySystemCode(
     const data = await response.json();
 
     if (data.success && data.module) {
-      // 2. Also mount and apply to client website runtime
       initializeSystemRuntime();
       if (window.__MUNDERDIFFL_SYSTEM__) {
-        // Register in window state
         const existingIdx = window.__MUNDERDIFFL_SYSTEM__.activeModules.findIndex(
           (m) => m.id === data.module.id
         );
@@ -119,16 +99,7 @@ export async function sendAndApplySystemCode(
         window.__MUNDERDIFFL_SYSTEM__.systemState.mountedFeatures =
           window.__MUNDERDIFFL_SYSTEM__.activeModules.length;
         window.__MUNDERDIFFL_SYSTEM__.systemState.lastPatchTime = Date.now();
-
-        // Run client-side patch execution
-        const clientResult = window.__MUNDERDIFFL_SYSTEM__.applyClientPatch(code, {
-          source,
-          name: data.module.name,
-        });
-
-        data.module.output = data.module.output || clientResult;
       }
-
       return {
         success: true,
         module: data.module,
@@ -142,13 +113,9 @@ export async function sendAndApplySystemCode(
       module: data.module,
     };
   } catch (err: any) {
-    // Fallback: apply client-side if offline/error
-    initializeSystemRuntime();
-    const clientResult = window.__MUNDERDIFFL_SYSTEM__?.applyClientPatch(code, { source, name });
     return {
-      success: true,
-      error: err.message,
-      output: clientResult,
+      success: false,
+      error: err?.message || 'Server-side execution unavailable. Client code execution is disabled.',
     };
   }
 }

@@ -30,6 +30,7 @@ import { AgentWorkstationModal } from './AgentWorkstationModal';
 import { DeploymentPipelineModal } from './DeploymentPipelineModal';
 import { MunderdifflinDashboard } from './MunderdifflinDashboard';
 import { DynamicKnowledgeBaseModal } from './DynamicKnowledgeBaseModal';
+import { SupabaseDiagnosticModal } from './SupabaseDiagnosticModal';
 import { Zap } from 'lucide-react';
 
 export interface ModalManagerState {
@@ -56,6 +57,7 @@ export interface ModalManagerState {
   isDeploymentPipelineOpen: boolean;
   isMunderdifflinDashboardOpen: boolean;
   isDynamicKbOpen: boolean;
+  isSupabaseDiagnosticOpen: boolean;
 }
 
 interface ModalManagerProps {
@@ -67,7 +69,7 @@ interface ModalManagerProps {
   tasks: FleetTask[];
   departments: any[];
   userProfile: UserProfile;
-  selectedAgent: Agent;
+  selectedAgent: Agent | null | undefined;
   onSelectAgent: (id: string) => void;
   onLogin: (profile: UserProfile) => void;
   onUpdatePreferences: (prefs: any) => void;
@@ -353,6 +355,11 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       <DynamicKnowledgeBaseModal
         isOpen={state.isDynamicKbOpen}
         onClose={() => onClose('isDynamicKbOpen')}
+      />
+
+      <SupabaseDiagnosticModal
+        isOpen={state.isSupabaseDiagnosticOpen}
+        onClose={() => onClose('isSupabaseDiagnosticOpen')}
       />
 
       {autoApplyToast && (

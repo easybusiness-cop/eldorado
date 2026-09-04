@@ -24,40 +24,85 @@ export const DEFAULT_AUTONOMOUS_POLICY: ExecutionPolicyConfig = {
   maxTimeoutMs: 120_000,
 };
 
-const BLOCKED_PATTERNS = [
-  /rm\s+-rf\s+\/(?:\s|$)/i,
-  /mkfs\./i,
-  /shutdown/i,
-  /reboot/i,
-  /:\(\)\s*\{\s*:\|:&\s*\};:/i,
-  /curl\s+.*\|\s*(bash|sh)/i,
-  /wget\s+.*\|\s*(bash|sh)/i,
+/*
+ * Block obviously destructive or privilege-escalating commands.
+ *
+ * This is NOT a complete sandbox. It is a policy layer.
+ * Real production isolation should additionally use a container,
+ * VM, WASM runtime, or another OS-level sandbox.
+ */
+const BLOCKED_PATTERNS: Array<[RegExp, string]> = [
+  [/rm\s+-rf\s+\/(?:\s|$)/i, "Root filesystem deletion"],
+  [/rm\s+-rf\s+\/\*/i, "Root filesystem deletion"],
+  [/mkfs(?:\.[a-z0-9]+)?\b/i, "Filesystem formatting"],
+  [/\bshutdown\b/i, "System shutdown"],
+  [/\breboot\b/i, "System reboot"],
+  [/\bpoweroff\b/i, "System poweroff"],
+  [/\binit\s+[06]\b/i, "System runlevel change"],
+  [/:.*\(\)\s*\{\s*:.*\|.*&\s*\};:/i, "Fork bomb"],
+  [/curl\s+[^|]*\|\s*(bash|sh|zsh)\b/i, "Remote shell execution"],
+  [/wget\s+[^|]*\|\s*(bash|sh|zsh)\b/i, "Remote shell execution"],
+  [/\bchmod\s+777\b/i, "Unsafe global permissions"],
+  [/\bchown\s+-R\s+.*\s+\/\s*$/i, "Root ownership modification"],
+  [/\bsudo\s+/i, "Privilege escalation"],
+  [/\bsu\s+-?\s*root\b/i, "Root account escalation"],
 ];
 
 export function validateCommand(
   command: string,
-  policy: ExecutionPolicyConfig = DEFAULT_AUTONOMOUS_POLICY
+  policy: ExecutionPolicyConfig = DEFAULT_AUTONOMOUS_POLICY,
 ) {
-  for (const pattern of BLOCKED_PATTERNS) {
-    if (pattern.test(command)) {
+  const normalized = command.trim();
+
+  if (!normalized) {
+    return {
+      allowed: false,
+      reason: "Command cannot be empty.",
+    };
+  }
+
+  for (const [pattern, reason] of BLOCKED_PATTERNS) {
+    if (pattern.test(normalized)) {
       return {
         allowed: false,
-        reason: `Command matched blocked security rule: ${pattern}`,
+        reason: `Command blocked: ${reason}.`,
       };
     }
   }
 
-  if (!policy.allowGit && /\bgit\b/i.test(command)) {
+  if (!policy.allowShell) {
     return {
       allowed: false,
-      reason: "Git access is disabled for this execution context.",
+      reason: "Shell execution is disabled.",
     };
   }
 
-  if (!policy.allowDeployment && /\b(deploy|vercel|production)\b/i.test(command)) {
+  if (!policy.allowGit && /\bgit\b/i.test(normalized)) {
     return {
       allowed: false,
-      reason: "Production deployment is not allowed by this policy.",
+      reason: "Git access is disabled.",
+    };
+  }
+
+  if (
+    !policy.allowDeployment &&
+    /\b(deploy|production|release|cloud\s*run|vercel)\b/i.test(
+      normalized,
+    )
+  ) {
+    return {
+      allowed: false,
+      reason: "Production deployment is disabled.",
+    };
+  }
+
+  if (
+    !policy.allowNetwork &&
+    /\b(curl|wget|nc|netcat|ssh|scp|ftp)\b/i.test(normalized)
+  ) {
+    return {
+      allowed: false,
+      reason: "Network-capable shell utilities are disabled.",
     };
   }
 
@@ -69,7 +114,8 @@ export function validateCommand(
 export class ExecutionPolicy {
   static evaluate(
     request: ExecutionRequest,
-    policyConfig: ExecutionPolicyConfig = DEFAULT_AUTONOMOUS_POLICY
+    policyConfig: ExecutionPolicyConfig =
+      DEFAULT_AUTONOMOUS_POLICY,
   ): PolicyDecision {
     if (!request.organizationId) {
       return {
@@ -87,7 +133,25 @@ export class ExecutionPolicy {
       };
     }
 
-    if ((request.mode as string) === "PRODUCTION") {
+    const timeoutMs = request.timeoutMs ?? 120_000;
+
+    if (timeoutMs <= 0) {
+      return {
+        allowed: false,
+        requiresApproval: false,
+        reason: "Timeout must be greater than zero.",
+      };
+    }
+
+    if (timeoutMs > policyConfig.maxTimeoutMs) {
+      return {
+        allowed: false,
+        requiresApproval: false,
+        reason: `Timeout exceeds policy maximum of ${policyConfig.maxTimeoutMs}ms.`,
+      };
+    }
+
+    if (request.mode === "PRODUCTION" as never) {
       return {
         allowed: false,
         requiresApproval: true,
@@ -96,21 +160,29 @@ export class ExecutionPolicy {
     }
 
     if (request.command) {
-      const validation = validateCommand(request.command, policyConfig);
+      const validation = validateCommand(
+        request.command,
+        policyConfig,
+      );
+
       if (!validation.allowed) {
         return {
           allowed: false,
-          requiresApproval: true,
+          requiresApproval: false,
           reason: validation.reason,
         };
       }
     }
 
-    if (request.networkAccess && request.mode !== "NETWORK" && !policyConfig.allowNetwork) {
+    if (
+      request.networkAccess &&
+      !policyConfig.allowNetwork
+    ) {
       return {
         allowed: false,
         requiresApproval: true,
-        reason: "Network access is not permitted for this execution mode.",
+        reason:
+          "Network access is not permitted for this execution context.",
       };
     }
 
