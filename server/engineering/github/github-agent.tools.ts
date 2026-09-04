@@ -68,7 +68,8 @@ export const createCommitTool = createTool({
     })).describe('List of files with their path and new contents'),
   }),
   execute: async ({ repo, branch, message, files }) => {
-    return await CommitService.createCommit(repo, branch, message, files);
+    const validFiles = (files || []).map((f) => ({ path: f.path || "", content: f.content || "" }));
+    return await CommitService.createCommit(repo, branch, message, validFiles);
   },
 });
 
@@ -83,7 +84,12 @@ export const createPullRequestTool = createTool({
     body: z.string(),
   }),
   execute: async (input) => {
-    return await PullRequestService.createPR(input.repo, input);
+    return await PullRequestService.createPR(input.repo || "", {
+      title: input.title || "",
+      head: input.head || "",
+      base: input.base || "",
+      body: input.body || "",
+    });
   },
 });
 

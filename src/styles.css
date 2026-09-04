@@ -57,7 +57,8 @@ button {
 .rufflo-app {
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background:
     linear-gradient(
       180deg,
@@ -1459,3 +1460,81 @@ kbd {
   }
 
 }
+
+/* ==========================================
+   GLOBAL & PER-PAGE SCROLLING ENHANCEMENTS
+   ========================================== */
+
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  min-height: 100vh;
+}
+
+.rufflo-app {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+.main-grid {
+  min-height: calc(100vh - 98px);
+  height: auto;
+  align-items: stretch;
+}
+
+.workspace {
+  min-width: 0;
+  padding: 24px;
+  overflow-y: auto !important;
+  max-height: calc(100vh - 98px);
+  scroll-behavior: smooth;
+}
+
+.sidebar {
+  overflow-y: auto !important;
+  max-height: calc(100vh - 98px);
+  position: sticky;
+  top: 60px;
+  scroll-behavior: smooth;
+}
+
+.copilot {
+  overflow-y: auto !important;
+  max-height: calc(100vh - 98px);
+  position: sticky;
+  top: 60px;
+  scroll-behavior: smooth;
+}
+
+/* Modals, Overlays, and Drawers Scrolling */
+div[role="dialog"],
+.modal-overlay,
+.modal-backdrop,
+.fixed.inset-0 {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-content,
+.drawer-content,
+.modal-window,
+.modal-body {
+  max-height: calc(100vh - 40px) !important;
+  overflow-y: auto !important;
+  scroll-behavior: smooth;
+}
+
+/* Specific view scrollability */
+.department-hub,
+.munderdifflin-dashboard,
+.activity-panel,
+.agents-section,
+.company-panel,
+.panel-body,
+.agent-grid {
+  overflow-y: auto;
+  max-height: none;
+}
+

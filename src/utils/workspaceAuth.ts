@@ -1,74 +1,73 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "./supabaseClient.ts";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-const provider = new GoogleAuthProvider();
-// Request Google Workspace scopes
-provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
-provider.addScope('https://www.googleapis.com/auth/gmail.send');
-provider.addScope('https://www.googleapis.com/auth/gmail.modify');
-provider.addScope('https://www.googleapis.com/auth/calendar');
-provider.addScope('https://www.googleapis.com/auth/documents');
-provider.addScope('https://www.googleapis.com/auth/spreadsheets');
-provider.addScope('https://www.googleapis.com/auth/spreadsheets.readonly');
-provider.addScope('https://www.googleapis.com/auth/drive');
-provider.addScope('https://www.googleapis.com/auth/drive.file');
-provider.addScope('https://www.googleapis.com/auth/drive.readonly');
-provider.addScope('https://www.googleapis.com/auth/presentations');
-provider.addScope('https://www.googleapis.com/auth/presentations.readonly');
-provider.addScope('https://www.googleapis.com/auth/meetings.space.created');
-provider.addScope('https://www.googleapis.com/auth/meetings.space.readonly');
-provider.addScope('https://www.googleapis.com/auth/meetings.space.settings');
-
-let isSigningIn = false;
-let cachedAccessToken: string | null = null;
+const GOOGLE_WORKSPACE_SCOPES = [
+  "https://www.googleapis.com/auth/gmail.readonly",
+  "https://www.googleapis.com/auth/gmail.send",
+  "https://www.googleapis.com/auth/calendar",
+  "https://www.googleapis.com/auth/documents",
+  "https://www.googleapis.com/auth/spreadsheets",
+  "https://www.googleapis.com/auth/drive.file",
+  "https://www.googleapis.com/auth/presentations",
+].join(" ");
 
 export const initWorkspaceAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void
 ) => {
-  return onAuthStateChanged(auth, async (user: User | null) => {
-    if (user) {
-      if (cachedAccessToken) {
-        if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
-      } else if (!isSigningIn) {
-        cachedAccessToken = null;
-        if (onAuthFailure) onAuthFailure();
-      }
-    } else {
-      cachedAccessToken = null;
-      if (onAuthFailure) onAuthFailure();
+  return supabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user && session.access_token) {
+      onAuthSuccess?.(session.user, session.access_token);
+      return;
     }
+
+    onAuthFailure?.();
+  }).data.subscription;
+};
+
+export async function signInToRufflo(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/`,
+    },
   });
-};
 
-export const googleWorkspaceSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
-  try {
-    isSigningIn = true;
-    const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    if (!credential?.accessToken) {
-      throw new Error('Failed to get access token from Firebase Auth');
-    }
-
-    cachedAccessToken = credential.accessToken;
-    return { user: result.user, accessToken: cachedAccessToken };
-  } catch (error: any) {
-    console.error('Workspace sign in error:', error);
+  if (error) {
     throw error;
-  } finally {
-    isSigningIn = false;
   }
-};
+}
 
-export const getWorkspaceAccessToken = async (): Promise<string | null> => {
-  return cachedAccessToken;
-};
+/*
+  Use only when the user explicitly connects Google Workspace.
+  Normal Rufflo login must not request Gmail/Drive/Calendar permissions.
+*/
+export async function connectGoogleWorkspace(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/`,
+      scopes: GOOGLE_WORKSPACE_SCOPES,
+    },
+  });
 
-export const workspaceSignOut = async () => {
-  await auth.signOut();
-  cachedAccessToken = null;
-};
+  if (error) {
+    throw error;
+  }
+}
+
+export async function getSupabaseAccessToken(): Promise<string | null> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  return session?.access_token ?? null;
+}
+
+export async function workspaceSignOut(): Promise<void> {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    throw error;
+  }
+}

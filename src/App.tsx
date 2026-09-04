@@ -1118,7 +1118,7 @@ export default function App() {
         </aside>
 
         {/* CENTER */}
-        <section className="workspace" style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        <section className="workspace overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
           <div className="flex-1 flex flex-col min-h-0">
                   <div className="workspace-header">
                     <div>

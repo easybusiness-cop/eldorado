@@ -2,6 +2,9 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { requireAuth } from "./server/security/auth.middleware.ts";
 
 // Routes & Controllers
 import { githubRouter } from "./server/routes/github.routes.ts";
@@ -23,14 +26,37 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+app.set("trust proxy", 1);
+
 // Body Parsers (Harden global limits to 2mb to prevent OOM/DoS memory pressure)
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+
+app.disable("x-powered-by");
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+app.use(
+  "/api",
+  rateLimit({
+    windowMs: 60_000,
+    limit: 120,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+  })
+);
 
 // Health Check
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
+
+app.use("/api", requireAuth);
 
 // OAuth Callback handlers for social plugins
 app.get(["/auth/callback/instagram", "/auth/callback/linkedin", "/auth/callback/instagram/", "/auth/callback/linkedin/"], (req, res) => {

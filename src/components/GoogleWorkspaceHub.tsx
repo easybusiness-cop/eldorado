@@ -21,8 +21,8 @@ import {
   Users,
   Check,
 } from 'lucide-react';
-import { googleWorkspaceSignIn, getWorkspaceAccessToken, workspaceSignOut, initWorkspaceAuth } from '../utils/workspaceAuth';
-import { User } from 'firebase/auth';
+import { connectGoogleWorkspace, getSupabaseAccessToken, workspaceSignOut, initWorkspaceAuth } from '../utils/workspaceAuth';
+import type { User } from '@supabase/supabase-js';
 
 interface GoogleWorkspaceHubProps {
   isOpen: boolean;
@@ -98,7 +98,7 @@ export function GoogleWorkspaceHub({ isOpen, onClose }: GoogleWorkspaceHubProps)
 
   useEffect(() => {
     if (isOpen) {
-      const unsubscribe = initWorkspaceAuth(
+      const sub = initWorkspaceAuth(
         (u, t) => {
           setUser(u);
           setToken(t);
@@ -109,7 +109,7 @@ export function GoogleWorkspaceHub({ isOpen, onClose }: GoogleWorkspaceHubProps)
           setToken(null);
         }
       );
-      return () => unsubscribe();
+      return () => sub?.unsubscribe();
     }
   }, [isOpen]);
 
@@ -117,13 +117,8 @@ export function GoogleWorkspaceHub({ isOpen, onClose }: GoogleWorkspaceHubProps)
     setLoading(true);
     setStatusMsg(null);
     try {
-      const res = await googleWorkspaceSignIn();
-      if (res) {
-        setUser(res.user);
-        setToken(res.accessToken);
-        setStatusMsg('Successfully connected Google Workspace with Slides & Meet permissions!');
-        await fetchWorkspaceData(res.accessToken);
-      }
+      await connectGoogleWorkspace();
+      setStatusMsg('Connecting Google Workspace...');
     } catch (err: any) {
       console.error('Workspace login error:', err);
       setStatusMsg(`Authentication failed: ${err.message || 'Popup blocked or cancelled'}`);
