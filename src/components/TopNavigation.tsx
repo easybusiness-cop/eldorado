@@ -44,6 +44,9 @@ interface TopNavigationProps {
   onOpenWorkspace?: () => void;
   onOpenPublicApiHub?: () => void;
   onOpenMunderdifflinDashboard?: () => void;
+  onOpenAgentCommunication?: () => void;
+  onOpenAgentSkillMatrix?: () => void;
+  onOpenAgentSops?: () => void;
   onOpenDynamicKnowledgeBase?: () => void;
   dynamicFeatureCount: number;
   systemModulesCount: number;
@@ -75,6 +78,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
   onOpenWorkspace,
   onOpenPublicApiHub,
   onOpenMunderdifflinDashboard,
+  onOpenAgentCommunication,
+  onOpenAgentSkillMatrix,
+  onOpenAgentSops,
   onOpenDynamicKnowledgeBase,
   dynamicFeatureCount,
   systemModulesCount,
@@ -162,6 +168,54 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
           >
             <span className="text-xs">📋</span>
             <span>Munderdiffl.in Agents</span>
+          </button>
+        )}
+
+        {/* Agent Communication Threads Button */}
+        {onOpenAgentCommunication && (
+          <button
+            id="btn-nav-agent-communication"
+            onClick={() => {
+              soundFx.playClick();
+              onOpenAgentCommunication();
+            }}
+            className="px-2.5 py-1 rounded bg-[#fabd2f] hover:bg-[#fabd2f]/90 text-[#1d2021] border border-[#d79921] flex items-center gap-1.5 font-bold text-[11px] transition-all shadow-sm"
+            title="Visual Messaging Threads with Quantum Alignment Telemetry"
+          >
+            <span className="text-xs">💬</span>
+            <span className="hidden lg:inline">Agent</span> Communication
+          </button>
+        )}
+
+        {/* Agent Skill Matrix Button */}
+        {onOpenAgentSkillMatrix && (
+          <button
+            id="btn-nav-agent-skill-matrix"
+            onClick={() => {
+              soundFx.playClick();
+              onOpenAgentSkillMatrix();
+            }}
+            className="px-2.5 py-1 rounded bg-[#427b58] hover:bg-[#346246] text-[#fbf1c7] border border-[#2d543c] flex items-center gap-1.5 font-bold text-[11px] transition-all shadow-sm"
+            title="Agent Skill Matrix & Personalized Learning Modules"
+          >
+            <span className="text-xs">🎯</span>
+            <span className="hidden lg:inline">Skill</span> Matrix
+          </button>
+        )}
+
+        {/* Agent SOPs Button */}
+        {onOpenAgentSops && (
+          <button
+            id="btn-nav-agent-sops"
+            onClick={() => {
+              soundFx.playClick();
+              onOpenAgentSops();
+            }}
+            className="px-2.5 py-1 rounded bg-[#076678] hover:bg-[#076678]/90 text-[#fbf1c7] border border-[#076678] flex items-center gap-1.5 font-bold text-[11px] transition-all shadow-sm"
+            title="Agent Standard Operating Procedures & Verified Data Clearance"
+          >
+            <span className="text-xs">📁</span>
+            <span className="hidden lg:inline">Agent</span> SOPs
           </button>
         )}
 

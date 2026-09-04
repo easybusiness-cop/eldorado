@@ -250,7 +250,7 @@ return applyCustomEnhancement(system);`
               <span className="text-[10px] text-[#a89984]">{modules.length} registered</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-2 space-y-1.5 no-scrollbar">
+            <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
               {modules.map((mod) => {
                 const isSelected = selectedModule?.id === mod.id;
                 return (

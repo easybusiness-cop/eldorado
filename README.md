@@ -4,7 +4,59 @@ Rufflo is an enterprise-grade Autonomous Company Operating System powered by a d
 
 ---
 
-## 1. Newly Implemented System Modules
+## 🏛️ Comprehensive Enterprise System Architecture
+
+Rufflo operates on a highly decentralized, stateful, and secure corporate micro-kernel design. Below are the core architectures driving the automated fleet operations, sandbox simulations, and self-healing systems.
+
+### 1. 🛡️ Zero-Trust Multi-Agent Cyber Security Grid
+Every action triggered by the autonomous workforce passes through a strict multidimensional gateway prioritizing security, safety, and tenant privacy.
+```text
+[Fleet Agent / Worker Node]
+             ↓
+[Policy Evaluation Engine]  ← Checks clearance levels (ADMIN, SECURE, PUBLIC)
+             ↓
+[Risk Calculator Runtime]  ← Ratings (LOW, MEDIUM, HIGH, CRITICAL)
+             ↓             → If CRITICAL, halts and triggers Human-In-The-Loop Approval
+[Tool Gateway Interface]   ← Sanitizes arguments, ensures tenancy-isolation
+             ↓
+[Integration Adapters]     ← Wrappers for GitHub APIs, Cloud SQL, and Workspace HTTP
+             ↓
+[V8 Sandbox/External Host]
+             ↓
+[Credential Redaction Gate] ← Sanitizes logs & responses (GitHub tokens, private keys)
+             ↓
+[Immutable Security Audit]  ← Persisted in JSON audit files
+```
+
+### 2. 🌐 Browser-Use Autonomous Headless Automation Architecture
+Integrates full-featured headless browser capabilities as a universal tool across the employee fleet.
+- **Trace-Action Planners**: When a search or URL parsing instruction is issued, the Browser-Use Engine builds a logical multi-step action tree.
+- **DOM Node Intersect Matrices**: Maps HTML DOM elements dynamically to coordinate accurate click, focus, input, and hover instructions on virtual screens.
+- **Scraper-Piping Flow**: Feeds real-time output text directly back into agent context windows, augmenting static models with real-time web awareness.
+
+### 3. 🧩 Budibase-Inspired Multi-Step Variable Binding Engine
+Facilitates dynamic state propagation and variable handoffs between sequentially executed orchestration steps.
+- **Template Context Interpolation**: Steps bind properties dynamically using the standard double-curly-braces syntax (e.g., `{{ steps.1.output }}` or `{{ steps.2.codeSnippet }}`).
+- **Dependency Pipeline Graphs**: Generates execution Directed Acyclic Graphs (DAGs) that track parameter prerequisites, preventing execution of child steps until their parent variables successfully resolve.
+
+### 4. ⚙️ Continuous SRE DevOps Telemetry, V8 Compiler & Self-Healing Daemon
+An advanced system monitoring and dynamic code hot-patching architecture.
+- **Live SRE Metrics Monitor**: Tracks V8 heap allocation, memory leak index scores, event loop latency, and CPU capacity on active Cloud Run nodes.
+- **TypeScript AST Analyzer**: Parses generated codebase scripts into logical token nodes (`ImportDeclaration`, `VariableDeclaration`, `ReactHook`, etc.) to run policy and syntax verification checks before runtime mounting.
+- **Simulated Fault Injection & Healing Loops**: 
+  - Allows intentional injection of software errors like **Hook Loop Leaks**, **AST Tokenizer Crashes**, or **Sandbox Scoping Violations**.
+  - Triggers **collaborative agent dialogue panels** where specialized bots (Ruflo Coder, Dwight Schrute, Toby Flenderson) analyze the diagnostics and speak on-screen to explain the root cause.
+  - Automatically heals the system, hot-patches memory leaks, restores proper AST nodes, and updates live telemetry.
+
+### 5. 🗄️ Interactive Code Artifact Vault & Sandboxed Testbed
+Provides administrators complete visibility and control over all software modules compiled by the autonomous fleet.
+- **Interactive Selector Hierarchy**: Navigates generated micro-frontend source files, backend server files, and database schemas with visual syntax highlighting.
+- **Data-URI Payload Exporters**: Facilitates direct standalone code downloads directly from browser sandboxes, bypassing file-system restrictions.
+- **AST Dry-Run Testbed**: Runs simulated integration assertions on code changes, reporting immediate compliance scoring.
+
+---
+
+## 🚀 Newly Implemented System Modules
 
 ### 🌐 Live Public API Integrator Hub & Pipeline Workbench
 An interactive API testing terminal and live data routing engine designed to fetch live public datasets and pipe them seamlessly into the autonomous workspace agent queues.
@@ -20,7 +72,7 @@ Integrated deep training and curation pipeline situated inside the CSE Agent Aca
 
 ---
 
-## 2. Master Open-Source Repository Integration Map
+## 🗺️ Master Open-Source Repository Integration Map
 
 | Component | Official Repository | Exact Package | Rufflo Directory | Core Functionality |
 |---|---|---|---|---|
@@ -30,7 +82,7 @@ Integrated deep training and curation pipeline situated inside the CSE Agent Aca
 
 ---
 
-## 2. Directory Structure
+## 📁 Directory Structure
 
 ```text
 ├── src/                          # React 19 Frontend Client
@@ -61,12 +113,12 @@ Integrated deep training and curation pipeline situated inside the CSE Agent Aca
 │   ├── types/                    # Shared TypeScript interfaces & types
 │   ├── schemas/                  # Task & tool validation schemas
 │   └── constants/                # Department budgets, policies, and pipelines
-└── tests/                        # Security and runtime validation test suites
+│   └── tsconfig.json             # Root TypeScript options
 ```
 
 ---
 
-## 3. Keyboard Shortcuts & Features
+## ⌨️ Keyboard Shortcuts & Features
 
 - **Quick Search Command Palette (`Cmd + K` or `Ctrl + K`)**:
   - Quickly search across all **Agents & Employees** (Michael, Dwight, Jim, Pam, Angela, Toby, Kelly, Ruflo Coder, etc.).
@@ -77,7 +129,7 @@ Integrated deep training and curation pipeline situated inside the CSE Agent Aca
 
 ---
 
-## 4. Security & Zero-Trust Policies
+## 🛡️ Security & Zero-Trust Policies
 
 1. **Zero-Trust Token Redaction**: Scans all outgoing logs and execution outputs to sanitize GitHub Personal Access Tokens, live Stripe keys, Google API tokens, and authorization headers (`[REDACTED_SECURITY_GATEWAY]`).
 2. **Multi-Tenant Isolation**: ToolGateway rejects any tool call missing a valid tenant organization ID.
@@ -86,7 +138,7 @@ Integrated deep training and curation pipeline situated inside the CSE Agent Aca
 
 ---
 
-## 5. Environment Variables (`.env.example`)
+## ⚙️ Environment Variables (`.env.example`)
 
 ```env
 # Required for autonomous model generation
@@ -104,7 +156,7 @@ GITHUB_TOKEN=""
 
 ---
 
-## 6. Commands to Run & Verify
+## 🛠️ Commands to Run & Verify
 
 - **Start Development Server**:
   ```bash

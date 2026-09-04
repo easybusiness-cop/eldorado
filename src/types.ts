@@ -853,5 +853,81 @@ export type AgentEvent =
       description: string;
     };
 
+// Inter-Agent Communication Threads & Quantum Alignment Types
+export interface InterAgentMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  text: string;
+  timestamp: string;
+  codeSnippet?: string;
+}
+
+export interface InterAgentQuantumSynergy {
+  synergyScore: number; // 0 - 100 percentage
+  phaseCoherence: number; // 0.0 - 1.0
+  amplitudeResonance: number; // 0 - 100 percentage
+  crossDeptEntanglement: number; // 0 - 100 percentage
+  synthesisTier: 'Harmonic Resonance' | 'Optimal Entanglement' | 'High Phase Alignment' | 'Constructive Interference';
+  quantumBasis: string; // e.g., |ψ_Dwight ⊗ ψ_Jim⟩
+  complementaryStrengths: string[];
+  decisionConsensus: string;
+  synergyInsight: string;
+}
+
+export interface InterAgentThread {
+  id: string;
+  agent1Id: string;
+  agent1Name: string;
+  agent1Role: string;
+  agent1Avatar?: string;
+  agent1Color: string;
+  agent2Id: string;
+  agent2Name: string;
+  agent2Role: string;
+  agent2Avatar?: string;
+  agent2Color: string;
+  topic: string;
+  category: 'marketing' | 'finance' | 'coding' | 'security' | 'operations' | 'quantum';
+  snippet: string;
+  timestamp: string;
+  status: 'active' | 'consensus_reached' | 'under_review';
+  messages: InterAgentMessage[];
+  quantumSynergy: InterAgentQuantumSynergy;
+}
+
+// Visual Agent Skill Matrix & Learning Modules Types
+export type SkillMatrixCategory = 'marketing' | 'finance' | 'coding' | 'security' | 'operations' | 'quantum';
+
+export interface AgentSkillProfile {
+  agentId: string;
+  agentName: string;
+  agentRole: string;
+  agentAvatar?: string;
+  agentColor: string;
+  department: string;
+  scores: Record<SkillMatrixCategory, number>; // 0 - 100
+  overallCompetency: number;
+  identifiedGapCategory: SkillMatrixCategory;
+  identifiedGapScore: number;
+  gapSeverity: 'low' | 'medium' | 'critical';
+}
+
+export interface PersonalizedLearningModule {
+  id: string;
+  title: string;
+  category: SkillMatrixCategory;
+  targetAgentId: string;
+  targetAgentName: string;
+  gapIdentified: string;
+  curriculumOverview: string;
+  xpReward: number;
+  durationMinutes: number;
+  projectedProficiencyBoost: number;
+  projectedSynergyBoost: number;
+  isCompleted?: boolean;
+}
+
+
 
 

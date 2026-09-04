@@ -3,14 +3,19 @@ import { Agent, FleetTask } from '../types';
 import { KnowledgeCategory, KnowledgeEntry } from '../types/knowledgeBase';
 import { knowledgeBaseService } from '../services/knowledgeBaseService';
 import { soundFx } from '../utils/speech';
+import { AgentCommunicationThreads } from './AgentCommunicationThreads';
+import { AgentSkillMatrix } from './AgentSkillMatrix';
+import { AgentSops } from './AgentSops';
 
 interface MunderdifflinDashboardProps {
   agents: Agent[];
   tasks: FleetTask[];
   onAddTask: (task: Partial<FleetTask>) => Promise<void> | void;
+  onAddAgent?: (agent: Agent) => void;
   onSelectAgent?: (agentId: string) => void;
   selectedAgentId?: string;
   onClose?: () => void;
+  initialTab?: 'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge' | 'pipelines' | 'communication' | 'skills' | 'sops';
 }
 
 // Specialty mapping to help user find agents for specific roles
@@ -183,16 +188,198 @@ const QUICK_PRESETS: Record<string, Array<{ title: string; category: KnowledgeCa
   ],
 };
 
+export interface PipelineStep {
+  agentId: string;
+  agentName: string;
+  role: string;
+  actionTitle: string;
+  instructions: string;
+  outputKey: string;
+  stepNumber?: number;
+}
+
+export interface PipelinePreset {
+  id: string;
+  title: string;
+  badge: string;
+  icon?: string;
+  estimatedTime?: string;
+  description: string;
+  steps: PipelineStep[];
+}
+
+export const WORKFLOW_PIPELINES: PipelinePreset[] = [
+  {
+    id: 'pipe-launch',
+    title: 'Enterprise Product Launch Pipeline',
+    badge: '🚀 Multi-Department',
+    description: 'Chains Marketing (Jim) ➔ Social Growth (Ryan) ➔ Finance (Kevin) ➔ Cyber Security (Dwight) into an airtight, audit-compliant launch package.',
+    steps: [
+      {
+        agentId: 'jim',
+        agentName: 'Jim Halpert',
+        role: 'Marketing & Sales',
+        actionTitle: 'Step 1: B2B Enterprise Value Proposition',
+        instructions: 'Formulate a 3-touchpoint acquisition funnel highlighting 40% procurement savings, guaranteed 4-hour replenishment SLA, and autonomous API re-order hooks.',
+        outputKey: 'value_proposition',
+      },
+      {
+        agentId: 'ryan',
+        agentName: 'Ryan Howard',
+        role: 'Social Media & Growth',
+        actionTitle: 'Step 2: Viral Multi-Platform Campaign & Teasers',
+        instructions: 'Translate Jim\'s value proposition into high-engagement LinkedIn and X thread hooks with clear CTA links for corporate demo scheduling.',
+        outputKey: 'social_campaign',
+      },
+      {
+        agentId: 'kevin',
+        agentName: 'Kevin Malone',
+        role: 'Finance & Accounting',
+        actionTitle: 'Step 3: Unit Economics & Compute Margin Audit',
+        instructions: 'Model customer acquisition cost (CAC) vs. lifetime value (LTV), compute server infrastructure overhead per tenant, and define profitable tier pricing.',
+        outputKey: 'financial_model',
+      },
+      {
+        agentId: 'dwight',
+        agentName: 'Dwight Schrute',
+        role: 'Cyber Security & Defense',
+        actionTitle: 'Step 4: Threat Model & Zero-Trust Verification',
+        instructions: 'Execute an exhaustive pre-flight threat assessment on customer onboarding webhooks, token lifespans, and API rate shields.',
+        outputKey: 'security_audit',
+      },
+    ],
+  },
+  {
+    id: 'pipe-security',
+    title: 'Zero-Trust Hardening & Compliance Chain',
+    badge: '🛡️ Cyber & Ops',
+    description: 'Autonomous cyber scan (Dwight) ➔ Employee Policy Memo (Pam) ➔ Engineering TypeScript Patch (Coder).',
+    steps: [
+      {
+        agentId: 'dwight',
+        agentName: 'Dwight Schrute',
+        role: 'Cyber Security & Defense',
+        actionTitle: 'Step 1: Perimeter Vulnerability & CVE Scan',
+        instructions: 'Audit public ingress endpoints, verify cryptographic token signatures, and flag any OWASP Top 10 vulnerabilities.',
+        outputKey: 'cve_audit',
+      },
+      {
+        agentId: 'pam',
+        agentName: 'Pam Beesly',
+        role: 'HR & People Operations',
+        actionTitle: 'Step 2: Inter-Office Security Compliance Memo',
+        instructions: 'Draft an official Scranton executive memo explaining updated token rotation policies, password complexity rules, and peer escalation chains.',
+        outputKey: 'hr_memo',
+      },
+      {
+        agentId: 'ruflo-coder',
+        agentName: 'Ruflo Coder',
+        role: 'Full-Stack Engineering',
+        actionTitle: 'Step 3: Production Code Patch Deployment',
+        instructions: 'Synthesize production-grade TypeScript middleware enforcing strict input sanitization, rate limiting, and defensive request boundaries.',
+        outputKey: 'code_patch',
+      },
+    ],
+  },
+  {
+    id: 'pipe-growth',
+    title: 'Scranton Growth & Unit Economics Chain',
+    badge: '📈 Revenue & Scale',
+    description: 'Cost ledger reconciliation (Kevin) ➔ Enterprise Renewal Funnel (Jim) ➔ Organic Growth Loops (Ryan).',
+    steps: [
+      {
+        agentId: 'kevin',
+        agentName: 'Kevin Malone',
+        role: 'Finance & Accounting',
+        actionTitle: 'Step 1: Operational Ledger Reconciliation',
+        instructions: 'Calculate current monthly server burn, gross margins across paper grades, and identify $12,400 in annualized cost savings.',
+        outputKey: 'ledger_audit',
+      },
+      {
+        agentId: 'jim',
+        agentName: 'Jim Halpert',
+        role: 'Marketing & Sales',
+        actionTitle: 'Step 2: Enterprise Renewal & Upsell Pitch',
+        instructions: 'Draft customized contract renewal proposals for top 20 corporate accounts with 2-year commitment incentives.',
+        outputKey: 'renewal_pitch',
+      },
+      {
+        agentId: 'ryan',
+        agentName: 'Ryan Howard',
+        role: 'Social Media & Growth',
+        actionTitle: 'Step 3: Viral Community Distribution Loop',
+        instructions: 'Design an organic referral loop where corporate clients unlock automated procurement analytics by referring sister branches.',
+        outputKey: 'viral_loop',
+      },
+    ],
+  },
+];
+
+const generatePipelineStepDeliverable = (step: PipelineStep, stepIndex: number, pipeline: PipelinePreset) => {
+  if (step.agentId === 'jim') {
+    return {
+      memo: `OFFICIAL PROPOSAL - B2B ENTERPRISE PAPER & AUTOMATION INCENTIVES\nPrepared by: Jim Halpert (Enterprise Sales & Strategic Accounts)\n\n1. Executive Proposition:\nAutonomous paper supply logistics integrated with client ERP webhooks.\n- Guaranteed 40% reduction in procurement overhead\n- Real-time stock level monitoring with 4-hour regional delivery SLA across northeastern corridor\n- Volume tiered discounts: 10,000 reams/quarter unlocks dedicated account agent and API ingress token\n\n2. Proposed Target Accounts:\n- Dunmore High School District (Annual contract: $48,000)\n- Lackawanna County Municipal Records (Annual contract: $120,000)\n- Apex Medical Systems Scranton (Annual contract: $85,000)\n\n3. Hand-off to Growth / Social:\nReady for teaser rollout to drive inbound demo signups.`,
+      snippet: `// Enterprise Tier Contract Verification\ninterface B2BContractSpec {\n  tenantId: string;\n  quarterlyVolumeReams: number;\n  deliverySlaHours: 4;\n  discountRatePct: 40;\n  erpIntegrationEnabled: true;\n}`,
+    };
+  } else if (step.agentId === 'ryan') {
+    return {
+      memo: `MULTI-PLATFORM GROWTH CAMPAIGN & VIRAL ACQUISITION HOOKS\nPrepared by: Ryan Howard (Digital Growth & Social Infrastructure)\n\n1. Multi-Platform Campaign Strategy:\nRepositioning Munder Diffl.in from legacy paper vendor to 'Autonomous Physical Compute Medium'.\n\n2. Content Matrix:\n- Hook 1 (LinkedIn): "Why Fortune 500 CFOs are quietly shifting procurement back to autonomous, offline-first medium in 2026."\n- Hook 2 (Twitter/X Thread): "1/7 The untold story of physical zero-trust audit trails. How paper out-survives cloud outages."\n- Hook 3 (Short-form Video Script): Dwight staring intently at a shredded sheet, whispering 'Untraceable.' Cut to 40% discount landing page.\n\n3. Target Metrics:\n- 25,000 impressions in initial 48-hour blast\n- 180 inbound trial form submissions\n- Hand-off to Accounting for margin model.`,
+      snippet: `// Campaign Tracking Parameters\nexport const CAMPAIGN_TELEMETRY = {\n  campaignId: "paper-autonomous-launch-2026",\n  channels: ["linkedin_sponsored", "x_organic_thread", "b2b_newsletter"],\n  attributionModel: "multi_touch_first_last_split",\n  targetConversionRate: 0.072,\n};`,
+    };
+  } else if (step.agentId === 'kevin') {
+    return {
+      memo: `ACCOUNTING RECONCILIATION & UNIT ECONOMICS MODEL\nPrepared by: Kevin Malone (Senior Accountant & Number Cruncher)\n\n1. The Math (Kept very clean):\n- Ream Production & Procurement Cost: $2.14 / ream\n- Warehouse Storage & Cold-Hold Overhead: $0.31 / ream\n- Autonomous Transport & Dispatch: $0.65 / ream\n- Enterprise Sale Price (with Jim's 40% discount applied): $4.80 / ream\n- Net Margin: $1.70 per ream (35.4% Gross Profit Margin!)\n\n2. Compute Cloud Burn vs. Revenue:\n- Fleet autonomous server overhead: $42.10 / month\n- Net projected profit across Dunmore + Lackawanna contracts: $89,400 annualized.\n- Kept the numbers simple. No mistakes found!`,
+      snippet: `// Kevin's Unit Profitability Calculator\nexport function calculateReamEconomics(volume: number): { grossRevenue: number; netProfit: number; marginPct: number } {\\n  const pricePerUnit = 4.80;\\n  const costPerUnit = 3.10;\\n  const grossRevenue = volume * pricePerUnit;\\n  const netProfit = volume * (pricePerUnit - costPerUnit);\\n  return { grossRevenue, netProfit, marginPct: (netProfit / grossRevenue) * 100 };\\n}`,
+    };
+  } else if (step.agentId === 'dwight') {
+    return {
+      memo: `ZERO-TRUST THREAT MODEL & DEFENSIVE PERIMETER AUDIT\nPrepared by: Dwight K. Schrute (Assistant Regional Manager & CISO)\n\n1. Executive Security Verdict: APPROVED WITH CAUTION\n- Performed aggressive penetration testing on external API ingress webhooks.\n- Scanned for unauthorized listening ports. 0 active exploits.\n- Re-keyed all cryptographic session tokens to 4096-bit zero-knowledge seeds.\n\n2. Perimeter Defenses Deployed:\n- Physical security: Scranton warehouse gates secured with biometric padlocks.\n- Digital security: Inbound demo submissions rate-limited to 5 requests per IP per minute.\n- Toby Flenderson prohibited from accessing server room keys.\n\n3. Final Sign-off:\nThe launch pipeline is hardened. We are ready to dominate the northeastern market.`,
+      snippet: `// Dwight's Zero-Trust Ingress Firewall\nexport function verifyIngressPayload(payload: { token: string; originIp: string }): boolean {\\n  if (!payload.token || payload.token.length < 32) return false;\\n  if (payload.originIp.startsWith('10.0.0.99')) return false; // Toby's workstation\\n  return true; // Verified\\n}`,
+    };
+  } else if (step.agentId === 'pam') {
+    return {
+      memo: `SCRANTON EXECUTIVE POLICY MEMO: INTER-OFFICE SECURITY COMPLIANCE\nPrepared by: Pam Beesly (HR & People Operations Lead)\n\n1. Summary of Changes:\nEffective immediately, all branch personnel and autonomous agents must comply with Dwight's updated Zero-Trust directives.\n\n2. Action Items for Staff:\n- Two-Factor Authentication required for all fleet dashboard sessions.\n- Clear desk policy: All printed draft memos must be shredded or filed in secure cabinets before leaving for the day.\n- Coffee machine etiquette: Please refill the pot if you take the last cup.\n\n3. Escalation Chain:\nDirect all security incident reports to Dwight Schrute. Direct any interpersonal disagreements to Pam Beesly.`,
+      snippet: `// Office Policy Compliance Checklist\nexport const HR_POLICY_RULES = [\\n  "Mandatory 2FA authentication",\\n  "Zero-retention on temporary token scratchpads",\\n  "Immediate reporting of unauthorized perimeter access",\\n  "Refill coffee pot if empty",\\n];`,
+    };
+  } else {
+    return {
+      memo: `FULL-STACK PRODUCTION PATCH & DEFENSIVE MIDDLEWARE\nPrepared by: Ruflo Coder (Autonomous Engineering Lead)\n\n1. Architectural Review:\nSuccessfully synthesized and tested production middleware enforcing defense-in-depth across all fleet communication channels.\n\n2. Features Implemented:\n- Request header sanitization and strict schema validation.\n- Cryptographic hash verification on all inter-agent messages.\n- Automatic circuit-breaker tripping upon anomalous error spike (>3%).\n\n3. Test Suite Status:\n14 / 14 unit tests passed. Zero regressions detected.`,
+      snippet: `// Production Defensive Middleware\nimport { Request, Response, NextFunction } from 'express';\n\nexport function defensiveMiddleware(req: Request, res: Response, next: NextFunction) {\\n  res.setHeader('X-Content-Type-Options', 'nosniff');\\n  res.setHeader('X-Frame-Options', 'SAMEORIGIN');\\n  res.setHeader('X-XSS-Protection', '1; mode=block');\\n  next();\\n}`,
+    };
+  }
+};
+
 export const MunderdifflinDashboard: React.FC<MunderdifflinDashboardProps> = ({
   agents,
   tasks,
   onAddTask,
+  onAddAgent,
   onSelectAgent,
   selectedAgentId,
   onClose,
+  initialTab,
 }) => {
   // Current active view tab
-  const [activeTab, setActiveTab] = useState<'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge'>('roster_and_assign');
+  const [activeTab, setActiveTab] = useState<'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge' | 'pipelines' | 'communication' | 'skills' | 'sops'>(initialTab || 'roster_and_assign');
+
+  // Sound effects mute state
+  const [isMuted, setIsMuted] = useState<boolean>(soundFx.muted);
+
+  // Custom Agent Creation state
+  const [showCreateAgentModal, setShowCreateAgentModal] = useState<boolean>(false);
+  const [newAgentName, setNewAgentName] = useState<string>('');
+  const [newAgentRole, setNewAgentRole] = useState<string>('');
+  const [newAgentCategory, setNewAgentCategory] = useState<KnowledgeCategory>('finance');
+  const [newAgentAuthority, setNewAgentAuthority] = useState<number>(7);
+  const [newAgentAvatar, setNewAgentAvatar] = useState<string>('📊');
+  const [newAgentColor, setNewAgentColor] = useState<string>('#b57614');
+  const [newAgentBio, setNewAgentBio] = useState<string>('');
+
+  // Workflow Pipeline execution state
+  const [activePipelineId, setActivePipelineId] = useState<string | null>(null);
+  const [pipelineCurrentStep, setPipelineCurrentStep] = useState<number>(0);
+  const [pipelineLogs, setPipelineLogs] = useState<string[]>([]);
+  const [pipelineResults, setPipelineResults] = useState<Record<string, string>>({});
 
   // Role filter for agent selector
   const [roleFilter, setRoleFilter] = useState<'all' | 'hacker' | 'hr' | 'marketing' | 'finance' | 'coding' | 'social_media'>('all');
@@ -581,6 +768,282 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
     return tasks.find((t) => t.id === inspectedTaskId) || null;
   }, [tasks, inspectedTaskId]);
 
+  // Download single memo in Markdown or Plain Text
+  const handleDownloadMemo = (task: FleetTask, format: 'markdown' | 'text') => {
+    soundFx.playClick();
+    const agent = agents.find((a) => a.id === task.assignedTo);
+    const agentName = agent?.name || task.assignedTo;
+    const dateStr = task.completedAt ? new Date(task.completedAt).toLocaleString() : new Date().toLocaleString();
+
+    let content = '';
+    const safeTitle = task.title.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 32);
+    const filename = `munderdifflin-memo-${safeTitle}.${format === 'markdown' ? 'md' : 'txt'}`;
+
+    if (format === 'markdown') {
+      content = `# Munder Diffl.in Autonomous Paper Co.
+## Official Inter-Office Memo: ${task.title}
+
+- **From**: ${agentName} (${agent?.role || 'Autonomous Fleet Agent'})
+- **Date**: ${dateStr}
+- **Priority**: ${task.priority.toUpperCase()}
+- **Classification**: CONFIDENTIAL & VERIFIED
+- **Deliverable Status**: Approved for Scranton Operations
+
+---
+
+### Executive Summary & Operational Memo
+${task.output || task.description || 'No memo content available.'}
+
+${task.codeSnippet ? `### Technical Specification / Code Payload
+\`\`\`
+${task.codeSnippet}
+\`\`\`
+` : ''}
+
+---
+*Synthesized autonomously by Munder Diffl.in Fleet Orchestrator · Excludes Google external dependencies.*
+`;
+    } else {
+      content = `===============================================================
+MUNDER DIFFL.IN AUTONOMOUS PAPER CO. - OFFICIAL INTER-OFFICE MEMO
+===============================================================
+TITLE:       ${task.title}
+FROM:        ${agentName} (${agent?.role || 'Autonomous Fleet Agent'})
+DATE:        ${dateStr}
+PRIORITY:    ${task.priority.toUpperCase()}
+STATUS:      VERIFIED & FILED
+===============================================================
+
+DELIVERABLE SUMMARY:
+---------------------------------------------------------------
+${task.output || task.description || 'No memo content available.'}
+
+${task.codeSnippet ? `---------------------------------------------------------------
+TECHNICAL SPECIFICATION / PAYLOAD:
+---------------------------------------------------------------
+${task.codeSnippet}
+` : ''}
+===============================================================
+Filed canonically in Scranton Operations Fleet.
+`;
+    }
+
+    const blob = new Blob([content], { type: format === 'markdown' ? 'text/markdown' : 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setToastMessage(`📥 Downloaded ${filename} successfully!`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Download all completed memos as an executive digest
+  const handleDownloadAllMemos = () => {
+    soundFx.playClick();
+    const completed = tasks.filter((t) => t.status === 'completed' && (t.output || t.description));
+    if (completed.length === 0) {
+      setToastMessage('⚠️ No completed memos available to export yet.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
+
+    const digest = `# Munder Diffl.in Fleet - Executive Memos Digest
+Generated: ${new Date().toLocaleString()}
+Total Completed Operations: ${completed.length}
+
+${completed
+  .map((t, i) => {
+    const agent = agents.find((a) => a.id === t.assignedTo);
+    return `## ${i + 1}. ${t.title}
+- **Agent**: ${agent?.name || t.assignedTo} (${agent?.role || 'Agent'})
+- **Priority**: ${t.priority.toUpperCase()}
+- **Completed**: ${t.completedAt ? new Date(t.completedAt).toLocaleString() : 'N/A'}
+
+${t.output || t.description}
+${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
+---
+`;
+  })
+  .join('\n\n')}`;
+
+    const blob = new Blob([digest], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `munderdifflin-executive-digest-${new Date().toISOString().slice(0, 10)}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setToastMessage(`📥 Exported complete digest with ${completed.length} memos!`);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Provision new custom agent
+  const handleCreateCustomAgent = () => {
+    if (!newAgentName.trim()) {
+      setToastMessage('⚠️ Please enter an Agent Name.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
+    soundFx.playClick();
+
+    const cleanId = `agent-${newAgentName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString().slice(-4)}`;
+    const roleTitle = newAgentRole.trim() || 'Autonomous Operations Specialist';
+
+    const deptMap: Record<KnowledgeCategory, { name: string; id: string; zone: 'management' | 'sales' | 'accounting' | 'reception' | 'annex' | 'conference' }> = {
+      hacking: { name: 'Security & Defense', id: 'security', zone: 'conference' },
+      marketing: { name: 'Sales & Outreach', id: 'sales', zone: 'sales' },
+      finance: { name: 'Accounting & Finance', id: 'accounting', zone: 'accounting' },
+      coding: { name: 'Engineering & Tech', id: 'engineering', zone: 'annex' },
+      social_media: { name: 'Digital Growth', id: 'growth', zone: 'reception' },
+    };
+
+    const dept = deptMap[newAgentCategory] || { name: 'Operations', id: 'operations', zone: 'sales' };
+
+    const createdAgent: Agent = {
+      id: cleanId,
+      name: newAgentName.trim(),
+      nickname: newAgentName.trim().split(' ')[0],
+      role: roleTitle,
+      title: roleTitle,
+      avatar: newAgentAvatar || '👔',
+      color: newAgentColor || '#d79921',
+      isAgent: true,
+      department: dept.name,
+      departmentId: dept.id,
+      departmentName: dept.name,
+      authorityLevel: newAgentAuthority,
+      assignedTools: ['Web Browser', 'Knowledge Base', 'Terminal', 'Database'],
+      permissions: ['read', 'write', 'execute_sandboxed'],
+      deskPosition: { x: 3, y: 3, facing: 'south', zone: dept.zone },
+      status: 'idle',
+      skills: [
+        { id: `sk-${Date.now()}`, name: roleTitle, category: 'domain', proficiency: 92, experiencePoints: 890, certified: true },
+      ],
+      capabilities: ['autonomous_execution', 'memo_synthesis', 'knowledge_indexing'],
+      systemPrompt: newAgentBio.trim() || `Execute specialized operations for ${dept.name} with high fidelity.`,
+      memory: [],
+      voicePitch: 1.0,
+      voiceRate: 1.0,
+      tokensProcessed: 0,
+    };
+
+    if (onAddAgent) {
+      onAddAgent(createdAgent);
+    }
+
+    QUICK_PRESETS[createdAgent.id] = [
+      {
+        title: `${newAgentName.trim().split(' ')[0]}'s Core Mandate`,
+        category: newAgentCategory,
+        priority: 'high',
+        prompt: newAgentBio.trim() || `Execute specialized operations for ${dept.name} with rigorous data integrity and zero-trust logging.`,
+      },
+      {
+        title: `${roleTitle} Departmental Audit`,
+        category: newAgentCategory,
+        priority: 'medium',
+        prompt: `Perform an end-to-end departmental audit for ${dept.name}, formulate an executive briefing, and log actionable findings to the Knowledge Base.`,
+      },
+    ];
+
+    setShowCreateAgentModal(false);
+    setTargetAgentId(createdAgent.id);
+    setNewAgentName('');
+    setNewAgentRole('');
+    setNewAgentBio('');
+
+    soundFx.playSuccessChime();
+    setToastMessage(`🎉 Successfully provisioned Agent ${createdAgent.name} (Authority Level ${newAgentAuthority})!`);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  // Live Multi-Agent Workflow Pipeline execution
+  const handleExecutePipeline = async (pipeline: PipelinePreset) => {
+    if (activePipelineId) {
+      setToastMessage('⚠️ Another workflow chain is actively executing.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
+    soundFx.playClick();
+    setActivePipelineId(pipeline.id);
+    setPipelineCurrentStep(0);
+    setPipelineLogs([`[00:00] 🚀 Workflow Chain "${pipeline.title}" started. Discharging ${pipeline.steps.length} sequential phases...`]);
+    setPipelineResults({});
+
+    for (let i = 0; i < pipeline.steps.length; i++) {
+      const step = pipeline.steps[i];
+      setPipelineCurrentStep(i);
+      soundFx.playNotification();
+
+      const timeSec = (i * 3 + 1).toString().padStart(2, '0');
+      setPipelineLogs((prev) => [
+        ...prev,
+        `[00:${timeSec}] ➔ Phase ${i + 1}/${pipeline.steps.length}: Dispatching to ${step.agentName} (${step.role})...`,
+      ]);
+
+      const stepTaskId = `task-pipe-${pipeline.id}-${Date.now()}-${i}`;
+      const runningTask: FleetTask = {
+        id: stepTaskId,
+        title: `${pipeline.title} [${step.actionTitle}]`,
+        description: step.instructions,
+        assignedTo: step.agentId,
+        status: 'running',
+        progress: 30,
+        priority: 'high',
+        createdAt: Date.now(),
+      };
+      if (onAddTask) onAddTask(runningTask);
+
+      // Simulated realistic phase processing time
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const deliverable = generatePipelineStepDeliverable(step, i, pipeline);
+
+      const completedTask: FleetTask = {
+        ...runningTask,
+        status: 'completed',
+        progress: 100,
+        completedAt: Date.now(),
+        output: deliverable.memo,
+        codeSnippet: deliverable.snippet,
+      };
+      if (onAddTask) onAddTask(completedTask);
+
+      // Record in Knowledge Base
+      knowledgeBaseService.recordAgentLearning(
+        step.agentName,
+        step.agentId,
+        step.actionTitle,
+        deliverable.memo.slice(0, 280),
+        i === 0 ? 'marketing' : i === 1 ? 'social_media' : i === 2 ? 'finance' : 'hacking'
+      );
+
+      setPipelineResults((prev) => ({
+        ...prev,
+        [step.outputKey]: deliverable.memo,
+      }));
+
+      const doneSec = (i * 3 + 3).toString().padStart(2, '0');
+      setPipelineLogs((prev) => [
+        ...prev,
+        `[00:${doneSec}] ✓ Phase ${i + 1} COMPLETE: ${step.agentName} completed "${step.actionTitle}". Inter-office deliverable verified and filed.`,
+      ]);
+    }
+
+    soundFx.playSuccessChime();
+    setActivePipelineId(null);
+    setToastMessage(`🏆 Workflow Chain "${pipeline.title}" completed! All ${pipeline.steps.length} multi-agent deliverables filed.`);
+    setTimeout(() => setToastMessage(null), 5000);
+  };
+
   return (
     <div
       id="munderdifflin-dashboard-root"
@@ -663,7 +1126,72 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
             >
               <span>🧠</span> Knowledge Base ({knowledgeEntries.length})
             </button>
+            <button
+              id="tab-pipelines"
+              onClick={() => { soundFx.playClick(); setActiveTab('pipelines'); }}
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'pipelines'
+                  ? 'bg-[#fabd2f] text-[#282828] shadow-sm border border-[#d79921]'
+                  : 'text-[#504945] hover:text-[#282828]'
+              }`}
+            >
+              <span>🔗</span> Workflow Chains
+              {activePipelineId && (
+                <span className="w-2 h-2 rounded-full bg-[#b57614] animate-ping ml-0.5" />
+              )}
+            </button>
+            <button
+              id="tab-communication"
+              onClick={() => { soundFx.playClick(); setActiveTab('communication'); }}
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'communication'
+                  ? 'bg-[#fabd2f] text-[#282828] shadow-sm border border-[#d79921]'
+                  : 'text-[#504945] hover:text-[#282828]'
+              }`}
+              title="Inter-agent messaging threads with quantum alignment telemetry"
+            >
+              <span>💬</span> Communication
+            </button>
+            <button
+              id="tab-skills"
+              onClick={() => { soundFx.playClick(); setActiveTab('skills'); }}
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'skills'
+                  ? 'bg-[#427b58] text-[#fbf1c7] shadow-sm border border-[#2d543c]'
+                  : 'text-[#504945] hover:text-[#282828]'
+              }`}
+              title="Agent Skill Matrix & Personalized Learning Modules"
+            >
+              <span>🎯</span> Skill Matrix
+            </button>
+            <button
+              id="tab-sops"
+              onClick={() => { soundFx.playClick(); setActiveTab('sops'); }}
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'sops'
+                  ? 'bg-[#076678] text-[#fbf1c7] shadow-sm border border-[#076678]'
+                  : 'text-[#504945] hover:text-[#282828]'
+              }`}
+              title="Agent SOPs & Verified Data Access Matrix"
+            >
+              <span>📁</span> SOPs & Data
+            </button>
           </nav>
+
+          {/* AUDIO MUTE TOGGLE */}
+          <button
+            onClick={() => {
+              const muted = soundFx.toggleMute();
+              setIsMuted(muted);
+              setToastMessage(muted ? '🔇 Sound effects muted' : '🔊 Sound effects enabled');
+              setTimeout(() => setToastMessage(null), 2500);
+            }}
+            className="px-2.5 py-1.5 rounded bg-[#ebdbb2] hover:bg-[#d5c4a1] border border-[#bdae93] text-xs font-bold text-[#504945] transition-colors flex items-center gap-1"
+            title={isMuted ? 'Unmute sound effects' : 'Mute sound effects'}
+          >
+            <span>{isMuted ? '🔇' : '🔊'}</span>
+            <span className="hidden sm:inline">{isMuted ? 'Muted' : 'Audio'}</span>
+          </button>
 
           {onClose && (
             <button
@@ -733,7 +1261,16 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
               <div className="bg-[#ebdbb2] border-2 border-[#d5c4a1] rounded-lg p-3 shadow-xs flex-1 flex flex-col">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#7c6f64] mb-2 flex items-center justify-between">
                   <span>Select Assignee</span>
-                  <span className="text-[10px]">{filteredAgents.length} available</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px]">{filteredAgents.length} available</span>
+                    <button
+                      onClick={() => { soundFx.playClick(); setShowCreateAgentModal(true); }}
+                      className="px-2 py-0.5 rounded bg-[#b57614] hover:bg-[#8f5d0f] text-[#fbf1c7] text-[10px] font-bold flex items-center gap-1 shadow-xs transition-colors"
+                      title="Provision a new specialized autonomous agent"
+                    >
+                      <span>+</span> Provision Agent
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
@@ -1176,7 +1713,16 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
             <div className="lg:col-span-4 bg-[#ebdbb2] border-2 border-[#d5c4a1] rounded-lg p-4 shadow-xs">
               <div className="text-[11px] font-bold uppercase tracking-wider text-[#7c6f64] mb-3 flex items-center justify-between">
                 <span>Completed Deliverables</span>
-                <span className="text-[10px] font-bold text-[#b57614]">{tasks.filter(t => t.status === 'completed').length} memos</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-[#b57614]">{tasks.filter(t => t.status === 'completed').length} memos</span>
+                  <button
+                    onClick={handleDownloadAllMemos}
+                    className="text-[10px] px-2 py-0.5 rounded bg-[#b57614] hover:bg-[#8f5d0f] text-[#fbf1c7] font-bold shadow-xs transition-colors flex items-center gap-1"
+                    title="Export all completed memos into a single Markdown digest"
+                  >
+                    <span>📥</span> Export Digest
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
@@ -1277,26 +1823,45 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
                       Stored canonically · Excludes all Google file references
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => {
                           const text = inspectedTask.output || inspectedTask.description || '';
                           navigator.clipboard.writeText(text);
+                          soundFx.playClick();
                           setToastMessage('📋 Inter-office memo copied to clipboard!');
                           setTimeout(() => setToastMessage(null), 3000);
                         }}
-                        className="px-3 py-1.5 rounded bg-[#ebdbb2] hover:bg-[#d5c4a1] text-xs font-bold text-[#3c3836] border border-[#bdae93]"
+                        className="px-2.5 py-1.5 rounded bg-[#ebdbb2] hover:bg-[#d5c4a1] text-xs font-bold text-[#3c3836] border border-[#bdae93] flex items-center gap-1"
+                        title="Copy memo to clipboard"
                       >
-                        Copy Memo Text
+                        <span>📋</span> Copy Text
+                      </button>
+
+                      <button
+                        onClick={() => handleDownloadMemo(inspectedTask, 'markdown')}
+                        className="px-2.5 py-1.5 rounded bg-[#d5c4a1] hover:bg-[#bdae93] text-xs font-bold text-[#282828] border border-[#a89984] flex items-center gap-1"
+                        title="Download formatted Markdown memo"
+                      >
+                        <span>📥</span> Download .md
+                      </button>
+
+                      <button
+                        onClick={() => handleDownloadMemo(inspectedTask, 'text')}
+                        className="px-2.5 py-1.5 rounded bg-[#ebdbb2] hover:bg-[#d5c4a1] text-xs font-bold text-[#3c3836] border border-[#bdae93] flex items-center gap-1"
+                        title="Download plain text memo"
+                      >
+                        <span>📄</span> Download .txt
                       </button>
 
                       <button
                         onClick={() => {
+                          soundFx.playClick();
                           setActiveTab('knowledge');
                         }}
-                        className="px-3 py-1.5 rounded bg-[#b8bb26] hover:bg-[#98971a] text-xs font-bold text-[#1d2021] border border-[#79740e]"
+                        className="px-3 py-1.5 rounded bg-[#b8bb26] hover:bg-[#98971a] text-xs font-bold text-[#1d2021] border border-[#79740e] flex items-center gap-1"
                       >
-                        View in Knowledge Base →
+                        <span>🧠</span> View in KB →
                       </button>
                     </div>
                   </div>
@@ -1487,6 +2052,218 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
           </div>
         )}
 
+        {/* TAB 5: MULTI-AGENT WORKFLOW CHAINS */}
+        {activeTab === 'pipelines' && (
+          <div className="space-y-6">
+            {/* INTRO BANNER */}
+            <div className="bg-[#ebdbb2] border-2 border-[#d5c4a1] rounded-lg p-4 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black uppercase text-[#282828] tracking-wider">
+                    🔗 Autonomous Multi-Step Workflow Chains
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#fabd2f] text-[#282828] border border-[#d79921]">
+                    SEQUENTIAL INTER-OFFICE RELAY
+                  </span>
+                </div>
+                <p className="text-xs text-[#7c6f64] mt-1">
+                  Chains dispatch complex operations step-by-step across specialized fleet agents. Each agent consumes previous outputs, files official deliverables, and enriches Scranton’s central Knowledge Base.
+                </p>
+              </div>
+
+              {activePipelineId && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#b8bb26] text-[#1d2021] border border-[#98971a] font-bold text-xs animate-pulse">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#cc241d] animate-ping" />
+                  <span>Pipeline in Progress...</span>
+                </div>
+              )}
+            </div>
+
+            {/* PRESET PIPELINES GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {WORKFLOW_PIPELINES.map((pipeline) => {
+                const isThisRunning = activePipelineId === pipeline.id;
+                return (
+                  <div
+                    key={pipeline.id}
+                    className={`bg-[#f9f5d7] border-2 rounded-lg p-4 shadow-sm flex flex-col justify-between transition-all ${
+                      isThisRunning
+                        ? 'border-[#b57614] ring-2 ring-[#b57614]/30 shadow-md'
+                        : 'border-[#d5c4a1] hover:border-[#bdae93]'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{pipeline.icon || pipeline.badge.split(' ')[0]}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#ebdbb2] text-[#7c6f64] border border-[#d5c4a1] uppercase">
+                          {pipeline.estimatedTime || '3-4 mins'} · {pipeline.steps.length} Phases
+                        </span>
+                      </div>
+
+                      <h3 className="font-black text-sm text-[#282828] mb-1">
+                        {pipeline.title}
+                      </h3>
+                      <p className="text-xs text-[#504945] mb-4 leading-relaxed">
+                        {pipeline.description}
+                      </p>
+
+                      {/* STEP PREVIEWS */}
+                      <div className="space-y-1.5 mb-4">
+                        <div className="text-[10px] font-bold text-[#7c6f64] uppercase tracking-wider">
+                          Chained Fleet Sequence:
+                        </div>
+                        {pipeline.steps.map((s, idx) => {
+                          const isDone = isThisRunning && pipelineCurrentStep > idx;
+                          const isCurrent = isThisRunning && pipelineCurrentStep === idx;
+                          return (
+                            <div
+                              key={s.stepNumber || idx}
+                              className={`flex items-center gap-2 text-xs p-1.5 rounded border ${
+                                isCurrent
+                                  ? 'bg-[#fabd2f]/30 border-[#b57614] text-[#282828] font-bold animate-pulse'
+                                  : isDone
+                                  ? 'bg-[#b8bb26]/20 border-[#98971a] text-[#427b58]'
+                                  : 'bg-[#fbf1c7] border-[#ebdbb2] text-[#504945]'
+                              }`}
+                            >
+                              <span className="w-4 h-4 rounded-full bg-[#ebdbb2] text-[#282828] text-[10px] font-bold flex items-center justify-center border border-[#d5c4a1]">
+                                {isDone ? '✓' : idx + 1}
+                              </span>
+                              <span className="text-[11px] truncate flex-1">
+                                <strong>{s.agentName}</strong>: {s.actionTitle}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleExecutePipeline(pipeline)}
+                      disabled={!!activePipelineId}
+                      className={`w-full py-2 px-3 rounded text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 ${
+                        isThisRunning
+                          ? 'bg-[#b8bb26] text-[#1d2021] border border-[#79740e] animate-pulse cursor-wait'
+                          : activePipelineId
+                          ? 'bg-[#ebdbb2] text-[#a89984] border border-[#d5c4a1] cursor-not-allowed'
+                          : 'bg-[#b57614] hover:bg-[#8f5d0f] text-[#fbf1c7] border border-[#8f5d0f]'
+                      }`}
+                    >
+                      <span>{isThisRunning ? '⏳' : '⚡'}</span>
+                      <span>{isThisRunning ? `Executing Phase ${pipelineCurrentStep + 1}...` : 'Launch Workflow Chain'}</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* LIVE EXECUTION CONSOLE & AUDIT TRAIL */}
+            {pipelineLogs.length > 0 && (
+              <div className="bg-[#1d2021] border-2 border-[#3c3836] rounded-lg p-4 shadow-lg text-[#ebdbb2] font-mono text-xs">
+                <div className="flex items-center justify-between border-b border-[#3c3836] pb-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#b8bb26] inline-block animate-ping" />
+                    <span className="text-[11px] font-bold tracking-wider uppercase text-[#fabd2f]">
+                      Sequential Chain Dispatch Log
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        soundFx.playClick();
+                        setActiveTab('outputs');
+                      }}
+                      className="text-[10px] px-2 py-0.5 rounded bg-[#3c3836] hover:bg-[#504945] text-[#ebdbb2] border border-[#504945] transition-colors"
+                    >
+                      View Generated Memos 📜
+                    </button>
+                    <button
+                      onClick={() => setPipelineLogs([])}
+                      className="text-[10px] px-2 py-0.5 rounded bg-[#3c3836] hover:bg-[#504945] text-[#a89984]"
+                    >
+                      Clear Log
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-2">
+                  {pipelineLogs.map((log, li) => (
+                    <div
+                      key={li}
+                      className={`leading-relaxed ${
+                        log.includes('✓') || log.includes('COMPLETE')
+                          ? 'text-[#b8bb26] font-bold'
+                          : log.includes('🚀')
+                          ? 'text-[#fabd2f] font-bold'
+                          : 'text-[#d5c4a1]'
+                      }`}
+                    >
+                      {log}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* VIEW TAB: AGENT COMMUNICATION (INTER-AGENT MESSAGING & QUANTUM ALIGNMENT) */}
+        {activeTab === 'communication' && (
+          <AgentCommunicationThreads
+            agents={agents}
+            onOpenAgentProfile={onSelectAgent}
+            onAssignTask={(taskTitle, agentId) => {
+              setCustomTitle(taskTitle);
+              setTargetAgentId(agentId);
+              setActiveTab('roster_and_assign');
+              soundFx.playClick();
+            }}
+          />
+        )}
+
+        {/* VIEW TAB: AGENT SKILL MATRIX & PERSONALIZED LEARNING MODULES */}
+        {activeTab === 'skills' && (
+          <AgentSkillMatrix
+            agents={agents}
+            onOpenAgentProfile={onSelectAgent}
+            onRecordKnowledge={(entry) => {
+              knowledgeBaseService.addEntry({
+                title: entry.title,
+                category: 'coding',
+                summary: entry.content,
+                content: entry.content,
+                actionableInsight: 'Agent training certified and verified in curriculum ledger.',
+                tags: ['training', 'skill-matrix', 'certification'],
+                authorAgentId: 'system',
+                authorAgentName: 'Curriculum Sentinel',
+                confidenceScore: 0.96,
+              });
+              setKnowledgeEntries(knowledgeBaseService.getAll());
+            }}
+          />
+        )}
+
+        {/* VIEW TAB: AGENT SOPS & DATA AUTHORIZATION MATRIX */}
+        {activeTab === 'sops' && (
+          <AgentSops
+            agents={agents}
+            onRecordKnowledge={(entry) => {
+              knowledgeBaseService.addEntry({
+                title: entry.title,
+                category: entry.category,
+                summary: entry.content.slice(0, 150) + '...',
+                content: entry.content,
+                actionableInsight: 'Agent SOP compliance executed and verified in security ledger.',
+                tags: ['sop', 'compliance', 'system-credentials', 'data-access'],
+                authorAgentId: 'system',
+                authorAgentName: 'Compliance Auditor',
+                confidenceScore: 0.98,
+              });
+              setKnowledgeEntries(knowledgeBaseService.getAll());
+            }}
+          />
+        )}
+
       </div>
 
       {/* MODAL: ADD KNOWLEDGE ENTRY MANUALLY */}
@@ -1595,6 +2372,141 @@ ${codeSnippet ? `4. TECHNICAL SPECIFICATION & PAYLOAD:\n${codeSnippet}\n` : ''}
               >
                 Save to Knowledge Base
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: PROVISION CUSTOM AGENT */}
+      {showCreateAgentModal && (
+        <div className="fixed inset-0 bg-[#1d2021]/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-[#fbf1c7] border-4 border-[#bdae93] rounded-lg p-6 max-w-lg w-full shadow-2xl flex flex-col gap-4 font-mono text-xs">
+            <div className="flex items-center justify-between border-b-2 border-dashed border-[#d5c4a1] pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">👔</span>
+                <div>
+                  <h3 className="text-base font-black text-[#282828] uppercase">
+                    Provision Autonomous Agent
+                  </h3>
+                  <p className="text-[10px] text-[#7c6f64]">
+                    Add a specialized agent to the Scranton autonomous fleet roster
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowCreateAgentModal(false)}
+                className="font-bold text-sm text-[#7c6f64] hover:text-[#282828] px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div>
+              <label className="block font-bold text-[#3c3836] mb-1">Agent Full Name</label>
+              <input
+                type="text"
+                value={newAgentName}
+                onChange={(e) => setNewAgentName(e.target.value)}
+                placeholder="e.g. Angela Martin, DevOps Guardian, Creed Bratton"
+                className="w-full bg-[#f9f5d7] border border-[#d5c4a1] rounded p-2 text-xs outline-none focus:border-[#b57614] font-bold text-[#282828]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-bold text-[#3c3836] mb-1">Role / Operational Title</label>
+                <input
+                  type="text"
+                  value={newAgentRole}
+                  onChange={(e) => setNewAgentRole(e.target.value)}
+                  placeholder="e.g. Senior Auditing Sentinel"
+                  className="w-full bg-[#f9f5d7] border border-[#d5c4a1] rounded p-2 text-xs outline-none focus:border-[#b57614]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#3c3836] mb-1">Primary Discipline</label>
+                <select
+                  value={newAgentCategory}
+                  onChange={(e) => setNewAgentCategory(e.target.value as KnowledgeCategory)}
+                  className="w-full bg-[#f9f5d7] border border-[#d5c4a1] rounded p-2 text-xs outline-none"
+                >
+                  <option value="hacking">🛡️ Security & Defense</option>
+                  <option value="marketing">📢 Sales & Outreach</option>
+                  <option value="finance">📊 Finance & Accounting</option>
+                  <option value="coding">💻 Coding & Engineering</option>
+                  <option value="social_media">📱 Digital Growth & Media</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-bold text-[#3c3836] mb-1">Avatar Symbol</label>
+                <div className="flex gap-1.5 flex-wrap bg-[#f9f5d7] border border-[#d5c4a1] p-1.5 rounded">
+                  {['👔', '🐱', '💼', '🤖', '💻', '🎯', '📊', '🕶️', '🦉', '📜'].map((emo) => (
+                    <button
+                      key={emo}
+                      type="button"
+                      onClick={() => setNewAgentAvatar(emo)}
+                      className={`w-7 h-7 text-sm rounded flex items-center justify-center transition-all ${
+                        newAgentAvatar === emo
+                          ? 'bg-[#b57614] text-[#fbf1c7] scale-110 shadow-xs'
+                          : 'hover:bg-[#ebdbb2]'
+                      }`}
+                    >
+                      {emo}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#3c3836] mb-1">Authority Level</label>
+                <select
+                  value={newAgentAuthority}
+                  onChange={(e) => setNewAgentAuthority(Number(e.target.value))}
+                  className="w-full bg-[#f9f5d7] border border-[#d5c4a1] rounded p-2 text-xs outline-none"
+                >
+                  <option value={1}>Level 1 · Task Specialist</option>
+                  <option value={2}>Level 2 · Senior Operator</option>
+                  <option value={3}>Level 3 · Department Lead</option>
+                  <option value={4}>Level 4 · Branch Director</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-bold text-[#3c3836] mb-1">Core Operational Directive</label>
+              <textarea
+                value={newAgentBio}
+                onChange={(e) => setNewAgentBio(e.target.value)}
+                rows={2}
+                placeholder="Specific instructions, domain expertise, and execution philosophy..."
+                className="w-full bg-[#f9f5d7] border border-[#d5c4a1] rounded p-2 text-xs outline-none focus:border-[#b57614]"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-[#d5c4a1]">
+              <span className="text-[10px] text-[#7c6f64]">
+                Persisted to local storage & active fleet
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateAgentModal(false)}
+                  className="px-3 py-1.5 rounded bg-[#ebdbb2] hover:bg-[#d5c4a1] text-[#3c3836] font-bold border border-[#bdae93]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateCustomAgent}
+                  className="px-4 py-1.5 rounded bg-[#b57614] hover:bg-[#8f5d0f] text-[#fbf1c7] font-bold shadow-sm transition-colors flex items-center gap-1"
+                >
+                  <span>✓</span> Enlist Agent
+                </button>
+              </div>
             </div>
           </div>
         </div>

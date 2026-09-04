@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Agent, FleetTask, UserProfile, AppliedSystemModule, SystemTelemetry } from '../types';
 import { AdminEngineDashboard } from './AdminEngineDashboard';
 import { soundFx, speakText } from '../utils/speech';
@@ -150,6 +150,30 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
 
   const [activeSandboxTab, setActiveSandboxTab] = useState('app'); // 'app' | 'telemetry' | 'source'
 
+  // AI Agent Orchestra Enhancements State
+  const [activeLogMode, setActiveLogMode] = useState<'shell' | 'quantum' | 'browser-use'>('shell');
+  const [isHealing, setIsHealing] = useState(false);
+  const [healingLogs, setHealingLogs] = useState<string[]>([]);
+  const [selectedArtifact, setSelectedArtifact] = useState<string>('App.tsx');
+  const [isTestingVM, setIsTestingVM] = useState(false);
+  const [vmTestOutput, setVmTestOutput] = useState<string[]>([]);
+
+  // Peak-Performance Autonomous Self-Correction & Software Execution Hub States
+  const [isAutonomousLoopActive, setIsAutonomousLoopActive] = useState(false);
+  const [autoLoopPhase, setAutoLoopPhase] = useState<'idle' | 'brainstorming' | 'writing' | 'security_audit' | 'lint_compile' | 'self_healing' | 'completed'>('idle');
+  const [autoLoopLogs, setAutoLoopLogs] = useState<string[]>([]);
+  const [autoLoopCodeSnippet, setAutoLoopCodeSnippet] = useState<string>('');
+  const [currentErrorSimulation, setCurrentErrorSimulation] = useState<string>('none');
+  const [simulationDiagnostics, setSimulationDiagnostics] = useState<{ text: string; author: string; avatar: string; recommendations: string[] } | null>(null);
+  const [isHealAnimationPlaying, setIsHealAnimationPlaying] = useState(false);
+  const [visualAstNodes, setVisualAstNodes] = useState<Array<{ id: string; name: string; type: string; status: 'verified' | 'violation' | 'unchecked'; description: string }>>([
+    { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
+    { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'verified', description: 'Declares autonomous components structure.' },
+    { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: 'verified', description: 'Instantiates state hooks correctly.' },
+    { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: 'verified', description: 'Connects standard system event listeners.' },
+    { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: 'verified', description: 'Compiles clean Tailwind HTML template.' },
+  ]);
+
   const getAgentColor = (dept: string) => {
     const d = (dept || '').toLowerCase();
     if (d === 'engineering' || d === 'qa') return '#3b82f6'; // steel blue
@@ -158,6 +182,159 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
     if (d === 'sales' || d === 'growth') return '#f97316'; // orange
     if (d === 'hr' || d === 'operations') return '#ef4444'; // coral/rose
     return '#ec4899'; // pink
+  };
+
+  // Autonomous loop simulator effect
+  useEffect(() => {
+    if (!isAutonomousLoopActive) {
+      setAutoLoopPhase('idle');
+      return;
+    }
+
+    let intervalId: any = null;
+    let currentStep = 0;
+    
+    setAutoLoopPhase('brainstorming');
+    setAutoLoopLogs([
+      `[OS_INIT] Bootstrapping autonomous full-stack compiler suite...`,
+      `[BRAINSTORM] Ruflo Coder: Analyzing current codebase schema. Target: Peak-level optimization of software modules.`,
+      `[BRAINSTORM] Dwight Schrute: Listening for zero-trust boundary events.`,
+      `[BRAINSTORM] Toby Flenderson: Running continuous heap diagnostics daemon.`,
+    ]);
+
+    const runLoop = async () => {
+      currentStep++;
+      if (currentStep === 1) {
+        setAutoLoopPhase('writing');
+        setAutoLoopLogs((prev) => [
+          ...prev,
+          `[COMPILING] Ruflo Coder: Designing dynamic AST modifications for self-updating components...`,
+          `[WRITE] Injected: "export default function AutonomousModule() { ... }"`,
+          `[WRITE] Appended: "const [telemetryState, setTelemetryState] = useState({ health: 100 });"`,
+          `[WRITE] Verified: Standard React hooks bindings declared cleanly.`,
+        ]);
+        setVisualAstNodes([
+          { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
+          { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'verified', description: 'Declares autonomous components structure.' },
+          { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: 'verified', description: 'Instantiates state hooks correctly.' },
+          { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: 'verified', description: 'Connects standard system event listeners.' },
+          { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: 'verified', description: 'Compiles clean Tailwind HTML template.' },
+        ]);
+      } else if (currentStep === 2) {
+        setAutoLoopPhase('security_audit');
+        setAutoLoopLogs((prev) => [
+          ...prev,
+          `[AUDIT] Dwight Schrute: Initiating mandatory 100% Zero-Trust structural audit on newly generated AST...`,
+          `[AUDIT] Dwight Schrute: Validating import boundaries, network sockets, and filesystem permissions.`,
+        ]);
+
+        if (currentErrorSimulation !== 'none') {
+          setAutoLoopLogs((prev) => [
+            ...prev,
+            `[SECURITY VIOLATION] Dwight Schrute: AST Audit Failed! Detected malicious or destructive patterns in script context!`,
+            `[SECURITY VIOLATION] Details: ${
+              currentErrorSimulation === 'ast_syntax_error' ? 'Syntax error (Missing brackets/semicolon)' :
+              currentErrorSimulation === 'hook_leak' ? 'React hook state leak / infinite re-render threat' :
+              'Scope pollution (Attempted raw memory heap write)'
+            }`,
+          ]);
+          setVisualAstNodes([
+            { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
+            { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'verified', description: 'Declares autonomous components structure.' },
+            { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: currentErrorSimulation === 'hook_leak' ? 'violation' : 'verified', description: 'State hook leaks or infinite re-renders flagged.' },
+            { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: currentErrorSimulation === 'scope_pollution' ? 'violation' : 'verified', description: 'Global scope pollution detected.' },
+            { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: currentErrorSimulation === 'ast_syntax_error' ? 'violation' : 'verified', description: 'Syntax formatting is broken / corrupt elements.' },
+          ]);
+
+          const rolePersona = currentErrorSimulation === 'ast_syntax_error' ? {
+            author: 'Ruflo Coder', avatar: '👨‍💻',
+            text: 'Ah, my bad! I accidentally left an orphaned bracket in the JSX ReturnStatement while hot-patching. The static AST compiler could not tokenize it properly.',
+            recommendations: ['Restore broken closing parentheses', 'Flushing AST tokenizers', 'Re-compiling with strict TSC flags']
+          } : currentErrorSimulation === 'hook_leak' ? {
+            author: 'Toby Flenderson', avatar: '⏳',
+            text: 'Wait, I found an infinite state-mutation loop inside useEffect because state was modified directly inside the component body. This would crash the user browser context.',
+            recommendations: ['Stabilize dependency array primitives', 'Wrap state mutations in conditional guards', 'Pruning orphaned listeners']
+          } : {
+            author: 'Dwight Schrute', avatar: '🛡️',
+            text: 'ALERT! Raw global memory scope write attempted in the execution sandboxed VM! This is a severe threat violation. I have immediately isolated the threat and locked down the context registers.',
+            recommendations: ['Revoking write permissions', 'Isolating global process context', 'Clearing unsafe memory references']
+          };
+
+          setSimulationDiagnostics(rolePersona);
+          setIsAutonomousLoopActive(false); 
+          soundFx.playNotification();
+        } else {
+          setAutoLoopLogs((prev) => [
+            ...prev,
+            `✓ [AUDIT PASSED] Dwight Schrute: 100% Zero-Trust verification achieved. AST conforms to secure corporate policy boundaries.`,
+          ]);
+        }
+      } else if (currentStep === 3) {
+        setAutoLoopPhase('lint_compile');
+        setAutoLoopLogs((prev) => [
+          ...prev,
+          `[COMPILER] Toby Flenderson: Running static type checking and production code compiler...`,
+          `[COMPILER] Running 'tsc --noEmit' and verifying build integrity.`,
+          `✓ [BUILD SUCCESS] Compiled dynamic binary bundle dist/server.cjs. Total build time: 114ms.`,
+        ]);
+      } else if (currentStep === 4) {
+        setAutoLoopPhase('completed');
+        setAutoLoopLogs((prev) => [
+          ...prev,
+          `✓ [PEAK STATUS] Project successfully assembled, audited, and deployed live to Cloud Run!`,
+          `[PEAK STATUS] Current uptime: 100% | CPU utilization: optimal | Performance index: 100/100.`,
+        ]);
+        soundFx.playSuccessChime();
+        confetti({ particleCount: 50, spread: 60 });
+        setIsAutonomousLoopActive(false); 
+      }
+    };
+
+    intervalId = setInterval(runLoop, 2000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isAutonomousLoopActive, currentErrorSimulation]);
+
+  const handleTriggerSelfHeal = async () => {
+    if (isHealAnimationPlaying) return;
+    soundFx.playClick();
+    setIsHealAnimationPlaying(true);
+    setAutoLoopPhase('self_healing');
+    
+    setHealingLogs([
+      `[HEAL_INIT] Initiating autonomous self-repair protocols...`,
+      `[HEAL] Toby Flenderson: Analyzing diagnostic report regarding '${currentErrorSimulation}'...`,
+    ]);
+
+    await new Promise((r) => setTimeout(r, 850));
+    setHealingLogs((prev) => [
+      ...prev,
+      `[HEAL] Dwight Schrute: Commencing AST verification checks and isolation overrides...`,
+      `[HEAL] Ruflo Coder: Applying targeted hot-fix parameters to correct AST nodes...`,
+    ]);
+
+    await new Promise((r) => setTimeout(r, 850));
+    setHealingLogs((prev) => [
+      ...prev,
+      `[HEAL] Toby Flenderson: Hot-patch completed successfully. Clearing warnings...`,
+      `✓ [HEALED] AST successfully stabilized and re-verified. Semicolons normalized, hook dependencies pruned, memory sanitized!`,
+    ]);
+
+    setCurrentErrorSimulation('none');
+    setSimulationDiagnostics(null);
+    setVisualAstNodes([
+      { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
+      { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'verified', description: 'Declares autonomous components structure.' },
+      { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: 'verified', description: 'Instantiates state hooks correctly.' },
+      { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: 'verified', description: 'Connects standard system event listeners.' },
+      { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: 'verified', description: 'Compiles clean Tailwind HTML template.' },
+    ]);
+    setAutoLoopPhase('completed');
+    setIsHealAnimationPlaying(false);
+    soundFx.playSuccessChime();
+    confetti({ particleCount: 70, spread: 80 });
   };
 
   if (!isOpen) return null;
@@ -502,6 +679,50 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                 </div>
               </div>
 
+              {/* Visual Multi-Agent Handoff Flow Chart */}
+              <div className="p-3 bg-[#fbf1c7] dark:bg-[#151722] border border-[#fabd2f]/30 rounded-lg space-y-2">
+                <span className="text-[10px] font-bold text-[#b57614] dark:text-[#fabd2f] uppercase block tracking-wider">
+                  ✦ BUDBASE-STYLE HANDOFF PIPELINE WORKFLOW (VISUALIZED)
+                </span>
+                <div className="flex flex-col md:flex-row items-center justify-around gap-3 pt-2">
+                  {activePlan.subtasks.map((st, idx) => {
+                    const agent = agents.find((a) => a.id === st.assignedTo);
+                    const isRunning = executingSubtaskId === st.id;
+                    const isDone = st.status === 'completed';
+                    const isLast = idx === activePlan.subtasks.length - 1;
+
+                    return (
+                      <React.Fragment key={st.id}>
+                        {/* Node */}
+                        <div className={`flex items-center gap-2 p-2 rounded-lg border-2 text-xs transition-all w-full md:w-auto ${
+                          isRunning 
+                            ? 'bg-[#fabd2f]/10 border-[#fabd2f] shadow-lg shadow-[#fabd2f]/20 animate-pulse scale-105' 
+                            : isDone 
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-800 dark:text-emerald-300' 
+                            : 'bg-[#ebdbb2]/30 dark:bg-[#1d2021]/80 border-[#d5c4a1] dark:border-[#3c3836]'
+                        }`}>
+                          <span className="text-sm">{agent?.avatar || '🤖'}</span>
+                          <div>
+                            <div className="font-extrabold text-[10px] uppercase text-slate-500 dark:text-slate-400">Step {idx + 1}: {agent?.name || st.assignedTo}</div>
+                            <div className="font-bold text-[11px] truncate max-w-[120px]">{st.title}</div>
+                          </div>
+                        </div>
+
+                        {/* Animated Link Arrow */}
+                        {!isLast && (
+                          <div className="flex flex-col items-center justify-center text-center">
+                            <span className="text-[#fabd2f] text-sm animate-bounce font-extrabold">&rarr;</span>
+                            <span className="text-[8px] font-mono text-[#7c6f64] dark:text-[#a89984] max-w-[80px] truncate">
+                              {`{{ steps.${idx + 1}.output }}`}
+                            </span>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Assigned Autonomous Agents Cards */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold">
@@ -578,7 +799,226 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
             </div>
           )}
 
-          {/* Loading Strategic Post-Mortem Report */}
+          {/* Peak-Performance Collaborative Autonomous Software DevOps & Self-Healing Console */}
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1a1c25] border-2 border-[#fabd2f]/60 shadow-xl space-y-4 font-sans text-[#282828] dark:text-[#ebdbb2]">
+            {/* Section Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#d5c4a1]/40 dark:border-slate-800 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-[#fabd2f] text-[#1d2021] flex items-center justify-center animate-pulse">
+                  <Bot className="w-5 h-5" />
+                </span>
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#b57614] dark:text-[#fabd2f] block leading-none">
+                    COLLABORATIVE AGENT ENGINE
+                  </span>
+                  <h2 className="text-sm font-extrabold flex items-center gap-1.5 mt-0.5">
+                    Peak-Level Autonomous Execution & Self-Healing Console
+                  </h2>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  HEALTHY // PEAK_ACTIVE
+                </span>
+              </div>
+            </div>
+
+            {/* Main Interactive Controls Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              
+              {/* Left Column: Loop Controller & Simulated Injector (6 cols) */}
+              <div className="lg:col-span-7 space-y-3">
+                <div className="p-3.5 rounded-lg bg-white dark:bg-[#111218] border border-slate-200 dark:border-slate-800 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                      <Terminal className="w-3.5 h-3.5 text-[#fabd2f]" />
+                      <span>AUTONOMOUS WORKSPACE TRIGGER</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-[#b57614] dark:text-[#fabd2f] uppercase">
+                      Phase: {autoLoopPhase.replace('_', ' ')}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        soundFx.playClick();
+                        setIsAutonomousLoopActive(!isAutonomousLoopActive);
+                      }}
+                      className={`flex-1 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                        isAutonomousLoopActive
+                          ? 'bg-red-600 hover:bg-red-500 text-white animate-pulse'
+                          : 'bg-[#fabd2f] hover:bg-[#fabd2f]/90 text-[#1d2021]'
+                      }`}
+                    >
+                      <Play className="w-4 h-4" />
+                      {isAutonomousLoopActive ? 'HALT RUN LOOP' : 'START AUTONOMOUS COMPILER LOOP'}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        soundFx.playClick();
+                        setAutoLoopLogs([`[OS_INIT] Console logs cache flushed. Ready for next loop run.`]);
+                        setSimulationDiagnostics(null);
+                        setCurrentErrorSimulation('none');
+                        setVisualAstNodes([
+                          { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
+                          { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'verified', description: 'Declares autonomous components structure.' },
+                          { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: 'verified', description: 'Instantiates state hooks correctly.' },
+                          { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: 'verified', description: 'Connects standard system event listeners.' },
+                          { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: 'verified', description: 'Compiles clean Tailwind HTML template.' },
+                        ]);
+                      }}
+                      className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+                      title="Reset Sandbox Indicators"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Simulated Fault Injector */}
+                  <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                      INTENTIONALLY INTRODUCE SOFTWARE ERROR (TEST AUTONOMOUS SELF-HEALING)
+                    </label>
+                    <select
+                      value={currentErrorSimulation}
+                      onChange={(e) => {
+                        soundFx.playClick();
+                        const val = e.target.value;
+                        setCurrentErrorSimulation(val);
+                        if (val !== 'none') {
+                          setIsAutonomousLoopActive(true); // Auto trigger execution to show linter catching it
+                        }
+                      }}
+                      className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#151722] text-[#282828] dark:text-[#ebdbb2] focus:outline-none focus:ring-1 focus:ring-[#fabd2f]"
+                    >
+                      <option value="none">🟢 Stable Build Workspace (Zero AST Errors / Safe Heap)</option>
+                      <option value="hook_leak">⏳ Hook Loop Leak Warning (Infinite re-renders inside component)</option>
+                      <option value="ast_syntax_error">❌ AST Tokenizer Crash (Broken JSX syntax / orphan delimiters)</option>
+                      <option value="scope_pollution">🛡️ Sandbox Violation Error (Malicious global window process write)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Real-time Compiler Log Stream */}
+                <div className="p-3 rounded-lg bg-[#0f111a] border border-slate-800 font-mono text-[10px] text-emerald-400 min-h-[160px] max-h-[220px] overflow-y-auto space-y-1 shadow-inner">
+                  <div className="text-slate-500 font-extrabold uppercase text-[9px] mb-1 tracking-widest border-b border-slate-800 pb-1 flex items-center justify-between">
+                    <span>V8 MICRO-FRONTEND COMPILER STREAM</span>
+                    <span className="text-[#fabd2f] animate-pulse">● LIVE CONNECTION</span>
+                  </div>
+                  {autoLoopLogs.length === 0 ? (
+                    <div className="text-slate-500 italic py-4 text-center">
+                      Autonomous loop idle. Click "Start Autonomous Compiler Loop" above to watch agents build and compile code.
+                    </div>
+                  ) : (
+                    autoLoopLogs.map((log, idx) => (
+                      <div key={idx} className="leading-relaxed whitespace-pre-wrap">
+                        &bull; {log}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: AST Visualizer & Diagnostic Speeches (5 cols) */}
+              <div className="lg:col-span-5 space-y-3 flex flex-col justify-between">
+                
+                {/* Visual AST Structure Diagram */}
+                <div className="p-3.5 rounded-lg bg-white dark:bg-[#111218] border border-slate-200 dark:border-slate-800 space-y-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <Shield className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>ABSTRACT SYNTAX TREE (AST) POLICY INTEGRITY DIAGRAM</span>
+                  </span>
+
+                  <div className="grid grid-cols-5 gap-1.5 pt-1">
+                    {visualAstNodes.map((node) => (
+                      <div
+                        key={node.id}
+                        className={`p-1.5 rounded text-center border cursor-help transition-all ${
+                          node.status === 'violation'
+                            ? 'bg-rose-500/10 border-rose-500 text-rose-500 ring-1 ring-rose-500 animate-pulse'
+                            : 'bg-emerald-500/10 border-emerald-500/50 text-emerald-600 dark:text-emerald-400'
+                        }`}
+                        title={`${node.name} (${node.type}): ${node.description}`}
+                      >
+                        <div className="text-[9px] font-extrabold truncate">{node.name}</div>
+                        <div className="text-[7px] opacity-75 font-mono">{node.status.toUpperCase()}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Meaningful Diagnostic Explanations / Dialogue Responses */}
+                {simulationDiagnostics ? (
+                  <div className="p-3.5 rounded-lg bg-yellow-50 dark:bg-amber-950/20 border border-amber-500/30 space-y-2.5 animate-fadeIn">
+                    <div className="flex items-start gap-2.5">
+                      <span className="text-2xl p-1 bg-amber-500/10 rounded-full flex-shrink-0">
+                        {simulationDiagnostics.avatar}
+                      </span>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <strong className="text-xs font-extrabold text-[#b57614] dark:text-[#fabd2f]">
+                            {simulationDiagnostics.author}
+                          </strong>
+                          <span className="text-[8px] font-mono uppercase bg-amber-500/10 text-[#b57614] dark:text-[#fabd2f] px-1 py-0.2 rounded font-bold">
+                            Diagnostic Specialist
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed font-sans font-medium italic">
+                          "{simulationDiagnostics.text}"
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Recommendations and Remedies */}
+                    <div className="space-y-1.5 pt-2 border-t border-amber-500/20">
+                      <span className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
+                        Suggested Autonomous Repair Protocols:
+                      </span>
+                      <div className="grid grid-cols-1 gap-1 text-[10px]">
+                        {simulationDiagnostics.recommendations.map((rec, rIdx) => (
+                          <div key={rIdx} className="flex items-center gap-1 text-slate-600 dark:text-slate-300 font-medium">
+                            <span className="text-amber-500">•</span>
+                            <span>{rec}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Trigger Healing */}
+                      <button
+                        onClick={handleTriggerSelfHeal}
+                        disabled={isHealAnimationPlaying}
+                        className={`w-full mt-2 py-1.5 px-3 rounded font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-white ${
+                          isHealAnimationPlaying
+                            ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40 animate-pulse cursor-not-allowed'
+                            : 'bg-emerald-600 hover:bg-emerald-500 shadow-lg'
+                        }`}
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isHealAnimationPlaying ? 'animate-spin' : ''}`} />
+                        {isHealAnimationPlaying ? 'APPLYING HOT-PATCHES...' : 'EXECUTE AUTONOMOUS SELF-HEAL DAEMON'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-lg bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center justify-center text-center py-6">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-1.5" />
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                      System Codebase Stable
+                    </span>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 max-w-xs mt-1">
+                      No AST compiler exceptions detected. Live web sandbox operates in optimal peak performance.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
           {isAnalyzing && (
             <div className="p-6 rounded-lg bg-yellow-50 dark:bg-amber-950/20 border border-amber-500/30 flex flex-col items-center justify-center text-center space-y-3 animate-pulse">
               <RefreshCw className="w-8 h-8 text-[#fabd2f] animate-spin" />
@@ -1526,7 +1966,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                                     </span>
                                   </div>
 
-                                  <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 no-scrollbar">
+                                  <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5">
                                     {sandboxTasks.filter(t => t.status === col.id).map((task) => (
                                       <div 
                                         key={task.id} 
@@ -1764,41 +2204,108 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
 
                 {/* Tab 2: Telemetry & Logs */}
                 {activeSandboxTab === 'telemetry' && (
-                  <div className="p-3 bg-[#111218] min-h-[360px] max-h-[500px] overflow-y-auto font-mono text-[11px] text-emerald-400 space-y-1.5">
-                    <div className="text-slate-500 font-bold uppercase border-b border-slate-800 pb-1 mb-2">
-                      REAL-TIME CONTAINER SANDBOX METRICS
+                  <div className="p-4 bg-[#111218] min-h-[380px] max-h-[500px] overflow-y-auto font-mono text-[11px] text-emerald-400 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-2 gap-2">
+                      <div className="text-slate-400 font-bold uppercase text-xs flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-[#fabd2f] animate-pulse" />
+                        <span>SRE CONTAINER & VM TELEMETRY METRICS</span>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (isHealing) return;
+                          soundFx.playClick();
+                          setIsHealing(true);
+                          setHealingLogs([
+                            `[DAEMON_INIT] Spawning Toby's autonomous Self-Healing Daemon...`,
+                            `[DIAGNOSTICS] Parsing sandbox bundle AST & V8 isolate thread loops...`,
+                            `[WARNING] Found 1 heap reference warning in sandboxed module App.tsx.`,
+                            `[HEALING] Cleaning orphaned EventListeners & flushing unused DOM nodes...`,
+                          ]);
+                          await new Promise((r) => setTimeout(r, 800));
+                          setHealingLogs((prev) => [
+                            ...prev,
+                            `[RESOLVING] Hot-patching component garbage collectors...`,
+                            `[COMPILING] Re-verifying TypeScript type-safety constraints...`,
+                          ]);
+                          await new Promise((r) => setTimeout(r, 800));
+                          setHealingLogs((prev) => [
+                            ...prev,
+                            `✓ [HEALED] Sandboxed micro-frontend successfully stabilized! Zero exceptions remaining.`,
+                          ]);
+                          setIsHealing(false);
+                          soundFx.playNotification();
+                          confetti({ particleCount: 60, spread: 50, origin: { y: 0.8 } });
+                        }}
+                        disabled={isHealing}
+                        className={`px-3 py-1 rounded text-[10px] font-extrabold flex items-center gap-1.5 transition-all ${
+                          isHealing
+                            ? 'bg-amber-600/20 text-amber-400 border border-amber-500/30 animate-pulse cursor-not-allowed'
+                            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md'
+                        }`}
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isHealing ? 'animate-spin' : ''}`} />
+                        {isHealing ? 'HEALING SYSTEM...' : "RUN TOBY'S HEALER DAEMON"}
+                      </button>
                     </div>
-                    <div>[SANDBOX INITIALIZED] V8 Isolates successfully locked down on port 3080.</div>
-                    <div>[NETWORKING] Reverse proxy routing mapped correctly.</div>
-                    <div className="text-amber-400">[TELEMETRY] Listening to client-side state mutator loops...</div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-2">
-                      <div className="p-2 rounded bg-[#161824] border border-slate-800">
-                        <span className="text-[9px] text-slate-500 block uppercase">Virtual HEAP alloc</span>
-                        <strong className="text-xs font-extrabold text-white font-mono block mt-0.5">
-                          18.42 MB / 512 MB
-                        </strong>
+
+                    {/* Telemetry Visual Indicators */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className="p-2.5 rounded bg-[#161824] border border-slate-800/80 space-y-1.5">
+                        <div className="flex justify-between text-[10px] text-slate-400">
+                          <span className="uppercase font-bold">V8 Isolate Heap</span>
+                          <span className="font-bold text-white">18.42 MB / 512 MB</span>
+                        </div>
+                        <div className="w-full bg-slate-850 h-1.5 rounded overflow-hidden">
+                          <div className="bg-emerald-500 h-full rounded" style={{ width: '3.6%' }} />
+                        </div>
                       </div>
-                      <div className="p-2 rounded bg-[#161824] border border-slate-800">
-                        <span className="text-[9px] text-slate-500 block uppercase">GC cycles</span>
-                        <strong className="text-xs font-extrabold text-white font-mono block mt-0.5">
-                          0.12 ms avg latency
-                        </strong>
+
+                      <div className="p-2.5 rounded bg-[#161824] border border-slate-800/80 space-y-1.5">
+                        <div className="flex justify-between text-[10px] text-slate-400">
+                          <span className="uppercase font-bold">CPU Thread Core Load</span>
+                          <span className="font-bold text-[#fabd2f]">12.8% Capacity</span>
+                        </div>
+                        <div className="w-full bg-slate-850 h-1.5 rounded overflow-hidden">
+                          <div className="bg-[#fabd2f] h-full rounded animate-pulse" style={{ width: '12.8%' }} />
+                        </div>
                       </div>
-                      <div className="p-2 rounded bg-[#161824] border border-slate-800">
-                        <span className="text-[9px] text-slate-500 block uppercase">COMPILE STAGE</span>
-                        <strong className="text-xs font-extrabold text-[#fabd2f] font-mono block mt-0.5">
-                          HOT_PATCHED
-                        </strong>
+
+                      <div className="p-2.5 rounded bg-[#161824] border border-slate-800/80 space-y-1.5">
+                        <div className="flex justify-between text-[10px] text-slate-400">
+                          <span className="uppercase font-bold">Memory Leak Score</span>
+                          <span className="font-bold text-emerald-400">0.00% Leak Rate</span>
+                        </div>
+                        <div className="w-full bg-slate-850 h-1.5 rounded overflow-hidden">
+                          <div className="bg-emerald-400 h-full rounded" style={{ width: '0%' }} />
+                        </div>
                       </div>
-                      <div className="p-2 rounded bg-[#161824] border border-slate-800">
-                        <span className="text-[9px] text-slate-500 block uppercase">DOM nodes count</span>
-                        <strong className="text-xs font-extrabold text-white font-mono block mt-0.5">
-                          182 nodes (optimized)
-                        </strong>
+
+                      <div className="p-2.5 rounded bg-[#161824] border border-slate-800/80 space-y-1.5">
+                        <div className="flex justify-between text-[10px] text-slate-400">
+                          <span className="uppercase font-bold">Fleet Dispatch Frequency</span>
+                          <span className="font-bold text-indigo-400">18 events/min</span>
+                        </div>
+                        <div className="w-full bg-slate-850 h-1.5 rounded overflow-hidden">
+                          <div className="bg-indigo-400 h-full rounded" style={{ width: '28%' }} />
+                        </div>
                       </div>
                     </div>
+
+                    {/* Healing Process Telemetry Window */}
+                    {healingLogs.length > 0 && (
+                      <div className="p-2.5 bg-[#0d0e15] border border-amber-500/20 rounded-md space-y-1 text-amber-400 text-[10px]">
+                        <div className="font-bold uppercase text-slate-500 mb-1 flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5 text-[#fabd2f]" />
+                          <span>DAEMON CONSOLE DIAGNOSTICS</span>
+                        </div>
+                        {healingLogs.map((hLog, hIdx) => (
+                          <div key={hIdx}>{hLog}</div>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="pt-2 border-t border-slate-800">
-                      <span className="text-slate-500 font-bold block uppercase mb-1">State Mutator Events Stream</span>
+                      <span className="text-slate-500 font-bold block uppercase mb-1.5 text-[10px]">Host State Event Stream</span>
                       <div className="space-y-1 text-[10px] text-slate-400">
                         <div>&bull; [04:56:11] Dispatching active sandbox system initialization sequences.</div>
                         <div>&bull; [04:56:12] Mounting dynamic React components tree into sandboxed iframe DOM.</div>
@@ -1811,12 +2318,67 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
 
                 {/* Tab 3: Generated Code Source */}
                 {activeSandboxTab === 'source' && (
-                  <div className="p-3 bg-[#141211] min-h-[360px] max-h-[500px] overflow-y-auto font-mono text-[11px] text-[#b8bb26] leading-relaxed">
-                    <div className="text-slate-500 font-bold uppercase border-b border-slate-800 pb-1 mb-2 font-sans text-xs">
-                      COMPILED SOURCE CODE DEFINITION
+                  <div className="p-4 bg-[#141211] min-h-[380px] max-h-[500px] overflow-y-auto font-mono text-[11px] space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-2 gap-2">
+                      <div className="text-slate-400 font-bold uppercase text-xs flex items-center gap-2">
+                        <FileCode className="w-4 h-4 text-[#fabd2f]" />
+                        <span>INTERACTIVE GENERATED ARTIFACT VAULT</span>
+                      </div>
+                      
+                      {/* Controls and Actions */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* Selector */}
+                        <select
+                          value={selectedArtifact}
+                          onChange={(e) => { soundFx.playClick(); setSelectedArtifact(e.target.value); }}
+                          className="px-2 py-1 bg-[#1d2021] border border-[#3c3836] text-[10px] rounded text-[#ebdbb2] focus:outline-none focus:border-[#fabd2f]"
+                        >
+                          <option value="App.tsx">App.tsx (Micro Frontend Core)</option>
+                          <option value="TelemetryDashboard.tsx">TelemetryDashboard.tsx (Metrics Engine)</option>
+                          <option value="ComplianceAudit.ts">ComplianceAudit.ts (SecOps Audit)</option>
+                        </select>
+
+                        {/* Copy Code */}
+                        <button
+                          onClick={() => {
+                            soundFx.playClick();
+                            const codeToCopy = selectedArtifact === 'App.tsx'
+                              ? `// Micro Frontend Core File\nexport default function App() {\n  return <div>Hello world</div>;\n}`
+                              : selectedArtifact === 'TelemetryDashboard.tsx'
+                              ? `// Telemetry Dashboard File\nexport function TelemetryDashboard() {\n  return <div>Metrics Tracker</div>;\n}`
+                              : `// SecOps Audit Script\nexport function executeAudit() {\n  return { success: true };\n}`;
+                            navigator.clipboard.writeText(codeToCopy);
+                            // Show brief feedback in UI if possible
+                          }}
+                          className="px-2 py-1 bg-[#282828] hover:bg-[#32302f] text-slate-300 hover:text-white rounded text-[10px] font-bold border border-[#3c3836]"
+                        >
+                          Copy
+                        </button>
+
+                        {/* Download link */}
+                        <a
+                          href={`data:text/typescript;charset=utf-8,${encodeURIComponent(
+                            selectedArtifact === 'App.tsx'
+                              ? `// Micro Frontend Core File\nexport default function App() {\n  return <div>Hello world</div>;\n}`
+                              : selectedArtifact === 'TelemetryDashboard.tsx'
+                              ? `// Telemetry Dashboard File\nexport function TelemetryDashboard() {\n  return <div>Metrics Tracker</div>;\n}`
+                              : `// SecOps Audit Script\nexport function executeAudit() {\n  return { success: true };\n}`
+                          )}`}
+                          download={selectedArtifact}
+                          onClick={() => soundFx.playNotification()}
+                          className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-bold shadow flex items-center gap-1"
+                        >
+                          Download
+                        </a>
+                      </div>
                     </div>
-                    <pre className="p-2 rounded bg-[#1d2021] border border-[#3c3836] whitespace-pre-wrap overflow-x-auto text-[10px]">
-                      {`// Compiled React micro-frontend sandbox bundle
+
+                    {/* Previews / Files code */}
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded bg-[#1d2021] border border-[#3c3836] overflow-x-auto text-[#b8bb26] whitespace-pre text-[10px] leading-relaxed">
+                        {selectedArtifact === 'App.tsx' && (
+                          <code>
+{`// Compiled React Micro-Frontend Sandbox Bundle
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Activity, ShieldCheck } from 'lucide-react';
@@ -1829,40 +2391,155 @@ export default function MicroFrontendComponent() {
   useEffect(() => {
     console.log("[System Hook] Connected to host runtime workspace.");
     setLocalData([
-      { metric: 'Latency', value: '14ms' },
+      { metric: 'Latency', value: '12ms' },
       { metric: 'FPS', value: '60' },
       { metric: 'AST_Vulnerabilities', value: '0' }
     ]);
   }, []);
 
   return (
-    <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200">
-      <div className="flex items-center justify-between border-b pb-2 mb-3">
-        <h2 className="text-sm font-extrabold text-indigo-600">
-          "${activePrompt.slice(0, 50)}..."
+    <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 text-white">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+        <h2 className="text-sm font-extrabold text-[#fabd2f] flex items-center gap-1.5">
+          <Sparkles className="w-4 h-4 text-[#fabd2f] animate-pulse" />
+          <span>${activePrompt.slice(0, 40)}...</span>
         </h2>
-        <span className="px-2 py-0.5 rounded text-[9px] bg-emerald-500 text-white font-bold">
+        <span className="px-2 py-0.5 rounded text-[9px] bg-emerald-500 text-white font-bold animate-pulse">
           LIVE
         </span>
       </div>
       
-      <p className="text-xs text-slate-500 leading-relaxed mb-3">
+      <p className="text-xs text-slate-400 leading-relaxed mb-3">
         Autonomous employee bots compiled this high-fidelity module. Code is actively executed inside V8 sandbox frames on host process node.
       </p>
 
       {/* Interactive elements */}
       <div className="grid grid-cols-3 gap-2">
         {localData.map((d, i) => (
-          <div key={i} className="p-2 rounded bg-white dark:bg-slate-800 border">
-            <span className="text-[8px] text-slate-400 block uppercase">{d.metric}</span>
-            <strong className="text-xs text-slate-800 dark:text-slate-100 font-bold">{d.value}</strong>
+          <div key={i} className="p-2 rounded bg-slate-850 border border-slate-800">
+            <span className="text-[8px] text-slate-500 block uppercase">{d.metric}</span>
+            <strong className="text-xs text-slate-200 font-bold">{d.value}</strong>
           </div>
         ))}
       </div>
     </div>
   );
 }`}
-                    </pre>
+                          </code>
+                        )}
+
+                        {selectedArtifact === 'TelemetryDashboard.tsx' && (
+                          <code>
+{`// Performance Analytics Graph & VM Telemetry Module
+import React from 'react';
+import { Sparkles, Activity, ShieldAlert } from 'lucide-react';
+
+export function TelemetryDashboard() {
+  const systemState = { status: 'OPTIMAL', memoryLeakRate: '0.00%', garbageCycles: '3 cycles total' };
+
+  return (
+    <div className="p-4 bg-slate-950 border border-[#3c3836] rounded-xl text-[#8ec07c]">
+      <div className="flex items-center justify-between border-b border-[#3c3836] pb-2 mb-3">
+        <h4 className="text-xs font-bold uppercase tracking-widest text-[#fabd2f] flex items-center gap-1.5">
+          <Activity className="w-4 h-4 text-emerald-400" />
+          <span>VM Sandbox Telemetry Engine</span>
+        </h4>
+        <span className="text-[9px] font-bold text-emerald-400">PORT 3080</span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400">
+        <div className="p-2 rounded bg-[#1d2021] border border-[#3c3836]">
+          <span className="block uppercase text-[8px] text-slate-500">Ast Leak Rate</span>
+          <strong className="text-[#fe8019] text-xs">{systemState.memoryLeakRate}</strong>
+        </div>
+        <div className="p-2 rounded bg-[#1d2021] border border-[#3c3836]">
+          <span className="block uppercase text-[8px] text-slate-500">GC Collection Frequency</span>
+          <strong className="text-[#83a598] text-xs">{systemState.garbageCycles}</strong>
+        </div>
+      </div>
+    </div>
+  );
+}`}
+                          </code>
+                        )}
+
+                        {selectedArtifact === 'ComplianceAudit.ts' && (
+                          <code>
+{`// Autonomous Zero-Trust SecOps Policy Check
+export interface PolicyCheck {
+  astValidation: boolean;
+  xssFiltering: boolean;
+  isolationLevel: 'v8-isolate' | 'none';
+  vulnerabilitiesCount: number;
+}
+
+export function executeAudit(): PolicyCheck {
+  console.log("[SecOps] Commencing zero-trust cold-boot policy audit...");
+  
+  // AST validation
+  const astValidation = true;
+  const xssFiltering = true;
+  const isolationLevel = 'v8-isolate';
+
+  return {
+    astValidation,
+    xssFiltering,
+    isolationLevel,
+    vulnerabilitiesCount: 0
+  };
+}`}
+                          </code>
+                        )}
+                      </div>
+
+                      {/* Sandbox Testing VM controls */}
+                      <div className="p-3 bg-[#0f0e0d] border border-[#3c3836] rounded-md space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase text-slate-500">V8 SANDBOXED RUNTIME SIMULATOR</span>
+                          <button
+                            onClick={async () => {
+                              soundFx.playClick();
+                              setIsTestingVM(true);
+                              setVmTestOutput([
+                                `[VM_LAUNCH] Locking down V8 isolate container thread...`,
+                                `[TEST_01] Rendering component mounting check...`,
+                              ]);
+                              await new Promise((r) => setTimeout(r, 600));
+                              setVmTestOutput((prev) => [
+                                ...prev,
+                                `✓ [TEST_01] Component mounted successfully without AST memory leaks.`,
+                                `[TEST_02] Analyzing virtual DOM layout constraints...`,
+                              ]);
+                              await new Promise((r) => setTimeout(r, 600));
+                              setVmTestOutput((prev) => [
+                                ...prev,
+                                `✓ [TEST_02] 100% style matching and contrast ratio passed.`,
+                                `✓ [SUMMARY] All VM sandboxed integration tests compiled and validated successfully!`,
+                              ]);
+                              setIsTestingVM(false);
+                              soundFx.playNotification();
+                            }}
+                            disabled={isTestingVM}
+                            className={`px-2.5 py-1 rounded text-[10px] font-bold flex items-center gap-1 transition-all ${
+                              isTestingVM
+                                ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 animate-pulse'
+                                : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                            }`}
+                          >
+                            <Play className="w-3 h-3 fill-current" />
+                            {isTestingVM ? 'Executing...' : 'Run Sandbox VM Test-Suite'}
+                          </button>
+                        </div>
+
+                        {vmTestOutput.length > 0 && (
+                          <div className="space-y-1 text-emerald-400 text-[10px] font-mono p-2 bg-[#1d2021] border border-[#3c3836] rounded">
+                            {vmTestOutput.map((vLog, vIdx) => (
+                              <div key={vIdx}>{vLog}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1871,38 +2548,88 @@ export default function MicroFrontendComponent() {
           )}
 
           {/* Live Terminal & System Self-Developing Stream */}
-          <div className="rounded-lg bg-[#141312] border border-[#3d3835] overflow-hidden">
-            <div className="flex items-center justify-between px-3 py-1.5 bg-[#1f1d1b] border-b border-[#3d3835] text-xs font-mono text-[#a89984]">
+          <div className="rounded-lg bg-[#141312] border border-[#3d3835] overflow-hidden shadow-inner">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3 py-2 bg-[#1f1d1b] border-b border-[#3d3835] text-xs font-mono text-[#a89984] gap-2">
               <div className="flex items-center gap-2">
-                <Terminal className="w-3.5 h-3.5 text-[#8ec07c]" />
+                <Terminal className="w-3.5 h-3.5 text-[#fabd2f]" />
                 <span className="font-bold text-[#ebdbb2]">LIVE SHELL & SYSTEM COMMAND STREAM</span>
               </div>
-              <span className="text-[10px] text-[#8ec07c]">● Autonomous REPL Online</span>
+              <div className="flex items-center gap-1.5 bg-[#141312] p-0.5 rounded border border-[#3d3835]">
+                <button
+                  onClick={() => { soundFx.playClick(); setActiveLogMode('shell'); }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${activeLogMode === 'shell' ? 'bg-[#fabd2f] text-[#1d2021]' : 'text-[#a89984] hover:text-[#ebdbb2]'}`}
+                >
+                  Shell REPL
+                </button>
+                <button
+                  onClick={() => { soundFx.playClick(); setActiveLogMode('quantum'); }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${activeLogMode === 'quantum' ? 'bg-[#b57614] text-white' : 'text-[#a89984] hover:text-[#ebdbb2]'}`}
+                >
+                  Quantum Grover
+                </button>
+                <button
+                  onClick={() => { soundFx.playClick(); setActiveLogMode('browser-use'); }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${activeLogMode === 'browser-use' ? 'bg-[#83a598] text-[#1d2021]' : 'text-[#a89984] hover:text-[#ebdbb2]'}`}
+                >
+                  Browser-Use
+                </button>
+              </div>
             </div>
-            <div className="p-3 h-44 overflow-y-auto font-mono text-[11px] text-[#8ec07c] space-y-1 bg-[#0f0e0d]">
-              {terminalLogs.length === 0 ? (
-                <div className="text-[#7c6f64] italic">
-                  Awaiting directive. Enter a task above or click a preset to watch the Administrator delegate and the website develop itself...
-                </div>
-              ) : (
-                terminalLogs.map((log, i) => (
-                  <div
-                    key={i}
-                    className={
-                      log.startsWith('>>>')
-                        ? 'text-[#fabd2f] font-bold'
-                        : log.startsWith('✓')
-                        ? 'text-emerald-400 font-bold'
-                        : log.startsWith('$')
-                        ? 'text-[#83a598]'
-                        : log.startsWith('[ERROR]')
-                        ? 'text-[#fb4934]'
-                        : 'text-[#d5c4a1]'
-                    }
-                  >
-                    {log}
+            <div className="p-3 h-48 overflow-y-auto font-mono text-[11px] text-[#8ec07c] space-y-1 bg-[#0f0e0d]">
+              {activeLogMode === 'shell' && (
+                terminalLogs.length === 0 ? (
+                  <div className="text-[#7c6f64] italic">
+                    Awaiting directive. Enter a task above or click a preset to watch the Administrator delegate and the website develop itself...
                   </div>
-                ))
+                ) : (
+                  terminalLogs.map((log, i) => (
+                    <div
+                      key={i}
+                      className={
+                        log.startsWith('>>>')
+                          ? 'text-[#fabd2f] font-bold'
+                          : log.startsWith('✓')
+                          ? 'text-emerald-400 font-bold'
+                          : log.startsWith('$')
+                          ? 'text-[#83a598]'
+                          : log.startsWith('[ERROR]')
+                          ? 'text-[#fb4934]'
+                          : 'text-[#d5c4a1]'
+                      }
+                    >
+                      {log}
+                    </div>
+                  ))
+                )
+              )}
+
+              {activeLogMode === 'quantum' && (
+                <div className="space-y-1.5 text-[#b8bb26]">
+                  <div className="text-[#a89984] font-bold">// INTERACTIVE GROVER SUPERPOSITION WAVEFUNCTION DECAY LOGS</div>
+                  <div>[QUANTUM_INIT] Initializing registers with {agents.length} employee-states in uniform superposition...</div>
+                  <div className="text-[#d3869b]">|Ψ_0⟩ = 1/√12 * (|Dwight⟩ + |Pam⟩ + |Jim⟩ + |Kevin⟩ + |Angela⟩ + |Toby⟩ + |Ruflo⟩ + |Cline⟩ + |Ryan| + |Stanley⟩ + |Kelly⟩ + |Creed⟩)</div>
+                  <div>[ORACLE_INVOKED] Matching sub-task requirements with agent clearance and skills matrices...</div>
+                  <div>[AMPLIFICATION] Executing diffusion iteration phase 1 (π/4 * √N rotation):</div>
+                  <div className="text-[#83a598]">  &bull; Dwight (Security Audits) probability state: 0.083 &rarr; <span className="text-emerald-400 font-bold">0.628</span></div>
+                  <div className="text-[#83a598]">  &bull; Ruflo (Surgical TS Code) probability state: 0.083 &rarr; <span className="text-emerald-400 font-bold">0.584</span></div>
+                  <div className="text-[#83a598]">  &bull; Toby (Performance Diagnostics) probability state: 0.083 &rarr; <span className="text-emerald-400 font-bold">0.490</span></div>
+                  <div className="text-amber-400">[MEASUREMENT] Coherence filter applied. Phase noise calibrated under Michael Scott's supervision.</div>
+                  <div className="text-[#fe8019] font-bold">[COLLAPSE] Wavefunction collapsed! Optimal delegation sequence mapped: Dwight (92%), Ruflo (89%), Toby (81%). Zero-leak runtime established!</div>
+                </div>
+              )}
+
+              {activeLogMode === 'browser-use' && (
+                <div className="space-y-1 text-[#83a598]">
+                  <div className="text-[#a89984] font-bold">// BROWSER-USE HEADLESS WEB CONTROLLER LOGS</div>
+                  <div>[INIT] Launching secure Chrome sandbox... Chrome processes isolation active.</div>
+                  <div className="text-[#fabd2f]">[NAVIGATE] Browsing to target repository: https://mastra.ai/docs</div>
+                  <div className="text-emerald-400">  &bull; Status: 200 OK | Rendered viewport: 1280x800 | DOM elements count: 480</div>
+                  <div>[EXTRACT] Analyzing webpage node elements for mastra tool schemas...</div>
+                  <div className="text-amber-400">[CLICK] Clicking interactive element: "#sidebar-navigation-link"</div>
+                  <div>[EXTRACT] Scraping live documentation... Retrieved 4 core tool codebases.</div>
+                  <div className="text-[#fe8019]">[TYPE] Inputting dynamic parameters into sandbox tester...</div>
+                  <div className="text-emerald-400">✓ [SUCCESS] Extracted document definitions and hot-patched agent memories successfully.</div>
+                </div>
               )}
             </div>
           </div>

@@ -101,9 +101,20 @@ function Tool({ name, icon, active = false }: { name: string; icon: string; acti
 }
 
 export default function App() {
-  const [agents, setAgents] = useState<Agent[]>(() => 
-    INITIAL_AGENTS.map((a) => ({ ...a, quantumState: initializeAgentQuantumState(a) }))
-  );
+  const [agents, setAgents] = useState<Agent[]>(() => {
+    let list = INITIAL_AGENTS.map((a) => ({ ...a, quantumState: initializeAgentQuantumState(a) }));
+    try {
+      const saved = localStorage.getItem('munderdiffl_custom_agents');
+      if (saved) {
+        const custom: Agent[] = JSON.parse(saved);
+        if (Array.isArray(custom) && custom.length > 0) {
+          const formatted = custom.map((a) => ({ ...a, quantumState: a.quantumState || initializeAgentQuantumState(a) }));
+          list = [...formatted, ...list];
+        }
+      }
+    } catch (e) {}
+    return list;
+  });
   const [selectedAgentId, setSelectedAgentId] = useState<string>('michael');
   const [logs, setLogs] = useState<AgentLog[]>([
     {
@@ -284,6 +295,9 @@ export default function App() {
   const setIsDeploymentPipelineOpen = createModalSetter('isDeploymentPipelineOpen');
   const setIsMunderdifflinDashboardOpen = createModalSetter('isMunderdifflinDashboardOpen');
   const setIsDynamicKbOpen = createModalSetter('isDynamicKbOpen');
+
+  // Initial tab to display when MunderdifflinDashboard is launched
+  const [dashboardInitialTab, setDashboardInitialTab] = useState<'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge' | 'pipelines' | 'communication' | 'skills' | 'sops'>('roster_and_assign');
 
   const [systemModulesCount, setSystemModulesCount] = useState<number>(1);
   const [featureToEditInIde, setFeatureToEditInIde] = useState<DynamicFeature | null>(null);
@@ -881,6 +895,33 @@ export default function App() {
     }
   };
 
+  // Add newly provisioned agent to fleet & persist locally
+  const handleAddAgent = (newAgent: Agent) => {
+    const agentWithState = {
+      ...newAgent,
+      quantumState: newAgent.quantumState || initializeAgentQuantumState(newAgent),
+    };
+    setAgents((prev) => [agentWithState, ...prev]);
+    try {
+      const saved = localStorage.getItem('munderdiffl_custom_agents');
+      const custom: Agent[] = saved ? JSON.parse(saved) : [];
+      custom.unshift(newAgent);
+      localStorage.setItem('munderdiffl_custom_agents', JSON.stringify(custom));
+    } catch (e) {}
+
+    // Add log
+    setLogs((prev) => [
+      {
+        id: `log-agent-${Date.now()}`,
+        timestamp: new Date().toLocaleTimeString(),
+        level: 'success',
+        agentId: newAgent.id,
+        message: `[Agent Commissioned] ${newAgent.name} (${newAgent.role}) provisioned with Authority Level ${newAgent.authorityLevel}. Added to Scranton Fleet roster.`,
+      },
+      ...prev,
+    ]);
+  };
+
   
   const [activeDepartment, setActiveDepartment] = useState("Overview");
   const [command, setCommand] = useState("");
@@ -942,7 +983,10 @@ export default function App() {
             <span className="health-pulse" />
             All systems operational
           </div>
-                    <button className="top-button bg-[#b57614]/30 hover:bg-[#b57614]/50 text-[#fabd2f] border border-[#fabd2f]/50 font-bold" title="Munder Diffl.in Agents Dashboard" onClick={() => { closeAllModals(); setIsMunderdifflinDashboardOpen(true); }}>📋 Munderdiffl.in Dashboard</button>
+          <button className="top-button bg-[#b57614]/30 hover:bg-[#b57614]/50 text-[#fabd2f] border border-[#fabd2f]/50 font-bold" title="Munder Diffl.in Agents Dashboard" onClick={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); setIsMunderdifflinDashboardOpen(true); }}>📋 Dashboard</button>
+          <button className="top-button bg-[#fabd2f]/30 hover:bg-[#fabd2f]/50 text-[#fabd2f] border border-[#d79921]/50 font-bold" title="Visual Messaging Threads & Quantum Alignment" onClick={() => { closeAllModals(); setDashboardInitialTab('communication'); setIsMunderdifflinDashboardOpen(true); }}>💬 Communication</button>
+          <button className="top-button bg-[#427b58]/30 hover:bg-[#427b58]/50 text-[#b8bb26] border border-[#427b58]/50 font-bold" title="Agent Skill Matrix & Personalized Learning Modules" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); setIsMunderdifflinDashboardOpen(true); }}>🎯 Skill Matrix</button>
+          <button className="top-button bg-[#076678]/30 hover:bg-[#076678]/50 text-[#fbf1c7] border border-[#076678]/50 font-bold" title="Agent Standard Operating Procedures & Verified Data Clearance" onClick={() => { closeAllModals(); setDashboardInitialTab('sops'); setIsMunderdifflinDashboardOpen(true); }}>📁 SOPs & Data</button>
           <button className="top-button bg-[#b8bb26]/30 hover:bg-[#b8bb26]/50 text-[#b8bb26] border border-[#b8bb26]/50 font-bold" title="Dynamic Knowledge Base for AI Agents" onClick={() => { closeAllModals(); setIsDynamicKbOpen(true); }}>🧠 Knowledge Base</button>
           <button className="top-button" title="Company Database (Supabase)" onClick={() => { closeAllModals(); setIsCompanyDbOpen(true); }}>🗄️ DB</button>
           <button className="top-button" title="Executive Analytics & Fleet Intelligence" onClick={() => { closeAllModals(); setIsAnalyticsOpen(true); }}>📊 Analytics</button>
@@ -970,6 +1014,18 @@ export default function App() {
             <button className={`nav-item ${activeDepartment === "Munderdifflin" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Munderdifflin'); }}>
               <Icon>📋</Icon>
               <span>Munderdiffl.in Agents</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('communication'); setIsMunderdifflinDashboardOpen(true); }}>
+              <Icon>💬</Icon>
+              <span>Agent Communication</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); setIsMunderdifflinDashboardOpen(true); }}>
+              <Icon>🎯</Icon>
+              <span>Skill Matrix</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('sops'); setIsMunderdifflinDashboardOpen(true); }}>
+              <Icon>📁</Icon>
+              <span>Agent SOPs & Data</span>
             </button>
             <button className="nav-item" onClick={() => { closeAllModals(); setIsDynamicKbOpen(true); }}>
               <Icon>🧠</Icon>
@@ -1096,6 +1152,7 @@ export default function App() {
                         agents={agents}
                         tasks={tasks}
                         onAddTask={handleAddTask}
+                        onAddAgent={handleAddAgent}
                       />
                     </div>
                   ) : (
@@ -1337,8 +1394,12 @@ export default function App() {
 
                   <div className="panel activity-panel">
                     <div className="panel-header">
-                      <div><span className="panel-kicker">REAL-TIME TELEMETRY</span><h2>Agent Activity</h2></div>
-                      <button className="text-button" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>Open event stream →</button>
+                      <div><span className="panel-kicker">REAL-TIME TELEMETRY & QUANTUM ALIGNMENT</span><h2>Agent Activity & Communication</h2></div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button className="text-button text-[#fabd2f] font-bold" onClick={() => { closeAllModals(); setDashboardInitialTab('communication'); setIsMunderdifflinDashboardOpen(true); }}>💬 Threads (Quantum) →</button>
+                        <button className="text-button text-[#b8bb26] font-bold" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); setIsMunderdifflinDashboardOpen(true); }}>🎯 Skill Matrix →</button>
+                        <button className="text-button" onClick={() => { closeAllModals(); setIsAdminOrchestratorOpen(true); }}>Events →</button>
+                      </div>
                     </div>
                     <div className="activity-list">
                       {logs.slice(0, 4).map(log => (
@@ -1431,6 +1492,7 @@ export default function App() {
         onImportRepoTool={handleImportRepoTool}
         onTriggerManualHeal={handleTriggerManualHeal}
         onAddTask={handleAddTask}
+        onAddAgent={handleAddAgent}
         onUpdateAgent={(updatedAgent) => {
           setAgents((prev) => prev.map((a) => (a.id === updatedAgent.id ? updatedAgent : a)));
         }}
@@ -1447,6 +1509,7 @@ export default function App() {
         }}
         autoApplyToast={autoApplyToast}
         onDismissToast={() => setAutoApplyToast(null)}
+        initialDashboardTab={dashboardInitialTab}
       />
     </div>
   );

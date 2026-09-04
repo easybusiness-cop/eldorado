@@ -1,5 +1,6 @@
 import { Router } from "express";
 import express from "express";
+import { BrowserUseEngine } from "../tools/browser/browser-use.ts";
 import vm from "vm";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -519,7 +520,34 @@ Guidelines:
 2. If the user asks to add/remove a feature, write executable JavaScript / TypeScript code that can be mounted into the app.
 3. If a file is attached (${attachedFile ? attachedFile.name : "None"}), incorporate its content.`;
 
+    // Browser-Use dynamic tool intercept
+    let browsingContext = "";
+    const lowerPrompt = prompt.toLowerCase();
+    const needsBrowsing = 
+      lowerPrompt.includes("http://") || 
+      lowerPrompt.includes("https://") || 
+      lowerPrompt.includes("browse") || 
+      lowerPrompt.includes("scrape") || 
+      lowerPrompt.includes("web-search") || 
+      lowerPrompt.includes("url") || 
+      lowerPrompt.includes("visit site") ||
+      lowerPrompt.includes("browser-use");
+
+    if (needsBrowsing) {
+      const urlMatch = prompt.match(/https?:\/\/[^\s]+/);
+      const targetUrl = urlMatch ? urlMatch[0] : undefined;
+      try {
+        const browserRes = await BrowserUseEngine.run(prompt, targetUrl, agentId || "system");
+        browsingContext = `\n\n[BROWSER-USE HEADLESS WEB CONTROLLER RESULT]\nObjective: ${prompt}\nFinal Scraped/Processed Output:\n${browserRes.finalOutput}\n\nExecution trace details:\n${browserRes.stepsExecuted.map(s => `- Step ${s.stepNumber} [${s.action}]: ${s.detail} (Status: ${s.status})`).join("\n")}`;
+      } catch (browserErr: any) {
+        console.error("Browser-Use execution error in agent chat:", browserErr);
+      }
+    }
+
     let userPromptWithFile = prompt;
+    if (browsingContext) {
+      userPromptWithFile += browsingContext;
+    }
     if (attachedFile) {
       userPromptWithFile += `\n\n[ATTACHED FILE: ${attachedFile.name} (${attachedFile.type})]\n\`\`\`\n${attachedFile.content}\n\`\`\``;
     }
@@ -723,3 +751,24 @@ agentExecutionRouter.post("/agent/execute-loop", async (req, res) => {
     });
   }
 });
+
+// ==========================================
+// AI AGENT ORCHESTRA
+// ==========================================
+import { AgentOrchestra } from "../orchestration/orchestra.ts";
+
+agentExecutionRouter.post("/agent/orchestra", async (req, res) => {
+  try {
+    const { prompt, projectId, requestedBy } = req.body;
+    if (!prompt || typeof prompt !== "string") {
+      return res.status(400).json({ success: false, error: "prompt is required" });
+    }
+
+    const result = await AgentOrchestra.executeOrchestra(prompt, { projectId, requestedBy });
+    res.json(result);
+  } catch (err: any) {
+    console.error("Agent Orchestra Endpoint Error:", err);
+    res.status(500).json({ success: false, error: err.message || "Internal server error in Agent Orchestra" });
+  }
+});
+

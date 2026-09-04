@@ -3,8 +3,15 @@ import { Agent } from '../types';
 // Web Audio sound synthesizer for retro office sounds and clicks
 class SoundFX {
   private ctx: AudioContext | null = null;
+  public muted: boolean = false;
+
+  toggleMute(): boolean {
+    this.muted = !this.muted;
+    return this.muted;
+  }
 
   private initCtx() {
+    if (this.muted) return;
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
@@ -14,6 +21,7 @@ class SoundFX {
   }
 
   playClick() {
+    if (this.muted) return;
     try {
       this.initCtx();
       if (!this.ctx) return;
@@ -39,6 +47,7 @@ class SoundFX {
   }
 
   playNotification() {
+    if (this.muted) return;
     try {
       this.initCtx();
       if (!this.ctx) return;
@@ -64,6 +73,7 @@ class SoundFX {
   }
 
   playSuccessChime() {
+    if (this.muted) return;
     try {
       this.initCtx();
       if (!this.ctx) return;
@@ -95,6 +105,7 @@ class SoundFX {
   }
 
   playWarning() {
+    if (this.muted) return;
     try {
       this.initCtx();
       if (!this.ctx) return;

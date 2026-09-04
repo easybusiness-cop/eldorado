@@ -85,12 +85,14 @@ interface ModalManagerProps {
   onImportRepoTool: (feature: Partial<DynamicFeature>) => void;
   onTriggerManualHeal: () => Promise<void>;
   onAddTask: (task: Partial<FleetTask>) => void;
+  onAddAgent?: (agent: Agent) => void;
   onUpdateAgent: (agent: Agent) => void;
   onTaskCreated: (task: any) => void;
   onLogCreated: (log: any) => void;
   onCodeApplied: (mod: any) => void;
   autoApplyToast: { show: boolean; agentName: string; moduleName: string } | null;
   onDismissToast: () => void;
+  initialDashboardTab?: 'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge' | 'pipelines' | 'communication' | 'skills' | 'sops';
 }
 
 export const ModalManager: React.FC<ModalManagerProps> = ({
@@ -120,12 +122,14 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
   onImportRepoTool,
   onTriggerManualHeal,
   onAddTask,
+  onAddAgent,
   onUpdateAgent,
   onTaskCreated,
   onLogCreated,
   onCodeApplied,
   autoApplyToast,
   onDismissToast,
+  initialDashboardTab,
 }) => {
   return (
     <>
@@ -337,6 +341,10 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
               agents={agents}
               tasks={tasks}
               onAddTask={onAddTask}
+              onAddAgent={onAddAgent}
+              onSelectAgent={onSelectAgent}
+              selectedAgentId={selectedAgent?.id}
+              initialTab={initialDashboardTab}
             />
           </div>
         </div>
