@@ -5,12 +5,59 @@ import { IngestionPipeline } from "../knowledge/ingestion/ingestion-pipeline.ts"
 import { capabilityEngine } from "../core/capabilities/capability.engine.ts";
 import { failureMemory } from "../core/learning/failure-memory.ts";
 import { skillMemory } from "../core/learning/skill-memory.ts";
+import { autonomousLifecycle } from "../core/autonomy/autonomous-lifecycle.ts";
 
 export const autonomyRouter = Router();
 
 const engineer = new AutonomousEngineer();
 const trainer = new MasterTrainer();
 const ingestionPipeline = new IngestionPipeline();
+
+// POST /api/autonomy/develop or /api/develop - Autonomous development loop
+const developHandler = async (req: any, res: any) => {
+  try {
+    const {
+      agentId,
+      organizationId,
+      objective,
+      workspace,
+      maxAttempts,
+      timeoutMs,
+      requiredCapability,
+    } = req.body;
+
+    if (!agentId || !organizationId || !objective || !workspace) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "agentId, organizationId, objective and workspace are required.",
+      });
+    }
+
+    const result = await autonomousLifecycle.run({
+      agentId,
+      organizationId,
+      objective,
+      workspace,
+      maxAttempts,
+      timeoutMs,
+      requiredCapability,
+    });
+
+    return res.status(result.success ? 200 : 422).json(result);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : String(error);
+
+    return res.status(500).json({
+      success: false,
+      error: message,
+    });
+  }
+};
+
+autonomyRouter.post("/autonomy/develop", developHandler);
+autonomyRouter.post("/develop", developHandler);
 
 // POST /api/autonomy/tasks - Solve task autonomously
 autonomyRouter.post("/autonomy/tasks", async (req, res) => {

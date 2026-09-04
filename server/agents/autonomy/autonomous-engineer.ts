@@ -2,6 +2,7 @@ import { executionKernel } from "../../core/execution/execution.kernel.ts";
 import { evaluationEngine } from "../../core/evaluation/evaluation.engine.ts";
 import { failureMemory } from "../../core/learning/failure-memory.ts";
 import { capabilityEngine } from "../../core/capabilities/capability.engine.ts";
+import { autonomousLifecycle } from "../../core/autonomy/autonomous-lifecycle.ts";
 import type { AgentTask, TaskAttempt } from "../../core/types/task.types.ts";
 
 export interface AutonomousResult {
@@ -12,6 +13,26 @@ export interface AutonomousResult {
 }
 
 export class AutonomousEngineer {
+  async develop(
+    task: AgentTask & {
+      objective?: string;
+      workspace?: string;
+    }
+  ) {
+    return autonomousLifecycle.run({
+      id: task.id,
+      agentId: task.agentId,
+      organizationId: task.organizationId,
+      objective: task.objective ?? "Complete the assigned engineering task.",
+      workspace: task.workspace ?? process.cwd(),
+      maxAttempts: task.maxAttempts,
+      timeoutMs: task.timeoutMs,
+      requiredCapability:
+        task.requiredCapabilities?.[0] ??
+        "software-engineering",
+    });
+  }
+
   async solve(task: AgentTask): Promise<AutonomousResult> {
     const attempts: TaskAttempt[] = [];
 

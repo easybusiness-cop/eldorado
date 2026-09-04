@@ -15,6 +15,8 @@ import { cseMlRouter } from "./server/routes/cse-ml.routes.ts";
 import { engineeringAdvancedRouter } from "./server/routes/engineering-advanced.routes.ts";
 import { knowledgeRouter } from "./server/routes/knowledge.routes.ts";
 import { autonomyRouter } from "./server/routes/autonomy.routes.ts";
+import { evolutionRouter } from "./server/routes/evolution.routes.ts";
+import { repositoryRouter } from "./server/routes/repository.routes.ts";
 
 dotenv.config();
 
@@ -75,6 +77,8 @@ app.use("/api", hqRouter);
 app.use("/api", webExplorerRouter);
 app.use("/api", enterpriseControlRouter);
 app.use("/api", autonomyRouter);
+app.use("/api/evolution", evolutionRouter);
+app.use("/api/repository", repositoryRouter);
 
 // Start Server with Vite Dev/Prod Middleware
 async function startServer() {

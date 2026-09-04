@@ -26,7 +26,7 @@ export class ExecutionKernel {
     }
 
     const workspace =
-      request.cwd ?? (await WorkspaceManager.create(request.taskId));
+      request.workspace ?? request.cwd ?? (await WorkspaceManager.create(request.taskId));
 
     if (!request.command) {
       return {

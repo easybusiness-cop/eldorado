@@ -78,3 +78,45 @@ githubRouter.post("/push", async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+githubRouter.get("/prs", async (req, res) => {
+  try {
+    const { owner, repo, state = "open" } = req.query as Record<string, string>;
+    if (!owner || !repo) {
+      return res.status(400).json({ success: false, error: "owner and repo parameters are required" });
+    }
+    const octokit = getOctokit();
+    const response = await octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: state as "open" | "closed" | "all",
+      per_page: 20,
+    });
+    res.json({ success: true, pulls: response.data });
+  } catch (err: any) {
+    console.error("GitHub list PRs error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+githubRouter.post("/pr", async (req, res) => {
+  try {
+    const { owner, repo, title, head, base = "main", body = "" } = req.body;
+    if (!owner || !repo || !title || !head) {
+      return res.status(400).json({ success: false, error: "owner, repo, title, and head are required" });
+    }
+    const octokit = getOctokit();
+    const response = await octokit.rest.pulls.create({
+      owner,
+      repo,
+      title,
+      head,
+      base,
+      body,
+    });
+    res.json({ success: true, pullRequest: response.data });
+  } catch (err: any) {
+    console.error("GitHub create PR error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
