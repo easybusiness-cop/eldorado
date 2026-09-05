@@ -11,16 +11,34 @@ export function OrchestratorChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+  const [providerStatus, setProviderStatus] = useState<
+    { name: string; available: boolean }[]
+  >([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Load provider status on mount
+  useEffect(() => {
+    fetch("/api/orchestrator/models")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.providers) {
+          setProviderStatus(data.providers);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const addMessage = (msg: Omit<ChatMessage, "id">) => {
     setMessages((prev) => [
       ...prev,
-      { ...msg, id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}` },
+      {
+        ...msg,
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      },
     ]);
   };
 
@@ -98,7 +116,7 @@ export function OrchestratorChat() {
               case "step_start":
                 addMessage({
                   role: "system",
-                  content: `▶ ${data.role.toUpperCase()} (${data.agentId}) started`,
+                  content: `▶ ${String(data.role || "").toUpperCase()} (${data.agentId}) started`,
                   meta: data.objective,
                 });
                 break;
@@ -110,7 +128,7 @@ export function OrchestratorChat() {
               case "step_complete":
                 addMessage({
                   role: "system",
-                  content: `✓ ${data.role.toUpperCase()} completed`,
+                  content: `✓ ${String(data.role || "").toUpperCase()} completed`,
                   meta: data.resultPreview,
                 });
                 break;
@@ -118,7 +136,7 @@ export function OrchestratorChat() {
               case "step_error":
                 addMessage({
                   role: "system",
-                  content: `✗ ${data.role.toUpperCase()} failed: ${data.error}`,
+                  content: `✗ ${String(data.role || "").toUpperCase()} failed: ${data.error}`,
                 });
                 break;
 
@@ -126,7 +144,10 @@ export function OrchestratorChat() {
               case "complete":
                 addMessage({
                   role: "assistant",
-                  content: data.finalAnswer || data.status || "Orchestration finished",
+                  content:
+                    data.finalAnswer ||
+                    data.status ||
+                    "Orchestration finished",
                 });
                 break;
 
@@ -135,6 +156,9 @@ export function OrchestratorChat() {
                   role: "system",
                   content: `Error: ${data.error}`,
                 });
+                break;
+
+              default:
                 break;
             }
           } catch {
@@ -159,6 +183,8 @@ export function OrchestratorChat() {
     }
   };
 
+  const activeProvider = providerStatus.find((p) => p.available);
+
   return (
     <div
       style={{
@@ -166,11 +192,13 @@ export function OrchestratorChat() {
         flexDirection: "column",
         height: "100%",
         maxHeight: "80vh",
+        minHeight: 480,
         background: "#1a1a1a",
         border: "1px solid #333",
         borderRadius: 12,
         overflow: "hidden",
-        fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+        fontFamily:
+          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
       }}
     >
       {/* Header */}
@@ -179,14 +207,30 @@ export function OrchestratorChat() {
           padding: "12px 16px",
           borderBottom: "1px solid #333",
           background: "#222",
-          fontWeight: 600,
-          color: "#e0e0e0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
         }}
       >
-        Rufflo Master Orchestrator
-        <span style={{ marginLeft: 8, fontSize: 12, color: "#888" }}>
-          {isRunning ? "● Running..." : "○ Ready"}
-        </span>
+        <div style={{ fontWeight: 600, color: "#e0e0e0" }}>
+          Rufflo Master Orchestrator
+          <span
+            style={{
+              marginLeft: 10,
+              fontSize: 12,
+              color: isRunning ? "#6ee7b7" : "#888",
+            }}
+          >
+            {isRunning ? "● Running..." : "○ Ready"}
+          </span>
+        </div>
+
+        <div style={{ fontSize: 11, color: "#888" }}>
+          {activeProvider
+            ? `Brain: ${activeProvider.name}`
+            : "Brain: checking..."}
+        </div>
       </div>
 
       {/* Messages */}
@@ -201,8 +245,12 @@ export function OrchestratorChat() {
         }}
       >
         {messages.length === 0 && (
-          <div style={{ color: "#666", fontSize: 13 }}>
-            Type an objective and press Enter. Example: “Build a sliding-window RateLimiter in TypeScript”
+          <div style={{ color: "#666", fontSize: 13, lineHeight: 1.5 }}>
+            Type an objective and press Enter.
+            <br />
+            Example: <code style={{ color: "#aaa" }}>
+              Build a sliding-window RateLimiter in TypeScript
+            </code>
           </div>
         )}
 
@@ -210,9 +258,8 @@ export function OrchestratorChat() {
           <div
             key={m.id}
             style={{
-              alignSelf:
-                m.role === "user" ? "flex-end" : "flex-start",
-              maxWidth: "90%",
+              alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+              maxWidth: "92%",
               padding: "8px 12px",
               borderRadius: 8,
               background:
@@ -221,20 +268,36 @@ export function OrchestratorChat() {
                   : m.role === "assistant"
                   ? "#1e2a3a"
                   : m.role === "progress"
-                  ? "#1a1a1a"
+                  ? "#141414"
                   : "#252525",
               color: "#ddd",
               fontSize: 13,
               whiteSpace: "pre-wrap",
-              border: m.role === "progress" ? "1px dashed #444" : "none",
+              border:
+                m.role === "progress" ? "1px dashed #444" : "1px solid transparent",
             }}
           >
-            <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>
+            <div
+              style={{
+                fontSize: 11,
+                color: "#888",
+                marginBottom: 4,
+                letterSpacing: 0.3,
+              }}
+            >
               {m.role.toUpperCase()}
             </div>
             {m.content}
             {m.meta && (
-              <div style={{ marginTop: 6, fontSize: 11, color: "#777" }}>
+              <div
+                style={{
+                  marginTop: 6,
+                  fontSize: 11,
+                  color: "#777",
+                  borderTop: "1px solid #333",
+                  paddingTop: 6,
+                }}
+              >
                 {m.meta}
               </div>
             )}
@@ -257,7 +320,7 @@ export function OrchestratorChat() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Enter objective..."
+          placeholder="Enter objective... (Enter to run, Shift+Enter for newline)"
           disabled={isRunning}
           rows={2}
           style={{
@@ -270,19 +333,22 @@ export function OrchestratorChat() {
             padding: "8px 10px",
             fontSize: 13,
             outline: "none",
+            lineHeight: 1.4,
           }}
         />
         <button
           onClick={runOrchestrator}
           disabled={isRunning || !input.trim()}
           style={{
-            padding: "0 16px",
+            padding: "0 18px",
             background: isRunning ? "#444" : "#3d6b4f",
             color: "#fff",
             border: "none",
             borderRadius: 8,
-            cursor: isRunning ? "not-allowed" : "pointer",
+            cursor: isRunning || !input.trim() ? "not-allowed" : "pointer",
             fontWeight: 600,
+            fontSize: 13,
+            minWidth: 90,
           }}
         >
           {isRunning ? "Running..." : "Run"}
