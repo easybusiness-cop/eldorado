@@ -22,6 +22,7 @@ import { evolutionRouter } from "./server/routes/evolution.routes.ts";
 import { repositoryRouter } from "./server/routes/repository.routes.ts";
 import { supabaseRouter } from "./server/routes/supabase.routes.ts";
 import { objectivesRouter } from "./server/routes/objectives.routes.ts";
+import { orchestratorRouter } from "./server/routes/orchestrator.routes.ts";
 
 dotenv.config();
 
@@ -109,6 +110,7 @@ app.use("/api/evolution", evolutionRouter);
 app.use("/api/repository", repositoryRouter);
 app.use("/api/supabase", supabaseRouter);
 app.use("/api", objectivesRouter);
+app.use("/api", orchestratorRouter);
 
 // Start Server with Vite Dev/Prod Middleware
 async function startServer() {

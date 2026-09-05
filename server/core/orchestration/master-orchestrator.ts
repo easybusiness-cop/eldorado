@@ -9,6 +9,7 @@ import { CapabilityRegistry } from "../../../apps/control-plane/integrations/reg
 import { randomUUID } from "node:crypto";
 import { knowledgeGraph } from "../memory/knowledge-graph";
 import { SoftwareBuilder } from "../builder/software-builder";
+import { modelRouter } from "../../ai/providers";
 
 export type OrchestratorRole =
   | "planner"
@@ -17,6 +18,15 @@ export type OrchestratorRole =
   | "executor"
   | "critic"
   | "synthesizer";
+
+export type ProgressEvent =
+  | { type: "step_start"; stepId: string; role: string; agentId: string; objective: string }
+  | { type: "step_token"; stepId: string; role: string; text: string }
+  | { type: "step_complete"; stepId: string; role: string; resultPreview?: string }
+  | { type: "step_error"; stepId: string; role: string; error: string }
+  | { type: "plan_complete"; planId: string; status: string; finalAnswer?: string };
+
+export type ProgressCallback = (event: ProgressEvent) => void;
 
 export interface OrchestratorStep {
   id: string;
@@ -54,6 +64,7 @@ export interface RunOrchestratorOptions {
   organizationId?: string;
   maxSteps?: number;
   preferredAgents?: Partial<Record<OrchestratorRole, string>>;
+  onProgress?: ProgressCallback;
 }
 
 export class MasterOrchestrator {
@@ -80,6 +91,7 @@ export class MasterOrchestrator {
 
     const planId = `orch-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     const agents = { ...this.DEFAULT_AGENTS, ...preferredAgents };
+    const onProgress = options.onProgress;
 
     // 1. Create high-level plan
     const steps = this.createPlan(objective, agents, maxSteps);
@@ -97,22 +109,46 @@ export class MasterOrchestrator {
       },
     };
 
-    // 2. Execute steps sequentially (can be parallelized later)
+    // 2. Execute steps sequentially
     for (const step of plan.steps) {
       step.status = "running";
       step.startedAt = new Date().toISOString();
 
+      onProgress?.({
+        type: "step_start",
+        stepId: step.id,
+        role: step.role,
+        agentId: step.agentId,
+        objective: step.objective,
+      });
+
       try {
-        const result = await this.executeStep(step, organizationId, plan);
+        const result = await this.executeStep(step, organizationId, plan, onProgress);
         step.result = result;
         step.status = "completed";
         plan.metadata.completedSteps += 1;
+
+        onProgress?.({
+          type: "step_complete",
+          stepId: step.id,
+          role: step.role,
+          resultPreview:
+            typeof result === "string"
+              ? result.slice(0, 300)
+              : JSON.stringify(result).slice(0, 300),
+        });
       } catch (err: any) {
         step.error = err.message || String(err);
         step.status = "failed";
         plan.metadata.failedSteps += 1;
 
-        // Critical failure stops the plan early
+        onProgress?.({
+          type: "step_error",
+          stepId: step.id,
+          role: step.role,
+          error: step.error,
+        });
+
         if (step.role === "planner" || step.role === "coder") {
           plan.status = "failed";
           plan.finalAnswer = `Orchestration failed at ${step.role} step: ${step.error}`;
@@ -141,6 +177,13 @@ export class MasterOrchestrator {
       outcome: plan.status === "completed" ? "success" : "failure",
       planId: plan.id,
       tags: ["orchestrator", plan.status],
+    });
+
+    onProgress?.({
+      type: "plan_complete",
+      planId: plan.id,
+      status: plan.status,
+      finalAnswer: plan.finalAnswer,
     });
 
     return plan;
@@ -267,7 +310,8 @@ export class MasterOrchestrator {
   private static async executeStep(
     step: OrchestratorStep,
     organizationId: string,
-    plan: OrchestratorPlan
+    plan: OrchestratorPlan,
+    onProgress?: ProgressCallback
   ): Promise<any> {
     // Special path: full Software Builder
     if (step.role === "coder" && step.parameters?.__useSoftwareBuilder) {
@@ -341,14 +385,172 @@ export class MasterOrchestrator {
       return gatewayResult.data;
     }
 
-    // Pure reasoning steps
-    return this.simulateReasoning(step, plan);
+    // Pure reasoning steps (now real LLM with streaming support)
+    return await this.simulateReasoning(step, plan, onProgress);
   }
 
   /**
-   * Lightweight reasoning simulation (can later be replaced by real LLM calls)
+   * Real LLM reasoning using ModelRouter (with safe fallback & progress streaming)
    */
-  private static simulateReasoning(step: OrchestratorStep, plan: OrchestratorPlan): any {
+  private static async simulateReasoning(
+    step: OrchestratorStep,
+    plan: OrchestratorPlan,
+    onProgress?: ProgressCallback
+  ): Promise<any> {
+    const obj = plan.originalObjective;
+
+    const systemPrompt = `You are a specialist agent inside the Rufflo Autonomous Company OS.
+Your current role is: ${step.role.toUpperCase()}.
+You must produce useful, structured, high-quality output for the given objective.
+Respond in clear, professional language. Prefer JSON when the output is structured.`;
+
+    let userPrompt = "";
+
+    switch (step.role) {
+      case "planner":
+        userPrompt = `Break down this objective into a clear, actionable multi-step plan:
+
+Objective: "${obj}"
+
+Return a JSON object with:
+{
+  "planSummary": "short summary",
+  "recommendedPhases": ["phase1", "phase2", ...],
+  "notes": "any important notes"
+}`;
+        break;
+
+      case "coder":
+        userPrompt = `You are the Coder agent. Design and write high-quality code for this objective:
+
+Objective: "${obj}"
+
+Return a JSON object with:
+{
+  "language": "javascript" or "typescript",
+  "code": "the full runnable code",
+  "explanation": "short explanation of what the code does"
+}
+
+The code must be self-contained and ready to run in a sandbox.`;
+        break;
+
+      case "critic":
+        const failed = plan.steps.filter((s) => s.status === "failed").length;
+        const completed = plan.steps.filter((s) => s.status === "completed").length;
+        userPrompt = `You are the Critic agent. Review the current orchestration results.
+
+Objective: "${obj}"
+Completed steps: ${completed}
+Failed steps: ${failed}
+
+Step details:
+${plan.steps.map((s) => `- [${s.status}] ${s.role}: ${s.objective}`).join("\n")}
+
+Return a JSON object with:
+{
+  "critique": "your honest assessment",
+  "riskLevel": "LOW" | "MEDIUM" | "HIGH",
+  "recommendations": ["rec1", "rec2"]
+}`;
+        break;
+
+      case "synthesizer":
+        userPrompt = `You are the Synthesizer agent. Produce the final high-quality answer for this objective.
+
+Objective: "${obj}"
+
+Available step results:
+${plan.steps
+  .filter((s) => s.status === "completed")
+  .map((s) => `- ${s.role}: ${JSON.stringify(s.result || {}).slice(0, 400)}`)
+  .join("\n")}
+
+Return a clear, well-structured final answer that the user can act on.`;
+        break;
+
+      default:
+        userPrompt = `Complete this step as the ${step.role} agent.
+
+Objective: "${obj}"
+Your specific task: ${step.objective}
+
+Provide a useful, structured response.`;
+    }
+
+    try {
+      // Prefer streaming if the router supports it
+      if (typeof (modelRouter as any).generateStream === "function") {
+        let fullText = "";
+
+        const result = await modelRouter.generateStream(
+          {
+            prompt: userPrompt,
+            systemInstruction: systemPrompt,
+            temperature: 0.3,
+          },
+          (chunk) => {
+            if (chunk.text) {
+              fullText += chunk.text;
+              onProgress?.({
+                type: "step_token",
+                stepId: step.id,
+                role: step.role,
+                text: chunk.text,
+              });
+            }
+          }
+        );
+
+        const raw = result.text || fullText;
+
+        try {
+          const jsonMatch = raw.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            return { ...parsed, _provider: result.provider };
+          }
+        } catch {}
+
+        return {
+          role: step.role,
+          content: raw,
+          source: result.provider,
+        };
+      }
+
+      // Non-streaming fallback
+      const result = await modelRouter.generate({
+        prompt: userPrompt,
+        systemInstruction: systemPrompt,
+        temperature: 0.3,
+      });
+
+      const raw = result.text;
+
+      try {
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return { ...parsed, _provider: result.provider };
+        }
+      } catch {}
+
+      return {
+        role: step.role,
+        content: raw,
+        source: result.provider,
+      };
+    } catch (err: any) {
+      console.warn(`[MasterOrchestrator] Model reasoning failed for ${step.role}:`, err.message);
+      return this.fallbackReasoning(step, plan);
+    }
+  }
+
+  /**
+   * Deterministic fallback when LLM is unavailable
+   */
+  private static fallbackReasoning(step: OrchestratorStep, plan: OrchestratorPlan): any {
     const obj = plan.originalObjective;
 
     switch (step.role) {
@@ -356,43 +558,46 @@ export class MasterOrchestrator {
         return {
           planSummary: `High-level plan created for: "${obj}"`,
           recommendedPhases: ["Research", "Design", "Implement", "Validate", "Synthesize"],
-          notes: "Plan generated by Master Orchestrator",
+          notes: "Fallback plan (LLM unavailable)",
+          source: "fallback",
         };
 
       case "coder":
-        // Produce a small example so the executor has something real to run
         return {
           language: "javascript",
           code: `
-            // Auto-generated by Master Orchestrator (Coder step)
             function solve() {
               const objective = ${JSON.stringify(obj)};
               const result = {
                 success: true,
                 objective,
-                message: "Code executed successfully inside sandbox",
+                message: "Fallback code executed successfully",
                 timestamp: new Date().toISOString()
               };
               __result = result;
-              console.log("Orchestrator coder output:", JSON.stringify(result));
+              console.log("Fallback coder output:", JSON.stringify(result));
               return result;
             }
             solve();
           `,
-          explanation: `Generated a runnable JavaScript snippet for objective: ${obj}`,
+          explanation: `Fallback code generated for: ${obj}`,
+          source: "fallback",
         };
 
       case "critic":
         const failed = plan.steps.filter((s) => s.status === "failed").length;
         const completed = plan.steps.filter((s) => s.status === "completed").length;
         return {
-          critique: failed > 0
-            ? `Found ${failed} failed step(s). Review required.`
-            : `All executed steps completed successfully (${completed} steps).`,
+          critique:
+            failed > 0
+              ? `Found ${failed} failed step(s). Review required.`
+              : `All executed steps completed successfully (${completed} steps).`,
           riskLevel: failed > 0 ? "MEDIUM" : "LOW",
-          recommendations: failed > 0
-            ? ["Re-run failed steps", "Increase research depth", "Add more validation"]
-            : ["Proceed to final synthesis"],
+          recommendations:
+            failed > 0
+              ? ["Re-run failed steps", "Increase research depth"]
+              : ["Proceed to final synthesis"],
+          source: "fallback",
         };
 
       case "synthesizer":
@@ -401,10 +606,15 @@ export class MasterOrchestrator {
           keyOutcomes: plan.steps
             .filter((s) => s.status === "completed")
             .map((s) => `${s.role}: success`),
+          source: "fallback",
         };
 
       default:
-        return { message: `Step ${step.role} completed`, objective: step.objective };
+        return {
+          message: `Step ${step.role} completed (fallback)`,
+          objective: step.objective,
+          source: "fallback",
+        };
     }
   }
 

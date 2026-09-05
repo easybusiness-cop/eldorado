@@ -5,7 +5,7 @@
 
 import { toolGateway } from "../../../apps/control-plane/integrations/gateway/tool.gateway";
 import { knowledgeGraph } from "../memory/knowledge-graph";
-import { callGeminiResilient } from "../../ai/geminiService";
+import { modelRouter } from "../../ai/providers";
 import { randomUUID } from "node:crypto";
 
 export interface BuildRequest {
@@ -212,15 +212,14 @@ Make the code actually useful and ready to integrate.`;
 
     let raw = "";
     try {
-      raw = await callGeminiResilient({
-        contents: userPrompt,
+      const result = await modelRouter.generate({
+        prompt: userPrompt,
         systemInstruction,
         temperature: 0.2,
-        preferredModel: "gemini-3.5-flash-lite",
       });
+      raw = result.text;
     } catch (err: any) {
-      // Fallback to a solid template if Gemini is unavailable
-      console.warn("[SoftwareBuilder] Gemini failed, using high-quality fallback:", err.message);
+      console.warn("[SoftwareBuilder] Model failed, using high-quality fallback:", err.message);
       return {
         files: this.fallbackGenerate(objective, language, targetDir),
         raw: `FALLBACK USED: ${err.message}`,
