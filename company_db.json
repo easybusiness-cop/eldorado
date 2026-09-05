@@ -5841,6 +5841,20 @@
   ],
   "audits": [
     {
+      "id": "aud-gw-1788592306030",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-05T07:11:46.035Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788592306030-8837"
+    },
+    {
       "id": "aud-gw-1788550043035",
       "agentId": "pete",
       "projectId": "prj-alpha",
