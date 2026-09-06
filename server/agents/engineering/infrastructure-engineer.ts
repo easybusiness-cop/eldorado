@@ -1,18 +1,18 @@
-import { toolGateway, ToolGateway } from '../../tools/gateway.ts';
+import { ToolGateway, toolGateway } from '../../tools/gateway.ts';
 
 export class InfrastructureEngineer {
   private toolGateway: ToolGateway;
 
   constructor() {
-    this.toolGateway = toolGateway;
-  }
-
-  async deployToStaging() {
-    return { success: true, environment: 'staging', url: 'https://staging.rufflo.com' };
+    this.toolGateway = toolGateway || ToolGateway.getInstance();
   }
 
   async callPublicAPI(endpoint: string, params: any) {
     return await this.toolGateway.callPublicAPI(endpoint, params);
+  }
+
+  async deployToStaging() {
+    return { success: true, environment: 'staging', url: 'https://staging.rufflo.com' };
   }
 }
 

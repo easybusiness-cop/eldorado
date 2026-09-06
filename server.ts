@@ -23,6 +23,7 @@ import { repositoryRouter } from "./server/routes/repository.routes.ts";
 import { supabaseRouter } from "./server/routes/supabase.routes.ts";
 import { objectivesRouter } from "./server/routes/objectives.routes.ts";
 import { orchestratorRouter } from "./server/routes/orchestrator.routes.ts";
+import departmentRoutes from "./server/routes/department.routes.ts";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
 
@@ -125,7 +126,7 @@ app.use("/api", orchestratorRouter);
 // Intelligent Engineering Department Endpoint
 app.post("/api/objectives/engineering", async (req, res) => {
   try {
-    const result = await engineering.handleObjective(req.body);
+    const result = await engineering.runFullAutonomousLifecycle(req.body);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({
@@ -134,6 +135,9 @@ app.post("/api/objectives/engineering", async (req, res) => {
     });
   }
 });
+
+// Full 10-Agent Engineering Department Routes
+app.use("/api/department", departmentRoutes);
 
 // Master Meta-Agent Observability & Self-Improvement Endpoints
 app.get("/api/meta/observe", async (_req, res) => {

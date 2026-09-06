@@ -1857,7 +1857,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                                       </div>
                                       <div className="flex justify-between font-extrabold text-indigo-400 border-t border-slate-800 pt-1 mt-1 text-xs">
                                         <span>Gross Cost:</span>
-                                        <span>${(Number(tradeAmount) * (cryptoPrices as any)[tradeCoin] + 0.40).toFixed(2)} USD</span>
+                                        <span>${(((Number(tradeAmount) || 0) * (Number((cryptoPrices as any)[tradeCoin]) || 0)) + 0.40).toFixed(2)} USD</span>
                                       </div>
                                     </div>
                                   </div>

@@ -376,10 +376,10 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                   <div className="bg-emerald-500/10 border border-emerald-500/25 p-1.5 rounded-lg flex items-center justify-between gap-1 text-[9px]">
                     <div className="truncate flex items-center gap-1 text-emerald-400 font-bold">
                       <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-                      <span className="truncate">Easiest Way: {winning.strategy}</span>
+                      <span className="truncate">Easiest Way: {winning?.strategy || 'Direct Optimization'}</span>
                     </div>
                     <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[8px] shrink-0 font-bold">
-                      Diff {winning.difficultyScore}/10
+                      Diff {winning?.difficultyScore ?? 2}/10
                     </span>
                   </div>
 

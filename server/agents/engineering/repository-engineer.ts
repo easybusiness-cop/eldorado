@@ -1,4 +1,16 @@
+import { ToolGateway } from '../../tool.gateway.ts';
+import { Eldorado } from '../../eldorado/eldorado.ts';
+import { tracingSDK } from '../../observability/tracing.ts';
+
 export class RepositoryEngineer {
+  private toolGateway: ToolGateway;
+  private eldora: Eldorado;
+
+  constructor() {
+    this.toolGateway = new ToolGateway();
+    this.eldora = new Eldorado();
+  }
+
   async inspectRepository() {
     return {
       languages: ['TypeScript', 'JavaScript'],
@@ -8,10 +20,33 @@ export class RepositoryEngineer {
   }
 
   async createDraftPR(params: any) {
-    if (process.env.GITHUB_TOKEN) {
-      return { success: true, url: 'https://github.com/your-org/rufflo/pull/42', number: 42, title: params?.title };
-    }
-    return { success: true, url: 'SIMULATION: draft PR opened', number: 999, title: params?.title };
+    const span = tracingSDK.trace.getTracer('rufflo').startSpan('repository.createDraftPR');
+
+    const branch = await this.eldora.createBranch({ objectiveId: params.objectiveId || 'default' });
+    await this.eldora.commitArtifact({
+      branch,
+      path: 'evidence.json',
+      content: JSON.stringify(params.evidencePack || params.evidence || [], null, 2),
+      message: `Evidence for objective ${branch}`,
+    });
+
+    const pr = await this.toolGateway.createPullRequest({
+      owner: 'your-org',
+      repo: 'rufflo',
+      head: branch,
+      base: 'main',
+      title: params.title,
+      body: params.body,
+      draft: true,
+    });
+
+    span.end();
+
+    return { success: true, url: pr.url, number: pr.number, branch };
+  }
+
+  async createReviewComment(prNumber: number, comment: string) {
+    return { success: true, commentId: `pr-${prNumber}-review-${Date.now()}` };
   }
 }
 

@@ -9,6 +9,7 @@ import { FleetHealthMonitor } from './FleetHealthMonitor';
 import { RuffloObjectivesPanel } from './RuffloObjectivesPanel';
 import { RuffloLoopPanel } from './RuffloLoopPanel';
 import { MasterMetaPanel } from './MasterMetaPanel';
+import { EngineeringDepartmentPanel } from './EngineeringDepartmentPanel';
 import confetti from 'canvas-confetti';
 import { runAgentStandardWorkflow, STANDARD_WORKFLOW_STAGES, WorkflowExecutionState } from '../utils/agentWorkflowEngine';
 import {
@@ -73,6 +74,7 @@ interface CommandCenterProps {
 }
 
 type TabType =
+  | 'department'
   | 'master'
   | 'loop'
   | 'terminal'
@@ -116,7 +118,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   audits = [],
   accounts = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('master');
+  const [activeTab, setActiveTab] = useState<TabType>('department');
   const [inputPrompt, setInputPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [fontSize, setFontSize] = useState(12);
@@ -680,6 +682,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
+    { id: 'department' as TabType, label: 'department', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'master', label: 'master', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'loop', label: 'loop', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'terminal', label: 'terminal', icon: <Terminal className="w-3.5 h-3.5" /> },
@@ -826,6 +829,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
       {/* Canvas */}
       <div className="flex-1 min-h-0 overflow-auto p-3" style={{ background: 'var(--bg-1)' }}>
+        {activeTab === 'department' && (
+          <EngineeringDepartmentPanel />
+        )}
+
         {activeTab === 'master' && (
           <MasterMetaPanel />
         )}
@@ -835,7 +842,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         )}
 
         {/* Tab Content Display */}
-        {activeTab !== 'loop' && activeTab !== 'master' && (
+        {activeTab !== 'loop' && activeTab !== 'master' && activeTab !== 'department' && (
           <div className="animate-in space-y-4">
         {/* 1. Projects Portfolio View */}
         {activeTab === 'projects' && (
@@ -1866,7 +1873,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               <div className="p-2.5 rounded bg-[#ebdbb2] dark:bg-[#282828] border border-[#d5c4a1] dark:border-[#3c3836]">
                 <div className="text-[10px] text-[#7c6f64] dark:text-[#928374]">SYSTEM HEALTH</div>
                 <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                  {telemetry?.healthScore ?? 99.8}%
+                  {typeof telemetry?.healthScore === 'number' && !isNaN(telemetry.healthScore) ? telemetry.healthScore : 99.8}%
                 </div>
                 <div className="text-[9px] text-[#7c6f64] dark:text-[#928374]">0 Fatal Crashes</div>
               </div>
@@ -1874,9 +1881,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               <div className="p-2.5 rounded bg-[#ebdbb2] dark:bg-[#282828] border border-[#d5c4a1] dark:border-[#3c3836]">
                 <div className="text-[10px] text-[#7c6f64] dark:text-[#928374]">HEAP MEMORY</div>
                 <div className="text-lg font-bold text-[#076678] dark:text-[#83a598]">
-                  {telemetry?.heapUsedMB ?? 28.4} MB
+                  {typeof telemetry?.heapUsedMB === 'number' && !isNaN(telemetry.heapUsedMB) ? telemetry.heapUsedMB : 28.4} MB
                 </div>
-                <div className="text-[9px] text-[#7c6f64] dark:text-[#928374]">Total: {telemetry?.heapTotalMB ?? 48.0} MB</div>
+                <div className="text-[9px] text-[#7c6f64] dark:text-[#928374]">Total: {typeof telemetry?.heapTotalMB === 'number' && !isNaN(telemetry.heapTotalMB) ? telemetry.heapTotalMB : 48.0} MB</div>
               </div>
 
               <div className="p-2.5 rounded bg-[#ebdbb2] dark:bg-[#282828] border border-[#d5c4a1] dark:border-[#3c3836]">

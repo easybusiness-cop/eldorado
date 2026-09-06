@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import { Agent, FleetTask, SystemTelemetry, AgentLog } from '../types';
 import { soundFx } from '../utils/speech';
+import { QuantumWavefunctionIndicator } from './QuantumWavefunctionIndicator';
 import {
   BarChart3,
   TrendingUp,
@@ -17,6 +18,7 @@ import {
   Play,
   Pause,
   Filter,
+  Atom,
 } from 'lucide-react';
 
 interface TokenTimePoint {
@@ -74,7 +76,7 @@ interface FleetD3PerformanceChartProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-type ChartViewMode = 'overview' | 'tokens' | 'efficiency' | 'tasks';
+type ChartViewMode = 'overview' | 'wavefunction' | 'tokens' | 'efficiency' | 'tasks';
 type TimeWindow = '5m' | '15m' | 'session';
 type LineDisplayMode = 'composite' | 'multiline' | 'filtered';
 
@@ -758,6 +760,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
       });
 
     // Center Health Display
+    const healthText = typeof telemetry?.healthScore === 'number' && !isNaN(telemetry.healthScore) ? telemetry.healthScore : 99.8;
     g.append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', '-0.2em')
@@ -765,7 +768,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
       .attr('font-weight', 'bold')
       .attr('fill', '#b8bb26')
       .attr('font-family', 'monospace')
-      .text(`${telemetry?.healthScore ?? 99.8}%`);
+      .text(`${healthText}%`);
 
     g.append('text')
       .attr('text-anchor', 'middle')
@@ -820,6 +823,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
           {(
             [
               { id: 'overview', label: 'Bento Overview', icon: <Layers className="w-3 h-3" /> },
+              { id: 'wavefunction', label: 'Wavefunction Collapse', icon: <Atom className="w-3 h-3 text-emerald-400" /> },
               { id: 'tokens', label: 'Tokens Stream', icon: <TrendingUp className="w-3 h-3" /> },
               { id: 'efficiency', label: 'Agent Efficiency', icon: <Zap className="w-3 h-3" /> },
               { id: 'tasks', label: 'Task Success & Health', icon: <CheckCircle2 className="w-3 h-3" /> },
@@ -914,7 +918,9 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
         <div className="p-2 rounded bg-[#282828]/70 border border-[#3c3836] flex items-center justify-between">
           <div>
             <div className="text-[10px] text-[#a89984]">HEALTH & RESILIENCE</div>
-            <div className="text-base font-bold text-emerald-400">{telemetry.healthScore}%</div>
+            <div className="text-base font-bold text-emerald-400">
+              {typeof telemetry?.healthScore === 'number' && !isNaN(telemetry.healthScore) ? telemetry.healthScore : 99.8}%
+            </div>
           </div>
           <Shield className="w-5 h-5 text-emerald-400/50" />
         </div>
@@ -1256,6 +1262,36 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                 <svg ref={barChartSvgRef} className="w-full h-full" />
               </div>
             </div>
+
+            {/* Real-Time Quantum Wavefunction Collapse Live Indicator */}
+            <div className="lg:col-span-12">
+              <QuantumWavefunctionIndicator
+                compact={true}
+                agents={agents}
+                tasks={tasks}
+                selectedAgentId={selectedAgentFilter !== 'all' ? selectedAgentFilter : selectedAgentId}
+                onSelectAgent={(id) => {
+                  setSelectedAgentFilter(id);
+                  onSelectAgent?.(id);
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* VIEW: REAL-TIME QUANTUM WAVEFUNCTION PATHFINDING COLLAPSE */}
+        {viewMode === 'wavefunction' && (
+          <div className="space-y-3">
+            <QuantumWavefunctionIndicator
+              compact={false}
+              agents={agents}
+              tasks={tasks}
+              selectedAgentId={selectedAgentFilter !== 'all' ? selectedAgentFilter : selectedAgentId}
+              onSelectAgent={(id) => {
+                setSelectedAgentFilter(id);
+                onSelectAgent?.(id);
+              }}
+            />
           </div>
         )}
 
@@ -1416,7 +1452,9 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
               <div className="space-y-2 text-[11px]">
                 <div className="p-2 rounded bg-[#1d2021] flex items-center justify-between">
                   <span className="text-[#a89984]">System Health Score</span>
-                  <span className="font-bold text-emerald-400">{telemetry?.healthScore ?? 99.8}%</span>
+                  <span className="font-bold text-emerald-400">
+                    {typeof telemetry?.healthScore === 'number' && !isNaN(telemetry.healthScore) ? telemetry.healthScore : 99.8}%
+                  </span>
                 </div>
                 <div className="p-2 rounded bg-[#1d2021] flex items-center justify-between">
                   <span className="text-[#a89984]">Self-Healed Memory Patches</span>

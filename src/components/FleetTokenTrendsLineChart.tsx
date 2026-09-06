@@ -107,7 +107,8 @@ export const FleetTokenTrendsLineChart: React.FC<FleetTokenTrendsLineChartProps>
       const agentData: Record<string, number> = {};
 
       agents.forEach((ag) => {
-        const base = Math.max(100, Math.round(ag.tokensProcessed * (0.8 + Math.random() * 0.4)));
+        const rawTokens = typeof ag.tokensProcessed === 'number' && !isNaN(ag.tokensProcessed) ? ag.tokensProcessed : 1200;
+        const base = Math.max(100, Math.round(rawTokens * (0.8 + Math.random() * 0.4)));
         const delta = Math.round(Math.random() * 180 + 20);
         agentData[ag.id] = base + delta;
         pointTotal += agentData[ag.id];
@@ -151,7 +152,10 @@ export const FleetTokenTrendsLineChart: React.FC<FleetTokenTrendsLineChartProps>
         if (isSpikeTriggered && spikeAgent && ag.id === spikeAgent.id) {
           agentDelta += burstTokens;
         }
-        const prevAgentVal = dataPoints[dataPoints.length - 1]?.[ag.id] || (ag.tokensProcessed || 2000);
+        const lastVal = dataPoints[dataPoints.length - 1]?.[ag.id];
+        const prevAgentVal = typeof lastVal === 'number' && !isNaN(lastVal) 
+          ? lastVal 
+          : (typeof ag.tokensProcessed === 'number' && !isNaN(ag.tokensProcessed) ? ag.tokensProcessed : 2000);
         agentData[ag.id] = prevAgentVal + agentDelta;
         pointTotal += agentData[ag.id];
       });
@@ -426,7 +430,7 @@ export const FleetTokenTrendsLineChart: React.FC<FleetTokenTrendsLineChartProps>
                 stroke="#a89984"
                 fontSize={11}
                 tickLine={false}
-                tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}
+                tickFormatter={(val) => (typeof val === 'number' && !isNaN(val) ? `${Math.round(val / 1000)}k` : '0k')}
               />
               <Tooltip content={<CustomTrendsTooltip />} />
               <Area
@@ -453,7 +457,7 @@ export const FleetTokenTrendsLineChart: React.FC<FleetTokenTrendsLineChartProps>
                 stroke="#a89984"
                 fontSize={11}
                 tickLine={false}
-                tickFormatter={(val) => `${val} t/s`}
+                tickFormatter={(val) => (typeof val === 'number' && !isNaN(val) ? `${val} t/s` : '0 t/s')}
               />
               <Tooltip content={<CustomTrendsTooltip />} />
               <ReferenceLine
@@ -502,7 +506,7 @@ export const FleetTokenTrendsLineChart: React.FC<FleetTokenTrendsLineChartProps>
                 stroke="#a89984"
                 fontSize={11}
                 tickLine={false}
-                tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}
+                tickFormatter={(val) => (typeof val === 'number' && !isNaN(val) ? `${Math.round(val / 1000)}k` : '0k')}
               />
               <Tooltip content={<CustomTrendsTooltip />} />
               <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />

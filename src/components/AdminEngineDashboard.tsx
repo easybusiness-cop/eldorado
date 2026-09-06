@@ -17,8 +17,8 @@ export const AdminEngineDashboard: React.FC<AdminEngineDashboardProps> = ({ tele
     if (!svgRef.current) return;
     
     const now = Date.now();
-    const heap = telemetry?.heapUsedMB || 45 + Math.random() * 5;
-    const health = telemetry?.healthScore || 98;
+    const heap = typeof telemetry?.heapUsedMB === 'number' && !isNaN(telemetry.heapUsedMB) ? telemetry.heapUsedMB : 45 + Math.random() * 5;
+    const health = typeof telemetry?.healthScore === 'number' && !isNaN(telemetry.healthScore) ? telemetry.healthScore : 98;
     
     // Add to history
     historyRef.current.push({ time: now, heap, health });
@@ -120,12 +120,12 @@ export const AdminEngineDashboard: React.FC<AdminEngineDashboardProps> = ({ tele
            <div className="flex items-center gap-1.5 text-[10px] font-bold">
               <HardDrive className="w-3 h-3 text-[#fabd2f]" />
               <span className="text-[#7c6f64] dark:text-[#a89984]">HEAP:</span>
-              <span className="text-[#282828] dark:text-[#ebdbb2]">{telemetry?.heapUsedMB?.toFixed(1) || '45.2'} MB</span>
+              <span className="text-[#282828] dark:text-[#ebdbb2]">{typeof telemetry?.heapUsedMB === 'number' && !isNaN(telemetry.heapUsedMB) ? telemetry.heapUsedMB.toFixed(1) : '45.2'} MB</span>
            </div>
            <div className="flex items-center gap-1.5 text-[10px] font-bold">
               <Cpu className="w-3 h-3 text-[#8ec07c]" />
               <span className="text-[#7c6f64] dark:text-[#a89984]">HEALTH:</span>
-              <span className="text-[#282828] dark:text-[#ebdbb2]">{telemetry?.healthScore || 100}%</span>
+              <span className="text-[#282828] dark:text-[#ebdbb2]">{typeof telemetry?.healthScore === 'number' && !isNaN(telemetry.healthScore) ? telemetry.healthScore : 100}%</span>
            </div>
         </div>
       </div>
