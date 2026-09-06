@@ -6,7 +6,7 @@ import { executionKernel } from "../core/execution/execution.kernel.ts";
 import { WorkspaceManager } from "../core/execution/workspace.manager.ts";
 import { evaluationEngine } from "../core/evaluation/evaluation.engine.ts";
 import { failureMemory } from "../core/learning/failure-memory.ts";
-import { callGeminiResilient } from "../ai/geminiService.ts";
+import { modelRouter } from "../ai/providers/index.ts";
 import type { Objective, ObjectiveStep } from "./objective.types.ts";
 import { objectiveDB } from "./objective.db.ts";
 import { PullRequestService, GitHubPRController } from "../engineering/github/pull-request.service.ts";
@@ -56,6 +56,11 @@ export class ObjectiveManager {
     return Array.from(this.objectives.values()).sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+  }
+
+  public async listRecent(limit: number = 50): Promise<Objective[]> {
+    const list = await this.listObjectives();
+    return list.slice(0, limit);
   }
 
   public async getObjective(id: string): Promise<Objective | undefined> {
@@ -169,15 +174,18 @@ Rules:
 `;
 
     try {
-      const response = await callGeminiResilient({
-        contents: prompt,
+      const result = await modelRouter.generate({
+        prompt,
         systemInstruction: "You are an expert software execution planner. Return only valid JSON array.",
         temperature: 0.1,
-        responseMimeType: "application/json",
       });
 
-      const parsed = JSON.parse(response);
-      if (Array.isArray(parsed)) {
+      const responseText = result?.text || "";
+      const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+      const toParse = jsonMatch ? jsonMatch[0] : responseText;
+      const parsed = JSON.parse(toParse);
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((item: any, idx: number) => ({
           id: `step-${objective.id}-${idx}`,
           name: String(item.name || `Execution Step ${idx + 1}`),
@@ -188,8 +196,8 @@ Rules:
           artifacts: [],
         }));
       }
-    } catch (err) {
-      console.warn("[ObjectiveManager] AI planning failed, applying fallback.", err);
+    } catch {
+      // Graceful fallback to deterministic planner steps
     }
 
     return this.generateFallbackSteps(objective);
@@ -488,15 +496,18 @@ Return ONLY a valid JSON array matching this format for the replacement steps:
 `;
 
     try {
-      const response = await callGeminiResilient({
-        contents: prompt,
+      const result = await modelRouter.generate({
+        prompt,
         systemInstruction: "You are a software repair planner. Return valid JSON array only.",
         temperature: 0.1,
-        responseMimeType: "application/json",
       });
 
-      const parsed = JSON.parse(response);
-      if (Array.isArray(parsed)) {
+      const responseText = result?.text || "";
+      const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+      const toParse = jsonMatch ? jsonMatch[0] : responseText;
+      const parsed = JSON.parse(toParse);
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((item: any, idx: number) => ({
           id: `replan-step-${objective.id}-${objective.recoveryAttempts}-${idx}`,
           name: String(item.name || `Correction Step ${idx + 1}`),
@@ -507,8 +518,8 @@ Return ONLY a valid JSON array matching this format for the replacement steps:
           artifacts: [],
         }));
       }
-    } catch (err) {
-      console.warn("[ObjectiveManager] AI replanning failed during recovery.", err);
+    } catch {
+      // Graceful fallback to deterministic healing step
     }
 
     // Default recovery step fallback

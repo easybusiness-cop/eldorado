@@ -8,6 +8,7 @@ import { FleetTokenTrendsLineChart } from './FleetTokenTrendsLineChart';
 import { FleetHealthMonitor } from './FleetHealthMonitor';
 import { RuffloObjectivesPanel } from './RuffloObjectivesPanel';
 import { RuffloLoopPanel } from './RuffloLoopPanel';
+import { MasterMetaPanel } from './MasterMetaPanel';
 import confetti from 'canvas-confetti';
 import { runAgentStandardWorkflow, STANDARD_WORKFLOW_STAGES, WorkflowExecutionState } from '../utils/agentWorkflowEngine';
 import {
@@ -72,6 +73,7 @@ interface CommandCenterProps {
 }
 
 type TabType =
+  | 'master'
   | 'loop'
   | 'terminal'
   | 'task-rates'
@@ -114,7 +116,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   audits = [],
   accounts = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('loop');
+  const [activeTab, setActiveTab] = useState<TabType>('master');
   const [inputPrompt, setInputPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [fontSize, setFontSize] = useState(12);
@@ -678,6 +680,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
+    { id: 'master', label: 'master', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'loop', label: 'loop', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'terminal', label: 'terminal', icon: <Terminal className="w-3.5 h-3.5" /> },
     { id: 'task-rates', label: 'task rates', icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-400" /> },
@@ -823,12 +826,16 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
       {/* Canvas */}
       <div className="flex-1 min-h-0 overflow-auto p-3" style={{ background: 'var(--bg-1)' }}>
+        {activeTab === 'master' && (
+          <MasterMetaPanel />
+        )}
+
         {activeTab === 'loop' && (
           <RuffloLoopPanel />
         )}
 
         {/* Tab Content Display */}
-        {activeTab !== 'loop' && (
+        {activeTab !== 'loop' && activeTab !== 'master' && (
           <div className="animate-in space-y-4">
         {/* 1. Projects Portfolio View */}
         {activeTab === 'projects' && (

@@ -1,0 +1,19 @@
+[
+  {
+    "eventId": "evt-1788639338664-lat3j3",
+    "timestamp": "2026-09-05T20:15:38.664Z",
+    "actor": "Dwight Schrute",
+    "tenant": "munderdiffl-default-tenant",
+    "action": "SYSTEM_CODE_EXECUTION",
+    "resource": "system_runtime",
+    "policyDecision": "deny",
+    "riskScore": 100,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Clearance Policy Violation: Role 'Dwight Schrute' does not possess capability 'SYSTEM_CODE_EXECUTION' for resource 'system_runtime'."
+    ],
+    "isolationLevel": "NONE",
+    "networkIsolated": false,
+    "credentialsStripped": false
+  }
+]

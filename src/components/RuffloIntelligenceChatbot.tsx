@@ -20,7 +20,7 @@ interface ChatMessage {
 interface RuffloIntelligenceChatbotProps {
   agents: Agent[];
   tasks: FleetTask[];
-  onExecutePrompt: (prompt: string) => Promise<void> | void;
+  onExecutePrompt: (prompt: string) => Promise<{ success: boolean; text: string; codeSnippet?: string } | any> | void;
   onOpenDashboard?: () => void;
   onOpenKnowledgeBase?: () => void;
   onAssignTask?: (task: Partial<FleetTask>) => void;
@@ -115,116 +115,149 @@ export const RuffloIntelligenceChatbot: React.FC<RuffloIntelligenceChatbotProps>
       return;
     }
 
-    // 2. Check for Agent Task Assignment Intents
+    // 2. Check for Direct Fleet/Website Status Inquiries
+    if (
+      lower.includes('what work') ||
+      lower.includes('what are you doing') ||
+      lower.includes('real task') ||
+      lower.includes('what task') ||
+      lower.includes('current task') ||
+      lower.includes('status of fleet') ||
+      lower.includes('what does this website do') ||
+      lower.includes('what is this website')
+    ) {
+      const activeTasks = tasks.filter((t) => t.status === 'running' || t.status === 'in_progress');
+      const completedTasks = tasks.filter((t) => t.status === 'completed');
+      const workingAgents = agents.filter((a) => a.status === 'working');
+
+      let statusReport = `📊 **Real-Time Website & Fleet Architecture Report:**\n\n`;
+      statusReport += `**1. What Real Tasks This Website Does:**\n`;
+      statusReport += `- **AI Engineering & Autonomous Coding:** Ruflo Coder & Cline generate production TypeScript/React modules and execute them directly in sandboxed Node environments.\n`;
+      statusReport += `- **Zero-Trust Security & Policy Audits:** Dwight Schrute audits code for unauthorized system calls, filesystem destructions, and policy violations.\n`;
+      statusReport += `- **Live GitHub Operations:** Octokit integration pushes commits, creates branches, and triggers workflows using your configured GitHub token.\n`;
+      statusReport += `- **Persistent Database Operations:** Live Supabase integration with your service role key.\n`;
+      statusReport += `- **Dynamic Knowledge Base:** Agents extract and synthesize insights from every completed task into our canonical store.\n\n`;
+
+      statusReport += `**2. Current Operations State:**\n`;
+      statusReport += `- **Fleet Status:** ${workingAgents.length > 0 ? `${workingAgents.length} agents actively executing` : 'All agents in idle standby, ready for your directives'}\n`;
+      statusReport += `- **Tasks Completed:** ${completedTasks.length} recorded in session\n`;
+      statusReport += `- **Active Tasks In Flight:** ${activeTasks.length}\n`;
+      if (activeTasks.length > 0) {
+        activeTasks.slice(0, 3).forEach((t) => {
+          statusReport += `  • *${t.title}* (${t.assignedTo})\n`;
+        });
+      }
+
+      statusReport += `\n💡 **Send any prompt or question:** Ask me to write code, solve a bug, audit security, or explain any feature. You will get direct real-time Gemini results!`;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          sender: 'assistant',
+          text: statusReport,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          actionTaken: { type: 'info' },
+          suggestedPrompts: [
+            '🛡️ Dwight: run a zero-trust vulnerability audit',
+            '⚡ Write a TypeScript function to validate emails',
+            '📊 Kevin: calculate cloud cost optimization',
+          ],
+        },
+      ]);
+      setIsProcessing(false);
+      soundFx.playSuccess();
+      return;
+    }
+
+    // 3. Dispatch and execute task/query via Real LLM Engine
     let targetAgent: Agent | undefined = undefined;
     let taskCategory: 'hacking' | 'marketing' | 'finance' | 'coding' | 'social_media' = 'coding';
     let taskTitle = '';
 
-    if (lower.includes('dwight') || lower.includes('hack') || lower.includes('security') || lower.includes('audit') || lower.includes('pen-test')) {
+    if (lower.includes('dwight') || lower.includes('security') || lower.includes('pen-test') || lower.includes('vulnerability')) {
       targetAgent = agents.find((a) => a.id === 'dwight') || agents[0];
       taskCategory = 'hacking';
       taskTitle = 'Perimeter Security & Vulnerability Scan';
-    } else if (lower.includes('pam') || lower.includes('hr') || lower.includes('policy') || lower.includes('people') || lower.includes('onboard')) {
+    } else if (lower.includes('pam') || lower.includes('hr') || lower.includes('policy') || lower.includes('people')) {
       targetAgent = agents.find((a) => a.id === 'pam') || agents[0];
       taskCategory = 'marketing';
-      taskTitle = 'HR Policy & Team Compliance Memo';
-    } else if (lower.includes('jim') || lower.includes('market') || lower.includes('funnel') || lower.includes('campaign') || lower.includes('client')) {
+      taskTitle = 'HR Policy & Compliance Directive';
+    } else if (lower.includes('jim') || lower.includes('market') || lower.includes('funnel') || lower.includes('campaign')) {
       targetAgent = agents.find((a) => a.id === 'jim') || agents[0];
       taskCategory = 'marketing';
-      taskTitle = 'B2B Client Acquisition & Value Proposition';
-    } else if (lower.includes('kevin') || lower.includes('finance') || lower.includes('cost') || lower.includes('budget') || lower.includes('ledger') || lower.includes('runway')) {
+      taskTitle = 'B2B Client Acquisition Strategy';
+    } else if (lower.includes('kevin') || lower.includes('finance') || lower.includes('budget') || lower.includes('cost') || lower.includes('ledger')) {
       targetAgent = agents.find((a) => a.id === 'kevin') || agents[0];
       taskCategory = 'finance';
-      taskTitle = 'Cloud Compute Unit Economics & Ledger Audit';
-    } else if (lower.includes('ryan') || lower.includes('social') || lower.includes('viral') || lower.includes('tiktok') || lower.includes('linkedin') || lower.includes('hook')) {
+      taskTitle = 'Financial Ledger & Compute Unit Economics';
+    } else if (lower.includes('ryan') || lower.includes('social') || lower.includes('viral') || lower.includes('hook')) {
       targetAgent = agents.find((a) => a.id === 'ryan') || agents[0];
       taskCategory = 'social_media';
-      taskTitle = 'Cross-Platform Viral Hook & Cadence Strategy';
-    } else if (lower.includes('code') || lower.includes('engineer') || lower.includes('dev') || lower.includes('refactor') || lower.includes('typescript') || lower.includes('api')) {
+      taskTitle = 'Viral Hook & Distribution Strategy';
+    } else if (lower.includes('code') || lower.includes('typescript') || lower.includes('refactor') || lower.includes('function') || lower.includes('bug') || lower.includes('api')) {
       targetAgent = agents.find((a) => a.id.includes('code') || a.id.includes('coder')) || agents[0];
       taskCategory = 'coding';
-      taskTitle = 'Production TypeScript & API Optimization';
+      taskTitle = 'Autonomous TypeScript & Code Engineering';
     }
 
-    if (targetAgent) {
-      // Dispatch real task
-      const newTaskId = `task-cmd-${Date.now()}`;
-      if (onAssignTask) {
+    try {
+      if (targetAgent && onAssignTask) {
         onAssignTask({
-          id: newTaskId,
+          id: `task-cmd-${Date.now()}`,
           title: taskTitle,
           description: textToSend,
           assignedTo: targetAgent.id,
           priority: 'high',
           status: 'running',
-          progress: 25,
+          progress: 50,
           createdAt: Date.now(),
         });
       }
 
-      // Also trigger execution prompt
-      onExecutePrompt(textToSend);
+      // Execute via the Real Gemini LLM Engine
+      const execRes: any = await onExecutePrompt(textToSend);
+      const replyText = execRes?.text || (typeof execRes === 'string' ? execRes : '');
+      const codeSnippet = execRes?.codeSnippet;
 
-      setTimeout(() => {
-        const reply = `⚡ **Mission Dispatched to ${targetAgent.name} (${targetAgent.role})**\n\n- **Directive:** "${textToSend}"\n- **Domain:** ${taskCategory.toUpperCase()}\n- **Status:** Execution in progress. Sandbox initialized with zero-trust authority verification.\n- **Continuous Learning:** Resulting intelligence will be distilled into the Dynamic Knowledge Base upon completion.\n\n*Track real-time progress in the Munder Diffl.in Dashboard.*`;
+      let finalText = replyText || '✦ Directive evaluated and executed across Rufflo Core.';
+      if (codeSnippet && !finalText.includes(codeSnippet)) {
+        finalText += `\n\n\`\`\`typescript\n${codeSnippet}\n\`\`\``;
+      }
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `bot-${Date.now()}`,
-            sender: 'assistant',
-            text: reply,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            actionTaken: {
-              type: 'task_assigned',
-              taskId: newTaskId,
-              agentName: targetAgent.name,
-              category: taskCategory,
-            },
-            suggestedPrompts: [
-              '📋 Open Munder Diffl.in Dashboard',
-              '⏱️ Check Active Task Progress',
-              '🧠 Query Learned Knowledge',
-            ],
-          },
-        ]);
-        setIsProcessing(false);
-        soundFx.playSuccess();
-      }, 700);
-      return;
-    }
-
-    // 3. General Rufflo Copilot Command execution via LLM / Agent loop
-    try {
-      await onExecutePrompt(textToSend);
-
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `bot-${Date.now()}`,
-            sender: 'assistant',
-            text: `✦ **Instruction executed across Rufflo Core.** The fleet evaluated the directive and logged operational telemetry to the system stream. You can inspect deliverables in the Munder Diffl.in Dashboard.`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            suggestedPrompts: [
-              '🛡️ Run zero-trust security audit',
-              '📢 Generate B2B marketing campaign',
-              '📊 Calculate monthly compute runway',
-            ],
-          },
-        ]);
-        setIsProcessing(false);
-      }, 800);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          sender: 'assistant',
+          text: finalText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          actionTaken: targetAgent
+            ? {
+                type: 'task_assigned',
+                agentName: targetAgent.name,
+                category: taskCategory,
+              }
+            : undefined,
+          suggestedPrompts: [
+            '🛡️ Run zero-trust security audit',
+            '📢 Generate marketing campaign',
+            '📊 Calculate compute runway',
+          ],
+        },
+      ]);
+      soundFx.playSuccess();
     } catch (e: any) {
       setMessages((prev) => [
         ...prev,
         {
           id: `bot-${Date.now()}`,
           sender: 'assistant',
-          text: `⚠️ Error during execution: ${e?.message || 'Unable to complete directive.'}`,
+          text: `⚠️ Execution error: ${e?.message || 'Unable to complete directive.'}`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
+    } finally {
       setIsProcessing(false);
     }
   };

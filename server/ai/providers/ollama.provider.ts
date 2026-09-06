@@ -13,16 +13,29 @@ export class OllamaProvider implements ModelProvider {
 
   private baseUrl: string;
   private defaultModel: string;
+  private apiKey?: string;
   private timeoutMs: number;
 
   constructor(options?: {
     baseUrl?: string;
     defaultModel?: string;
+    apiKey?: string;
     timeoutMs?: number;
   }) {
     this.baseUrl = (options?.baseUrl || process.env.OLLAMA_BASE_URL || "http://localhost:11434").replace(/\/$/, "");
     this.defaultModel = options?.defaultModel || process.env.OLLAMA_MODEL || "llama3.2";
+    this.apiKey = options?.apiKey || process.env.OLLAMA_API_KEY;
     this.timeoutMs = options?.timeoutMs || 180_000; // 3 minutes for longer streams
+  }
+
+  private getHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+    }
+    return headers;
   }
 
   async isAvailable(): Promise<boolean> {
@@ -31,6 +44,7 @@ export class OllamaProvider implements ModelProvider {
       const timer = setTimeout(() => controller.abort(), 3000);
       const res = await fetch(`${this.baseUrl}/api/tags`, {
         method: "GET",
+        headers: this.getHeaders(),
         signal: controller.signal,
       });
       clearTimeout(timer);
@@ -81,7 +95,7 @@ export class OllamaProvider implements ModelProvider {
     try {
       const response = await fetch(`${this.baseUrl}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: this.getHeaders(),
         body: JSON.stringify({
           model,
           messages,
@@ -195,7 +209,9 @@ export class OllamaProvider implements ModelProvider {
 
   async listModels(): Promise<string[]> {
     try {
-      const res = await fetch(`${this.baseUrl}/api/tags`);
+      const res = await fetch(`${this.baseUrl}/api/tags`, {
+        headers: this.getHeaders(),
+      });
       if (!res.ok) return [];
       const data = await res.json();
       return (data?.models || []).map((m: any) => m.name || m.model).filter(Boolean);

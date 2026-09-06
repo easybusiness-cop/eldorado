@@ -263,6 +263,28 @@ export class ToolGateway {
       };
     }
   }
+
+  public async callPublicAPI(endpoint: string, params: any): Promise<any> {
+    const startTime = Date.now();
+    try {
+      if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
+        const res = await fetch(endpoint, {
+          method: params?.method || "GET",
+          headers: params?.headers || { "Content-Type": "application/json" },
+          body: params?.body ? JSON.stringify(params.body) : undefined,
+        });
+        const data = await res.json().catch(() => ({ status: res.status, statusText: res.statusText }));
+        toolAuditLogger.logExecution(`api.${endpoint}`, "system", "org-munderdifflin", true, Date.now() - startTime);
+        return { success: true, status: res.status, data };
+      }
+      // Internal or simulated API
+      toolAuditLogger.logExecution(`api.${endpoint}`, "system", "org-munderdifflin", true, Date.now() - startTime);
+      return { success: true, endpoint, params, simulated: true };
+    } catch (err: any) {
+      toolAuditLogger.logExecution(`api.${endpoint}`, "system", "org-munderdifflin", false, Date.now() - startTime);
+      return { success: false, error: err?.message || String(err) };
+    }
+  }
 }
 
 export const toolGateway = ToolGateway.getInstance();

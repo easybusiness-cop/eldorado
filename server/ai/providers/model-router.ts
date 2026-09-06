@@ -18,16 +18,16 @@ export class ModelRouter {
   constructor(options?: { preferLocal?: boolean }) {
     this.preferLocal = options?.preferLocal ?? true;
 
-    // 1. Ollama (real local LLM)
+    // 1. Ollama (real local LLM if running)
     const ollama = new OllamaProvider();
     this.providers.push(ollama);
 
-    // 2. Always-available rule-based local
-    this.providers.push(new LocalProvider());
-
-    // 3. Optional Gemini
+    // 2. Gemini (real cloud LLM)
     const gemini = new GeminiProvider();
     this.providers.push(gemini);
+
+    // 3. Rule-based offline fallback (only if all real models are unavailable)
+    this.providers.push(new LocalProvider());
   }
 
   /** Register any future provider */

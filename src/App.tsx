@@ -726,6 +726,12 @@ export default function App() {
         },
         ...prev,
       ]);
+
+      return {
+        success: true,
+        text: replyText,
+        codeSnippet: data.codeSnippet,
+      };
     } catch (err: any) {
       const errorLog: AgentLog = {
         id: `err-${Date.now()}`,
@@ -739,6 +745,11 @@ export default function App() {
       setAgents((prev) =>
         prev.map((a) => (a.id === selectedAgentId ? { ...a, status: 'idle' } : a))
       );
+
+      return {
+        success: false,
+        text: `Execution failed: ${err.message || 'Server error'}`,
+      };
     }
   };
 

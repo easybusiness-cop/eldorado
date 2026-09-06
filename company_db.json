@@ -1444,11 +1444,25 @@
       "memorySummary": "Hot-patch runtime integrity validated. Ready for autonomous subordinate developer deployments.",
       "trainingState": "PRODUCTION",
       "kpis": {
-        "tasksCompleted": 85,
+        "tasksCompleted": 86,
         "accuracyScore": 99.5,
         "uptimeBonusPercent": 15,
-        "tokensProcessed": 540000,
-        "totalCost": 24.8
+        "tokensProcessed": 540908,
+        "totalCost": 24.8000681
+      },
+      "trainingRecord": {
+        "completedLevels": [
+          1
+        ],
+        "currentLevel": 2,
+        "competencyScore": 55,
+        "competencyGrade": "L2",
+        "certifications": [],
+        "practicalProjectsCompleted": [
+          "test-exec-1788683902706"
+        ],
+        "hoursTrained": 2,
+        "skillsMatrix": {}
       }
     },
     {
@@ -1482,11 +1496,11 @@
       "memorySummary": "Verified sandbox containment on Node VM execution. Localhost/private IP ranges strictly locked.",
       "trainingState": "PRODUCTION",
       "kpis": {
-        "tasksCompleted": 114,
+        "tasksCompleted": 115,
         "accuracyScore": 100,
         "uptimeBonusPercent": 15,
-        "tokensProcessed": 324800,
-        "totalCost": 15.6
+        "tokensProcessed": 325513,
+        "totalCost": 15.600053475
       }
     },
     {
@@ -5837,9 +5851,432 @@
       "subtasks": [],
       "createdAt": 1788480302722,
       "completedAt": 1788480302722
+    },
+    {
+      "id": "tsk-1788639338682",
+      "projectId": "prj-alpha",
+      "title": "What is 15 multiplied by 4? Also list 2 essential ...",
+      "description": "Task executed by Dwight Schrute (Security Auditor)",
+      "assignedTo": "dwight",
+      "status": "completed",
+      "progress": 100,
+      "priority": "medium",
+      "output": "**Calculation:**\n15 multiplied by 4 is **60**. \n*(Simple arithmetic. Even Kevin could compute that if pies or mini-cupcakes were the unit of measurement.)*\n\n---\n\nNow, onto matters of actual enterprise survival. As the Assistant Regional Manager (and Safety Officer), I treat an unhardened Node.js runtime as an open invitation for corporate espionage, unauthorized infiltrators, or worse—a breach orchestrated by the Syracuse branch.\n\nHere are **two non-negotiable security checks** for any production Node.js server:\n\n---\n\n### 1. Dependency & Supply Chain Vulnerability Auditing\n**Threat Vector:** Malicious open-source packages, compromised transitive dependencies, and unpatched known CVEs.\n* **The Rule:** Zero-trust towards third-party code. If you didn't personally inspect the code on your own isolated subnet, assume it contains hostile payload.\n* **Actionable Enforcement:**\n  * Run automated security audits in your CI/CD pipeline:\n    ```bash\n    npm audit --audit-level=high\n    ```\n  * Enforce reproducible, locked builds with exact SHA integrity hashes:\n    ```bash\n    npm ci\n    ```\n  * Utilize tools like Snyk or Socket.dev to block malicious typosquatting packages before they touch memory.\n\n---\n\n### 2. HTTP Header Hardening & Rate Limiting (Perimeter Defense)\n**Threat Vector:** Cross-Site Scripting (XSS), Clickjacking, MIME-sniffing, and Denial-of-Service (DoS) brute-force floods.\n* **The Rule:** An exposed server without header defense and rate limits is like leaving the perimeter gates of Schrute Farms unlocked during harvest season.\n* **Actionable Enforcement (Express / Fastify):**\n  * Strip `X-Powered-By: Express` (never give the enemy tactical reconnaissance about your stack).\n  * Enforce strict Content Security Policies (CSP) and HTTP security headers using `helmet`.\n  * Clamp down on request floods using rate limiting:\n\n```typescript\nimport express from 'express';\nimport helmet from 'helmet';\nimport rateLimit from 'express-rate-limit';\n\nconst app = express();\n\n// 1. Fortify HTTP Response Headers\napp.use(helmet({\n  contentSecurityPolicy: true,\n  hidePoweredBy: true,\n}));\n\n// 2. Set Up Perimeter Rate Limiter (Max 100 requests per 15 min window per IP)\nconst perimeterLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000,\n  max: 100,\n  standardHeaders: true,\n  legacyHeaders: false,\n  message: { error: \"Access throttled: Maximum security threshold exceeded.\" },\n});\n\napp.use('/api/', perimeterLimiter);\n```\n\n---\n\nDo you require a full zero-trust diagnostic of your current authentication middleware, Admin? Let me know, and I will initiate a level-5 penetration sweep immediately.",
+      "codeSnippet": "bash\n    npm audit --audit-level=high",
+      "evidence": [
+        {
+          "status": "SUCCEEDED",
+          "source": "dwight",
+          "timestamp": "2026-09-05T20:15:38.682Z"
+        }
+      ],
+      "subtasks": [],
+      "createdAt": 1788639338682,
+      "completedAt": 1788639338682
+    },
+    {
+      "id": "tsk-1788682988461",
+      "projectId": "prj-alpha",
+      "title": "B2B Client Acquisition Strategy",
+      "description": "📢 Have Jim design a marketing funnel",
+      "assignedTo": "jim",
+      "status": "failed",
+      "progress": 100,
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": "tsk-1788682988461-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "jim"
+        },
+        {
+          "id": "tsk-1788682988461-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": false,
+          "assignedTo": "jim"
+        },
+        {
+          "id": "tsk-1788682988461-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": false,
+          "assignedTo": "jim"
+        }
+      ],
+      "createdAt": 1788682988461,
+      "output": "Execution Loop Error: Gemini API Client unavailable"
+    },
+    {
+      "id": "tsk-1788683759940",
+      "projectId": "prj-alpha",
+      "title": "Financial Ledger & Compute Unit Economics",
+      "description": "📊 Ask Kevin to check compute costs",
+      "assignedTo": "kevin",
+      "status": "failed",
+      "progress": 100,
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": "tsk-1788683759940-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "kevin"
+        },
+        {
+          "id": "tsk-1788683759940-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": false,
+          "assignedTo": "kevin"
+        },
+        {
+          "id": "tsk-1788683759940-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": false,
+          "assignedTo": "kevin"
+        }
+      ],
+      "createdAt": 1788683759940,
+      "output": "Execution Loop Error: Gemini API Client unavailable"
+    },
+    {
+      "id": "test-exec-1788683879367",
+      "projectId": "prj-alpha",
+      "title": "Verify database indexing and query latency optimization",
+      "description": "Analyze slow query logs and configure compound indexes for student records",
+      "assignedTo": "ruflo",
+      "status": "failed",
+      "progress": 100,
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": "test-exec-1788683879367-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "ruflo"
+        },
+        {
+          "id": "test-exec-1788683879367-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": false,
+          "assignedTo": "ruflo"
+        },
+        {
+          "id": "test-exec-1788683879367-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": false,
+          "assignedTo": "ruflo"
+        }
+      ],
+      "createdAt": 1788683879367,
+      "output": "Execution Loop Error: RepositoryEngineer failed: Development failed: Workspace contains no readable project files."
+    },
+    {
+      "id": "test-exec-1788683902706",
+      "projectId": "prj-alpha",
+      "title": "Verify database indexing and query latency optimization",
+      "description": "Analyze slow query logs and configure compound indexes for student records",
+      "assignedTo": "ruflo",
+      "status": "completed",
+      "progress": 100,
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": "test-exec-1788683902706-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "ruflo"
+        },
+        {
+          "id": "test-exec-1788683902706-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "ruflo"
+        },
+        {
+          "id": "test-exec-1788683902706-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "ruflo"
+        }
+      ],
+      "createdAt": 1788683902706,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788683902758,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "ruflo",
+          "timestamp": "2026-09-06T08:38:22.758Z",
+          "verificationId": "v-292"
+        }
+      ]
     }
   ],
   "audits": [
+    {
+      "id": "aud-comp-1788683902796",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "test-exec-1788683902706",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Verify database indexing and query latency optimiz\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000068",
+      "timestamp": "2026-09-06T08:38:22.796Z",
+      "riskLevel": "medium",
+      "approvalRequired": false,
+      "executionId": "ex-1788683902706"
+    },
+    {
+      "id": "aud-prom-1788683902773",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "test-exec-1788683902706",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Ruflo",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Ruflo has advanced to CSE Level 2 (Grade L2) after completing project task.",
+      "timestamp": "2026-09-06T08:38:22.773Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788683902773"
+    },
+    {
+      "id": "aud-1788683902706",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "test-exec-1788683902706",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Verify database indexing and query latency optimiz\"",
+      "inputHash": "QW5hbHl6ZSBzbG93IHF1",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-06T08:38:22.706Z",
+      "riskLevel": "medium",
+      "approvalRequired": false,
+      "executionId": "ex-1788683902706"
+    },
+    {
+      "id": "aud-err-1788683879417",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "test-exec-1788683879367",
+      "tool": "agent.execution_loop",
+      "action": "Task Failure: \"Verify database indexing and query latency optimiz\"",
+      "inputHash": "UmVwb3NpdG9yeUVuZ2lu",
+      "result": "CRITICAL ERROR: Asynchronous execution crashed: RepositoryEngineer failed: Development failed: Workspace contains no readable project files.",
+      "timestamp": "2026-09-06T08:37:59.417Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788683879368"
+    },
+    {
+      "id": "aud-1788683879368",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "test-exec-1788683879367",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Verify database indexing and query latency optimiz\"",
+      "inputHash": "QW5hbHl6ZSBzbG93IHF1",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-06T08:37:59.368Z",
+      "riskLevel": "medium",
+      "approvalRequired": false,
+      "executionId": "ex-1788683879368"
+    },
+    {
+      "id": "aud-evt-1788683759981-874",
+      "agentId": "kevin",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788683759940",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Financial Ledger & Compute Unit Economics\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-06T08:35:59.981Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788683759981"
+    },
+    {
+      "id": "aud-err-1788683759974",
+      "agentId": "kevin",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788683759940",
+      "tool": "agent.execution_loop",
+      "action": "Task Failure: \"Financial Ledger & Compute Unit Economics\"",
+      "inputHash": "R2VtaW5pIEFQSSBDbGll",
+      "result": "CRITICAL ERROR: Asynchronous execution crashed: Gemini API Client unavailable",
+      "timestamp": "2026-09-06T08:35:59.974Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788683759941"
+    },
+    {
+      "id": "aud-1788683759941",
+      "agentId": "kevin",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788683759940",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Financial Ledger & Compute Unit Economics\"",
+      "inputHash": "8J+TiiBBc2sgS2V2aW4g",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-06T08:35:59.941Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788683759941"
+    },
+    {
+      "id": "aud-evt-1788683759933-194",
+      "agentId": "kevin",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Financial Ledger & Compute Unit Economics\" assigned to employee: kevin",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-06T08:35:59.933Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788683759933"
+    },
+    {
+      "id": "aud-gw-1788683101128",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-06T08:25:01.134Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788683101128-990"
+    },
+    {
+      "id": "aud-evt-1788682988500-49",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788682988461",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"B2B Client Acquisition Strategy\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-06T08:23:08.500Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788682988500"
+    },
+    {
+      "id": "aud-err-1788682988493",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788682988461",
+      "tool": "agent.execution_loop",
+      "action": "Task Failure: \"B2B Client Acquisition Strategy\"",
+      "inputHash": "R2VtaW5pIEFQSSBDbGll",
+      "result": "CRITICAL ERROR: Asynchronous execution crashed: Gemini API Client unavailable",
+      "timestamp": "2026-09-06T08:23:08.493Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788682988462"
+    },
+    {
+      "id": "aud-1788682988462",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788682988461",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"B2B Client Acquisition Strategy\"",
+      "inputHash": "8J+ToiBIYXZlIEppbSBk",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-06T08:23:08.462Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788682988462"
+    },
+    {
+      "id": "aud-evt-1788682988455-90",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"B2B Client Acquisition Strategy\" assigned to employee: jim",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-06T08:23:08.455Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788682988455"
+    },
+    {
+      "id": "aud-gw-1788682830706",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-06T08:20:30.713Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788682830706-4596"
+    },
+    {
+      "id": "aud-gw-1788682643040",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-06T08:17:23.045Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788682643040-2869"
+    },
+    {
+      "id": "aud-gw-1788682263878",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-06T08:11:03.882Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788682263878-2180"
+    },
+    {
+      "id": "aud-chat-1788639338693",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788639338682",
+      "tool": "agent.chat",
+      "action": "Processed user instruction: \"What is 15 multiplied by 4? Also list 2 essential security c...\"",
+      "inputHash": "V2hhdCBpcyAxNSBtdWx0",
+      "result": "SUCCESS: Generated 2619 characters response. Token cost: $0.00005",
+      "timestamp": "2026-09-05T20:15:38.693Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-chat-1788639338693"
+    },
+    {
+      "id": "aud-gw-1788639271638",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-05T20:14:31.642Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788639271638-988"
+    },
     {
       "id": "aud-gw-1788598993695",
       "agentId": "pete",
@@ -7996,6 +8433,26 @@
       "classifiedAs": "INTERNAL",
       "author": "michael",
       "timestamp": "2026-09-02T18:02:49.104Z"
+    },
+    {
+      "id": "mem-prom-1788683902777",
+      "namespace": "agent.ruflo",
+      "departmentId": "engineering",
+      "key": "task.execution.1788683902778",
+      "content": "Earned promotion to CSE Academy Level 2 and Grade L2 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "ruflo",
+      "timestamp": "2026-09-06T08:38:22.778Z"
+    },
+    {
+      "id": "mem-1788683902792",
+      "namespace": "agent.ruflo",
+      "departmentId": "engineering",
+      "key": "task.execution.1788683902792",
+      "content": "Successfully completed mission task \"Verify database indexing and query latency optimization\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "ruflo",
+      "timestamp": "2026-09-06T08:38:22.792Z"
     }
   ],
   "employees": [

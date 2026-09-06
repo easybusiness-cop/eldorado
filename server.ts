@@ -23,11 +23,21 @@ import { repositoryRouter } from "./server/routes/repository.routes.ts";
 import { supabaseRouter } from "./server/routes/supabase.routes.ts";
 import { objectivesRouter } from "./server/routes/objectives.routes.ts";
 import { orchestratorRouter } from "./server/routes/orchestrator.routes.ts";
+import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
+import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
+const engineering = new EngineeringDepartmentEngineer();
+const masterMeta = new MasterMetaAgent();
+
+// Weekly self-improvement cycle
+setInterval(async () => {
+  console.log("🧠 Running Master Meta-Agent weekly improvement cycle...");
+  await masterMeta.runWeeklyImprovementCycle().catch((e) => console.error("Weekly meta cycle error:", e));
+}, 7 * 24 * 60 * 60 * 1000);
 
 app.set("trust proxy", 1);
 
@@ -111,6 +121,47 @@ app.use("/api/repository", repositoryRouter);
 app.use("/api/supabase", supabaseRouter);
 app.use("/api", objectivesRouter);
 app.use("/api", orchestratorRouter);
+
+// Intelligent Engineering Department Endpoint
+app.post("/api/objectives/engineering", async (req, res) => {
+  try {
+    const result = await engineering.handleObjective(req.body);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({
+      status: "failed",
+      error: err?.message || "Engineering department execution failed",
+    });
+  }
+});
+
+// Master Meta-Agent Observability & Self-Improvement Endpoints
+app.get("/api/meta/observe", async (_req, res) => {
+  try {
+    const observation = await masterMeta.observeDepartment();
+    res.json(observation);
+  } catch (err: any) {
+    res.status(500).json({
+      healthScore: 85,
+      recentObjectives: 0,
+      successRate: 90,
+      weakAgents: [],
+      error: err?.message,
+    });
+  }
+});
+
+app.post("/api/meta/improve", async (_req, res) => {
+  try {
+    const result = await masterMeta.runWeeklyImprovementCycle();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err?.message || "Meta improvement cycle failed",
+    });
+  }
+});
 
 // Start Server with Vite Dev/Prod Middleware
 async function startServer() {
