@@ -156,6 +156,12 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
           onSelectAgent(id);
           onOpen('isCallOpen');
         }}
+        onOpenWorkspace={() => onOpen('isWorkspaceOpen')}
+        onOpenKnowledgeBase={() => onOpen('isDynamicKbOpen')}
+        onOpenAnalytics={() => onOpen('isAnalyticsOpen')}
+        onOpenCompanyDb={() => onOpen('isCompanyDbOpen')}
+        onOpenPublicApi={() => onOpen('isPublicApiOpen')}
+        onOpenWebExplorer={() => onOpen('isWebOpen')}
       />
 
       <AuthModal

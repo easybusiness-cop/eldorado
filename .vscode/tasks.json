@@ -39,6 +39,26 @@
       "group": {
         "kind": "test"
       }
+    },
+    {
+      "label": "Docker: Build Fleet Image",
+      "type": "shell",
+      "command": "docker",
+      "args": ["build", "-t", "rufflo-fleet:latest", "."],
+      "group": {
+        "kind": "build"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Run Isolated Container",
+      "type": "shell",
+      "command": "docker",
+      "args": ["run", "--rm", "-p", "3000:3000", "--name", "rufflo-fleet-container", "rufflo-fleet:latest"],
+      "group": {
+        "kind": "test"
+      },
+      "problemMatcher": []
     }
   ]
 }

@@ -15,6 +15,11 @@ import {
   ArrowRight,
   Zap,
   Flame,
+  Globe,
+  Database,
+  BarChart3,
+  Brain,
+  Share2,
 } from 'lucide-react';
 import { Agent, FleetTask } from '../types';
 
@@ -43,6 +48,12 @@ interface SearchModalProps {
   onOpenSystemModules: () => void;
   onOpenPreferences: () => void;
   onOpenCall: (agentId: string) => void;
+  onOpenWorkspace?: () => void;
+  onOpenKnowledgeBase?: () => void;
+  onOpenAnalytics?: () => void;
+  onOpenCompanyDb?: () => void;
+  onOpenPublicApi?: () => void;
+  onOpenWebExplorer?: () => void;
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -60,6 +71,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onOpenSystemModules,
   onOpenPreferences,
   onOpenCall,
+  onOpenWorkspace,
+  onOpenKnowledgeBase,
+  onOpenAnalytics,
+  onOpenCompanyDb,
+  onOpenPublicApi,
+  onOpenWebExplorer,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -154,6 +171,78 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         },
       },
 
+      {
+        id: 'tool-workspace',
+        category: 'tools',
+        title: 'Google Workspace Enterprise Hub (Chat, Sheets, Classroom, Gmail, Forms)',
+        subtitle: 'Real-time Google Workspace applications with dual Supabase/Firebase engine',
+        badge: 'Workspace',
+        icon: <Globe className="w-4 h-4 text-blue-400" />,
+        action: () => {
+          onClose();
+          onOpenWorkspace?.();
+        },
+      },
+      {
+        id: 'tool-knowledge-base',
+        category: 'tools',
+        title: 'Dynamic Knowledge Base & Corporate Cascade',
+        subtitle: 'Autonomous Learning Radar, multi-tier workforce, and organizational hierarchy',
+        badge: 'Workforce',
+        icon: <Brain className="w-4 h-4 text-pink-400" />,
+        action: () => {
+          onClose();
+          onOpenKnowledgeBase?.();
+        },
+      },
+      {
+        id: 'tool-company-db',
+        category: 'tools',
+        title: 'Company Canonical Database & Ledger',
+        subtitle: 'Inspect persistent SQLite, JSON, and Postgres company records',
+        badge: 'Database',
+        icon: <Database className="w-4 h-4 text-emerald-400" />,
+        action: () => {
+          onClose();
+          onOpenCompanyDb?.();
+        },
+      },
+      {
+        id: 'tool-analytics',
+        category: 'tools',
+        title: 'Executive Analytics & Telemetry Dashboard',
+        subtitle: 'Real-time agent productivity, token metrics, and budget tracking',
+        badge: 'Analytics',
+        icon: <BarChart3 className="w-4 h-4 text-teal-400" />,
+        action: () => {
+          onClose();
+          onOpenAnalytics?.();
+        },
+      },
+      {
+        id: 'tool-web-explorer',
+        category: 'tools',
+        title: 'OSINT Web Access & Live DOM Explorer',
+        subtitle: 'Scrape URLs, extract architectural graphs, and mount to IDE',
+        badge: 'OSINT',
+        icon: <Globe className="w-4 h-4 text-cyan-400" />,
+        action: () => {
+          onClose();
+          onOpenWebExplorer?.();
+        },
+      },
+      {
+        id: 'tool-public-api',
+        category: 'tools',
+        title: 'Public API Hub & Composio Connectors',
+        subtitle: 'Manage GitHub, Slack, Linear, and third-party API keys',
+        badge: 'Integrations',
+        icon: <Share2 className="w-4 h-4 text-orange-400" />,
+        action: () => {
+          onClose();
+          onOpenPublicApi?.();
+        },
+      },
       {
         id: 'tool-prefs',
         category: 'tools',
