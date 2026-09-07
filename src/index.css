@@ -680,3 +680,145 @@ button {
 .vibrant-background {
   background: var(--bg-1);
 }
+
+/* =========================================================
+   Spider-Web Task Ring: Data Packet Flow & Priority Pulse
+   Mimics data packets flowing along threads in #spiderWebContainer
+   Pulse speed is correlated to the agent's task priority.
+   ========================================================= */
+
+@keyframes dataPacketFlow {
+  0% {
+    stroke-dashoffset: 48;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dataPacketPulse {
+  0%, 100% {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 2px var(--glow-color, rgba(255, 170, 0, 0.4)));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px var(--glow-color, rgba(255, 170, 0, 0.95))) drop-shadow(0 0 3px #ffffff);
+  }
+}
+
+@keyframes dataPacketSurge {
+  0%, 100% {
+    stroke-width: var(--packet-stroke, 3.2px);
+  }
+  50% {
+    stroke-width: calc(var(--packet-stroke, 3.2px) + 1.4px);
+  }
+}
+
+/* Base style for data packet threads inside #spiderWebContainer */
+#spiderWebContainer svg path.data-packet-thread,
+#spiderWebContainer #taskThreads path,
+#spiderWebContainer svg path[data-packet-stream="true"],
+#spiderWebContainer svg path[data-priority],
+#spiderWebContainer #thread1,
+#spiderWebContainer #agentSpokes path {
+  stroke-dasharray: 8 16;
+  stroke-linecap: round;
+  animation-name: dataPacketFlow, dataPacketPulse, dataPacketSurge;
+  animation-timing-function: linear, ease-in-out, ease-in-out;
+  animation-iteration-count: infinite, infinite, infinite;
+  animation-duration: var(--pulse-speed, var(--packet-speed, 1.0s)), var(--pulse-speed, 1.0s), var(--pulse-speed, 1.0s);
+  will-change: stroke-dashoffset, filter, opacity, stroke-width;
+}
+
+/* General fallback rule for SVG paths in #spiderWebContainer */
+#spiderWebContainer svg path:not(.spider-perimeter):not(.spider-static) {
+  --packet-speed: var(--pulse-speed, 1.0s);
+}
+
+/* =========================================================
+   Pulse speed correlated to Agent Task Priority:
+   P1 (Critical / Real-Time Override): 0.45s rapid pulse
+   P2 (High / Distributed Sync): 0.90s moderate pulse
+   P3 (Normal / Staging & Replication): 1.80s relaxed pulse
+   Idle / Standby: 3.60s ambient pulse
+   ========================================================= */
+
+/* Priority 1 (Urgent / Critical) - Rapid 0.45s pulse */
+#spiderWebContainer svg path.priority-1,
+#spiderWebContainer svg path.priority-p1,
+#spiderWebContainer svg path[data-priority="1"],
+#spiderWebContainer [data-priority="1"] path,
+#spiderWebContainer g[data-priority="1"] path {
+  --pulse-speed: 0.45s;
+  --packet-speed: 0.45s;
+  --glow-color: rgba(255, 170, 0, 0.95);
+  --packet-stroke: 4px;
+  stroke: #ffaa00;
+  stroke-dasharray: 10 14;
+  animation-duration: 0.45s, 0.45s, 0.45s;
+  filter: drop-shadow(0 0 8px rgba(255, 170, 0, 0.9));
+}
+
+/* Priority 2 (High / Elevated) - Medium 0.90s pulse */
+#spiderWebContainer svg path.priority-2,
+#spiderWebContainer svg path.priority-p2,
+#spiderWebContainer svg path[data-priority="2"],
+#spiderWebContainer [data-priority="2"] path,
+#spiderWebContainer g[data-priority="2"] path {
+  --pulse-speed: 0.9s;
+  --packet-speed: 0.9s;
+  --glow-color: rgba(0, 229, 255, 0.85);
+  --packet-stroke: 3.2px;
+  stroke: #00e5ff;
+  stroke-dasharray: 8 16;
+  animation-duration: 0.9s, 0.9s, 0.9s;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.8));
+}
+
+/* Priority 3 (Standard / Normal) - Relaxed 1.80s pulse */
+#spiderWebContainer svg path.priority-3,
+#spiderWebContainer svg path.priority-p3,
+#spiderWebContainer svg path[data-priority="3"],
+#spiderWebContainer [data-priority="3"] path,
+#spiderWebContainer g[data-priority="3"] path {
+  --pulse-speed: 1.8s;
+  --packet-speed: 1.8s;
+  --glow-color: rgba(131, 165, 152, 0.8);
+  --packet-stroke: 2.8px;
+  stroke: #83a598;
+  stroke-dasharray: 6 18;
+  animation-duration: 1.8s, 1.8s, 1.8s;
+  filter: drop-shadow(0 0 4px rgba(131, 165, 152, 0.7));
+}
+
+/* Priority 4+ (Low) - Slow 2.60s pulse */
+#spiderWebContainer svg path.priority-4,
+#spiderWebContainer svg path[data-priority="4"],
+#spiderWebContainer [data-priority="4"] path {
+  --pulse-speed: 2.6s;
+  --packet-speed: 2.6s;
+  --glow-color: rgba(179, 136, 255, 0.7);
+  --packet-stroke: 2.5px;
+  stroke: #b388ff;
+  stroke-dasharray: 6 20;
+  animation-duration: 2.6s, 2.6s, 2.6s;
+}
+
+/* Priority Idle / Standby (Agent has no active task) - Ambient 3.60s pulse */
+#spiderWebContainer svg path.priority-idle,
+#spiderWebContainer svg path.priority-0,
+#spiderWebContainer svg path[data-priority="idle"],
+#spiderWebContainer svg path[data-priority="0"],
+#spiderWebContainer [data-priority="idle"] path,
+#spiderWebContainer [data-priority="0"] path {
+  --pulse-speed: 3.6s;
+  --packet-speed: 3.6s;
+  --glow-color: rgba(146, 131, 116, 0.35);
+  --packet-stroke: 1.8px;
+  stroke: #504945;
+  stroke-dasharray: 4 22;
+  animation-duration: 3.6s, 3.6s, 3.6s;
+  opacity: 0.4;
+}

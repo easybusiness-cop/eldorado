@@ -1,10 +1,13 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import dotenv from "dotenv";
+import { WebSocketServer, WebSocket } from "ws";
 import { createServer as createViteServer } from "vite";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { requireAuth } from "./server/security/auth.middleware.ts";
+import { taskRingEngine } from "./server/spider/task-ring.ts";
 
 // Routes & Controllers
 import { githubRouter } from "./server/routes/github.routes.ts";
@@ -167,7 +170,7 @@ app.post("/api/meta/improve", async (_req, res) => {
   }
 });
 
-// Start Server with Vite Dev/Prod Middleware
+// Start Server with Vite Dev/Prod Middleware and WebSocket Engine
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -183,8 +186,57 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[Rufflo Server] Running on http://localhost:${PORT}`);
+  const server = http.createServer(app);
+  const wss = new WebSocketServer({ noServer: true });
+
+  server.on("upgrade", (request, socket, head) => {
+    const host = request.headers.host || "localhost:3000";
+    const pathname = request.url ? new URL(request.url, `http://${host}`).pathname : "";
+
+    if (pathname === "/ws/department" || pathname === "/ws/spider") {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit("connection", ws, request);
+      });
+    }
+  });
+
+  wss.on("connection", (ws: WebSocket) => {
+    taskRingEngine.addSubscriber(ws);
+
+    ws.on("message", (raw) => {
+      try {
+        const msg = JSON.parse(raw.toString());
+        if (msg.type === "COMMAND") {
+          taskRingEngine.triggerCommand(msg.command, msg.payload);
+        } else if (msg.type === "ASSIGN_TASK") {
+          taskRingEngine.assignTask(msg.task);
+        } else if (msg.type === "COMPLETE_TASK") {
+          taskRingEngine.onTaskComplete(msg.agentId);
+        } else if (msg.type === "FAILOVER") {
+          taskRingEngine.failoverAgent(msg.agentId);
+        } else if (msg.type === "SWARM_SOLVE") {
+          taskRingEngine.swarmSolveTask(msg.goal, msg.priority);
+        } else if (msg.type === "AUTO_SOLVE_NEXT") {
+          taskRingEngine.autoSolveNextQueue();
+        } else if (msg.type === "SYNC_FLEET") {
+          taskRingEngine.syncFleetAgents(msg.agents);
+        } else if (msg.type === "COLLABORATE") {
+          taskRingEngine.collaborateAgents(msg.agentAId, msg.agentBId, msg.taskDesc);
+        } else if (msg.type === "PING") {
+          ws.send(JSON.stringify({ type: "PONG", timestamp: Date.now() }));
+        }
+      } catch (err) {
+        console.error("[WebSocket] message parse error:", err);
+      }
+    });
+
+    ws.on("close", () => {
+      taskRingEngine.removeSubscriber(ws);
+    });
+  });
+
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`[Rufflo Server] Running on http://localhost:${PORT} with WebSocket Engine online at /ws/department and /ws/spider`);
   });
 }
 

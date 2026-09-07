@@ -264,7 +264,7 @@ export function parseAgentVoiceDelegation(transcript: string): { agentName: stri
   return null;
 }
 
-function cleanAgentName(raw: string): string {
+export function cleanAgentName(raw: string): string {
   const normalized = raw.toLowerCase().trim();
   if (normalized.includes('michael')) return 'michael';
   if (normalized.includes('dwight')) return 'dwight';

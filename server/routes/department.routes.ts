@@ -2,6 +2,7 @@ import express from 'express';
 import { EngineeringDepartmentEngineer } from '../agents/engineering/engineering-department-engineer.ts';
 import { MasterMetaAgent } from '../agents/orchestration/master-meta-agent.ts';
 import { tracingSDK } from '../observability/tracing.ts';
+import { taskRingEngine } from '../spider/task-ring.ts';
 
 const router = express.Router();
 const departmentEngineer = new EngineeringDepartmentEngineer();
@@ -12,27 +13,45 @@ router.get('/status', async (_req, res) => {
   const observation = await masterMeta.observeDepartment();
   span.end();
 
-  const agents = [
-    { id: 1, name: 'CoreEngineer', role: 'MIT-Level Coder', status: 'running', lastAction: 'implementCode' },
-    { id: 2, name: 'RepositoryEngineer', role: 'Architecture & Git', status: 'idle', lastAction: 'inspectRepository' },
-    { id: 3, name: 'TesterEngineer', role: 'Testing & QA', status: 'completed', lastAction: 'runTests' },
-    { id: 4, name: 'SafetyEngineer', role: 'Security & Guardrails', status: 'idle', lastAction: 'evaluateSafety' },
-    { id: 5, name: 'InfrastructureEngineer', role: 'Deployment & Public API', status: 'running', lastAction: 'deployToStaging' },
-    { id: 6, name: 'EvaluationEngineer', role: 'Outcome Evaluation', status: 'completed', lastAction: 'evaluateResult' },
-    { id: 7, name: 'NegotiationEngineer', role: 'Team Coordination', status: 'idle', lastAction: 'assignTeams' },
-    { id: 8, name: 'TrainingManager', role: 'CSE Syllabus & Curriculum', status: 'idle', lastAction: 'syncCurriculum' },
-    { id: 9, name: 'MasterMetaAgent', role: 'Self-Improvement', status: 'idle', lastAction: 'observeDepartment' },
-    { id: 10, name: 'EngineeringDepartmentEngineer', role: 'Master Orchestration', status: 'running', lastAction: 'runFullAutonomousLifecycle' },
-  ];
+  const snapshot = taskRingEngine.getStateSnapshot();
 
   res.json({
     ...observation,
     healthScore: observation.healthScore || 94,
-    agents,
+    agents: snapshot.departmentAgents,
+    taskRing: snapshot,
+    networkStrength: snapshot.networkStrength,
     successRate: observation.successRate || 96.5,
     recentObjectives: observation.recentObjectives || 24,
     evidencePack: [],
   });
+});
+
+router.post('/command', async (req, res) => {
+  const { command, payload } = req.body;
+  if (!command) {
+    return res.status(400).json({ error: 'Command type required' });
+  }
+
+  taskRingEngine.triggerCommand(command, payload);
+  res.json({ success: true, command, snapshot: taskRingEngine.getStateSnapshot() });
+});
+
+router.post('/swarm-solve', async (req, res) => {
+  const { goal, priority } = req.body;
+  taskRingEngine.swarmSolveTask(goal || 'Collaborative fleet swarm execution', priority || 1);
+  res.json({ success: true, snapshot: taskRingEngine.getStateSnapshot() });
+});
+
+router.post('/auto-solve', async (_req, res) => {
+  taskRingEngine.autoSolveNextQueue();
+  res.json({ success: true, snapshot: taskRingEngine.getStateSnapshot() });
+});
+
+router.post('/sync-fleet', async (req, res) => {
+  const { agents } = req.body;
+  taskRingEngine.syncFleetAgents(agents || []);
+  res.json({ success: true, snapshot: taskRingEngine.getStateSnapshot() });
 });
 
 router.post('/run-full', async (req, res) => {
@@ -40,8 +59,10 @@ router.post('/run-full', async (req, res) => {
   const startTime = Date.now();
 
   try {
+    taskRingEngine.triggerCommand('run-department');
     const payload = req.body && req.body.goal ? req.body : { goal: 'Automated Full-Department MIT-Level Engineering Run' };
     const result = await departmentEngineer.handleObjective(payload);
+
     
     const final = await masterMeta.runWeeklyImprovementCycle(); // self-improvement
     

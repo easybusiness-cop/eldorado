@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Agent, AgentLog, FleetTask, AttachedFile, SystemTelemetry, UserProfile } from '../types';
-import { soundFx, speakText, createSpeechRecognizer, parseMissionVoiceTrigger, parseAgentVoiceDelegation, startMicrophoneAudioCapture, AudioCaptureController } from '../utils/speech';
+import { soundFx, speakText, createSpeechRecognizer, parseMissionVoiceTrigger, parseAgentVoiceDelegation, startMicrophoneAudioCapture, AudioCaptureController, cleanAgentName } from '../utils/speech';
 import { FleetD3PerformanceChart } from './FleetD3PerformanceChart';
 import { FleetTaskCompletionBarChart } from './FleetTaskCompletionBarChart';
 import { FleetTokenTrendsLineChart } from './FleetTokenTrendsLineChart';
@@ -10,6 +10,7 @@ import { RuffloObjectivesPanel } from './RuffloObjectivesPanel';
 import { RuffloLoopPanel } from './RuffloLoopPanel';
 import { MasterMetaPanel } from './MasterMetaPanel';
 import { EngineeringDepartmentPanel } from './EngineeringDepartmentPanel';
+import { SpiderWebPanel } from './SpiderWebPanel';
 import confetti from 'canvas-confetti';
 import { runAgentStandardWorkflow, STANDARD_WORKFLOW_STAGES, WorkflowExecutionState } from '../utils/agentWorkflowEngine';
 import {
@@ -65,6 +66,7 @@ interface CommandCenterProps {
   onToggleAutoMode: () => void;
   userProfile: UserProfile;
   telemetry: SystemTelemetry;
+  onSetWorkspaceTab?: (tab: 'command' | 'fleet' | 'network') => void;
   company?: any;
   departments?: any[];
   projects?: any[];
@@ -75,6 +77,7 @@ interface CommandCenterProps {
 
 type TabType =
   | 'department'
+  | 'spider-web'
   | 'master'
   | 'loop'
   | 'terminal'
@@ -111,6 +114,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onToggleAutoMode,
   userProfile,
   telemetry,
+  onSetWorkspaceTab,
   company,
   departments = [],
   projects = [],
@@ -580,6 +584,137 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       (transcript, isFinal) => {
         setLiveVoiceTranscript(transcript);
 
+        // Check for specific spoken commands: "Create task for Dwight" or "Display fleet health" directly
+        const cleanTranscript = transcript.toLowerCase().trim();
+
+        // 1. "Display fleet health" / "Show fleet health"
+        if (
+          cleanTranscript.includes('display fleet health') || 
+          cleanTranscript.includes('show fleet health') || 
+          cleanTranscript.includes('display fleet') || 
+          cleanTranscript.includes('show fleet telemetry')
+        ) {
+          if (lastTriggeredMissionRef.current !== 'cmd-display-fleet-health') {
+            lastTriggeredMissionRef.current = 'cmd-display-fleet-health';
+            if (onSetWorkspaceTab) {
+              onSetWorkspaceTab('fleet');
+            }
+            setVoiceTriggerNotice({
+              message: 'Voice Command: Displaying Fleet Health Monitor',
+              type: 'success' as any
+            });
+            if (voiceSpeechEnabled) {
+              speakText('Displaying agent fleet health and telemetry monitor.', selectedAgent);
+            }
+          }
+          return;
+        }
+
+        // 2. "Display spider web" / "Show spider web" / "Show network" / "Display network"
+        if (
+          cleanTranscript.includes('display spider web') || 
+          cleanTranscript.includes('show spider web') || 
+          cleanTranscript.includes('show network') || 
+          cleanTranscript.includes('display network') ||
+          cleanTranscript.includes('show spider-web')
+        ) {
+          if (lastTriggeredMissionRef.current !== 'cmd-display-spider-web') {
+            lastTriggeredMissionRef.current = 'cmd-display-spider-web';
+            if (onSetWorkspaceTab) {
+              onSetWorkspaceTab('network');
+            }
+            setVoiceTriggerNotice({
+              message: 'Voice Command: Displaying Company Intelligence Network',
+              type: 'success' as any
+            });
+            if (voiceSpeechEnabled) {
+              speakText('Opening company intelligence spider web network.', selectedAgent);
+            }
+          }
+          return;
+        }
+
+        // 3. "Display command center" / "Show command center" / "Show command"
+        if (
+          cleanTranscript.includes('display command center') || 
+          cleanTranscript.includes('show command center') || 
+          cleanTranscript.includes('show command')
+        ) {
+          if (lastTriggeredMissionRef.current !== 'cmd-display-command-center') {
+            lastTriggeredMissionRef.current = 'cmd-display-command-center';
+            if (onSetWorkspaceTab) {
+              onSetWorkspaceTab('command');
+            }
+            setVoiceTriggerNotice({
+              message: 'Voice Command: Displaying Command Center',
+              type: 'success' as any
+            });
+            if (voiceSpeechEnabled) {
+              speakText('Opening central command and dispatch center.', selectedAgent);
+            }
+          }
+          return;
+        }
+
+        // 4. "Create task for Dwight" or "Create task for Jim" or "Create task for [Agent]"
+        const createTaskRegex = /(?:create\s+task\s+for\s+)([a-zA-Z\s\-0-9]+?)(?:\s+to\s+(.+))?$/i;
+        const matchCreate = transcript.match(createTaskRegex);
+        if (matchCreate && matchCreate[1]) {
+          const rawAgent = matchCreate[1].trim();
+          const taskDescription = matchCreate[2] ? matchCreate[2].trim() : '';
+          const agentId = cleanAgentName(rawAgent);
+          const targetAgent = agents.find((a) => a.id === agentId || a.name.toLowerCase().includes(rawAgent.toLowerCase()));
+
+          if (targetAgent) {
+            const cacheKey = `cmd-create-task-${targetAgent.id}-${taskDescription.toLowerCase()}`;
+            if (lastTriggeredMissionRef.current !== cacheKey) {
+              lastTriggeredMissionRef.current = cacheKey;
+              
+              const titleText = taskDescription ? taskDescription.charAt(0).toUpperCase() + taskDescription.slice(1) : `${targetAgent.name} System Update`;
+              const descriptionText = taskDescription 
+                ? `Voice-delegated instruction: "${taskDescription}"`
+                : `Autonomous workspace execution loop requested via voice command for ${targetAgent.name}.`;
+
+              const delegatedTask: FleetTask = {
+                id: `tsk-voice-del-${Date.now()}`,
+                title: titleText,
+                description: descriptionText,
+                assignedTo: targetAgent.id,
+                priority: 'high',
+                status: 'running',
+                progress: 20,
+                createdAt: Date.now(),
+              };
+
+              onAddTask(delegatedTask);
+
+              // Call execution loop API
+              fetch('/api/agent/execute-loop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  projectId: 'prj-alpha',
+                  assignedTo: targetAgent.id,
+                  title: titleText,
+                  description: descriptionText,
+                  priority: 'high',
+                  userProfile,
+                }),
+              }).catch((err) => console.warn('Voice execute loop fallback:', err));
+
+              setVoiceTriggerNotice({
+                message: `Voice Command: Created task for ${targetAgent.name}`,
+                type: 'success' as any
+              });
+
+              if (voiceSpeechEnabled) {
+                speakText(`Created task for ${targetAgent.name}. Task title: ${titleText}. Initializing autonomous execution loop.`, targetAgent);
+              }
+            }
+            return;
+          }
+        }
+
         // Check for voice-to-text trigger: "Rufflo, initialize [Mission Name]"
         const detectedMission = parseMissionVoiceTrigger(transcript);
         if (detectedMission && lastTriggeredMissionRef.current !== `mis-${detectedMission.toLowerCase()}`) {
@@ -683,6 +818,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
     { id: 'department' as TabType, label: 'department', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
+    { id: 'spider-web' as TabType, label: 'spider web', icon: <Network className="w-3.5 h-3.5 text-[#22ff88]" /> },
     { id: 'master', label: 'master', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'loop', label: 'loop', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'terminal', label: 'terminal', icon: <Terminal className="w-3.5 h-3.5" /> },
@@ -833,6 +969,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <EngineeringDepartmentPanel />
         )}
 
+        {activeTab === 'spider-web' && (
+          <SpiderWebPanel agents={agents} />
+        )}
+
         {activeTab === 'master' && (
           <MasterMetaPanel />
         )}
@@ -842,7 +982,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         )}
 
         {/* Tab Content Display */}
-        {activeTab !== 'loop' && activeTab !== 'master' && activeTab !== 'department' && (
+        {activeTab !== 'loop' && activeTab !== 'master' && activeTab !== 'department' && activeTab !== 'spider-web' && (
           <div className="animate-in space-y-4">
         {/* 1. Projects Portfolio View */}
         {activeTab === 'projects' && (

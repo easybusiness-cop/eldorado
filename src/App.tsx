@@ -1164,6 +1164,7 @@ export default function App() {
                         onToggleAutoMode={() => setAutoMode(!autoMode)}
                         userProfile={userProfile}
                         telemetry={telemetry}
+                        onSetWorkspaceTab={setWorkspaceTab}
                         departments={departments}
                       />
                     </div>
