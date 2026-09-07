@@ -24,6 +24,7 @@ import {
   Brain,
   Rocket,
   Activity,
+  ClipboardList,
 } from 'lucide-react';
 
 interface TopNavigationProps {
@@ -161,11 +162,27 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
       primary: true,
     },
     {
+      id: 'workforce',
+      label: 'Workforce & Radar',
+      icon: <Brain className="w-3.5 h-3.5 text-amber-500" />,
+      onClick: onOpenDynamicKnowledgeBase,
+      primary: true,
+      hidden: !onOpenDynamicKnowledgeBase,
+    },
+    {
       id: 'features',
       label: `Features (${dynamicFeatureCount})`,
       icon: <Sparkles className="w-3.5 h-3.5" />,
       onClick: onOpenDynamicFeatures,
       primary: true,
+    },
+    {
+      id: 'google-workspace',
+      label: 'Google Workspace',
+      icon: <Sparkles className="w-3.5 h-3.5 text-teal-400" />,
+      onClick: onOpenWorkspace,
+      primary: true,
+      hidden: !onOpenWorkspace,
     },
   ].filter((i) => !i.hidden);
 
@@ -174,7 +191,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     { id: 'comms', label: 'Agent communication', icon: <Phone className="w-3.5 h-3.5" />, onClick: onOpenAgentCommunication, hidden: !onOpenAgentCommunication },
     { id: 'skills', label: 'Skill matrix', icon: <Brain className="w-3.5 h-3.5" />, onClick: onOpenAgentSkillMatrix, hidden: !onOpenAgentSkillMatrix },
     { id: 'sops', label: 'SOPs & data', icon: <Shield className="w-3.5 h-3.5" />, onClick: onOpenAgentSops, hidden: !onOpenAgentSops },
-    { id: 'kb', label: 'Knowledge base', icon: <Brain className="w-3.5 h-3.5" />, onClick: onOpenDynamicKnowledgeBase, hidden: !onOpenDynamicKnowledgeBase },
+    { id: 'kb', label: 'Virtual Workforce & Radar', icon: <Brain className="w-3.5 h-3.5 text-amber-500" />, onClick: onOpenDynamicKnowledgeBase, hidden: !onOpenDynamicKnowledgeBase },
     { id: 'db', label: 'Company DB', icon: <Database className="w-3.5 h-3.5" />, onClick: onOpenDb, hidden: !onOpenDb },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" />, onClick: onOpenAnalytics, hidden: !onOpenAnalytics },
     { id: 'workspace', label: 'Workspace', icon: <Layers className="w-3.5 h-3.5" />, onClick: onOpenWorkspace, hidden: !onOpenWorkspace },

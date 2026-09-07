@@ -16,8 +16,14 @@ import {
   Search, 
   RefreshCw,
   PlusCircle,
-  FolderMinus
+  FolderMinus,
+  Globe,
+  Cpu,
+  Crown
 } from 'lucide-react';
+import { AutonomousLearningRadarTab } from './workforce/AutonomousLearningRadarTab';
+import { VirtualWorkforceFleetTab } from './workforce/VirtualWorkforceFleetTab';
+import { CorporateCascadeTab } from './workforce/CorporateCascadeTab';
 
 interface DynamicKnowledgeBaseModalProps {
   isOpen: boolean;
@@ -28,7 +34,7 @@ export const DynamicKnowledgeBaseModal: React.FC<DynamicKnowledgeBaseModalProps>
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'kb' | 'graph' | 'capabilities'>('kb');
+  const [activeTab, setActiveTab] = useState<'kb' | 'graph' | 'capabilities' | 'discovery' | 'workforce' | 'cascade'>('cascade');
   
   // Traditional KB State
   const [entries, setEntries] = useState<KnowledgeEntry[]>([]);
@@ -283,12 +289,45 @@ export const DynamicKnowledgeBaseModal: React.FC<DynamicKnowledgeBaseModalProps>
         </div>
 
         {/* TAB NAVIGATION */}
-        <div className="bg-[#ebdbb2] border-b-2 border-[#d5c4a1] px-6 flex gap-1">
+        <div className="bg-[#ebdbb2] border-b-2 border-[#d5c4a1] px-6 flex gap-1 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => { soundFx.playClick(); setActiveTab('cascade'); }}
+            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'cascade'
+                ? 'bg-[#fbf1c7] border-[#d79921] text-[#282828]'
+                : 'border-transparent text-[#7c6f64] hover:text-[#3c3836]'
+            }`}
+          >
+            <Crown className="w-3.5 h-3.5 text-[#d79921]" />
+            Corporate Command Cascade
+          </button>
+          <button
+            onClick={() => { soundFx.playClick(); setActiveTab('discovery'); }}
+            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'discovery'
+                ? 'bg-[#fbf1c7] border-[#b57614] text-[#282828]'
+                : 'border-transparent text-[#7c6f64] hover:text-[#3c3836]'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5 text-[#b57614]" />
+            Continuous Learning Radar
+          </button>
+          <button
+            onClick={() => { soundFx.playClick(); setActiveTab('workforce'); }}
+            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'workforce'
+                ? 'bg-[#fbf1c7] border-[#076678] text-[#282828]'
+                : 'border-transparent text-[#7c6f64] hover:text-[#3c3836]'
+            }`}
+          >
+            <Cpu className="w-3.5 h-3.5 text-[#076678]" />
+            Virtual Workforce Fleet
+          </button>
           <button
             onClick={() => { soundFx.playClick(); setActiveTab('kb'); }}
-            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'kb'
-                ? 'bg-[#fbf1c7] border-[#b57614] text-[#282828]'
+                ? 'bg-[#fbf1c7] border-[#427b58] text-[#282828]'
                 : 'border-transparent text-[#7c6f64] hover:text-[#3c3836]'
             }`}
           >
@@ -297,25 +336,25 @@ export const DynamicKnowledgeBaseModal: React.FC<DynamicKnowledgeBaseModalProps>
           </button>
           <button
             onClick={() => { soundFx.playClick(); setActiveTab('graph'); }}
-            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'graph'
-                ? 'bg-[#fbf1c7] border-[#b57614] text-[#282828]'
+                ? 'bg-[#fbf1c7] border-[#af3a03] text-[#282828]'
                 : 'border-transparent text-[#7c6f64] hover:text-[#3c3836]'
             }`}
           >
             <Network className="w-3.5 h-3.5" />
-            Persistent Knowledge Graph
+            Knowledge Graph
           </button>
           <button
             onClick={() => { soundFx.playClick(); setActiveTab('capabilities'); }}
-            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 text-xs font-black uppercase border-t-4 transition-all flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'capabilities'
-                ? 'bg-[#fbf1c7] border-[#b57614] text-[#282828]'
+                ? 'bg-[#fbf1c7] border-[#8f3f71] text-[#282828]'
                 : 'border-transparent text-[#7c6f64] hover:text-[#3c3836]'
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
-            Granular Capability Registry
+            Granular Capabilities
           </button>
         </div>
 
@@ -958,6 +997,15 @@ export const DynamicKnowledgeBaseModal: React.FC<DynamicKnowledgeBaseModalProps>
               )}
             </div>
           )}
+
+          {/* TAB 4: CONTINUOUS LEARNING RADAR */}
+          {activeTab === 'discovery' && <AutonomousLearningRadarTab />}
+
+          {/* TAB 5: UNLIMITED VIRTUAL WORKFORCE */}
+          {activeTab === 'workforce' && <VirtualWorkforceFleetTab />}
+
+          {/* TAB 6: CORPORATE COMMAND CASCADE LOOP */}
+          {activeTab === 'cascade' && <CorporateCascadeTab />}
         </div>
       </div>
     </div>

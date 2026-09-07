@@ -1,3 +1,5 @@
+import { executiveTools } from './executive.tools.ts';
+
 export interface MastraToolDefinition {
   name: string;
   description: string;
@@ -13,6 +15,10 @@ export class MastraToolRegistry {
 
   private constructor() {
     this.registerBuiltins();
+
+    for (const tool of executiveTools) {
+      this.register(tool);
+    }
   }
 
   public static getInstance(): MastraToolRegistry {

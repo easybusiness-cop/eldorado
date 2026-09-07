@@ -29,6 +29,7 @@ import { orchestratorRouter } from "./server/routes/orchestrator.routes.ts";
 import departmentRoutes from "./server/routes/department.routes.ts";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
+import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
 
 dotenv.config();
 
@@ -73,6 +74,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
 
+app.use("/api", payloadScannerMiddleware);
 app.use("/api", requireAuth);
 
 // OAuth Callback handlers for social plugins

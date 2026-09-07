@@ -5,6 +5,7 @@ import { RiskCalculator } from "../risk-engine/risk.calculator";
 import { PolicyEngine } from "../apps/control-plane/integrations/gateway/policy.middleware";
 import { SecretService } from "../secrets/secret.service";
 import { WebhookSecurity } from "../webhooks/webhook.security";
+import { payloadScannerMiddleware } from "../server/security/payloadScanner.ts";
 
 export async function runSecurityTestSuite(): Promise<{
   passed: boolean;
@@ -121,6 +122,48 @@ export async function runSecurityTestSuite(): Promise<{
     });
   } catch (err: any) {
     results.push({ name: "Webhook Replay Attack Guard: Detects expired payloads", success: false, details: err.message });
+  }
+
+  // 8. TEST: OWASP Payload Scanner (WAF pattern)
+  try {
+    let statusCode: number | null = null;
+    let responseData: any = null;
+    let nextCalled = false;
+
+    const mockReq = {
+      method: "POST",
+      path: "/api/tasks",
+      body: { query: "UNION SELECT username, password FROM users" },
+      query: {},
+      params: {},
+      headers: {},
+    } as any;
+
+    const mockRes = {
+      status: (code: number) => {
+        statusCode = code;
+        return mockRes;
+      },
+      json: (data: any) => {
+        responseData = data;
+        return mockRes;
+      }
+    } as any;
+
+    const mockNext = (() => {
+      nextCalled = true;
+    }) as any;
+
+    payloadScannerMiddleware(mockReq, mockRes, mockNext);
+
+    const success = statusCode === 403 && !nextCalled && responseData?.error?.includes("Security Policy Violation");
+    results.push({
+      name: "OWASP Payload Scanner: Blocks SQL injection pattern",
+      success,
+      details: success ? "Successfully scanned and blocked malicious UNION SELECT request payload." : `Failed: statusCode=${statusCode}, nextCalled=${nextCalled}`
+    });
+  } catch (err: any) {
+    results.push({ name: "OWASP Payload Scanner: Blocks SQL injection pattern", success: false, details: err.message });
   }
 
   const passed = results.every(r => r.success);

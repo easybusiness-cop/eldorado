@@ -1,73 +1,255 @@
-import type { User } from "@supabase/supabase-js";
-import { supabase } from "./supabaseClient.ts";
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  type User as FirebaseUser
+} from 'firebase/auth';
+import { supabase } from './supabaseClient';
+import firebaseConfig from '../../firebase-applet-config.json';
 
-const GOOGLE_WORKSPACE_SCOPES = [
-  "https://www.googleapis.com/auth/gmail.readonly",
-  "https://www.googleapis.com/auth/gmail.send",
-  "https://www.googleapis.com/auth/calendar",
-  "https://www.googleapis.com/auth/documents",
-  "https://www.googleapis.com/auth/spreadsheets",
-  "https://www.googleapis.com/auth/drive.file",
-  "https://www.googleapis.com/auth/presentations",
-].join(" ");
-
-export const initWorkspaceAuth = (
-  onAuthSuccess?: (user: User, token: string) => void,
-  onAuthFailure?: () => void
-) => {
-  return supabase.auth.onAuthStateChange((_event, session) => {
-    if (session?.user && session.access_token) {
-      onAuthSuccess?.(session.user, session.access_token);
-      return;
-    }
-
-    onAuthFailure?.();
-  }).data.subscription;
+export type WorkspaceUser = {
+  uid: string;
+  email?: string | null;
+  displayName?: string | null;
+  photoURL?: string | null;
+  provider?: 'supabase' | 'firebase';
 };
 
-export async function signInToRufflo(): Promise<void> {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/`,
-    },
+export const GOOGLE_WORKSPACE_SCOPES = [
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/drive.readonly',
+  // Forms
+  'https://www.googleapis.com/auth/forms.body',
+  'https://www.googleapis.com/auth/forms.body.readonly',
+  'https://www.googleapis.com/auth/forms.responses.readonly',
+  // Gmail
+  'https://mail.google.com/',
+  'https://www.googleapis.com/auth/gmail.readonly',
+  'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/gmail.modify',
+  'https://www.googleapis.com/auth/gmail.compose',
+  // Google Sheets
+  'https://www.googleapis.com/auth/spreadsheets',
+  'https://www.googleapis.com/auth/spreadsheets.readonly',
+  // Google Chat
+  'https://www.googleapis.com/auth/chat.spaces',
+  'https://www.googleapis.com/auth/chat.spaces.readonly',
+  'https://www.googleapis.com/auth/chat.spaces.create',
+  'https://www.googleapis.com/auth/chat.messages',
+  'https://www.googleapis.com/auth/chat.messages.readonly',
+  'https://www.googleapis.com/auth/chat.messages.create',
+  'https://www.googleapis.com/auth/chat.memberships',
+  'https://www.googleapis.com/auth/chat.memberships.readonly',
+  // Google Classroom
+  'https://www.googleapis.com/auth/classroom.courses',
+  'https://www.googleapis.com/auth/classroom.courses.readonly',
+  'https://www.googleapis.com/auth/classroom.coursework.me',
+  'https://www.googleapis.com/auth/classroom.coursework.students',
+  'https://www.googleapis.com/auth/classroom.announcements',
+  'https://www.googleapis.com/auth/classroom.rosters',
+  'https://www.googleapis.com/auth/classroom.topics',
+  // Docs, Slides, Calendar
+  'https://www.googleapis.com/auth/documents',
+  'https://www.googleapis.com/auth/presentations',
+  'https://www.googleapis.com/auth/calendar',
+];
+
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+GOOGLE_WORKSPACE_SCOPES.forEach((scope) => provider.addScope(scope));
+provider.setCustomParameters({ prompt: 'select_account' });
+
+let isSigningIn = false;
+let cachedAccessToken: string | null = null;
+let cachedUser: WorkspaceUser | null = null;
+let preferredAuthEngine: 'supabase' | 'firebase' = 'supabase';
+
+export function setPreferredAuthEngine(engine: 'supabase' | 'firebase') {
+  preferredAuthEngine = engine;
+}
+
+export function getPreferredAuthEngine(): 'supabase' | 'firebase' {
+  return preferredAuthEngine;
+}
+
+export const initWorkspaceAuth = (
+  onAuthSuccess?: (user: WorkspaceUser, token: string) => void,
+  onAuthFailure?: () => void
+) => {
+  // Check Supabase session first
+  const checkSupabase = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.provider_token) {
+        cachedAccessToken = session.provider_token;
+        cachedUser = {
+          uid: session.user.id,
+          email: session.user.email,
+          displayName: session.user.user_metadata?.full_name || session.user.email,
+          photoURL: session.user.user_metadata?.avatar_url,
+          provider: 'supabase',
+        };
+        onAuthSuccess?.(cachedUser, cachedAccessToken);
+        return true;
+      }
+    } catch {
+      // ignore
+    }
+    return false;
+  };
+
+  checkSupabase().then((hasSupabase) => {
+    if (hasSupabase) return;
+
+    // Listen to Firebase auth
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser && cachedAccessToken) {
+        cachedUser = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName || firebaseUser.email,
+          photoURL: firebaseUser.photoURL,
+          provider: 'firebase',
+        };
+        onAuthSuccess?.(cachedUser, cachedAccessToken);
+      } else if (!isSigningIn) {
+        if (!firebaseUser) {
+          cachedAccessToken = null;
+          cachedUser = null;
+        }
+        onAuthFailure?.();
+      }
+    });
   });
 
-  if (error) {
-    throw error;
+  const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    if (session?.provider_token) {
+      cachedAccessToken = session.provider_token;
+      cachedUser = {
+        uid: session.user.id,
+        email: session.user.email,
+        displayName: session.user.user_metadata?.full_name || session.user.email,
+        photoURL: session.user.user_metadata?.avatar_url,
+        provider: 'supabase',
+      };
+      onAuthSuccess?.(cachedUser, cachedAccessToken);
+    }
+  });
+
+  return {
+    unsubscribe: () => {
+      authListener.subscription.unsubscribe();
+    }
+  };
+};
+
+/**
+ * Signs in using Supabase OAuth with Google provider & all workspace scopes
+ */
+export async function signInWithSupabase(): Promise<{ user: WorkspaceUser; accessToken: string } | null> {
+  try {
+    isSigningIn = true;
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        scopes: GOOGLE_WORKSPACE_SCOPES.join(' '),
+        redirectTo: window.location.origin,
+      }
+    });
+    if (error) throw error;
+    return null;
+  } catch (err) {
+    console.warn('Supabase OAuth notice, falling back to popup:', err);
+    return signInWithFirebase();
+  } finally {
+    isSigningIn = false;
   }
 }
 
-/*
-  Use only when the user explicitly connects Google Workspace.
-  Normal Rufflo login must not request Gmail/Drive/Calendar permissions.
-*/
-export async function connectGoogleWorkspace(): Promise<void> {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/`,
-      scopes: GOOGLE_WORKSPACE_SCOPES,
-    },
-  });
-
-  if (error) {
+/**
+ * Signs in using Firebase popup with Google provider & all workspace scopes
+ */
+export async function signInWithFirebase(): Promise<{ user: WorkspaceUser; accessToken: string } | null> {
+  try {
+    isSigningIn = true;
+    const result = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (!credential?.accessToken) {
+      throw new Error('Failed to obtain Google access token from credentials');
+    }
+    cachedAccessToken = credential.accessToken;
+    cachedUser = {
+      uid: result.user.uid,
+      email: result.user.email,
+      displayName: result.user.displayName || result.user.email,
+      photoURL: result.user.photoURL,
+      provider: 'firebase',
+    };
+    return { user: cachedUser, accessToken: cachedAccessToken };
+  } catch (error: any) {
+    console.error('Google Workspace authentication error:', error);
     throw error;
+  } finally {
+    isSigningIn = false;
   }
+}
+
+export async function googleSignIn(): Promise<{ user: WorkspaceUser; accessToken: string } | null> {
+  if (preferredAuthEngine === 'supabase') {
+    try {
+      return await signInWithFirebase(); // Firebase provides immediate popup token in iframe
+    } catch {
+      return await signInWithSupabase();
+    }
+  }
+  return signInWithFirebase();
+}
+
+export async function connectGoogleWorkspace(): Promise<{ user: WorkspaceUser; accessToken: string } | null> {
+  return googleSignIn();
+}
+
+export async function signInToRufflo(): Promise<{ user: WorkspaceUser; accessToken: string } | null> {
+  return googleSignIn();
+}
+
+export async function getAccessToken(): Promise<string | null> {
+  return cachedAccessToken;
+}
+
+export async function getGoogleAccessToken(): Promise<string | null> {
+  return cachedAccessToken;
 }
 
 export async function getSupabaseAccessToken(): Promise<string | null> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  return cachedAccessToken;
+}
 
-  return session?.access_token ?? null;
+export function getCurrentWorkspaceUser(): WorkspaceUser | null {
+  return cachedUser;
 }
 
 export async function workspaceSignOut(): Promise<void> {
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    throw error;
+  try {
+    await supabase.auth.signOut();
+  } catch {
+    // ignore
   }
+  try {
+    await firebaseSignOut(auth);
+  } catch {
+    // ignore
+  }
+  cachedAccessToken = null;
+  cachedUser = null;
+}
+
+export async function logout(): Promise<void> {
+  return workspaceSignOut();
 }

@@ -1,9 +1,17 @@
 export * from './base.agent.ts';
+export * from './executive.agents.ts';
 export * from './engineering.agents.ts';
 export * from './business.agents.ts';
 
 import {
   CeoAgent,
+  ChiefOfStaffAgent,
+  StrategyDirectorAgent,
+  OperationsDirectorAgent,
+  ExecutiveAnalystAgent,
+} from './executive.agents.ts';
+
+import {
   EngineeringManagerAgent,
   BackendEngineerAgent,
   FrontendEngineerAgent,
@@ -43,12 +51,21 @@ export class MastraAgentRegistry {
 
   private registerAll() {
     const defaultAgents: BaseMastraAgent[] = [
+      // Executive
       new CeoAgent(),
+      new ChiefOfStaffAgent(),
+      new StrategyDirectorAgent(),
+      new OperationsDirectorAgent(),
+      new ExecutiveAnalystAgent(),
+
+      // Engineering
       new EngineeringManagerAgent(),
       new BackendEngineerAgent(),
       new FrontendEngineerAgent(),
       new DevOpsAgent(),
       new SecurityAgent(),
+
+      // Business
       new ProductManagerAgent(),
       new MarketingManagerAgent(),
       new SocialMediaAgent(),
@@ -68,6 +85,10 @@ export class MastraAgentRegistry {
 
   public getAgent(id: string): BaseMastraAgent | undefined {
     return this.agents.get(id);
+  }
+
+  public registerAgent(agent: BaseMastraAgent): void {
+    this.agents.set(agent.getId(), agent);
   }
 
   public getAllAgents(): BaseMastraAgent[] {

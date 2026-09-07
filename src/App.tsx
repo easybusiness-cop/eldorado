@@ -618,6 +618,126 @@ export default function App() {
       console.warn("Quantum simulation non-fatal warning:", qErr);
     }
 
+    // 2c. If chatting with CEO (Michael Scott), trigger the full Corporate Command Cascade Loop!
+    if (selectedAgent.id === 'michael') {
+      try {
+        const cascadeRes = await fetch('/api/autonomy/cascade/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command: prompt }),
+        });
+        const cascadeData = await cascadeRes.json();
+        if (cascadeData.success && cascadeData.run) {
+          const run = cascadeData.run;
+
+          // Add CEO Directive & COO Deconstruction Logs
+          setLogs((prev) => [
+            ...prev,
+            {
+              id: `ceo-dir-${Date.now()}`,
+              timestamp: new Date().toLocaleTimeString(),
+              level: 'info',
+              agentId: 'michael',
+              message: `[👑 CEO DIRECTIVE DISPATCHED] "${run.ceoDirective?.speech}"\nMandate to COO Dwight: "${run.ceoDirective?.mandate}"`,
+            },
+            {
+              id: `coo-plan-${Date.now()}`,
+              timestamp: new Date().toLocaleTimeString(),
+              level: 'info',
+              agentId: 'dwight',
+              message: `[💼 COO DWIGHT SCHRUTE DECONSTRUCTION] "${run.executivePlan?.analysis}"\nMobilized Departments: ${run.executivePlan?.activatedDepartments?.join(', ')}`,
+            },
+          ]);
+
+          // Add logs for each department mission and simultaneous employees
+          for (const [deptKey, mission] of Object.entries(run.departmentMissions as Record<string, any>)) {
+            for (const task of mission.assignedTasks) {
+              setLogs((prev) => [
+                ...prev,
+                {
+                  id: `tsk-${task.taskId}`,
+                  timestamp: new Date().toLocaleTimeString(),
+                  level: 'success',
+                  agentId: task.assignedAgentId,
+                  message: `[🏢 ${deptKey.toUpperCase()} // ${mission.hodName} ➔ ${task.assignedAgentName}] Delivered: "${task.taskTitle}" in ${(task.executionTimeMs / 1000).toFixed(1)}s\n\n${task.output?.slice(0, 300)}...`,
+                  codeSnippet: task.codeSnippet,
+                },
+              ]);
+
+              // If an engineering specialist produced code, auto-apply it to system modules
+              if (task.codeSnippet) {
+                const modName = `${task.assignedAgentName} Autonomous Code`;
+                sendAndApplySystemCode(
+                  task.codeSnippet,
+                  modName,
+                  task.assignedAgentName,
+                  'system_runtime',
+                  { userProfile }
+                ).then((res) => {
+                  if (res.success) setSystemModulesCount((c) => Math.max(c + 1, 1));
+                });
+              }
+            }
+          }
+
+          // Final CEO Response Log
+          const finalReply = run.ceoFinalResponse || 'All departments executed concurrently!';
+          const ceoLog: AgentLog = {
+            id: `ceo-final-${Date.now()}`,
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'success',
+            agentId: 'michael',
+            message: finalReply,
+          };
+          setLogs((prev) => [...prev, ceoLog]);
+
+          // Speak if voice enabled
+          if (userProfile.preferences.voiceAutoSpeak) {
+            speakText(finalReply, selectedAgent, userProfile.preferences.speechRate, userProfile.preferences.speechPitch);
+          }
+
+          // Update CEO state
+          setAgents((prev) =>
+            prev.map((a) =>
+              a.id === 'michael'
+                ? {
+                    ...a,
+                    status: 'idle',
+                    tokensProcessed: a.tokensProcessed + 950,
+                    speechBubble: {
+                      text: `Dispatched & Conquered: ${prompt.slice(0, 35)}...`,
+                      expiresAt: Date.now() + 12000,
+                    },
+                    memory: [prompt.slice(0, 60), ...a.memory.slice(0, 5)],
+                  }
+                : a
+            )
+          );
+
+          // Add completed tasks for all departments
+          setTasks((prev) => [
+            ...prev,
+            {
+              id: `cascade-${Date.now()}`,
+              title: `Corporate Cascade: ${prompt.slice(0, 35)}...`,
+              description: `Concurrently executed by ${run.metrics?.totalEmployeesInvolved} employees across ${run.metrics?.totalDepartments} departments`,
+              assignedTo: 'michael',
+              status: 'completed',
+              progress: 100,
+              priority: 'high',
+              department: 'Executive',
+              createdAt: new Date().toISOString(),
+              completedAt: new Date().toISOString(),
+            },
+          ]);
+
+          return;
+        }
+      } catch (cascadeErr) {
+        console.warn("Cascade execution fallback to standard agent chat:", cascadeErr);
+      }
+    }
+
     try {
       const response = await fetch('/api/agent/chat', {
         method: 'POST',

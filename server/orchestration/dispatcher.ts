@@ -1,9 +1,8 @@
-import { mastra } from '../ai/mastra/index.ts';
-
 export class Dispatcher {
   public static async dispatchToAgent(agentId: string, task: string): Promise<{ success: boolean; output: string }> {
     try {
-      const res = await mastra.executeTaskWithAgent(agentId, task);
+      const { productionMastraRuntime } = await import('../ai/runtime/mastra.runtime.ts');
+      const res = await productionMastraRuntime.executeTaskWithAgent(agentId, task);
       return {
         success: res.success,
         output: res.result,

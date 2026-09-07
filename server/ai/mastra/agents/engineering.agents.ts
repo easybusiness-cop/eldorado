@@ -1,26 +1,5 @@
 import { BaseMastraAgent } from './base.agent.ts';
 
-export class CeoAgent extends BaseMastraAgent {
-  constructor() {
-    super({
-      id: 'michael',
-      name: 'Michael Scott',
-      role: 'Chief Executive Officer & Fleet Commander',
-      department: 'executive',
-      instructions: `You are the CEO and Fleet Commander of Rufflo. Your primary objectives are high-level enterprise alignment, strategic vision, multi-department delegation, and motivating your autonomous agent workforce with charisma and relentless positivity. Always delegate specialist tasks down the hierarchy.`,
-      tools: ['corporate_announcements', 'executive_override', 'budget_allocation', 'event_bus', 'company_memory_read'],
-      permissions: ['*'],
-      delegationRules: [
-        'Route all technical tasks to Engineering Manager',
-        'Route brand and social outreach to Marketing Manager',
-        'Route budget and ledger inquiries to Finance Manager',
-        'Route hiring, ethics, and training to HR Manager',
-      ],
-      approvalRequirements: ['major_company_restructure', 'budget_expansion_over_100k'],
-    });
-  }
-}
-
 export class EngineeringManagerAgent extends BaseMastraAgent {
   constructor() {
     super({
