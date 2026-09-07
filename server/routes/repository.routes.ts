@@ -37,7 +37,6 @@ repositoryRouter.post("/develop", async (req, res) => {
   try {
     const {
       agentId,
-      organizationId,
       objective,
       workspace,
       branchName,
@@ -45,6 +44,8 @@ repositoryRouter.post("/develop", async (req, res) => {
       maxAttempts,
       timeoutMs,
     } = req.body;
+
+    const organizationId = (req as any).identity?.organizationId || req.body.organizationId;
 
     if (!agentId || !organizationId || !objective) {
       return res.status(400).json({

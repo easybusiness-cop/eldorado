@@ -21,7 +21,8 @@ export const orchestratorRouter = Router();
  */
 orchestratorRouter.post("/orchestrator/run", async (req, res) => {
   try {
-    const { objective, requestedBy, maxSteps, preferredAgents, organizationId } = req.body;
+    const { objective, requestedBy, maxSteps, preferredAgents } = req.body;
+    const organizationId = (req as any).identity?.organizationId || "org-default";
 
     if (!objective || typeof objective !== "string" || objective.trim().length < 3) {
       return res.status(400).json({
@@ -33,7 +34,7 @@ orchestratorRouter.post("/orchestrator/run", async (req, res) => {
     const plan = await MasterOrchestrator.run({
       objective: objective.trim(),
       requestedBy: requestedBy || "frontend",
-      organizationId: organizationId || "org-munderdifflin",
+      organizationId,
       maxSteps: maxSteps ? Number(maxSteps) : 8,
       preferredAgents: preferredAgents || {},
     });
@@ -201,6 +202,7 @@ orchestratorRouter.post("/orchestrator/run-stream", async (req, res) => {
     const plan = await MasterOrchestrator.run({
       objective: objective.trim(),
       requestedBy: requestedBy || "frontend",
+      organizationId: (req as any).identity?.organizationId || "org-default",
       maxSteps: maxSteps ? Number(maxSteps) : 8,
       preferredAgents: preferredAgents || {},
       onProgress: (event) => {

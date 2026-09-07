@@ -18,13 +18,14 @@ const developHandler = async (req: any, res: any) => {
   try {
     const {
       agentId,
-      organizationId,
       objective,
       workspace,
       maxAttempts,
       timeoutMs,
       requiredCapability,
     } = req.body;
+
+    const organizationId = req.identity?.organizationId || req.body.organizationId;
 
     if (!agentId || !organizationId || !objective || !workspace) {
       return res.status(400).json({
@@ -62,7 +63,8 @@ autonomyRouter.post("/develop", developHandler);
 // POST /api/autonomy/tasks - Solve task autonomously
 autonomyRouter.post("/autonomy/tasks", async (req, res) => {
   try {
-    const { organizationId, agentId, objective, requiredCapabilities } = req.body;
+    const { agentId, objective, requiredCapabilities } = req.body;
+    const organizationId = (req as any).identity?.organizationId || req.body.organizationId;
 
     if (!organizationId || !agentId || !objective) {
       return res.status(400).json({

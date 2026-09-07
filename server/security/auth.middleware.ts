@@ -54,8 +54,10 @@ const DEV_IDENTITY: RuffloIdentity = {
 };
 
 function isDevelopmentAuthEnabled(): boolean {
+  if (process.env.NODE_ENV === "production") {
+    return false;
+  }
   return (
-    process.env.NODE_ENV !== "production" ||
     process.env.RUFFLO_DEV_AUTH === "true" ||
     process.env.RUFFLO_PUBLIC_FLEET !== "false"
   );
@@ -240,4 +242,45 @@ export function requireCapability(
 
     next();
   };
+}
+
+export async function verifyAccessToken(token: string): Promise<RuffloIdentity | null> {
+  if (isDevelopmentAuthEnabled()) {
+    return DEV_IDENTITY;
+  }
+  try {
+    const authClient = getSupabaseAuthClient();
+    const { data, error } = await authClient.auth.getUser(token);
+    if (error || !data.user) {
+      return null;
+    }
+
+    const { data: memberships, error: membershipError } = await getSupabaseAdmin()
+      .from("organization_memberships")
+      .select("organization_id, role, capabilities")
+      .eq("user_id", data.user.id)
+      .eq("is_active", true);
+
+    if (membershipError || !memberships || memberships.length === 0) {
+      return null;
+    }
+
+    const membership = memberships[0];
+    const capabilities = Array.isArray(membership.capabilities)
+      ? membership.capabilities.filter(
+          (value): value is RuffloCapability => typeof value === "string"
+        )
+      : [];
+
+    return {
+      userId: data.user.id,
+      email: data.user.email ?? null,
+      organizationId: membership.organization_id,
+      role: membership.role,
+      capabilities,
+    };
+  } catch (err) {
+    console.error("[AUTH] verifyAccessToken failed:", err);
+    return null;
+  }
 }

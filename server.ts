@@ -6,7 +6,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { createServer as createViteServer } from "vite";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { requireAuth } from "./server/security/auth.middleware.ts";
+import { requireAuth, verifyAccessToken, requireCapability } from "./server/security/auth.middleware.ts";
 import { taskRingEngine } from "./server/spider/task-ring.ts";
 
 // Routes & Controllers
@@ -107,27 +107,28 @@ app.get(["/auth/callback/instagram", "/auth/callback/linkedin", "/auth/callback/
 });
 
 // Mount Modular API Routers
-app.use("/api/github", githubRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/cse-ml", cseMlRouter);
-app.use("/api/engineering", engineeringAdvancedRouter);
-app.use("/api/knowledge", knowledgeRouter);
+app.use("/api/github", requireCapability("repository:read"), githubRouter);
+app.use("/api/admin", requireCapability("system:admin"), adminRouter);
+app.use("/api/v2", requireCapability("task:run"), cseMlRouter);
+app.use("/api/v2", requireCapability("task:run"), engineeringAdvancedRouter);
+app.use("/api/knowledge", requireCapability("system:read"), knowledgeRouter);
 
 // Root /api scoped domain routers
+app.use("/api/evolution", requireCapability("system:admin"), evolutionRouter);
+app.use("/api/repository", requireCapability("repository:write"), repositoryRouter);
+app.use("/api/supabase", requireCapability("system:admin"), supabaseRouter);
+
 app.use("/api", agentExecutionRouter);
 app.use("/api", systemTelemetryRouter);
 app.use("/api", hqRouter);
 app.use("/api", webExplorerRouter);
 app.use("/api", enterpriseControlRouter);
 app.use("/api", autonomyRouter);
-app.use("/api/evolution", evolutionRouter);
-app.use("/api/repository", repositoryRouter);
-app.use("/api/supabase", supabaseRouter);
 app.use("/api", objectivesRouter);
 app.use("/api", orchestratorRouter);
 
 // Intelligent Engineering Department Endpoint
-app.post("/api/objectives/engineering", async (req, res) => {
+app.post("/api/objectives/engineering", requireCapability("task:run"), async (req, res) => {
   try {
     const result = await engineering.runFullAutonomousLifecycle(req.body);
     res.json(result);
@@ -140,7 +141,7 @@ app.post("/api/objectives/engineering", async (req, res) => {
 });
 
 // Full 10-Agent Engineering Department Routes
-app.use("/api/department", departmentRoutes);
+app.use("/api/department", requireCapability("system:read"), departmentRoutes);
 
 // Master Meta-Agent Observability & Self-Improvement Endpoints
 app.get("/api/meta/observe", async (_req, res) => {
@@ -189,11 +190,34 @@ async function startServer() {
   const server = http.createServer(app);
   const wss = new WebSocketServer({ noServer: true });
 
-  server.on("upgrade", (request, socket, head) => {
+  server.on("upgrade", async (request, socket, head) => {
     const host = request.headers.host || "localhost:3000";
-    const pathname = request.url ? new URL(request.url, `http://${host}`).pathname : "";
+    const urlObj = request.url ? new URL(request.url, `http://${host}`) : null;
+    const pathname = urlObj ? urlObj.pathname : "";
+    const token = urlObj ? urlObj.searchParams.get("token") : null;
 
     if (pathname === "/ws/department" || pathname === "/ws/spider") {
+      // In production, we require token-based authentication and authorization
+      if (process.env.NODE_ENV === "production" || process.env.RUFFLO_DEV_AUTH !== "true") {
+        if (!token) {
+          socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+          socket.destroy();
+          return;
+        }
+        const identity = await verifyAccessToken(token);
+        if (!identity) {
+          socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+          socket.destroy();
+          return;
+        }
+        if (!identity.capabilities.includes("system:read")) {
+          socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+          socket.destroy();
+          return;
+        }
+        (request as any).identity = identity;
+      }
+
       wss.handleUpgrade(request, socket, head, (ws) => {
         wss.emit("connection", ws, request);
       });

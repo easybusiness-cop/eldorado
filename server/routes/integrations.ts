@@ -17,7 +17,20 @@ integrationRouter.get('/status', async (req, res) => {
 });
 
 integrationRouter.post('/tool/execute', async (req, res) => {
-  const result = await toolGateway.execute(req.body);
+  const organizationId = (req as any).identity?.organizationId;
+  if (!organizationId) {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'UNAUTHORIZED_TENANT', message: 'Authentication / Organization tenant ID is required.' }
+    });
+  }
+
+  const payload = {
+    ...req.body,
+    organizationId,
+  };
+
+  const result = await toolGateway.execute(payload);
   if (!result.success) {
     return res.status(400).json(result);
   }

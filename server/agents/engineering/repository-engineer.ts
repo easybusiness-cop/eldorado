@@ -1,13 +1,12 @@
-import { ToolGateway } from '../../tool.gateway.ts';
+import { toolGateway } from '../../tools/gateway.ts';
 import { Eldorado } from '../../eldorado/eldorado.ts';
 import { tracingSDK } from '../../observability/tracing.ts';
 
 export class RepositoryEngineer {
-  private toolGateway: ToolGateway;
+  private toolGateway = toolGateway;
   private eldora: Eldorado;
 
   constructor() {
-    this.toolGateway = new ToolGateway();
     this.eldora = new Eldorado();
   }
 

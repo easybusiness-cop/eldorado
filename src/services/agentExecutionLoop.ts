@@ -49,6 +49,7 @@ export interface IngestTaskParams {
   description: string;
   assignedTo: string; // Employee ID
   priority?: "low" | "medium" | "high" | "critical";
+  organizationId?: string;
   userProfile?: {
     username?: string;
     displayName?: string;
@@ -205,7 +206,7 @@ export class AgentExecutionLoopService {
     }
 
     // C: Build standard task object
-    const taskObj: DBTask = {
+    const taskObj: DBTask & { organizationId?: string } = {
       id: taskId,
       projectId: params.projectId,
       missionId: params.missionId,
@@ -215,6 +216,7 @@ export class AgentExecutionLoopService {
       status: "queued",
       progress: 0,
       priority,
+      organizationId: params.organizationId,
       subtasks: [
         { id: `${taskId}-sub-1`, title: "Security and authority check", completed: false, assignedTo: params.assignedTo },
         { id: `${taskId}-sub-2`, title: "Context synthesis & LLM execution", completed: false, assignedTo: params.assignedTo },

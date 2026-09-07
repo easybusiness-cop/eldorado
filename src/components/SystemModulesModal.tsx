@@ -381,7 +381,7 @@ return applyCustomEnhancement(system);`
                     <div className="flex items-center gap-1.5">
                       <span className="text-[#a89984] font-bold text-[10px] uppercase">Sandbox Isolation:</span>
                       <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-mono">
-                        ⚙️ Ephemeral MicroVM Container
+                        ⚙️ Restricted Node.js Process (Not OS Container)
                       </span>
                     </div>
                   </div>

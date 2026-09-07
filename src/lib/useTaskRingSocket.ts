@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { getSupabaseAccessToken } from '../utils/workspaceAuth';
 
 export interface TaskRingItem {
   id: string;
@@ -58,15 +59,16 @@ export function useTaskRingSocket() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(async () => {
     if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
       return;
     }
 
     try {
+      const token = await getSupabaseAccessToken();
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const host = window.location.host;
-      const wsUrl = `${protocol}//${host}/ws/department`;
+      const wsUrl = `${protocol}//${host}/ws/department${token ? `?token=${encodeURIComponent(token)}` : ''}`;
 
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;

@@ -25,20 +25,79 @@ export function runInIsolatedProcess(
   const serializedContext = JSON.stringify(context || {});
 
   // JavaScript wrapper payload sent to Node subprocess
-  const workerScript = `const fs = require('fs');
+  const workerScript = `const path = require('path');
+const originalRequire = module.constructor.prototype.require;
+
+const workspaceRoot = process.cwd();
+function enforceWorkspaceBoundary(filePath) {
+  if (!filePath) return;
+  let strPath = "";
+  if (typeof filePath === 'string') {
+    strPath = filePath;
+  } else if (filePath instanceof URL) {
+    strPath = filePath.pathname;
+  } else if (typeof filePath.toString === 'function') {
+    strPath = filePath.toString();
+  } else {
+    return;
+  }
+
+  const resolvedPath = path.resolve(strPath);
+  if (!resolvedPath.startsWith(workspaceRoot)) {
+    throw new Error("Access denied: File path escapes the secure workspace boundary: " + resolvedPath);
+  }
+
+  const baseName = path.basename(resolvedPath);
+  if (['.env', 'package-lock.json', 'firestore.rules', 'firebase-blueprint.json'].includes(baseName) || resolvedPath.includes('.git') || resolvedPath.includes('node_modules')) {
+    throw new Error("Access denied: Reading or writing sensitive configuration or artifact is strictly forbidden inside sandbox.");
+  }
+}
+
+function createFsProxy(originalFs) {
+  return new Proxy(originalFs, {
+    get(target, prop) {
+      const originalVal = target[prop];
+      if (typeof originalVal === 'function') {
+        return function(...args) {
+          if (args[0]) {
+            enforceWorkspaceBoundary(args[0]);
+          }
+          return originalVal.apply(target, args);
+        };
+      }
+      return originalVal;
+    }
+  });
+}
 
 // Intercept module require to block network/file access modules
-const originalRequire = module.constructor.prototype.require;
 module.constructor.prototype.require = function(id) {
-  if (['http', 'https', 'net', 'dgram', 'dns', 'child_process', 'fs', 'fs/promises', 'tls', 'cluster'].includes(id)) {
-    throw new Error("Access denied: Module '" + id + "' is blocked within the Restricted Node Worker.");
+  if (['http', 'https', 'net', 'dgram', 'dns', 'child_process', 'tls', 'cluster'].includes(id)) {
+    throw new Error("Access denied: Module '" + id + "' is blocked within the Restricted Node Worker (Network/Process isolation).");
   }
+  
+  if (id === 'fs' || id === 'node:fs') {
+    const originalFs = originalRequire.apply(this, [id]);
+    return createFsProxy(originalFs);
+  }
+
+  if (id === 'fs/promises' || id === 'node:fs/promises') {
+    const originalFsPromises = originalRequire.apply(this, [id]);
+    return createFsProxy(originalFsPromises);
+  }
+
   return originalRequire.apply(this, arguments);
 };
 
-// Intercept global fetch and other network helpers
+// Intercept global fetch and other network helpers to enforce actual network isolation
 const blockMessage = "Access denied: Host network access is blocked within the Restricted Node Worker.";
 globalThis.fetch = () => Promise.reject(new Error(blockMessage));
+
+if (globalThis.XMLHttpRequest) {
+  globalThis.XMLHttpRequest = function() {
+    throw new Error(blockMessage);
+  };
+}
 
 // Block host process control operations
 const blockFn = () => { throw new Error("Access denied: Process operations are restricted in this sandbox."); };

@@ -37,6 +37,12 @@ export const handleSandboxedCodeExecution = async (req: express.Request, res: ex
       return res.status(400).json({ error: "Code is required" });
     }
 
+    const organizationId = (req as any).identity?.organizationId || "org-default";
+    const secureContext = {
+      ...context,
+      organizationId,
+    };
+
     // 1. Dwight Schrute Zero-Trust Security Audit
     const forbiddenPatterns = [
       { pattern: /process\.exit/i, desc: "Attempted process termination" },
@@ -51,6 +57,7 @@ export const handleSandboxedCodeExecution = async (req: express.Request, res: ex
       auditedBy: "Dwight Schrute (Security Sentinel)",
       violations: violations.map((v) => v.desc),
       riskLevel: violations.length > 0 ? "CRITICAL" : "LOW",
+      isolationBoundary: "Restricted Node Worker Process (Not OS-level Container/VM)",
     };
 
     if (violations.length > 0) {
@@ -69,7 +76,7 @@ export const handleSandboxedCodeExecution = async (req: express.Request, res: ex
     }
 
     // 2. Ephemeral Container / MicroVM Worker Sandbox Execution
-    const execution = runInIsolatedProcess(code, context);
+    const execution = runInIsolatedProcess(code, secureContext);
     const consoleLogs = execution.logs;
     const result = execution.output;
     const executionTimeMs = Date.now() - startTime;
@@ -676,6 +683,14 @@ agentExecutionRouter.post("/agent/execute-loop", async (req, res) => {
       userProfile = {},
     } = req.body;
 
+    const organizationId = (req as any).identity?.organizationId;
+    if (!organizationId) {
+      return res.status(401).json({
+        success: false,
+        error: "Authenticated organization is required.",
+      });
+    }
+
     if (!projectId || !assignedTo || !title || !description) {
       return res.status(400).json({
         success: false,
@@ -698,6 +713,7 @@ agentExecutionRouter.post("/agent/execute-loop", async (req, res) => {
       priority,
       missionId,
       userProfile,
+      organizationId,
     });
 
     if (executionResult.success) {
