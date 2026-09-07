@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Rufflo Self-Healer Daemon",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "self-healer"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Run Full Fleet",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Lint & Fix",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "lint"],
+      "group": {
+        "kind": "build"
+      }
+    },
+    {
+      "label": "Risk Engine Check",
+      "type": "shell",
+      "command": "npx",
+      "args": ["tsx", "risk-engine/risk.rules.ts"],
+      "group": {
+        "kind": "test"
+      }
+    }
+  ]
+}

@@ -15,6 +15,10 @@ import {
   Lock,
   Play,
   RotateCcw,
+  Box,
+  Server,
+  Wrench,
+  X,
 } from 'lucide-react';
 import { useTaskRingSocket } from '../lib/useTaskRingSocket';
 
@@ -54,6 +58,23 @@ export function EngineeringDepartmentPanel() {
   const [selectedAgent, setSelectedAgent] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [quickTaskInput, setQuickTaskInput] = useState('');
+  const [showToolchainModal, setShowToolchainModal] = useState(false);
+  const [toolchainLoading, setToolchainLoading] = useState(false);
+  const [toolchainData, setToolchainData] = useState<any>(null);
+
+  const handleOpenToolchain = async () => {
+    setShowToolchainModal(true);
+    setToolchainLoading(true);
+    try {
+      const res = await fetch('/api/department/tools/status');
+      const data = await res.json();
+      setToolchainData(data);
+    } catch (e) {
+      console.error('Failed to load toolchain data', e);
+    } finally {
+      setToolchainLoading(false);
+    }
+  };
 
   // Run full department with synchronous report back
   const handleRunFullDepartment = async () => {
@@ -398,6 +419,28 @@ export function EngineeringDepartmentPanel() {
           >
             <RotateCcw className="w-3.5 h-3.5" />
             STABILIZE THREADS
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenToolchain}
+            style={{
+              background: '#282828',
+              color: '#83a598',
+              border: '1px solid rgba(131,165,152,0.4)',
+              padding: '6px 12px',
+              borderRadius: 6,
+              fontWeight: 700,
+              fontSize: 11,
+              fontFamily: 'monospace',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Wrench className="w-3.5 h-3.5 text-[#83a598]" />
+            DEV TOOLCHAIN & DOCKER
           </button>
         </div>
       </div>
@@ -913,6 +956,160 @@ export function EngineeringDepartmentPanel() {
           </div>
         </div>
       </div>
+
+      {/* Dev Toolchain & Docker Modal */}
+      {showToolchainModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.75)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#1d2021',
+              border: '1px solid #504945',
+              borderRadius: 16,
+              maxWidth: 680,
+              width: '100%',
+              padding: 24,
+              boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Wrench className="w-5 h-5 text-[#83a598]" />
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: '#fbf1c7', margin: 0 }}>
+                  Engineering Toolchain & Containerized Simulation
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowToolchainModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#a89984',
+                  cursor: 'pointer',
+                  padding: 4,
+                }}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {toolchainLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}>
+                <Loader2 className="w-6 h-6 animate-spin text-[#83a598]" />
+                <span style={{ fontSize: 13, color: '#ebdbb2', fontFamily: 'monospace' }}>
+                  Auditing connected developer toolchains & sandboxes...
+                </span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div style={{ background: '#282828', padding: 14, borderRadius: 10, border: '1px solid #3c3836' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#83a598', fontWeight: 700, fontSize: 13 }}>
+                      <Box className="w-4 h-4" />
+                      Docker Simulation Engine
+                    </div>
+                    <div style={{ fontSize: 11, color: '#b8bb26', marginTop: 6, fontFamily: 'monospace' }}>
+                      Status: {toolchainData?.environments?.docker?.status?.toUpperCase() || 'ACTIVE'}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#a89984', marginTop: 2 }}>
+                      Isolation: {toolchainData?.environments?.docker?.isolation || 'Sandboxed Cgroups'}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#928374', marginTop: 4 }}>
+                      Extension: ms-azuretools.vscode-docker
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#282828', padding: 14, borderRadius: 10, border: '1px solid #3c3836' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#fabd2f', fontWeight: 700, fontSize: 13 }}>
+                      <Server className="w-4 h-4" />
+                      Local Live Server Bridge
+                    </div>
+                    <div style={{ fontSize: 11, color: '#b8bb26', marginTop: 6, fontFamily: 'monospace' }}>
+                      Status: {toolchainData?.environments?.liveServer?.status?.toUpperCase() || 'BRIDGED-VITE'}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#a89984', marginTop: 2 }}>
+                      Target Port: {toolchainData?.environments?.liveServer?.port || 5173}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#928374', marginTop: 4 }}>
+                      Extension: ritwickdey.liveserver
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ background: '#282828', padding: 14, borderRadius: 10, border: '1px solid #3c3836' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#ebdbb2', marginBottom: 8, fontFamily: 'monospace' }}>
+                    ACTIVE VS CODE EXTENSIONS & TOOLS ({toolchainData?.installedExtensions?.length || 11}):
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {(toolchainData?.installedExtensions || [
+                      'ms-azuretools.vscode-docker',
+                      'ritwickdey.liveserver',
+                      'esbenp.prettier-vscode',
+                      'dbaeumer.vscode-eslint',
+                      'tailwindcss.vscode-tailwindcss',
+                      'usernamehw.errorlens',
+                      'humao.rest-client',
+                      'mikestead.dotenv',
+                      'eamodio.gitlens',
+                      'ms-vsliveshare.vsliveshare',
+                      'ms-vscode-remote.remote-containers',
+                    ]).map((ext: string) => (
+                      <span
+                        key={ext}
+                        style={{
+                          background: '#1d2021',
+                          border: '1px solid #504945',
+                          borderRadius: 6,
+                          padding: '4px 8px',
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                          color: ext.includes('docker') || ext.includes('liveserver') ? '#fabd2f' : '#ebdbb2',
+                        }}
+                      >
+                        ✓ {ext}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowToolchainModal(false)}
+                    style={{
+                      background: '#3c3836',
+                      color: '#fbf1c7',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

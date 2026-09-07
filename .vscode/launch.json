@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Rufflo Fleet Debug (Server)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.ts",
+      "args": ["--inspect=0.0.0.0:9229"],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    },
+    {
+      "name": "Rufflo Fleet Debug (Frontend)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src"
+    },
+    {
+      "name": "Attach to WebSocket Fleet",
+      "type": "node",
+      "request": "attach",
+      "port": 9229
+    }
+  ]
+}

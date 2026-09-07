@@ -1,5 +1,6 @@
 import express from 'express';
 import { EngineeringDepartmentEngineer } from '../agents/engineering/engineering-department-engineer.ts';
+import { infrastructureEngineer } from '../agents/engineering/infrastructure-engineer.ts';
 import { MasterMetaAgent } from '../agents/orchestration/master-meta-agent.ts';
 import { tracingSDK } from '../observability/tracing.ts';
 import { taskRingEngine } from '../spider/task-ring.ts';
@@ -7,6 +8,39 @@ import { taskRingEngine } from '../spider/task-ring.ts';
 const router = express.Router();
 const departmentEngineer = new EngineeringDepartmentEngineer();
 const masterMeta = new MasterMetaAgent();
+
+router.get('/tools/status', async (_req, res) => {
+  try {
+    const dockerInfo = await infrastructureEngineer.verifyDockerSandbox();
+    const liveServerInfo = await infrastructureEngineer.inspectLiveServerBridge();
+    res.json({
+      success: true,
+      department: 'Engineering',
+      installedExtensions: [
+        'ms-azuretools.vscode-docker',
+        'ritwickdey.liveserver',
+        'esbenp.prettier-vscode',
+        'dbaeumer.vscode-eslint',
+        'tailwindcss.vscode-tailwindcss',
+        'usernamehw.errorlens',
+        'humao.rest-client',
+        'mikestead.dotenv',
+        'eamodio.gitlens',
+        'ms-vsliveshare.vsliveshare',
+        'ms-vscode-remote.remote-containers',
+      ],
+      environments: {
+        docker: dockerInfo,
+        liveServer: liveServerInfo,
+        restClient: { enabled: true, specFile: '.api.http' },
+        snippets: { enabled: true, file: '.vscode/agent.code-snippets' },
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'Toolchain verification failed' });
+  }
+});
 
 router.get('/status', async (_req, res) => {
   const span = tracingSDK.trace.getTracer('rufflo').startSpan('department.status');

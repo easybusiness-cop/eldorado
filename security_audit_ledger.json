@@ -1,5 +1,58 @@
 [
   {
+    "eventId": "evt-1788780766916-sv7ktd",
+    "timestamp": "2026-09-07T11:32:46.916Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
+    "eventId": "evt-1788780389263-qdbdvv",
+    "timestamp": "2026-09-07T11:26:29.263Z",
+    "actor": "Ruflo IDE Editor",
+    "tenant": "munderdiffl-default-tenant",
+    "action": "SYSTEM_CODE_EXECUTION",
+    "resource": "system_runtime",
+    "policyDecision": "deny",
+    "riskScore": 100,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Clearance Policy Violation: Role 'Ruflo IDE Editor' does not possess capability 'SYSTEM_CODE_EXECUTION' for resource 'system_runtime'."
+    ],
+    "isolationLevel": "NONE",
+    "networkIsolated": false,
+    "credentialsStripped": false
+  },
+  {
+    "eventId": "evt-1788775891146-2xy2il",
+    "timestamp": "2026-09-07T10:11:31.146Z",
+    "actor": "admin",
+    "tenant": "munderdiffl-default-tenant",
+    "action": "SYSTEM_CODE_EXECUTION",
+    "resource": "system_runtime",
+    "policyDecision": "allow",
+    "riskScore": 50,
+    "riskLevel": "HIGH",
+    "findings": [
+      "Subprocess spawning or execution tokens identified."
+    ],
+    "isolationLevel": "EPHEMERAL_CONTAINER_MICROVM",
+    "networkIsolated": true,
+    "credentialsStripped": true,
+    "durationMs": 124
+  },
+  {
     "eventId": "evt-1788774801171-2xqus2",
     "timestamp": "2026-09-07T09:53:21.171Z",
     "actor": "anonymous-intruder",

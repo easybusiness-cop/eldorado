@@ -1,0 +1,35 @@
+{
+  "Mastra Tool Definition": {
+    "prefix": "mastratool",
+    "body": [
+      "export const ${1:toolName}Tool: MastraToolDefinition = {",
+      "  name: '${1:toolName}',",
+      "  description: '${2:Tool description}',",
+      "  category: '${3|system,database,security,ai,web|}',",
+      "  requiresAuth: true,",
+      "  requiredPermission: '${4:system:read}',",
+      "  execute: async (params, context) => {",
+      "    return {",
+      "      success: true,",
+      "      timestamp: new Date().toISOString(),",
+      "      data: params",
+      "    };",
+      "  }",
+      "};"
+    ],
+    "description": "Scaffold a new Mastra Agent Tool definition"
+  },
+  "Express API Route": {
+    "prefix": "expressroute",
+    "body": [
+      "router.get('/${1:path}', requireCapability('${2:system:read}'), async (req, res) => {",
+      "  try {",
+      "    res.json({ success: true });",
+      "  } catch (err: any) {",
+      "    res.status(500).json({ error: err.message });",
+      "  }",
+      "});"
+    ],
+    "description": "Scaffold a secured Express API route"
+  }
+}

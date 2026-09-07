@@ -1,0 +1,50 @@
+{
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 3000,
+
+  // TypeScript (your main language)
+  "typescript.preferences.quoteStyle": "double",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.jsxQuoteStyle": "double",
+
+  // ESLint + Prettier (enforces your project rules)
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // React + Tailwind (your frontend)
+  "react.enableDeveloperTools": true,
+  "tailwindCSS.enableHover": true,
+  "tailwindCSS.classAttributes": ["className", "class", "classList"],
+
+  // Vite dev server (your backend/frontend bridge)
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.port": 5173,
+
+  // Debug + WebSocket testing
+  "debug.javascript.autoAttach": "on",
+  "debug.console.fontSize": 14,
+
+  // AI-friendly (perfect for your agents)
+  "editor.fontSize": 15,
+  "editor.fontFamily": "Fira Code, Consolas, 'Droid Sans Mono', 'Courier New', monospace",
+  "editor.renderWhitespace": "selection",
+  "files.exclude": {
+    "**/.rufflo-memory/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.env*": true
+  },
+  "files.watcherExclude": {
+    "**/.rufflo-memory/**": true,
+    "**/node_modules/**": true
+  },
+
+  // Agent-friendly (so Ruflo can edit this safely)
+  "files.writable": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "terminal.integrated.fontFamily": "Fira Code",
+  "terminal.integrated.fontSize": 14
+}

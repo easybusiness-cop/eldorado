@@ -1,0 +1,37 @@
+### 1. System Health Check
+GET http://localhost:3000/api/health
+Content-Type: application/json
+
+### 2. Company Telemetry & Metrics
+GET http://localhost:3000/api/system-telemetry
+Content-Type: application/json
+
+### 3. Department Status & Hierarchy
+GET http://localhost:3000/api/department
+Content-Type: application/json
+
+### 3b. Engineering Department Toolchain & Environment Status
+GET http://localhost:3000/api/department/tools/status
+Content-Type: application/json
+
+### 4. Master Meta-Agent Observability
+GET http://localhost:3000/api/meta/observe
+Content-Type: application/json
+
+### 5. Knowledge Graph Summary
+GET http://localhost:3000/api/knowledge/graph
+Content-Type: application/json
+
+### 6. List Autonomous Objectives
+GET http://localhost:3000/api/objectives
+Content-Type: application/json
+
+### 7. Trigger Autonomous Engineering Objective
+POST http://localhost:3000/api/objectives/engineering
+Content-Type: application/json
+
+{
+  "goal": "Verify environment configuration and system health",
+  "priority": "normal",
+  "maxRecoveryAttempts": 2
+}

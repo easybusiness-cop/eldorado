@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "tailwindcss.vscode-tailwindcss",
+    "usernamehw.errorlens",
+    "humao.rest-client",
+    "mikestead.dotenv",
+    "eamodio.gitlens",
+    "ms-vsliveshare.vsliveshare",
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-complete-tag",
+    "ms-vscode-remote.remote-containers",
+    "ms-azuretools.vscode-docker",
+    "ritwickdey.liveserver"
+  ],
+  "unwantedRecommendations": [
+    "GitHub.copilot",
+    "GitHub.copilot-chat"
+  ]
+}
