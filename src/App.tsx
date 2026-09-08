@@ -20,6 +20,8 @@ import { TopNavigation } from './components/TopNavigation';
 import { CommandCenter } from './components/CommandCenter';
 import { FleetHealthMonitor, getAgentThroughputTier, formatTokenThroughput } from './components/FleetHealthMonitor';
 import { ModalManager, ModalManagerState } from './components/ModalManager';
+import { CascadeRunData } from './components/ExecutiveSummaryModal';
+import { generateExecutiveSummaryMarkdown } from './utils/markdownGenerator';
 import { DepartmentHubView } from './components/DepartmentHubView';
 import { MunderdifflinDashboard } from './components/MunderdifflinDashboard';
 import { RuffloIntelligenceChatbot } from './components/RuffloIntelligenceChatbot';
@@ -147,13 +149,22 @@ export default function App() {
     isCompanyDbOpen: false,
     isAnalyticsOpen: false,
     isWorkspaceOpen: false,
+    isN8nOpen: false,
+    isTelegramOpen: false,
     isPublicApiOpen: false,
     isSocialPluginOpen: false,
     isDeploymentPipelineOpen: false,
     isMunderdifflinDashboardOpen: false,
     isDynamicKbOpen: false,
     isSupabaseDiagnosticOpen: false,
+    isExecutiveSummaryOpen: false,
+    isPredictiveLoadBalancerOpen: false,
+    isCrashalystOpen: false,
+    isGrokbotOpen: false,
   });
+
+  const [executiveSummaryRun, setExecutiveSummaryRun] = useState<CascadeRunData | null>(null);
+  const [executiveSummaryMarkdown, setExecutiveSummaryMarkdown] = useState<string>('');
 
   const openModal = (key: keyof ModalManagerState) => {
     setModalState((prev) => ({ ...prev, [key]: true }));
@@ -183,12 +194,18 @@ export default function App() {
       isCompanyDbOpen: false,
       isAnalyticsOpen: false,
       isWorkspaceOpen: false,
+      isN8nOpen: false,
+      isTelegramOpen: false,
       isPublicApiOpen: false,
       isSocialPluginOpen: false,
       isDeploymentPipelineOpen: false,
       isMunderdifflinDashboardOpen: false,
       isDynamicKbOpen: false,
       isSupabaseDiagnosticOpen: false,
+      isExecutiveSummaryOpen: false,
+      isPredictiveLoadBalancerOpen: false,
+      isCrashalystOpen: false,
+      isGrokbotOpen: false,
     });
   };
 
@@ -731,6 +748,15 @@ export default function App() {
             },
           ]);
 
+          // Automatically generate executive summary report in Markdown format and open modal window
+          const summaryMarkdown = generateExecutiveSummaryMarkdown(run);
+          setExecutiveSummaryRun(run);
+          setExecutiveSummaryMarkdown(summaryMarkdown);
+          setModalState((prev) => ({
+            ...prev,
+            isExecutiveSummaryOpen: true,
+          }));
+
           return;
         }
       } catch (cascadeErr) {
@@ -775,6 +801,21 @@ export default function App() {
       };
 
       setLogs((prev) => prev.some(l => l.id === agentLog.id) ? prev : [...prev, agentLog]);
+
+      // Auto-sync agent response & log to Telegram if agent has Telegram sync enabled
+      if (selectedAgent.telegramSyncEnabled) {
+        const chatId = selectedAgent.telegramChannelId || '-1001928374650';
+        fetch('/api/telegram/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatId,
+            text: `🤖 [AUTO-SYNC LOG] ${selectedAgent.name}: ${replyText}`,
+            senderName: `${selectedAgent.name} (Agent)`,
+            agentId: selectedAgent.id,
+          }),
+        }).catch((tErr) => console.warn('Telegram auto-sync failed:', tErr));
+      }
 
       // If code was generated, auto-apply to system codes and notify
       if (data.codeSnippet) {
@@ -1042,6 +1083,11 @@ export default function App() {
         onOpenAcademy={() => { closeAllModals(); openModal('isAcademyOpen'); }}
         onOpenMasterEvolution={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}
         onOpenWorkspace={() => { closeAllModals(); openModal('isWorkspaceOpen'); }}
+        onOpenN8n={() => { closeAllModals(); openModal('isN8nOpen'); }}
+        onOpenTelegram={() => { closeAllModals(); openModal('isTelegramOpen'); }}
+        onOpenPredictiveLoadBalancer={() => { closeAllModals(); openModal('isPredictiveLoadBalancerOpen'); }}
+        onOpenCrashalyst={() => { closeAllModals(); openModal('isCrashalystOpen'); }}
+        onOpenGrokbot={() => { closeAllModals(); openModal('isGrokbotOpen'); }}
         onOpenPublicApiHub={() => { closeAllModals(); openModal('isPublicApiOpen'); }}
         onOpenMunderdifflinDashboard={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); openModal('isMunderdifflinDashboardOpen'); }}
         onOpenAgentCommunication={() => { closeAllModals(); setDashboardInitialTab('communication'); openModal('isMunderdifflinDashboardOpen'); }}
@@ -1112,19 +1158,54 @@ export default function App() {
             </button>
           </div>
 
-          <div className="sidebar-section">
+          <div className="sidebar-section relative">
             <div className="section-label">ORGANIZATION</div>
-            {departmentsList.map(([name, symbol, color, deptKey]) => (
-              <button
-                key={name}
-                className={`nav-item department ${activeDepartment === name ? "active" : ""}`}
-                onClick={() => { closeAllModals(); setActiveDepartment(name); }}
-              >
-                <span className="department-icon" style={{ color, borderColor: `${color}55`, background: `${color}12` }}>{symbol}</span>
-                <span>{name}</span>
-                <span className="department-count">{agents.filter((a) => a.department === deptKey).length}</span>
-              </button>
-            ))}
+            {departmentsList.map(([name, symbol, color, deptKey]) => {
+              const isActive = activeDepartment === name;
+              return (
+                <button
+                  key={name}
+                  id={`sidebar-dept-${deptKey}`}
+                  className={`nav-item department relative transition-colors duration-200 ${isActive ? "active font-semibold text-white" : "hover:text-[#f5f5f4]"}`}
+                  onClick={() => { closeAllModals(); setActiveDepartment(name); }}
+                  style={{
+                    color: isActive ? color : undefined,
+                  }}
+                >
+                  {/* Smooth active background pill */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-department-bg"
+                      className="absolute inset-0 rounded-lg pointer-events-none"
+                      style={{
+                        background: `${color}14`,
+                        borderColor: `${color}35`,
+                        borderWidth: 1,
+                        borderStyle: 'solid',
+                      }}
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+
+                  <span className="department-icon relative z-10 transition-transform duration-200" style={{ color, borderColor: `${color}55`, background: `${color}12` }}>{symbol}</span>
+                  <span className="relative z-10">{name}</span>
+                  <span className="department-count relative z-10" style={{ color: isActive ? color : undefined }}>{agents.filter((a) => a.department === deptKey).length}</span>
+
+                  {/* Animated active state underline */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-department-underline"
+                      className="absolute bottom-0 left-2 right-2 h-[2.5px] rounded-full pointer-events-none"
+                      style={{
+                        backgroundColor: color,
+                        boxShadow: `0 0 10px ${color}aa`,
+                      }}
+                      transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           <div className="sidebar-section">
@@ -1168,6 +1249,14 @@ export default function App() {
             <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}>
               <Icon>⚡</Icon>
               <span className="text-[#38bdf8] font-bold">Supabase Sync</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isN8nOpen'); }}>
+              <Icon>⚡</Icon>
+              <span className="text-[#ff6d5a] font-bold">n8n Workflows</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isTelegramOpen'); }}>
+              <Icon>✈</Icon>
+              <span className="text-[#24a1de] font-bold">Telegram Hub</span>
             </button>
             <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSystemModulesOpen'); }}>
               <Icon>⚡</Icon>
@@ -1620,6 +1709,8 @@ export default function App() {
         autoApplyToast={autoApplyToast}
         onDismissToast={() => setAutoApplyToast(null)}
         initialDashboardTab={dashboardInitialTab}
+        executiveSummaryRun={executiveSummaryRun}
+        executiveSummaryMarkdown={executiveSummaryMarkdown}
       />
     </div>
   );

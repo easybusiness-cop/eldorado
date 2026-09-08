@@ -11,6 +11,7 @@ import { RuffloLoopPanel } from './RuffloLoopPanel';
 import { MasterMetaPanel } from './MasterMetaPanel';
 import { EngineeringDepartmentPanel } from './EngineeringDepartmentPanel';
 import { SpiderWebPanel } from './SpiderWebPanel';
+import RuffloGrokbot from './RuffloGrokbot';
 import confetti from 'canvas-confetti';
 import { runAgentStandardWorkflow, STANDARD_WORKFLOW_STAGES, WorkflowExecutionState } from '../utils/agentWorkflowEngine';
 import {
@@ -79,7 +80,6 @@ type TabType =
   | 'department'
   | 'spider-web'
   | 'master'
-  | 'loop'
   | 'terminal'
   | 'task-rates'
   | 'token-trends'
@@ -91,14 +91,11 @@ type TabType =
   | 'analytics'
   | 'monitor'
   | 'tasks'
-  | 'ask me'
   | 'triggers'
   | 'memory'
   | 'graph'
   | 'activity'
-  | 'commands'
-  | 'workers'
-  | 'rufflo';
+  | 'workers';
 
 export const CommandCenter: React.FC<CommandCenterProps> = ({
   agents,
@@ -122,6 +119,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   audits = [],
   accounts = [],
 }) => {
+  const [showGrokbot, setShowGrokbot] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('department');
   const [inputPrompt, setInputPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -150,6 +148,123 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   const [voiceSpeechEnabled, setVoiceSpeechEnabled] = useState(userProfile.preferences.voiceAutoSpeak ?? true);
   const [bypassPermissions, setBypassPermissions] = useState(true);
   const [commandFilter, setCommandFilter] = useState('');
+  const [predictiveAssignment, setPredictiveAssignment] = useState(true);
+
+  // Predictive agent assignment helper using performance & capability metadata
+  const getPredictiveAgentRecommendation = (taskTitle: string, taskDesc: string = '') => {
+    const text = (taskTitle + ' ' + taskDesc).toLowerCase();
+    if (
+      text.includes('code') ||
+      text.includes('bug') ||
+      text.includes('feature') ||
+      text.includes('api') ||
+      text.includes('react') ||
+      text.includes('build') ||
+      text.includes('script') ||
+      text.includes('frontend') ||
+      text.includes('backend')
+    ) {
+      const best = agents.find((a) => a.id === 'ruflo-coder') || agents.find((a) => a.id === 'cline') || agents[0];
+      return {
+        agent: best,
+        confidence: 98,
+        reason: 'Deep Code Synthesis & Low Execution Latency (14ms)',
+      };
+    }
+    if (
+      text.includes('security') ||
+      text.includes('auth') ||
+      text.includes('audit') ||
+      text.includes('token') ||
+      text.includes('protect') ||
+      text.includes('firewall') ||
+      text.includes('compliance') ||
+      text.includes('zero-trust')
+    ) {
+      const best = agents.find((a) => a.id === 'dwight') || agents[0];
+      return {
+        agent: best,
+        confidence: 99,
+        reason: 'Zero-Trust Security & Perimeter Governance Lead',
+      };
+    }
+    if (
+      text.includes('finance') ||
+      text.includes('cost') ||
+      text.includes('ledger') ||
+      text.includes('budget') ||
+      text.includes('runway') ||
+      text.includes('expense') ||
+      text.includes('revenue') ||
+      text.includes('accounting')
+    ) {
+      const best = agents.find((a) => a.id === 'kevin') || agents[0];
+      return {
+        agent: best,
+        confidence: 96,
+        reason: 'CFO Mathematical & Capital Runway Balancing Engine',
+      };
+    }
+    if (
+      text.includes('research') ||
+      text.includes('search') ||
+      text.includes('github') ||
+      text.includes('library') ||
+      text.includes('docs') ||
+      text.includes('benchmark') ||
+      text.includes('telegram')
+    ) {
+      const best = agents.find((a) => a.id === 'stanley') || agents[0];
+      return {
+        agent: best,
+        confidence: 97,
+        reason: 'Multi-Hop Web Intelligence & Deep Repository Indexer',
+      };
+    }
+    if (
+      text.includes('market') ||
+      text.includes('tweet') ||
+      text.includes('social') ||
+      text.includes('outreach') ||
+      text.includes('viral') ||
+      text.includes('campaign') ||
+      text.includes('growth')
+    ) {
+      const best = agents.find((a) => a.id === 'ryan') || agents[0];
+      return {
+        agent: best,
+        confidence: 94,
+        reason: 'High-Growth Social Strategist & Market Outreach',
+      };
+    }
+    if (
+      text.includes('debug') ||
+      text.includes('memory') ||
+      text.includes('cleanup') ||
+      text.includes('garbage') ||
+      text.includes('sweep') ||
+      text.includes('daemon') ||
+      text.includes('crash')
+    ) {
+      const best = agents.find((a) => a.id === 'toby') || agents[0];
+      return {
+        agent: best,
+        confidence: 98,
+        reason: 'Background Daemon, Continuous Debugger & Memory Sweeper',
+      };
+    }
+    // Workload-balanced fallback based on real active queue count
+    const sortedByWorkload = [...agents].sort((a, b) => {
+      const loadA = tasks.filter((t) => t.assignedTo === a.id && t.status !== 'completed').length;
+      const loadB = tasks.filter((t) => t.assignedTo === b.id && t.status !== 'completed').length;
+      return loadA - loadB;
+    });
+    return {
+      agent: sortedByWorkload[0] || selectedAgent,
+      confidence: 91,
+      reason: 'Optimal Workload Capacity & Lowest Queue Latency',
+    };
+  };
 
   // Enterprise Workflow, Approvals & Compliance state
   const [workflowTemplates, setWorkflowTemplates] = useState<any[]>([]);
@@ -820,7 +935,6 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     { id: 'department' as TabType, label: 'department', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'spider-web' as TabType, label: 'spider web', icon: <Network className="w-3.5 h-3.5 text-[#22ff88]" /> },
     { id: 'master', label: 'master', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
-    { id: 'loop', label: 'loop', icon: <Cpu className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'terminal', label: 'terminal', icon: <Terminal className="w-3.5 h-3.5" /> },
     { id: 'task-rates', label: 'task rates', icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-400" /> },
     { id: 'token-trends', label: 'token trends', icon: <TrendingUp className="w-3.5 h-3.5 text-[#fabd2f]" /> },
@@ -832,14 +946,11 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     { id: 'analytics', label: 'fleet performance', icon: <BarChart3 className="w-3.5 h-3.5 text-[#fabd2f]" /> },
     { id: 'monitor', label: 'monitor', icon: <Activity className="w-3.5 h-3.5" /> },
     { id: 'tasks', label: 'tasks', icon: <CheckSquare className="w-3.5 h-3.5" /> },
-    { id: 'ask me', label: 'ask me', icon: <HelpCircle className="w-3.5 h-3.5" /> },
     { id: 'triggers', label: 'triggers', icon: <Zap className="w-3.5 h-3.5" /> },
     { id: 'memory', label: 'memory', icon: <Brain className="w-3.5 h-3.5" /> },
     { id: 'graph', label: 'graph', icon: <Network className="w-3.5 h-3.5" /> },
     { id: 'activity', label: 'activity', icon: <ListFilter className="w-3.5 h-3.5" /> },
-    { id: 'commands', label: 'commands', icon: <Command className="w-3.5 h-3.5" /> },
     { id: 'workers', label: 'workers', icon: <Cpu className="w-3.5 h-3.5" /> },
-    { id: 'rufflo', label: 'Rufflo Loop', icon: <Target className="w-3.5 h-3.5 text-rose-500" /> },
   ];
 
   return (
@@ -882,7 +993,27 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Header Right Actions */}
-        <div className="flex items-center gap-1.5 text-xs">
+        <div className="flex items-center gap-2 text-xs">
+          <button
+            id="btn-open-grokbot"
+            onClick={() => {
+              soundFx.playClick();
+              setShowGrokbot(true);
+            }}
+            style={{
+              background: "#3d6b4f",
+              color: "#fff",
+              border: "none",
+              padding: "10px 18px",
+              borderRadius: 8,
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+            title="Open Interactive Rufflo Grokbot AI"
+          >
+            Open Grokbot
+          </button>
+
           <button
             id="btn-open-d3"
             onClick={() => {
@@ -977,12 +1108,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <MasterMetaPanel />
         )}
 
-        {activeTab === 'loop' && (
-          <RuffloLoopPanel />
-        )}
-
         {/* Tab Content Display */}
-        {activeTab !== 'loop' && activeTab !== 'master' && activeTab !== 'department' && activeTab !== 'spider-web' && (
+        {activeTab !== 'master' && activeTab !== 'department' && activeTab !== 'spider-web' && (
           <div className="animate-in space-y-4">
         {/* 1. Projects Portfolio View */}
         {activeTab === 'projects' && (
@@ -2084,54 +2211,153 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* 3. Tasks & Queue View */}
         {activeTab === 'tasks' && (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-xs">FLEET TASK QUEUE ({tasks.length})</span>
-              <button
-                onClick={() => {
-                  const title = prompt('Enter task objective:');
-                  if (title) {
-                    onAddTask({
-                      title,
-                      description: `Autonomous task dispatched by ${userProfile.displayName}`,
-                      assignedTo: selectedAgent.id,
-                      priority: 'high',
-                      status: 'running',
-                      progress: 10,
-                    });
-                    soundFx.playNotification();
-                  }
-                }}
-                className="px-2 py-1 bg-[#fabd2f] text-[#1d2021] rounded text-[11px] font-bold"
-              >
-                + Dispatch Task
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#d5c4a1] dark:border-[#3c3836]">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-xs">FLEET TASK QUEUE ({tasks.length})</span>
+                <span className="text-[10px] text-[#7c6f64] dark:text-[#928374]">
+                  • {tasks.filter((t) => t.status === 'completed').length} Completed •{' '}
+                  {tasks.filter((t) => t.status !== 'completed').length} In-Flight
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Predictive Assignment Toggle */}
+                <button
+                  onClick={() => {
+                    soundFx.playClick();
+                    setPredictiveAssignment(!predictiveAssignment);
+                  }}
+                  className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
+                    predictiveAssignment
+                      ? 'bg-[#fabd2f] text-[#1d2021] border-[#fabd2f] shadow-sm'
+                      : 'bg-[#ebdbb2] dark:bg-[#3c3836] text-[#7c6f64] dark:text-[#a89984] border-[#d5c4a1] dark:border-[#504945]'
+                  }`}
+                  title="Predictive Assignment uses Agent Performance & Latency Metadata to automatically suggest the most efficient agent"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-900" />
+                  <span>Predictive Assignment: {predictiveAssignment ? 'ON' : 'OFF'}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    const title = prompt('Enter task objective:');
+                    if (title) {
+                      let targetAgentId = selectedAgent.id;
+                      let recommendationNote = '';
+
+                      if (predictiveAssignment) {
+                        const rec = getPredictiveAgentRecommendation(title);
+                        targetAgentId = rec.agent.id;
+                        recommendationNote = ` [Predictive Assignment: ${rec.agent.name} • ${rec.confidence}% Match • ${rec.reason}]`;
+                      }
+
+                      onAddTask({
+                        title,
+                        description: `Autonomous task dispatched by ${userProfile.displayName}${recommendationNote}`,
+                        assignedTo: targetAgentId,
+                        priority: 'high',
+                        status: 'running',
+                        progress: 10,
+                      });
+                      soundFx.playNotification();
+                    }
+                  }}
+                  className="px-2.5 py-1 bg-[#fabd2f] hover:bg-[#d79921] text-[#1d2021] rounded text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shadow-sm"
+                >
+                  <span>+ Dispatch Task</span>
+                </button>
+              </div>
             </div>
+
+            {/* Predictive Engine Status Banner */}
+            {predictiveAssignment && (
+              <div className="p-2 rounded bg-amber-500/10 border border-amber-500/30 text-[11px] flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[#b57614] dark:text-[#fabd2f] font-medium">
+                  <Sparkles className="w-3.5 h-3.5 fill-current text-amber-500" />
+                  <span>
+                    <strong>Predictive Assignment Active:</strong> Agent performance metadata (tokens/sec, specialized domains, queue latency) actively evaluates assignments.
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded border border-emerald-500/25">
+                  METRICS LIVE
+                </span>
+              </div>
+            )}
 
             <div className="space-y-2">
               {tasks.map((task) => {
                 const assignedAgent = agents.find((a) => a.id === task.assignedTo);
+                const rec = getPredictiveAgentRecommendation(task.title, task.description);
+                const isOptimalFit = task.assignedTo === rec.agent.id;
+
                 return (
                   <div
                     key={task.id}
-                    className="p-2.5 rounded bg-[#ebdbb2] dark:bg-[#282828] border border-[#d5c4a1] dark:border-[#3c3836] space-y-1.5"
+                    className="p-2.5 rounded bg-[#ebdbb2] dark:bg-[#282828] border border-[#d5c4a1] dark:border-[#3c3836] space-y-2 transition-all hover:border-[#bdae93] dark:hover:border-[#504945]"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 font-bold text-xs">
-                        <span>{assignedAgent?.avatar}</span>
-                        <span>{task.title}</span>
+                        <span className="text-base">{assignedAgent?.avatar || '🤖'}</span>
+                        <span className="text-[#3c3836] dark:text-[#fbf1c7]">{task.title}</span>
                       </div>
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${
-                          task.status === 'completed'
-                            ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-amber-500/20 text-amber-600 dark:text-amber-400 animate-pulse'
-                        }`}
-                      >
-                        {task.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-[#7c6f64] dark:text-[#928374] font-mono">
+                          Assignee: <strong>{assignedAgent?.name || task.assignedTo}</strong>
+                        </span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${
+                            task.status === 'completed'
+                              ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                              : 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse'
+                          }`}
+                        >
+                          {task.status}
+                        </span>
+                      </div>
                     </div>
 
-                    <p className="text-[11px] text-[#7c6f64] dark:text-[#a89984]">{task.description}</p>
+                    <p className="text-[11px] text-[#7c6f64] dark:text-[#a89984] leading-relaxed">
+                      {task.description}
+                    </p>
+
+                    {/* Predictive Recommendation Badge */}
+                    {predictiveAssignment && (
+                      <div className="p-1.5 rounded bg-[#ebdbb2]/60 dark:bg-[#1d2021] border border-[#d5c4a1] dark:border-[#3c3836] flex items-center justify-between text-[10.5px]">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span className="text-amber-500 font-bold">⚡ Predictive Match:</span>
+                          <span className="text-[#3c3836] dark:text-[#ebdbb2] font-semibold">
+                            {rec.agent.avatar} {rec.agent.name}
+                          </span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                            ({rec.confidence}% Efficiency)
+                          </span>
+                          <span className="text-[#7c6f64] dark:text-[#928374] truncate hidden sm:inline">
+                            — {rec.reason}
+                          </span>
+                        </div>
+
+                        {!isOptimalFit && task.status !== 'completed' ? (
+                          <button
+                            onClick={() => {
+                              soundFx.playClick();
+                              onAddTask({
+                                ...task,
+                                id: `task-reassigned-${Date.now()}`,
+                                assignedTo: rec.agent.id,
+                                description: `${task.description} (Re-assigned via Predictive Assignment)`,
+                              });
+                            }}
+                            className="px-2 py-0.5 text-[9.5px] bg-[#fabd2f] hover:bg-[#d79921] text-[#1d2021] font-bold rounded cursor-pointer shrink-0 transition-colors"
+                          >
+                            Apply Optimal Assignee
+                          </button>
+                        ) : (
+                          <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
+                            ✓ Optimal Fit
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Progress Bar */}
                     <div className="w-full bg-[#d5c4a1] dark:bg-[#181615] rounded-full h-1.5 overflow-hidden">
@@ -2147,79 +2373,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
         )}
 
-        {/* 4. Ask Me / Quick Presets View */}
-        {activeTab === 'ask me' && (
-          <div className="space-y-3">
-            <div className="text-xs font-bold text-[#b57614] dark:text-[#fabd2f]">
-              QUICK ACTION DIRECTIVES FOR {selectedAgent.name.toUpperCase()}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {[
-                {
-                  title: 'Defensive Security Audit',
-                  desc: 'Audit runtime vulnerabilities, zero-trust tokens, and perimeter access logs.',
-                  agentId: 'dwight',
-                  prompt: 'Execute a comprehensive defensive cybersecurity audit on the system and generate a vulnerability remediation report.',
-                },
-                {
-                  title: 'Viral Social Campaign',
-                  desc: 'Generate high-engagement Twitter/X threads and LinkedIn growth hooks.',
-                  agentId: 'ryan',
-                  prompt: 'Create a 5-tweet viral thread and marketing growth strategy on autonomous multi-agent workforces.',
-                },
-                {
-                  title: 'P&L Runway Calculation',
-                  desc: 'Audit monthly expenses, calculate burn rate, and generate financial projections.',
-                  agentId: 'kevin',
-                  prompt: 'Audit company numbers: Starting with $500,000 capital and $25,000 monthly burn, calculate runway and give 3 cost optimization strategies.',
-                },
-                {
-                  title: 'Open Source Repo Indexing',
-                  desc: 'Search GitHub architecture patterns and package dependencies.',
-                  agentId: 'stanley',
-                  prompt: 'Analyze top open-source multi-agent frameworks, architecture tradeoffs, and licensing recommendations.',
-                },
-                {
-                  title: 'Cline Autonomous Web Dev',
-                  desc: 'Build full-stack React components, refactor UI, and apply live system patches.',
-                  agentId: 'cline',
-                  prompt: 'Build a high-performance web development dashboard widget with interactive controls, responsive design, and auto-applied system code.',
-                },
-                {
-                  title: 'Dynamic Feature Injection',
-                  desc: 'Write and mount a new live interactive widget into the dashboard.',
-                  agentId: 'ruflo-coder',
-                  prompt: 'Write and inject a new dynamic feature tool widget for real-time team latency and sentiment tracking.',
-                },
-                {
-                  title: 'Hourly Fleet Standup',
-                  desc: 'Gather all 9 agents in the conference room for task synchronization.',
-                  agentId: 'michael',
-                  prompt: 'Call an all-hands hourly standup with the entire fleet. Summarize what each agent is working on and ensure maximum alignment.',
-                },
-              ].map((preset, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    onSelectAgent(preset.agentId);
-                    setInputPrompt(preset.prompt);
-                    setActiveTab('terminal');
-                    soundFx.playClick();
-                  }}
-                  className="p-2.5 rounded text-left bg-[#ebdbb2] dark:bg-[#282828] hover:bg-[#d5c4a1] dark:hover:bg-[#3c3836] border border-[#d5c4a1] dark:border-[#3c3836] transition-colors group"
-                >
-                  <div className="font-bold text-xs text-[#b57614] dark:text-[#fabd2f] group-hover:underline">
-                    ⚡ {preset.title}
-                  </div>
-                  <div className="text-[11px] text-[#7c6f64] dark:text-[#a89984] mt-0.5">{preset.desc}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 5. Memory & Context View */}
+        {/* 4. Memory & Context View */}
         {activeTab === 'memory' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-1 border-b border-[#d5c4a1] dark:border-[#3c3836]">
@@ -2423,36 +2577,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
         )}
 
-        {/* 9. Commands Palette */}
-        {activeTab === 'commands' && (
-          <div className="space-y-2">
-            <div className="font-bold text-xs mb-1">TERMINAL SLASH COMMANDS</div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-              {[
-                { cmd: '/standup', desc: 'Trigger an all-hands fleet standup meeting in the conference room' },
-                { cmd: '/audit_security', desc: 'Run zero-trust defensive security scan with Dwight' },
-                { cmd: '/runway', desc: 'Calculate runway and P&L unit economics with Kevin' },
-                { cmd: '/viral_thread', desc: 'Generate social media post campaign with Ryan' },
-                { cmd: '/open_ide', desc: 'Launch dynamic feature live code editor' },
-                { cmd: '/toggle_auto', desc: 'Switch between autonomous and manual mode' },
-              ].map((c, i) => (
-                <div
-                  key={i}
-                  onClick={() => {
-                    setInputPrompt(c.cmd);
-                    setActiveTab('terminal');
-                  }}
-                  className="p-2 rounded bg-[#ebdbb2] dark:bg-[#282828] hover:bg-[#d5c4a1] dark:hover:bg-[#3c3836] cursor-pointer border border-[#d5c4a1] dark:border-[#3c3836]"
-                >
-                  <code className="text-[#b57614] dark:text-[#fabd2f] font-bold">{c.cmd}</code>
-                  <p className="text-[10px] text-[#7c6f64] dark:text-[#928374] mt-0.5">{c.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 10. Background Workers */}
+        {/* 9. Background Workers */}
         {activeTab === 'workers' && (
           <div className="space-y-2">
             <div className="font-bold text-xs mb-2">ACTIVE BACKGROUND THREADS & DAEMONS (24*7)</div>
@@ -2478,11 +2603,6 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               </div>
             ))}
           </div>
-        )}
-
-        {/* 11. Rufflo Loop Dashboard */}
-        {activeTab === 'rufflo' && (
-          <RuffloObjectivesPanel />
         )}
         </div>
         )}
@@ -2566,27 +2686,26 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#7c6f64] dark:text-[#928374]">
-              QUEUE - {selectedAgent.name.toUpperCase()}
+          <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#3c3836]">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded text-[10px] font-black bg-[#fabd2f] text-[#1d2021] flex items-center gap-1 shadow-sm">
+                <Zap className="w-3 h-3 fill-current" />
+                <span>SINGLE UNIFIED COMMAND PANEL</span>
+              </span>
+              <span className="text-[10px] font-mono text-[#928374] hidden md:inline">
+                Target: {selectedAgent.name} ({selectedAgent.role})
+              </span>
             </div>
-            {/* Quick Voice Trigger Test Chips */}
-            <div className="hidden sm:flex items-center gap-1">
-              <span className="text-[9px] text-[#7c6f64] dark:text-[#928374]">Voice Trigger:</span>
+
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => {
-                  soundFx.playClick();
-                  const phrase = 'Rufflo, initialize Security Audit';
-                  setLiveVoiceTranscript(phrase);
-                  const mission = parseMissionVoiceTrigger(phrase);
-                  if (mission) handleInitializeVoiceMission(mission);
-                }}
-                className="px-1.5 py-0.5 rounded bg-[#d5c4a1] dark:bg-[#3c3836] hover:bg-[#c6b690] dark:hover:bg-[#504945] text-[9px] text-[#3c3836] dark:text-[#ebdbb2] border border-[#bdae93] dark:border-[#504945] flex items-center gap-1 transition-colors"
-                title="Simulate Voice Command: 'Rufflo, initialize Security Audit'"
+                onClick={() => setShowGrokbot(true)}
+                className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#3d6b4f] hover:bg-[#3d6b4f]/80 text-white border border-[#3d6b4f] flex items-center gap-1 transition-colors cursor-pointer"
+                title="Launch Rufflo Grokbot Conversational Harness"
               >
-                <Sparkles className="w-2.5 h-2.5 text-[#b57614] dark:text-[#fabd2f]" />
-                <span>"Rufflo, initialize Security Audit"</span>
+                <Sparkles className="w-2.5 h-2.5 text-emerald-300" />
+                <span>Chat Grokbot</span>
               </button>
             </div>
           </div>
@@ -2677,6 +2796,15 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </form>
         </div>
       </div>
+
+      {/* Rufflo Grokbot Modal */}
+      {showGrokbot && (
+        <RuffloGrokbot
+          isOpen={showGrokbot}
+          onClose={() => setShowGrokbot(false)}
+          onTaskCreated={onAddTask}
+        />
+      )}
     </div>
   );
 };

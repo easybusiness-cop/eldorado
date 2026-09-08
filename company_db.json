@@ -6813,6 +6813,45 @@
   ],
   "audits": [
     {
+      "id": "aud-evt-1788790562630-596",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-07T14:16:02.630Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788790562630"
+    },
+    {
+      "id": "aud-evt-1788790562181-329",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-07T14:16:02.181Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788790562181"
+    },
+    {
+      "id": "aud-evt-1788790562173-317",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-07T14:16:02.173Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788790562173"
+    },
+    {
       "id": "aud-gw-1788781821709",
       "agentId": "pete",
       "projectId": "prj-alpha",

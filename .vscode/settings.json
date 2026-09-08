@@ -1,16 +1,36 @@
 {
   "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 3000,
+  "files.autoSaveDelay": 1000,
 
   // TypeScript (your main language)
-  "typescript.preferences.quoteStyle": "double",
+  "typescript.preferences.quoteStyle": "single",
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.preferences.jsxQuoteStyle": "double",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
 
-  // ESLint + Prettier (enforces your project rules)
+  // Code Actions & Formatting (seamless auto-format on save)
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
@@ -18,31 +38,43 @@
   "react.enableDeveloperTools": true,
   "tailwindCSS.enableHover": true,
   "tailwindCSS.classAttributes": ["className", "class", "classList"],
-
-  // Vite dev server (your backend/frontend bridge)
-  "liveServer.settings.donotShowInfoMsg": true,
-  "liveServer.settings.port": 5173,
+  "tailwindCSS.experimental.classRegex": [
+    "cva\\(([^)]*)\\)",
+    "[\"'`]([^\"'`]*[\"'`])"
+  ],
 
   // Debug + WebSocket testing
   "debug.javascript.autoAttach": "on",
   "debug.console.fontSize": 14,
 
-  // AI-friendly (perfect for your agents)
-  "editor.fontSize": 15,
+  // AI-friendly Workspace (optimized search/watch exclusions for remote tunnels)
+  "editor.fontSize": 14,
   "editor.fontFamily": "Fira Code, Consolas, 'Droid Sans Mono', 'Courier New', monospace",
   "editor.renderWhitespace": "selection",
   "files.exclude": {
     "**/.rufflo-memory/**": true,
     "**/node_modules/**": true,
     "**/dist/**": true,
-    "**/.env*": true
+    "**/build/**": true,
+    "**/.env*": false,
+    "**/.git/**": true,
+    "**/.cache/**": true
   },
   "files.watcherExclude": {
     "**/.rufflo-memory/**": true,
-    "**/node_modules/**": true
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.git/**": true
+  },
+  "search.exclude": {
+    "**/.rufflo-memory/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true
   },
 
-  // Agent-friendly (so Ruflo can edit this safely)
+  // Agent-friendly & Security Settings
   "files.writable": true,
   "security.workspace.trust.untrustedFiles": "open",
   "terminal.integrated.fontFamily": "Fira Code",

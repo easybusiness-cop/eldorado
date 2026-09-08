@@ -5,6 +5,7 @@ import { employeeFactory, DynamicVirtualEmployee } from "./employee.factory.ts";
 import { roleRegistry, RoleCategory, RoleDefinition } from "./role.registry.ts";
 import { capabilityRegistry, CapabilityCategory } from "./capability.registry.ts";
 import { capabilityEngine } from "../../../core/capabilities/capability.engine.ts";
+import { predictiveLoadBalancer } from "./predictive-load-balancer.ts";
 
 export interface WorkforceTask {
   id: string;
@@ -164,12 +165,33 @@ export class WorkforceManager {
     const departmentMatch = Boolean(requestedDept && agentDept === requestedDept);
     const departmentBonus = departmentMatch ? 0.1 : 0;
 
+    // Temporal Peak Window Efficiency check from Predictive Load Balancer
+    const currentHour = new Date().getHours();
+    const config = predictiveLoadBalancer.getConfig();
+    let temporalPeakBonus = 0.05;
+    try {
+      const pred = predictiveLoadBalancer.predictOptimalAgent({
+        taskTitle: requiredCapabilities.join(" "),
+        taskDescription: preferredDepartment || "",
+        requiredCapabilities,
+        preferredDepartment,
+      });
+      if (pred.recommendedAgentId === agentId) {
+        temporalPeakBonus = 0.15;
+      } else if (pred.isCurrentWindowPeak) {
+        temporalPeakBonus = 0.10;
+      }
+    } catch {
+      // Fallback baseline
+    }
+
     // Composite Score calculation:
-    // 50% Capability Coverage + 25% Empirical Proficiency + 15% Workload Availability + 10% Dept Alignment
+    // 40% Capability Coverage + 20% Empirical Proficiency + 15% Workload Availability + 15% Temporal Peak Window + 10% Dept Alignment
     const rawComposite =
-      coverageRatio * 0.5 +
-      proficiencyScore * 0.25 +
+      coverageRatio * 0.40 +
+      proficiencyScore * 0.20 +
       workloadFactor * 0.15 +
+      temporalPeakBonus +
       departmentBonus;
 
     const compositeScore = Math.min(Math.max(rawComposite, 0), 1.0);

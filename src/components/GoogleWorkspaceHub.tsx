@@ -50,6 +50,7 @@ import { GoogleChatTab } from './workspace/GoogleChatTab';
 import { GoogleSheetsTab } from './workspace/GoogleSheetsTab';
 import { GoogleClassroomTab } from './workspace/GoogleClassroomTab';
 import { GmailTab } from './workspace/GmailTab';
+import { GoogleTasksTab } from './workspace/GoogleTasksTab';
 import { CreateFormModal } from './workspace/CreateFormModal';
 
 interface GoogleWorkspaceHubProps {
@@ -61,7 +62,7 @@ export function GoogleWorkspaceHub({ isOpen, onClose }: GoogleWorkspaceHubProps)
   const [user, setUser] = useState<WorkspaceUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'chat' | 'sheets' | 'classroom' | 'gmail' | 'forms' | 'slides' | 'meet' | 'calendar' | 'docs'
+    'chat' | 'sheets' | 'classroom' | 'gmail' | 'forms' | 'slides' | 'meet' | 'calendar' | 'docs' | 'tasks'
   >('chat');
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
@@ -532,6 +533,20 @@ export function GoogleWorkspaceHub({ isOpen, onClose }: GoogleWorkspaceHubProps)
               Core Google Workspace
             </div>
 
+            {/* Google Tasks */}
+            <button
+              id="tab-btn-tasks"
+              onClick={() => setActiveTab('tasks')}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'tasks'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
+                  : 'hover:bg-[#282828] text-[#ebdbb2] border border-transparent'
+              }`}
+            >
+              <ClipboardList className="w-4 h-4 text-amber-400" />
+              <span>Google Tasks</span>
+            </button>
+
             {/* Google Chat */}
             <button
               id="tab-btn-chat"
@@ -675,6 +690,16 @@ export function GoogleWorkspaceHub({ isOpen, onClose }: GoogleWorkspaceHubProps)
 
           {/* Active Tab Panel */}
           <div className="flex-1 flex flex-col bg-[#121110] overflow-hidden">
+            {activeTab === 'tasks' && (
+              <div className="p-6 overflow-y-auto">
+                <GoogleTasksTab
+                  token={token}
+                  statusMsg={statusMsg}
+                  setStatusMsg={setStatusMsg}
+                />
+              </div>
+            )}
+
             {activeTab === 'chat' && (
               <GoogleChatTab
                 token={token}

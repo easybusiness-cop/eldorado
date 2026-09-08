@@ -296,6 +296,9 @@ export interface AgentConfiguration {
   maxConcurrentTasks: number;
   notificationLevel: 'minimal' | 'normal' | 'high';
   appearanceLocked: boolean;
+  telegramSyncEnabled?: boolean;
+  telegramChannelId?: string;
+  telegramChannelName?: string;
 }
 
 export interface AgentBrainPipeline {
@@ -404,6 +407,9 @@ export interface Agent {
   voicePitch: number;
   voiceRate: number;
   tokensProcessed: number;
+  telegramSyncEnabled?: boolean;
+  telegramChannelId?: string;
+  telegramChannelName?: string;
   gender?: AgentGender;
   skinTone?: string;
   hairStyle?: string;

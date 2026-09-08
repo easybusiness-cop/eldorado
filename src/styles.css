@@ -296,6 +296,12 @@ kbd {
   font-weight: 600;
 }
 
+.nav-item.department.active {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
 .icon {
   width: 18px;
   display: inline-grid;

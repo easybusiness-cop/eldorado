@@ -7,6 +7,8 @@
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
+    "tunnel": "bash ./scripts/setup-vs-code-tunnel.sh && ./bin/code tunnel",
+    "postinstall": "bash ./scripts/verify-env.sh",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "self-healer": "tsx scripts/test-objective.ts",

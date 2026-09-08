@@ -6,6 +6,9 @@ import { soundFx } from '../utils/speech';
 import { AgentCommunicationThreads } from './AgentCommunicationThreads';
 import { AgentSkillMatrix } from './AgentSkillMatrix';
 import { AgentSops } from './AgentSops';
+import { DepartmentTaskBarChart } from './widgets/DepartmentTaskBarChart.tsx';
+import { FirebaseCrashalystHub } from './FirebaseCrashalystHub.tsx';
+import { Flame, Sparkles, BrainCircuit, Zap, CheckCircle2 } from 'lucide-react';
 
 interface MunderdifflinDashboardProps {
   agents: Agent[];
@@ -392,6 +395,65 @@ export const MunderdifflinDashboard: React.FC<MunderdifflinDashboardProps> = ({
   const [customPrompt, setCustomPrompt] = useState('');
   const [customPriority, setCustomPriority] = useState<'low' | 'medium' | 'high' | 'critical'>('high');
   const [customCategory, setCustomCategory] = useState<KnowledgeCategory>('hacking');
+
+  // Predictive Assignment state & Firebase Crashalyst state
+  const [isPredictiveAssignmentEnabled, setIsPredictiveAssignmentEnabled] = useState<boolean>(true);
+  const [isCrashalystOpen, setIsCrashalystOpen] = useState<boolean>(false);
+
+  // Predictive Assignment Scoring Engine
+  const predictiveRecommendation = useMemo(() => {
+    if (!agents || agents.length === 0) return null;
+
+    const scores = agents.map((agent) => {
+      let categoryMatch = 40;
+      const cat = customCategory.toLowerCase();
+      const role = (agent.role || '').toLowerCase();
+      const name = (agent.name || '').toLowerCase();
+
+      if (cat === 'coding' && (role.includes('code') || role.includes('dev') || name.includes('pam') || role.includes('tech'))) {
+        categoryMatch = 95;
+      } else if (cat === 'hacking' && (role.includes('hack') || role.includes('security') || name.includes('dwight'))) {
+        categoryMatch = 98;
+      } else if (cat === 'finance' && (role.includes('finance') || role.includes('account') || name.includes('angela') || name.includes('oscar'))) {
+        categoryMatch = 92;
+      } else if (cat === 'marketing' && (role.includes('market') || role.includes('sales') || name.includes('jim') || name.includes('creed'))) {
+        categoryMatch = 88;
+      } else if (cat === 'social_media' && (role.includes('social') || role.includes('media') || name.includes('ryan') || name.includes('kelly'))) {
+        categoryMatch = 90;
+      }
+
+      const completedCount = tasks.filter((t) => t.assignedTo === agent.id && (t.status === 'completed' || t.progress === 100)).length;
+      const throughputPoints = Math.min((agent.tokensProcessed || 1000) / 1000, 30) + (completedCount * 12);
+      const availabilityPoints = agent.status === 'idle' ? 35 : 10;
+      const authorityPoints = (agent.authorityLevel || 5) * 4;
+
+      const totalScore = categoryMatch + throughputPoints + availabilityPoints + authorityPoints;
+
+      return {
+        agent,
+        totalScore,
+        categoryMatch,
+        completedCount,
+        matchPercentage: Math.min(Math.round(totalScore / 2.2), 99),
+        reason: `${agent.name} has ${completedCount} completed operations in ${agent.department || 'Branch'} with ${(agent.tokensProcessed || 14000).toLocaleString()} tokens processed (${agent.status === 'idle' ? 'Idle & Ready' : 'Active'}).`,
+      };
+    });
+
+    scores.sort((a, b) => b.totalScore - a.totalScore);
+    return scores[0];
+  }, [agents, tasks, customCategory, customTitle, customPrompt]);
+
+  // Auto-select agent when Predictive Assignment is enabled
+  useEffect(() => {
+    if (isPredictiveAssignmentEnabled && predictiveRecommendation) {
+      if (predictiveRecommendation.agent.id !== targetAgentId) {
+        setTargetAgentId(predictiveRecommendation.agent.id);
+        if (onSelectAgent) {
+          onSelectAgent(predictiveRecommendation.agent.id);
+        }
+      }
+    }
+  }, [isPredictiveAssignmentEnabled, predictiveRecommendation]);
 
   // Real-time task progress simulation & tracking
   const [activeRunningTasks, setActiveRunningTasks] = useState<Record<string, { progress: number; currentStep: string; stepIndex: number; logs: string[] }>>({});
@@ -1178,6 +1240,19 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
             </button>
           </nav>
 
+          {/* FIREBASE CRASHALYST BUTTON */}
+          <button
+            onClick={() => {
+              soundFx.playClick();
+              setIsCrashalystOpen(true);
+            }}
+            className="px-2.5 py-1.5 rounded bg-[#fb4934]/15 hover:bg-[#fb4934]/25 border border-[#fb4934]/40 text-xs font-bold text-[#fb4934] transition-colors flex items-center gap-1.5"
+            title="Open Firebase Crashalyst Exception & Stack Analysis Engine"
+          >
+            <Flame className="w-3.5 h-3.5 animate-pulse" />
+            <span className="hidden sm:inline">Crashalyst</span>
+          </button>
+
           {/* AUDIO MUTE TOGGLE */}
           <button
             onClick={() => {
@@ -1472,6 +1547,77 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                   </div>
                 </div>
 
+                {/* PREDICTIVE ASSIGNMENT TOGGLE & RECOMMENDATION ENGINE */}
+                <div className="bg-[#ebdbb2] border border-[#d5c4a1] rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#b57614]" />
+                      <span className="text-xs font-bold text-[#282828]">Predictive Assignment Engine</span>
+                      <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-[#b8bb26]/20 text-[#427b58]">
+                        Performance AI
+                      </span>
+                    </div>
+
+                    {/* Toggle Switch */}
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={isPredictiveAssignmentEnabled}
+                        onChange={(e) => {
+                          soundFx.playClick();
+                          setIsPredictiveAssignmentEnabled(e.target.checked);
+                          if (e.target.checked) {
+                            setToastMessage('✨ Predictive Assignment Engine Enabled');
+                            setTimeout(() => setToastMessage(null), 2500);
+                          }
+                        }}
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-[#d5c4a1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#b57614]"></div>
+                      <span className="ml-2 text-xs font-bold text-[#3c3836]">
+                        {isPredictiveAssignmentEnabled ? 'ACTIVE' : 'OFF'}
+                      </span>
+                    </label>
+                  </div>
+
+                  {isPredictiveAssignmentEnabled && predictiveRecommendation && (
+                    <div className="bg-[#fbf1c7] border border-[#b57614] p-2.5 rounded-lg flex items-center justify-between gap-3 animate-fade-in shadow-xs">
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white shadow-xs"
+                          style={{ backgroundColor: predictiveRecommendation.agent.color || '#b57614' }}
+                        >
+                          {predictiveRecommendation.agent.name[0]}
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-[#282828] flex items-center gap-1.5">
+                            <span>Optimal Assignee: <strong className="text-[#b57614]">{predictiveRecommendation.agent.name}</strong></span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#b8bb26]/20 text-[#427b58] font-bold">
+                              {predictiveRecommendation.matchPercentage}% Efficiency Score
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-[#665c54] mt-0.5 leading-snug">
+                            {predictiveRecommendation.reason}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTargetAgentId(predictiveRecommendation.agent.id);
+                          if (onSelectAgent) onSelectAgent(predictiveRecommendation.agent.id);
+                          setToastMessage(`✓ Auto-selected optimal agent: ${predictiveRecommendation.agent.name}`);
+                          setTimeout(() => setToastMessage(null), 2000);
+                        }}
+                        className="px-2.5 py-1 rounded bg-[#b57614] text-[#fbf1c7] text-[11px] font-bold whitespace-nowrap shadow-xs hover:bg-[#8f5d0f] cursor-pointer"
+                      >
+                        Auto-Selected
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold text-[#504945] mb-1 flex items-center justify-between">
                     <span>Task Instructions & Requirements</span>
@@ -1560,6 +1706,9 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                 <div className="text-[10px] text-[#504945] mt-1">Learned from completed operations</div>
               </div>
             </div>
+
+            {/* D3.js Department Task Breakdown Widget */}
+            <DepartmentTaskBarChart tasks={tasks} agents={agents} />
 
             {/* LIVE ACTIVE TASKS WITH REAL-TIME PROGRESS BARS */}
             <div className="bg-[#fbf1c7] border-2 border-[#bdae93] rounded-lg p-5 shadow-sm">
@@ -2511,6 +2660,12 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
           </div>
         </div>
       )}
+
+      {/* FIREBASE CRASHALYST & DIAGNOSTIC SEARCH MODAL */}
+      <FirebaseCrashalystHub
+        isOpen={isCrashalystOpen}
+        onClose={() => setIsCrashalystOpen(false)}
+      />
 
     </div>
   );

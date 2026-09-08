@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { TrendingUp, Users, Activity, CheckCircle2, AlertTriangle, RefreshCw, BarChart3, PieChart as PieIcon } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient.ts';
+import { DepartmentTaskBarChart } from './widgets/DepartmentTaskBarChart.tsx';
 
 interface ExecutiveAnalyticsModalProps {
   isOpen: boolean;
@@ -257,6 +258,11 @@ export function ExecutiveAnalyticsModal({ isOpen, onClose }: ExecutiveAnalyticsM
                   </ResponsiveContainer>
                 )}
               </div>
+            </div>
+
+            {/* Full-width D3.js Department Task Breakdown Bar Chart */}
+            <div className="pt-2">
+              <DepartmentTaskBarChart />
             </div>
 
           </div>

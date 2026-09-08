@@ -25,6 +25,9 @@ import {
   Rocket,
   Activity,
   ClipboardList,
+  Workflow,
+  Send,
+  Flame,
 } from 'lucide-react';
 
 interface TopNavigationProps {
@@ -52,6 +55,11 @@ interface TopNavigationProps {
   onOpenAgentSops?: () => void;
   onOpenDynamicKnowledgeBase?: () => void;
   onOpenSupabaseDiagnostic?: () => void;
+  onOpenN8n?: () => void;
+  onOpenTelegram?: () => void;
+  onOpenCrashalyst?: () => void;
+  onOpenPredictiveLoadBalancer?: () => void;
+  onOpenGrokbot?: () => void;
   dynamicFeatureCount: number;
   systemModulesCount: number;
   autoMode: boolean;
@@ -97,6 +105,11 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     onOpenAgentSops,
     onOpenDynamicKnowledgeBase,
     onOpenSupabaseDiagnostic,
+    onOpenN8n,
+    onOpenTelegram,
+    onOpenCrashalyst,
+    onOpenPredictiveLoadBalancer,
+    onOpenGrokbot,
     dynamicFeatureCount,
     systemModulesCount,
     autoMode,
@@ -125,6 +138,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
   };
 
   const primary: NavItem[] = [
+    {
+      id: 'grokbot',
+      label: 'Rufflo Grokbot',
+      icon: <Sparkles className="w-3.5 h-3.5 text-emerald-400" />,
+      onClick: onOpenGrokbot,
+      primary: true,
+      hidden: !onOpenGrokbot,
+    },
     {
       id: 'search',
       label: 'Search',
@@ -184,6 +205,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
       primary: true,
       hidden: !onOpenWorkspace,
     },
+    {
+      id: 'telegram',
+      label: 'Telegram',
+      icon: <Send className="w-3.5 h-3.5 text-[#24a1de]" />,
+      onClick: onOpenTelegram,
+      primary: true,
+      hidden: !onOpenTelegram,
+    },
   ].filter((i) => !i.hidden);
 
   const overflow: NavItem[] = [
@@ -195,6 +224,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     { id: 'db', label: 'Company DB', icon: <Database className="w-3.5 h-3.5" />, onClick: onOpenDb, hidden: !onOpenDb },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" />, onClick: onOpenAnalytics, hidden: !onOpenAnalytics },
     { id: 'workspace', label: 'Workspace', icon: <Layers className="w-3.5 h-3.5" />, onClick: onOpenWorkspace, hidden: !onOpenWorkspace },
+    { id: 'loadbalancer', label: 'Predictive load balancer', icon: <Zap className="w-3.5 h-3.5 text-[#fabd2f]" />, onClick: onOpenPredictiveLoadBalancer, hidden: !onOpenPredictiveLoadBalancer },
+    { id: 'crashalyst', label: 'Firebase Crashalyst', icon: <Flame className="w-3.5 h-3.5 text-[#fb4934]" />, onClick: onOpenCrashalyst, hidden: !onOpenCrashalyst },
+    { id: 'n8n', label: 'n8n Workflows', icon: <Workflow className="w-3.5 h-3.5 text-[#ff6d5a]" />, onClick: onOpenN8n, hidden: !onOpenN8n },
     { id: 'apihub', label: 'API Hub', icon: <Globe className="w-3.5 h-3.5" />, onClick: onOpenPublicApiHub, hidden: !onOpenPublicApiHub },
     { id: 'academy', label: 'Academy', icon: <Sparkles className="w-3.5 h-3.5" />, onClick: onOpenAcademy, hidden: !onOpenAcademy },
     { id: 'evolution', label: 'Master evolution', icon: <Rocket className="w-3.5 h-3.5" />, onClick: onOpenMasterEvolution, hidden: !onOpenMasterEvolution },

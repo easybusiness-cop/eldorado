@@ -95,6 +95,18 @@ const POPULAR_PUBLIC_APIS: ApiEndpoint[] = [
     url: 'https://jsonplaceholder.typicode.com/posts/1',
     method: 'GET',
     defaultParams: {}
+  },
+  {
+    id: 'n8n_inbound_webhook',
+    name: 'n8n Inbound Webhook Orchestration',
+    category: 'testing',
+    description: 'Internal gateway endpoint receiving automated node triggers from self-hosted or cloud n8n workflows.',
+    url: '/api/n8n/webhook/fleet-task',
+    method: 'POST',
+    defaultParams: {
+      action: 'ASSIGN_TASK',
+      targetAgent: 'CoreCoder'
+    }
   }
 ];
 

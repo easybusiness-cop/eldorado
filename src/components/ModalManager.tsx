@@ -31,9 +31,16 @@ import { DeploymentPipelineModal } from './DeploymentPipelineModal';
 import { MunderdifflinDashboard } from './MunderdifflinDashboard';
 import { DynamicKnowledgeBaseModal } from './DynamicKnowledgeBaseModal';
 import { SupabaseDiagnosticModal } from './SupabaseDiagnosticModal';
+import { N8nIntegrationModal } from './N8nIntegrationModal';
+import { TelegramHubModal } from './TelegramHubModal';
+import { ExecutiveSummaryModal, CascadeRunData } from './ExecutiveSummaryModal';
+import { PredictiveLoadBalancerModal } from './PredictiveLoadBalancerModal';
+import { FirebaseCrashalystHub } from './FirebaseCrashalystHub';
+import RuffloGrokbot from './RuffloGrokbot';
 import { Zap } from 'lucide-react';
 
 export interface ModalManagerState {
+  isGrokbotOpen?: boolean;
   isSearchOpen: boolean;
   isAuthOpen: boolean;
   isPreferencesOpen: boolean;
@@ -52,12 +59,17 @@ export interface ModalManagerState {
   isCompanyDbOpen: boolean;
   isAnalyticsOpen: boolean;
   isWorkspaceOpen: boolean;
+  isN8nOpen: boolean;
+  isTelegramOpen: boolean;
   isPublicApiOpen: boolean;
   isSocialPluginOpen: boolean;
   isDeploymentPipelineOpen: boolean;
   isMunderdifflinDashboardOpen: boolean;
   isDynamicKbOpen: boolean;
   isSupabaseDiagnosticOpen: boolean;
+  isExecutiveSummaryOpen: boolean;
+  isPredictiveLoadBalancerOpen: boolean;
+  isCrashalystOpen: boolean;
 }
 
 interface ModalManagerProps {
@@ -95,6 +107,8 @@ interface ModalManagerProps {
   autoApplyToast: { show: boolean; agentName: string; moduleName: string } | null;
   onDismissToast: () => void;
   initialDashboardTab?: 'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge' | 'pipelines' | 'communication' | 'skills' | 'sops';
+  executiveSummaryRun: CascadeRunData | null;
+  executiveSummaryMarkdown: string;
 }
 
 export const ModalManager: React.FC<ModalManagerProps> = ({
@@ -132,6 +146,8 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
   autoApplyToast,
   onDismissToast,
   initialDashboardTab,
+  executiveSummaryRun,
+  executiveSummaryMarkdown,
 }) => {
   return (
     <>
@@ -162,6 +178,8 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onOpenCompanyDb={() => onOpen('isCompanyDbOpen')}
         onOpenPublicApi={() => onOpen('isPublicApiOpen')}
         onOpenWebExplorer={() => onOpen('isWebOpen')}
+        onOpenN8n={() => onOpen('isN8nOpen')}
+        onOpenTelegram={() => onOpen('isTelegramOpen')}
       />
 
       <AuthModal
@@ -278,6 +296,36 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onClose={() => onClose('isWorkspaceOpen')}
       />
 
+      <N8nIntegrationModal
+        isOpen={state.isN8nOpen}
+        onClose={() => onClose('isN8nOpen')}
+        onTriggerAgentTask={(prompt) => {
+          if (onAddTask) {
+            onAddTask({
+              title: 'n8n Automation Event Task',
+              description: prompt,
+              priority: 'high',
+              status: 'pending',
+            });
+          }
+        }}
+      />
+
+      <TelegramHubModal
+        isOpen={state.isTelegramOpen}
+        onClose={() => onClose('isTelegramOpen')}
+        onTriggerAgentTask={(prompt) => {
+          if (onAddTask) {
+            onAddTask({
+              title: 'Telegram Autonomous Fleet Task',
+              description: prompt,
+              priority: 'high',
+              status: 'pending',
+            });
+          }
+        }}
+      />
+
       <PublicApiHubModal
         isOpen={state.isPublicApiOpen}
         onClose={() => onClose('isPublicApiOpen')}
@@ -318,6 +366,16 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onOpenCall={() => {
           closeAll();
           onOpen('isCallOpen');
+        }}
+        onToggleTelegramSync={(agentId, enabled, channelId) => {
+          const target = agents.find(a => a.id === agentId);
+          if (target) {
+            onUpdateAgent({
+              ...target,
+              telegramSyncEnabled: enabled,
+              telegramChannelId: channelId,
+            });
+          }
         }}
       />
 
@@ -366,6 +424,33 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       <SupabaseDiagnosticModal
         isOpen={state.isSupabaseDiagnosticOpen}
         onClose={() => onClose('isSupabaseDiagnosticOpen')}
+      />
+
+      <ExecutiveSummaryModal
+        isOpen={state.isExecutiveSummaryOpen}
+        onClose={() => onClose('isExecutiveSummaryOpen')}
+        runData={executiveSummaryRun}
+        markdownContent={executiveSummaryMarkdown}
+      />
+
+      <PredictiveLoadBalancerModal
+        isOpen={state.isPredictiveLoadBalancerOpen}
+        onClose={() => onClose('isPredictiveLoadBalancerOpen')}
+        agents={agents}
+        onAddTask={onAddTask}
+      />
+
+      <FirebaseCrashalystHub
+        isOpen={state.isCrashalystOpen}
+        onClose={() => onClose('isCrashalystOpen')}
+      />
+
+      <RuffloGrokbot
+        isOpen={!!state.isGrokbotOpen}
+        onClose={() => onClose('isGrokbotOpen')}
+        userProfile={userProfile}
+        onTaskCreated={onTaskCreated}
+        onLogCreated={onLogCreated}
       />
 
       {autoApplyToast && (

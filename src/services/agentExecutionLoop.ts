@@ -350,9 +350,11 @@ Project Description: ${project.description}
 [HISTORICAL CONTEXT SUMMARY]
 ${recentContextText || "No previous tasks recorded for this project workspace."}
 
-Provide a comprehensive execution log, detailed technical steps taken, analysis, and output results. If applicable, output any clean executable JavaScript/TypeScript block enclosed inside markdown:
+Provide a comprehensive execution log, detailed technical steps taken, analysis, and output results. If applicable, output any clean executable code block enclosed inside markdown. ALWAYS include the target file path as the very first line of the code block, as a comment. For example:
 \`\`\`typescript
-// code logic
+// src/components/NewComponent.tsx
+export const NewComponent = () => {
+// ...
 \`\`\`
       `.trim();
 
@@ -400,9 +402,30 @@ Provide a comprehensive execution log, detailed technical steps taken, analysis,
           tokensUsed = genResult?.usage?.completionTokens ? (genResult.usage.promptTokens || 0) + genResult.usage.completionTokens : Math.ceil(chars / 3.8);
           costUsed = (tokensUsed / 1000000) * 0.075;
 
-          const match = finalOutput.match(/```(?:typescript|javascript|ts|js)?\n([\s\S]*?)```/);
+          const match = finalOutput.match(/```[a-z]*\n([\s\S]*?)```/i);
           if (match) {
             codeSnippet = match[1].trim();
+            const lines = codeSnippet.split('\n');
+            let filename = '';
+            if (lines[0].startsWith('//')) {
+               filename = lines[0].replace('//', '').trim();
+            } else if (lines[0].startsWith('/*')) {
+               filename = lines[0].replace('/*', '').replace('*/', '').trim();
+            } else if (lines[0].startsWith('#')) {
+               filename = lines[0].replace('#', '').trim();
+            }
+            
+            if (!filename || filename.includes(' ') || !filename.includes('.')) {
+               filename = `generated_code_${Date.now()}.ts`;
+            }
+
+            try {
+              const fullPath = path.join(workspaceRoot, filename);
+              fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+              fs.writeFileSync(fullPath, codeSnippet);
+            } catch (e) {
+              console.error("Failed to write to VS Code workspace file", e);
+            }
           }
         } catch (genErr: any) {
           console.warn(`[Agent Execution Loop Fallback] Primary model generation note: ${genErr?.message || genErr}`);

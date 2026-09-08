@@ -26,6 +26,9 @@ import { repositoryRouter } from "./server/routes/repository.routes.ts";
 import { supabaseRouter } from "./server/routes/supabase.routes.ts";
 import { objectivesRouter } from "./server/routes/objectives.routes.ts";
 import { orchestratorRouter } from "./server/routes/orchestrator.routes.ts";
+import { n8nRouter } from "./server/routes/n8n.routes.ts";
+import { telegramRouter } from "./server/routes/telegram.routes.ts";
+import { loadBalancerRouter } from "./server/routes/load-balancer.routes.ts";
 import departmentRoutes from "./server/routes/department.routes.ts";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
@@ -128,6 +131,9 @@ app.use("/api", enterpriseControlRouter);
 app.use("/api", autonomyRouter);
 app.use("/api", objectivesRouter);
 app.use("/api", orchestratorRouter);
+app.use("/api/n8n", n8nRouter);
+app.use("/api/telegram", telegramRouter);
+app.use("/api/load-balancer", loadBalancerRouter);
 
 // Intelligent Engineering Department Endpoint
 app.post("/api/objectives/engineering", requireCapability("task:run"), async (req, res) => {

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Agent, FleetTask } from '../types';
-import { Bot, Terminal, ShieldAlert, Cpu, Globe, CheckCircle2, ChevronRight, MessageSquare, Play, Pause, Activity } from 'lucide-react';
+import { Bot, Terminal, ShieldAlert, Cpu, Globe, CheckCircle2, ChevronRight, MessageSquare, Play, Pause, Activity, Send, Radio, Check, ExternalLink, Loader2 } from 'lucide-react';
 
 interface AgentDetailDrawerProps {
   isOpen: boolean;
@@ -9,14 +9,85 @@ interface AgentDetailDrawerProps {
   tasks: FleetTask[];
   onOpenWorkstation: () => void;
   onOpenCall: () => void;
+  onToggleTelegramSync?: (agentId: string, enabled: boolean, channelId?: string) => void;
 }
 
-export function AgentDetailDrawer({ isOpen, onClose, agent, tasks, onOpenWorkstation, onOpenCall }: AgentDetailDrawerProps) {
+const TELEGRAM_CHANNELS = [
+  { id: '-1001928374650', title: '⚡ Rufflo Autonomous Fleet War Room', category: 'fleet_operations' },
+  { id: '-1002049182391', title: '🛠️ Dunder Mifflin Engineering Guild', category: 'engineering' },
+  { id: '-1003182938472', title: '🛡️ SafetyGuard & Security Overwatch', category: 'security' },
+  { id: '-1004920193821', title: '📢 Executive Dispatch & Direct Feed', category: 'executive' },
+];
+
+export function AgentDetailDrawer({ 
+  isOpen, 
+  onClose, 
+  agent, 
+  tasks, 
+  onOpenWorkstation, 
+  onOpenCall,
+  onToggleTelegramSync
+}: AgentDetailDrawerProps) {
   if (!isOpen || !agent) return null;
+
+  const [syncEnabled, setSyncEnabled] = useState<boolean>(agent.telegramSyncEnabled ?? false);
+  const [targetChannelId, setTargetChannelId] = useState<string>(agent.telegramChannelId || '-1001928374650');
+  const [testPingSending, setTestPingSending] = useState<boolean>(false);
+  const [testPingStatus, setTestPingStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (agent) {
+      setSyncEnabled(agent.telegramSyncEnabled ?? false);
+      setTargetChannelId(agent.telegramChannelId || '-1001928374650');
+    }
+  }, [agent]);
 
   const agentTasks = tasks.filter(t => t.assignedTo === agent.id);
   const activeTask = agentTasks.find(t => t.status === 'running');
   const completedTasks = agentTasks.filter(t => t.status === 'completed').length;
+
+  const handleToggleSync = (newVal: boolean) => {
+    setSyncEnabled(newVal);
+    if (onToggleTelegramSync) {
+      onToggleTelegramSync(agent.id, newVal, targetChannelId);
+    }
+  };
+
+  const handleChannelChange = (channelId: string) => {
+    setTargetChannelId(channelId);
+    if (syncEnabled && onToggleTelegramSync) {
+      onToggleTelegramSync(agent.id, true, channelId);
+    }
+  };
+
+  const handleSendTestPing = async () => {
+    setTestPingSending(true);
+    setTestPingStatus(null);
+    try {
+      const channel = TELEGRAM_CHANNELS.find(c => c.id === targetChannelId);
+      const res = await fetch('/api/telegram/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId: targetChannelId,
+          text: `⚡ [TELEGRAM SYNC VERIFIED] Agent ${agent.name} (${agent.role}) is live-linked to Telegram! System logs & interactions routed autonomously.`,
+          senderName: `${agent.name} (Agent)`,
+          agentId: agent.id
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTestPingStatus(`✓ Delivered to ${channel?.title || 'Telegram Channel'}!`);
+      } else {
+        setTestPingStatus('⚠ Failed to dispatch test ping.');
+      }
+    } catch {
+      setTestPingStatus('⚠ Dispatch connection error.');
+    } finally {
+      setTestPingSending(false);
+      setTimeout(() => setTestPingStatus(null), 4000);
+    }
+  };
 
   return (
     <>
@@ -121,6 +192,103 @@ export function AgentDetailDrawer({ isOpen, onClose, agent, tasks, onOpenWorksta
                 </div>
               ))}
             </div>
+          </section>
+
+          {/* Telegram Integration */}
+          <section className="bg-[#1a232e]/60 border border-[#24a1de]/30 rounded-xl p-4 shadow-lg space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#24a1de]/20 border border-[#24a1de]/40 flex items-center justify-center text-[#24a1de]">
+                  <Send className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    Sync to Telegram
+                    {syncEnabled && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono font-bold uppercase animate-pulse">
+                        LIVE
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#a89984] leading-tight">
+                    Route logs, reasoning & chats to a Telegram channel
+                  </p>
+                </div>
+              </div>
+
+              {/* Toggle Switch */}
+              <button
+                type="button"
+                onClick={() => handleToggleSync(!syncEnabled)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  syncEnabled ? 'bg-[#24a1de]' : 'bg-[#3c3836]'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    syncEnabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {syncEnabled ? (
+              <div className="pt-2 border-t border-[#24a1de]/20 space-y-3 font-mono text-xs">
+                <div>
+                  <label className="block text-[10px] text-[#24a1de] uppercase tracking-wider font-bold mb-1.5">
+                    Linked Telegram Channel
+                  </label>
+                  <select
+                    value={targetChannelId}
+                    onChange={(e) => handleChannelChange(e.target.value)}
+                    className="w-full bg-[#121110] border border-[#24a1de]/40 rounded-lg px-2.5 py-2 text-white text-xs focus:outline-none focus:border-[#24a1de]"
+                  >
+                    {TELEGRAM_CHANNELS.map((ch) => (
+                      <option key={ch.id} value={ch.id}>
+                        {ch.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5 text-[11px] text-[#a89984]">
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Auto-route system logs & diagnostics</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Mirror chat responses & standup dispatches</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Real-time webhook routing enabled</span>
+                  </div>
+                </div>
+
+                <div className="pt-1 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handleSendTestPing}
+                    disabled={testPingSending}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#24a1de]/20 border border-[#24a1de]/40 text-[#38bdf8] hover:bg-[#24a1de]/30 transition-colors text-xs font-bold disabled:opacity-50"
+                  >
+                    {testPingSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                    <span>{testPingSending ? 'Sending Ping...' : 'Send Test Ping'}</span>
+                  </button>
+
+                  {testPingStatus && (
+                    <span className="text-[10px] font-bold text-emerald-400 animate-in fade-in">
+                      {testPingStatus}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-[11px] text-[#7c6f64] italic">
+                Toggle ON to connect {agent.name} to Telegram for real-time channel broadcasting.
+              </div>
+            )}
           </section>
 
           {/* Memory / Stats */}
