@@ -49,7 +49,7 @@ export const QuantumWavefunctionIndicator: React.FC<QuantumWavefunctionIndicator
 
   // Current task context
   const activeTaskTitle = useMemo(() => {
-    const task = tasks.find((t) => t.agentId === activeAgent.id && t.status === 'in-progress');
+    const task = tasks.find((t) => (t.assignedTo === activeAgent.id || (t as any).agentId === activeAgent.id) && (t.status === 'running' || (t.status as string) === 'in-progress'));
     if (task) return task.title;
     return `Optimize AST Zero-Trust Validator Gate for ${activeAgent.name}`;
   }, [tasks, activeAgent]);

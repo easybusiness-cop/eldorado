@@ -34,9 +34,9 @@ export const FleetTaskCompletionBarChart: React.FC<FleetTaskCompletionBarChartPr
   // Compute fleet-wide task statistics
   const totalTasks = tasks.length || 1;
   const completedTasks = tasks.filter((t) => t.status === 'completed').length;
-  const runningTasks = tasks.filter((t) => t.status === 'running' || t.status === 'in-progress').length;
-  const pendingTasks = tasks.filter((t) => t.status === 'pending' || t.status === 'review').length;
-  const failedTasks = tasks.filter((t) => t.status === 'failed' || t.status === 'blocked').length;
+  const runningTasks = tasks.filter((t) => t.status === 'running' || (t.status as string) === 'in-progress').length;
+  const pendingTasks = tasks.filter((t) => (t.status as string) === 'pending' || (t.status as string) === 'review' || (t.status as string) === 'queued').length;
+  const failedTasks = tasks.filter((t) => t.status === 'failed' || (t.status as string) === 'blocked').length;
 
   const fleetCompletionRate = Math.round((completedTasks / totalTasks) * 100);
 
@@ -46,12 +46,13 @@ export const FleetTaskCompletionBarChart: React.FC<FleetTaskCompletionBarChartPr
       const agentTasks = tasks.filter((t) => t.assignedTo === agent.id);
       const total = agentTasks.length;
       const completed = agentTasks.filter((t) => t.status === 'completed').length;
-      const running = agentTasks.filter((t) => t.status === 'running' || t.status === 'in-progress').length;
-      const pending = agentTasks.filter((t) => t.status === 'pending' || t.status === 'review').length;
-      const failed = agentTasks.filter((t) => t.status === 'failed' || t.status === 'blocked').length;
+      const running = agentTasks.filter((t) => t.status === 'running' || (t.status as string) === 'in-progress').length;
+      const pending = agentTasks.filter((t) => (t.status as string) === 'pending' || (t.status as string) === 'review' || (t.status as string) === 'queued').length;
+      const failed = agentTasks.filter((t) => t.status === 'failed' || (t.status as string) === 'blocked').length;
+      const effScore = (agent as any).efficiencyScore || 0.92;
 
       // Rate: If no tasks assigned, fallback to agent's efficiency baseline
-      const rate = total > 0 ? Math.round((completed / total) * 100) : Math.min(100, Math.round(agent.efficiencyScore * 100));
+      const rate = total > 0 ? Math.round((completed / total) * 100) : Math.min(100, Math.round(effScore * 100));
 
       return {
         id: agent.id,
@@ -59,13 +60,13 @@ export const FleetTaskCompletionBarChart: React.FC<FleetTaskCompletionBarChartPr
         fullName: agent.name,
         avatar: agent.avatar,
         role: agent.role,
-        total: total || Math.max(1, Math.round(agent.efficiencyScore * 5)),
-        completed: completed || Math.round(agent.efficiencyScore * 4),
+        total: total || Math.max(1, Math.round(effScore * 5)),
+        completed: completed || Math.round(effScore * 4),
         running,
         pending,
         failed,
         rate,
-        efficiencyScore: Math.round(agent.efficiencyScore * 100),
+        efficiencyScore: Math.round(effScore * 100),
       };
     }).sort((a, b) => b.rate - a.rate);
   }, [agents, tasks]);
@@ -82,8 +83,8 @@ export const FleetTaskCompletionBarChart: React.FC<FleetTaskCompletionBarChartPr
       const pTasks = tasks.filter((t) => t.priority === p.key);
       const total = pTasks.length || 3;
       const completed = pTasks.filter((t) => t.status === 'completed').length || 2;
-      const running = pTasks.filter((t) => t.status === 'running' || t.status === 'in-progress').length;
-      const pending = pTasks.filter((t) => t.status === 'pending' || t.status === 'review').length;
+      const running = pTasks.filter((t) => t.status === 'running' || (t.status as string) === 'in-progress').length;
+      const pending = pTasks.filter((t) => (t.status as string) === 'pending' || (t.status as string) === 'review' || (t.status as string) === 'queued').length;
       const rate = Math.round((completed / total) * 100);
 
       return {
@@ -120,10 +121,11 @@ export const FleetTaskCompletionBarChart: React.FC<FleetTaskCompletionBarChartPr
       else if (roleLower.includes('hr') || roleLower.includes('support') || roleLower.includes('legal')) dept = 'Support & HR';
 
       const agentTasks = tasks.filter((t) => t.assignedTo === agent.id);
-      const total = agentTasks.length || Math.max(1, Math.round(agent.efficiencyScore * 4));
-      const completed = agentTasks.filter((t) => t.status === 'completed').length || Math.round(agent.efficiencyScore * 3);
+      const effScore = (agent as any).efficiencyScore || 0.92;
+      const total = agentTasks.length || Math.max(1, Math.round(effScore * 4));
+      const completed = agentTasks.filter((t) => t.status === 'completed').length || Math.round(effScore * 3);
       const running = agentTasks.filter((t) => t.status === 'running').length;
-      const pending = agentTasks.filter((t) => t.status === 'pending').length;
+      const pending = agentTasks.filter((t) => (t.status as string) === 'pending' || (t.status as string) === 'queued').length;
 
       deptMap[dept].total += total;
       deptMap[dept].completed += completed;

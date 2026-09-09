@@ -472,8 +472,9 @@ export interface FleetTask {
   priority: 'low' | 'medium' | 'high' | 'critical';
   output?: string;
   codeSnippet?: string;
-  createdAt: number;
-  completedAt?: number;
+  department?: string;
+  createdAt: number | string;
+  completedAt?: number | string;
 }
 
 export interface DynamicFeature {

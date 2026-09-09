@@ -355,7 +355,7 @@ export const DepartmentHubView: React.FC<DepartmentHubViewProps> = ({
                       className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase ${
                         task.status === 'completed'
                           ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                          : task.status === 'in_progress'
+                          : (task.status as string) === 'in_progress' || (task.status as string) === 'running'
                           ? 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse'
                           : 'bg-neutral-800 text-neutral-300'
                       }`}

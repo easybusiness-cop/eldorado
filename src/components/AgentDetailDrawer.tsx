@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Agent, FleetTask } from '../types';
-import { Bot, Terminal, ShieldAlert, Cpu, Globe, CheckCircle2, ChevronRight, MessageSquare, Play, Pause, Activity, Send, Radio, Check, ExternalLink, Loader2 } from 'lucide-react';
+import { 
+  Bot, 
+  Terminal, 
+  ShieldAlert, 
+  Cpu, 
+  Globe, 
+  CheckCircle2, 
+  ChevronRight, 
+  MessageSquare, 
+  Play, 
+  Pause, 
+  Activity, 
+  Send, 
+  Radio, 
+  Check, 
+  ExternalLink, 
+  Loader2,
+  ArrowRightLeft,
+  Sparkles,
+  AlertCircle
+} from 'lucide-react';
+import { soundFx } from '../utils/speech';
 
 interface AgentDetailDrawerProps {
   isOpen: boolean;
@@ -10,6 +31,8 @@ interface AgentDetailDrawerProps {
   onOpenWorkstation: () => void;
   onOpenCall: () => void;
   onToggleTelegramSync?: (agentId: string, enabled: boolean, channelId?: string) => void;
+  agents?: Agent[];
+  onReassignTask?: (taskId: string, newAssignedTo: string) => Promise<void> | void;
 }
 
 const TELEGRAM_CHANNELS = [
@@ -26,7 +49,9 @@ export function AgentDetailDrawer({
   tasks, 
   onOpenWorkstation, 
   onOpenCall,
-  onToggleTelegramSync
+  onToggleTelegramSync,
+  agents = [],
+  onReassignTask
 }: AgentDetailDrawerProps) {
   if (!isOpen || !agent) return null;
 
@@ -35,16 +60,111 @@ export function AgentDetailDrawer({
   const [testPingSending, setTestPingSending] = useState<boolean>(false);
   const [testPingStatus, setTestPingStatus] = useState<string | null>(null);
 
+  // Auto-delegate prompt modal state
+  const [showDelegateModal, setShowDelegateModal] = useState<boolean>(false);
+  const [delegateTaskId, setDelegateTaskId] = useState<string>('');
+  const [delegateTargetAgentId, setDelegateTargetAgentId] = useState<string>('');
+  const [delegateStatus, setDelegateStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [isDelegating, setIsDelegating] = useState<boolean>(false);
+
   useEffect(() => {
     if (agent) {
       setSyncEnabled(agent.telegramSyncEnabled ?? false);
       setTargetChannelId(agent.telegramChannelId || '-1001928374650');
+      setShowDelegateModal(false);
+      setDelegateStatus(null);
     }
   }, [agent]);
 
   const agentTasks = tasks.filter(t => t.assignedTo === agent.id);
-  const activeTask = agentTasks.find(t => t.status === 'running');
+  const activeTask = agentTasks.find(t => t.status === 'running') || agentTasks[0];
   const completedTasks = agentTasks.filter(t => t.status === 'completed').length;
+
+  // Active / non-completed tasks eligible for delegation
+  const nonCompletedTasks = agentTasks.filter(t => t.status !== 'completed');
+  const lowPriorityTasks = nonCompletedTasks.filter(t => t.priority === 'low' || t.priority === 'medium');
+  const delegatableTasks = lowPriorityTasks.length > 0 ? lowPriorityTasks : nonCompletedTasks;
+
+  // Candidate peer agents (excluding the current agent)
+  const candidateAgents = (agents || [])
+    .filter(a => a.id !== agent.id)
+    .map(a => {
+      const peerActiveTasks = tasks.filter(t => t.assignedTo === a.id && t.status !== 'completed');
+      return {
+        ...a,
+        activeTaskCount: peerActiveTasks.length,
+        isIdle: a.status === 'idle' || peerActiveTasks.length === 0,
+      };
+    })
+    .sort((a, b) => {
+      if (a.isIdle && !b.isIdle) return -1;
+      if (!a.isIdle && b.isIdle) return 1;
+      return a.activeTaskCount - b.activeTaskCount;
+    });
+
+  const bestIdleCandidate = candidateAgents.find(a => a.isIdle) || candidateAgents[0];
+
+  const handleOpenAutoDelegate = () => {
+    soundFx.playClick();
+    if (nonCompletedTasks.length === 0) {
+      setDelegateStatus({
+        type: 'error',
+        message: `${agent.name} has no active tasks to delegate.`,
+      });
+      setTimeout(() => setDelegateStatus(null), 3500);
+      return;
+    }
+    if (candidateAgents.length === 0) {
+      setDelegateStatus({
+        type: 'error',
+        message: `No candidate peer agents found in the fleet.`,
+      });
+      setTimeout(() => setDelegateStatus(null), 3500);
+      return;
+    }
+
+    // Default to lowest-priority task first, and top idle candidate
+    const initialTaskId = delegatableTasks[0]?.id || nonCompletedTasks[0]?.id || '';
+    const initialTargetId = bestIdleCandidate?.id || candidateAgents[0]?.id || '';
+
+    setDelegateTaskId(initialTaskId);
+    setDelegateTargetAgentId(initialTargetId);
+    setShowDelegateModal(true);
+    setDelegateStatus(null);
+  };
+
+  const handleConfirmDelegation = async () => {
+    if (!delegateTaskId || !delegateTargetAgentId) return;
+    setIsDelegating(true);
+    try {
+      const targetAgent = candidateAgents.find(a => a.id === delegateTargetAgentId);
+      const targetTask = agentTasks.find(t => t.id === delegateTaskId);
+      const taskTitle = targetTask ? targetTask.title : 'Task';
+      const targetName = targetAgent ? targetAgent.name : delegateTargetAgentId;
+
+      if (onReassignTask) {
+        await onReassignTask(delegateTaskId, delegateTargetAgentId);
+      }
+
+      soundFx.playNotification();
+      setDelegateStatus({
+        type: 'success',
+        message: `✓ Reassigned "${taskTitle}" to ${targetName}!`,
+      });
+
+      setTimeout(() => {
+        setIsDelegating(false);
+        setShowDelegateModal(false);
+        setDelegateStatus(null);
+      }, 2000);
+    } catch (e: any) {
+      setIsDelegating(false);
+      setDelegateStatus({
+        type: 'error',
+        message: e?.message || 'Failed to reassign task.',
+      });
+    }
+  };
 
   const handleToggleSync = (newVal: boolean) => {
     setSyncEnabled(newVal);
@@ -118,23 +238,137 @@ export function AgentDetailDrawer({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           
-          {/* Current Mission */}
-          <section>
-            <div className="text-[10px] font-bold text-[#928374] tracking-widest uppercase mb-3 flex items-center gap-2">
-              <Activity className="w-3 h-3" /> Current Mission
+          {/* Current Mission & Task Queue */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-bold text-[#928374] tracking-widest uppercase flex items-center gap-2">
+                <Activity className="w-3 h-3" /> Operational Tasks ({agentTasks.length})
+              </div>
+              <button
+                type="button"
+                onClick={handleOpenAutoDelegate}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:text-amber-300 text-[11px] font-bold transition-all cursor-pointer shadow-sm"
+                title="Auto-delegate low-priority tasks from this agent to an idle peer"
+              >
+                <ArrowRightLeft className="w-3 h-3 text-amber-300" />
+                <span>⚡ Auto-Delegate</span>
+              </button>
             </div>
+
+            {/* Auto-Delegate Prompt Card / Modal */}
+            {showDelegateModal && (
+              <div className="p-4 rounded-xl bg-[#1d2021] border border-amber-500/40 shadow-xl space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-md bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                      <ArrowRightLeft className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                        Auto-Delegate Workload
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          Low-Priority Focus
+                        </span>
+                      </h4>
+                      <p className="text-[11px] text-[#a89984]">
+                        Reassign from {agent.name} ({nonCompletedTasks.length} active) to an available peer.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowDelegateModal(false)}
+                    className="text-[#a89984] hover:text-white p-1 text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Task Selection */}
+                <div>
+                  <label className="block text-[10px] text-[#a89984] uppercase font-mono font-bold mb-1">
+                    Select Task to Reassign ({delegatableTasks.length} eligible)
+                  </label>
+                  <select
+                    value={delegateTaskId}
+                    onChange={(e) => setDelegateTaskId(e.target.value)}
+                    className="w-full bg-[#121110] border border-[#3c3836] rounded-lg px-2.5 py-2 text-white text-xs focus:outline-none focus:border-amber-500 font-mono"
+                  >
+                    {delegatableTasks.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        [{t.priority ? t.priority.toUpperCase() : 'MED'}] {t.title} ({t.progress || 0}%)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Target Destination Agent */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[10px] text-[#a89984] uppercase font-mono font-bold">
+                      Destination Agent
+                    </label>
+                    {bestIdleCandidate && (
+                      <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> Best: {bestIdleCandidate.name} ({bestIdleCandidate.isIdle ? 'Idle' : `${bestIdleCandidate.activeTaskCount} tasks`})
+                      </span>
+                    )}
+                  </div>
+                  <select
+                    value={delegateTargetAgentId}
+                    onChange={(e) => setDelegateTargetAgentId(e.target.value)}
+                    className="w-full bg-[#121110] border border-[#3c3836] rounded-lg px-2.5 py-2 text-white text-xs focus:outline-none focus:border-emerald-500 font-mono"
+                  >
+                    {candidateAgents.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} — {c.isIdle ? '⚡ IDLE (0 Tasks)' : `${c.activeTaskCount} Active Tasks`} [{c.role}]
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Status Feedback */}
+                {delegateStatus && (
+                  <div className={`p-2 rounded text-[11px] font-mono font-medium flex items-center gap-2 ${delegateStatus.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/10 text-red-300 border border-red-500/30'}`}>
+                    <span>{delegateStatus.message}</span>
+                  </div>
+                )}
+
+                {/* Confirmation Prompt Actions */}
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowDelegateModal(false)}
+                    className="px-3 py-1.5 rounded-lg border border-[#3c3836] bg-[#121110] text-[#a89984] hover:text-white text-xs font-bold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmDelegation}
+                    disabled={isDelegating || !delegateTaskId || !delegateTargetAgentId}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-[#121110] font-bold text-xs transition-colors cursor-pointer disabled:opacity-50 shadow-md"
+                  >
+                    {isDelegating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowRightLeft className="w-3.5 h-3.5" />}
+                    <span>Confirm Delegation</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {activeTask ? (
               <div className="bg-[#1d2021] border border-[#3c3836] rounded-xl p-4">
-                <h3 className="text-white font-medium mb-3">{activeTask.description}</h3>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
+                    Primary Mission • {activeTask.priority || 'medium'} priority
+                  </span>
+                  <span className="text-xs text-emerald-400 font-mono font-bold">{activeTask.progress || 78}%</span>
+                </div>
+                <h3 className="text-white font-medium mb-3 text-sm">{activeTask.title || activeTask.description}</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-[#a89984] font-mono">
-                    <span>Task Progress</span>
-                    <span className="text-emerald-400">78%</span>
-                  </div>
                   <div className="h-1.5 w-full bg-[#3c3836] rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 w-[78%] rounded-full relative">
+                    <div className="h-full bg-emerald-500 rounded-full relative" style={{ width: `${activeTask.progress || 78}%` }}>
                       <div className="absolute inset-0 bg-white/20 animate-pulse" />
                     </div>
                   </div>
@@ -143,6 +377,28 @@ export function AgentDetailDrawer({
             ) : (
               <div className="bg-[#1d2021] border border-[#3c3836] border-dashed rounded-xl p-4 text-center text-[#a89984] text-sm font-mono">
                 Awaiting new directive
+              </div>
+            )}
+
+            {/* List of other queued/assigned tasks */}
+            {agentTasks.length > 1 && (
+              <div className="space-y-1.5 pt-1">
+                <div className="text-[10px] text-[#a89984] uppercase font-mono font-bold">
+                  Assigned Queue ({agentTasks.length - 1} additional)
+                </div>
+                <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+                  {agentTasks.filter(t => t.id !== activeTask?.id).map(t => (
+                    <div key={t.id} className="p-2 rounded bg-[#1d2021]/80 border border-[#3c3836] flex items-center justify-between text-xs">
+                      <div className="truncate mr-2">
+                        <span className={`text-[9px] uppercase font-mono px-1.5 py-0.5 rounded mr-1.5 ${t.priority === 'low' ? 'bg-blue-500/20 text-blue-300' : t.priority === 'medium' ? 'bg-amber-500/20 text-amber-300' : 'bg-red-500/20 text-red-300'}`}>
+                          {t.priority || 'med'}
+                        </span>
+                        <span className="text-[#ebdbb2] truncate">{t.title}</span>
+                      </div>
+                      <span className="text-[10px] text-[#a89984] font-mono whitespace-nowrap">{t.status}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </section>
@@ -311,15 +567,23 @@ export function AgentDetailDrawer({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-[#3c3836] bg-[#1d2021] grid grid-cols-3 gap-3">
-          <button className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-[#3c3836] bg-[#121110] text-[#a89984] hover:text-white hover:bg-[#3c3836] transition-colors text-xs font-bold">
-            <Pause className="w-4 h-4" /> Pause
+        <div className="p-4 border-t border-[#3c3836] bg-[#1d2021] grid grid-cols-4 gap-2">
+          <button
+            type="button"
+            onClick={handleOpenAutoDelegate}
+            className="flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors text-xs font-bold cursor-pointer"
+            title="Auto-delegate low-priority tasks to an idle peer"
+          >
+            <ArrowRightLeft className="w-3.5 h-3.5" /> Delegate
           </button>
-          <button onClick={onOpenWorkstation} className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-[#ebdbb2] text-[#121110] hover:bg-white transition-colors text-xs font-bold">
-            <Terminal className="w-4 h-4" /> Inspect
+          <button className="flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-lg border border-[#3c3836] bg-[#121110] text-[#a89984] hover:text-white hover:bg-[#3c3836] transition-colors text-xs font-bold">
+            <Pause className="w-3.5 h-3.5" /> Pause
           </button>
-          <button onClick={onOpenCall} className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-[#3c3836] bg-[#121110] text-[#a89984] hover:text-white hover:bg-[#3c3836] transition-colors text-xs font-bold">
-            <MessageSquare className="w-4 h-4" /> Message
+          <button onClick={onOpenWorkstation} className="flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-lg bg-[#ebdbb2] text-[#121110] hover:bg-white transition-colors text-xs font-bold">
+            <Terminal className="w-3.5 h-3.5" /> Inspect
+          </button>
+          <button onClick={onOpenCall} className="flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-lg border border-[#3c3836] bg-[#121110] text-[#a89984] hover:text-white hover:bg-[#3c3836] transition-colors text-xs font-bold">
+            <MessageSquare className="w-3.5 h-3.5" /> Message
           </button>
         </div>
 

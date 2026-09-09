@@ -826,7 +826,7 @@ export const N8nVisualWorkflowEditor: React.FC<N8nVisualWorkflowEditorProps> = (
             } else if (node.category === 'Sheets') {
               iconColor = '#0f9d58';
               IconComponent = FileText;
-            } else if (node.category === 'Security' || node.subType === 'safetyguard') {
+            } else if ((node.category as string) === 'Security' || node.subType === 'safetyguard') {
               iconColor = '#fb4934';
               IconComponent = Shield;
             }

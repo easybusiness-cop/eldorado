@@ -658,3 +658,62 @@ hqRouter.post("/tasks/update-status", (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Reassign task to a different agent (Auto-Delegation)
+hqRouter.post("/tasks/reassign", (req, res) => {
+  try {
+    const { taskId, newAssignedTo, agentId = "michael" } = req.body;
+    if (!taskId || !newAssignedTo) {
+      return res.status(400).json({ error: "taskId and newAssignedTo are required" });
+    }
+
+    const updated = companyDb.reassignTask(taskId, newAssignedTo);
+    if (!updated) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    companyDb.logAudit({
+      id: `aud-reassign-${Date.now()}`,
+      agentId,
+      taskId,
+      tool: "task.auto_delegate",
+      action: `Auto-delegated task "${updated.title}" to employee ${newAssignedTo}`,
+      inputHash: Buffer.from(newAssignedTo).toString("base64").slice(0, 20),
+      result: `SUCCESS: Task workload rebalanced. Transferred assignment to ${newAssignedTo}.`,
+      timestamp: new Date().toISOString(),
+      riskLevel: "low",
+      approvalRequired: false,
+      executionId: `ex-reassign-${Date.now()}`,
+    });
+
+    res.json({ success: true, task: updated });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Auto-assign and populate operational tasks for all fleet agents
+hqRouter.post("/tasks/auto-assign-fleet", (req, res) => {
+  try {
+    const { agentId = "michael" } = req.body;
+    companyDb.seedFleetTasks();
+    const tasks = companyDb.getTasks();
+
+    companyDb.logAudit({
+      id: `aud-assign-${Date.now()}`,
+      agentId,
+      tool: "fleet.auto_assign",
+      action: "Dispatched operational tasks across all autonomous fleet agents",
+      inputHash: Buffer.from("auto-assign-all").toString("base64").slice(0, 20),
+      result: `SUCCESS: Initialized and assigned active tasks for ${tasks.length} queue items across all departments.`,
+      timestamp: new Date().toISOString(),
+      riskLevel: "low",
+      approvalRequired: false,
+      executionId: `ex-assign-${Date.now()}`,
+    });
+
+    res.json({ success: true, tasks, totalTasks: tasks.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});

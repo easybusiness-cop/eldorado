@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeSupabaseUrl } from "../routes/supabase.routes.ts";
 import type { Objective } from "./objective.types.ts";
 
 export class ObjectiveDB {
@@ -25,7 +26,8 @@ export class ObjectiveDB {
   }
 
   private initializeSupabase() {
-    const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim();
+    const rawUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim();
+    const url = normalizeSupabaseUrl(rawUrl);
     const key = (
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||

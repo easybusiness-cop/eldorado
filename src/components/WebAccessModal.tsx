@@ -243,7 +243,7 @@ export const WebAccessModal: React.FC<WebAccessModalProps> = ({
                       {fetchedFile.title}
                     </span>
                     <span className="text-[10px] px-1.5 rounded bg-[#3c3836] text-[#a89984]">
-                      {fetchedFile.length} bytes
+                      {fetchedFile.content?.length || 0} bytes
                     </span>
                   </div>
 

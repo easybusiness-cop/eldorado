@@ -3,10 +3,29 @@ import { createClient } from "@supabase/supabase-js";
 
 export const supabaseRouter = Router();
 
+export function normalizeSupabaseUrl(rawUrl?: string | null): string {
+  if (!rawUrl) return "";
+  let url = rawUrl.trim();
+  if (!url) return "";
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    url = `https://${url}`;
+  }
+  url = url.replace(/\/+$/, "");
+  url = url.replace(/\/(?:rest|auth)\/v1\/?$/i, "");
+  url = url.replace(/\/+$/, "");
+  return url;
+}
+
 supabaseRouter.get("/diagnostic", async (req, res) => {
   const startTime = Date.now();
-  const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim();
-  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "").trim();
+  const rawUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim();
+  const url = normalizeSupabaseUrl(rawUrl);
+  const key = (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.VITE_SUPABASE_ANON_KEY ||
+    ""
+  ).trim();
 
   const isConfigured = Boolean(url && key && !url.includes("placeholder") && url.startsWith("http"));
 
@@ -27,21 +46,22 @@ supabaseRouter.get("/diagnostic", async (req, res) => {
   try {
     const supabase = createClient(url, key);
     
-    // Test auth or profiles table inquiry
+    // Probe profiles table with wildcard to support all valid schema variants
     const { data: profiles, error: profileErr } = await supabase
       .from("profiles")
-      .select("id, full_name, role, department")
+      .select("*")
       .limit(3);
 
-    const { data: orgs, error: orgErr } = await supabase
-      .from("organization_members")
-      .select("*, organizations(*)")
+    // Probe threads or organization memberships
+    const { data: threads, error: threadErr } = await supabase
+      .from("threads")
+      .select("*")
       .limit(3);
 
     const latencyMs = Date.now() - startTime;
 
-    if (profileErr && profileErr.code !== "42P01") {
-      console.error("[Server Supabase Diagnostic Error]:", profileErr);
+    if (profileErr && profileErr.code !== "42P01" && profileErr.code !== "PGRST205") {
+      console.warn("[Server Supabase Diagnostic Notice]:", profileErr.message);
     }
 
     return res.json({
@@ -52,25 +72,25 @@ supabaseRouter.get("/diagnostic", async (req, res) => {
       environment: {
         hasUrl: true,
         hasKey: true,
-        urlPreview: `${url.slice(0, 22)}...`,
+        urlPreview: `${url.slice(0, 25)}...`,
       },
       data: {
         profilesCount: profiles?.length || 0,
         sampleProfiles: profiles || [],
-        orgsCount: orgs?.length || 0,
-        sampleOrgs: orgs || [],
+        threadsCount: threads?.length || 0,
+        sampleThreads: threads || [],
       },
       errors: {
         profileError: profileErr ? profileErr.message : null,
-        orgError: orgErr ? orgErr.message : null,
+        threadError: threadErr ? threadErr.message : null,
       },
     });
   } catch (err: any) {
-    console.error("[Server Supabase Exception]:", err);
+    console.error("[Server Supabase Exception]:", err?.message || err);
     return res.status(500).json({
       success: false,
       status: "error",
-      message: err.message || "Server exception during Supabase verification",
+      message: err?.message || "Server exception during Supabase verification",
       latencyMs: Date.now() - startTime,
     });
   }

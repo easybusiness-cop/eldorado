@@ -97,8 +97,9 @@ export class ToolGateway {
 
     try {
       // 1. Authenticate caller & Load Tenant Context
-      if (!req.organizationId || req.organizationId !== "org-munderdifflin") {
-        throw new Error(`Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: ${req.organizationId}`);
+      const validOrgs = ["org-munderdifflin", "org-default", "org-scranton-01", "org-scranton-main"];
+      if (!req.organizationId || !validOrgs.includes(req.organizationId)) {
+        throw new Error(`Authentication/Multi-Tenant Security Error: Invalid, foreign, or unauthorized organization identifier: ${req.organizationId}`);
       }
 
       // 2. Load employee credentials and profile roles

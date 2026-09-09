@@ -1288,6 +1288,234 @@ const INITIAL_TASKS: DBTask[] = [
       { id: 'sub-13', title: 'Bind telemetry to real DB records', completed: false }
     ],
     createdAt: Date.now() - 1800000
+  },
+  {
+    id: 'tsk-michael-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Floor Orchestration & Standup Coordination',
+    description: 'Run autonomous multi-agent standups, evaluate pending queue bottlenecks, and route high-priority customer deliverables across departments.',
+    assignedTo: 'michael',
+    status: 'running',
+    progress: 75,
+    priority: 'critical',
+    output: 'Standup completed: All 12 agents aligned on operational priorities. Zero blockers detected.',
+    codeSnippet: `// Michael Scott Fleet Orchestration\nfunction runHourlyStandup() {\n  const fleet = companyDb.getAgents();\n  console.log("Standup broadcast dispatched to " + fleet.length + " agents.");\n  return { status: "aligned", timestamp: Date.now() };\n}`,
+    subtasks: [
+      { id: 'st-m-1', title: 'Queue synthesis and agent heartbeat audit', completed: true, assignedTo: 'michael' },
+      { id: 'st-m-2', title: 'Inter-department SLA verification', completed: true, assignedTo: 'michael' },
+      { id: 'st-m-3', title: 'Executive escalation routing to Regional Manager', completed: false, assignedTo: 'michael' },
+    ],
+    createdAt: Date.now() - 3600000,
+  },
+  {
+    id: 'tsk-dwight-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Zero-Trust Perimeter Scan & Cyber Audit',
+    description: 'Enforce zero-trust network policies, scan runtime environment for credential leakage, and verify OWASP Top 10 defensive shields.',
+    assignedTo: 'dwight',
+    status: 'running',
+    progress: 80,
+    priority: 'critical',
+    output: 'Perimeter scan verified: 0 rogue ports open, strict token validation rules enforced.',
+    codeSnippet: `// Dwight Schrute Zero-Trust Sentinel\nexport function auditPerimeter() {\n  return { status: "SECURE", blockedThreats: 0, zeroTrustEnforced: true };\n}`,
+    subtasks: [
+      { id: 'st-d-1', title: 'Zero-trust token permission inspection', completed: true, assignedTo: 'dwight' },
+      { id: 'st-d-2', title: 'Perimeter firewall & SSRF prevention scan', completed: true, assignedTo: 'dwight' },
+      { id: 'st-d-3', title: 'Root credential isolation verification', completed: false, assignedTo: 'dwight' },
+    ],
+    createdAt: Date.now() - 3200000,
+  },
+  {
+    id: 'tsk-jim-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'B2B Client Acquisition & Outreach Funnels',
+    description: 'Design high-converting 3-touchpoint outbound proposals for regional corporate accounts, track funnel metrics, and optimize customer acquisition costs.',
+    assignedTo: 'jim',
+    status: 'running',
+    progress: 65,
+    priority: 'high',
+    output: 'Outreach campaign drafted: 3-step high-converting sequence prepared for procurement leads.',
+    codeSnippet: `// Jim Halpert Outbound Lead Engine\nexport function sendClientTouchpoint(account) {\n  return { delivered: true, openRateEstimate: "48.2%", account };\n}`,
+    subtasks: [
+      { id: 'st-j-1', title: 'Draft personalized outbound outreach sequence', completed: true, assignedTo: 'jim' },
+      { id: 'st-j-2', title: 'Customer acquisition cost (CAC) benchmarking', completed: true, assignedTo: 'jim' },
+      { id: 'st-j-3', title: 'Pipeline lead conversion review with sales leads', completed: false, assignedTo: 'jim' },
+    ],
+    createdAt: Date.now() - 2800000,
+  },
+  {
+    id: 'tsk-pam-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Agent Academy Curriculum & Inter-Office SOPs',
+    description: 'Maintain Scranton office SOPs, structure standardized onboarding workflows for newly provisioned agents, and conduct quarterly team pulse surveys.',
+    assignedTo: 'pam',
+    status: 'running',
+    progress: 70,
+    priority: 'medium',
+    output: 'CSE Agent Academy Level 8 syllabus updated with autonomous tooling certification.',
+    codeSnippet: `// Pam Beesly People Ops & Academy Standard\nexport function onboardAgent(agentProfile) {\n  return { certified: true, level: 8, sopChecklistCompleted: true };\n}`,
+    subtasks: [
+      { id: 'st-p-1', title: 'Update CSE Agent Academy Level 8 training syllabus', completed: true, assignedTo: 'pam' },
+      { id: 'st-p-2', title: 'Standardize inter-office remote compliance handbook', completed: true, assignedTo: 'pam' },
+      { id: 'st-p-3', title: 'Review quarterly department psychological safety index', completed: false, assignedTo: 'pam' },
+    ],
+    createdAt: Date.now() - 2500000,
+  },
+  {
+    id: 'tsk-kevin-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Runway Modeling & Cloud Token P&L Reconciliation',
+    description: 'Audit monthly compute, memory, and LLM token expenditures. Formulate unit economics breakdown and 18-month cash runway models.',
+    assignedTo: 'kevin',
+    status: 'running',
+    progress: 70,
+    priority: 'high',
+    output: '18-month runway confirmed. Gross margins healthy at 84.6% after Keleven arithmetic check.',
+    codeSnippet: `// Kevin Malone Ledger & Runway Engine\nexport function calculateRunway(cash, monthlyBurn) {\n  return { runwayMonths: Math.round(cash / monthlyBurn), status: "HEALTHY" };\n}`,
+    subtasks: [
+      { id: 'st-k-1', title: 'Compile per-agent token consumption ledger', completed: true, assignedTo: 'kevin' },
+      { id: 'st-k-2', title: 'Calculate 18-month burn rate and hiring runway', completed: true, assignedTo: 'kevin' },
+      { id: 'st-k-3', title: 'Present unit economics report to Executive Suite', completed: false, assignedTo: 'kevin' },
+    ],
+    createdAt: Date.now() - 2200000,
+  },
+  {
+    id: 'tsk-ryan-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Omnichannel Social Media Growth & Viral Hooks',
+    description: 'Format multi-platform viral threads, analyze platform engagement algorithms, and schedule high-retention content drops across social channels.',
+    assignedTo: 'ryan',
+    status: 'running',
+    progress: 60,
+    priority: 'high',
+    output: '5 viral short-form hooks generated and scheduled across Twitter/X and LinkedIn.',
+    codeSnippet: `// Ryan Howard Viral Distribution\nexport function scheduleViralHooks(hooks) {\n  return { queued: hooks.length, estimatedImpressions: "250K+" };\n}`,
+    subtasks: [
+      { id: 'st-r-1', title: 'Generate 5 viral short-form hooks and scripts', completed: true, assignedTo: 'ryan' },
+      { id: 'st-r-2', title: 'Analyze platform algorithm updates for Twitter/X', completed: true, assignedTo: 'ryan' },
+      { id: 'st-r-3', title: 'Schedule weekly engagement distribution queue', completed: false, assignedTo: 'ryan' },
+    ],
+    createdAt: Date.now() - 1900000,
+  },
+  {
+    id: 'tsk-stanley-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Open-Source Repo Deep Analysis & Package Auditing',
+    description: 'Inspect GitHub repository dependencies, verify licensing compliance, benchmark autonomous agent architectures, and extract developer specifications.',
+    assignedTo: 'stanley',
+    status: 'running',
+    progress: 75,
+    priority: 'medium',
+    output: '40 open-source agent repositories indexed. Architecture patterns cataloged.',
+    codeSnippet: `// Stanley Hudson Repo Spec Parser\nexport function auditRepoDependencies(repo) {\n  return { clean: true, licensed: "MIT/Apache-2.0", vulnCount: 0 };\n}`,
+    subtasks: [
+      { id: 'st-s-1', title: 'Scan top 40 open-source agent architectures', completed: true, assignedTo: 'stanley' },
+      { id: 'st-s-2', title: 'Verify package licenses and security vulnerability status', completed: true, assignedTo: 'stanley' },
+      { id: 'st-s-3', title: 'Index technical documentation into central repository', completed: false, assignedTo: 'stanley' },
+    ],
+    createdAt: Date.now() - 1700000,
+  },
+  {
+    id: 'tsk-thorne-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Distributed Vector Indexing & ArXiv Synthesis',
+    description: 'Synthesize neural embeddings across 50,000 frontier AI papers, evaluate quantization loss, and compile distributed citation graph indexes.',
+    assignedTo: 'dr-thorne',
+    status: 'running',
+    progress: 85,
+    priority: 'critical',
+    output: 'Distributed vector index constructed with 4-bit quantization. Memory efficiency up 38%.',
+    codeSnippet: `// Dr. Thorne Vector Quantization Engine\nexport function quantizeEmbeddings(vectors, bits = 4) {\n  return { quantized: true, compressionRatio: 3.8, loss: 0.002 };\n}`,
+    subtasks: [
+      { id: 'st-th-1', title: 'Vectorize high-priority arXiv reasoning papers', completed: true, assignedTo: 'dr-thorne' },
+      { id: 'st-th-2', title: 'Benchmark 4-bit attention kernel latency savings', completed: true, assignedTo: 'dr-thorne' },
+      { id: 'st-th-3', title: 'Shard vector embeddings across cluster memory', completed: false, assignedTo: 'dr-thorne' },
+    ],
+    createdAt: Date.now() - 1500000,
+  },
+  {
+    id: 'tsk-nova-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Frontier Model Reasoning & Attention Stress-Testing',
+    description: 'Benchmark frontier models across MATH-500 and GPQA, execute quadratic vs linear attention stress-tests, and verify long-context needle-in-haystack retrieval.',
+    assignedTo: 'nova-chen',
+    status: 'running',
+    progress: 90,
+    priority: 'high',
+    output: 'Attention stress-tests completed up to 1M context tokens with 99.4% needle accuracy.',
+    codeSnippet: `// Nova Chen Model Benchmark Evaluator\nexport function runReasoningBenchmark(model) {\n  return { passRate: 94.2, contextScore: 99.4, latencyMs: 142 };\n}`,
+    subtasks: [
+      { id: 'st-n-1', title: 'Run multi-hop reasoning evaluation harness', completed: true, assignedTo: 'nova-chen' },
+      { id: 'st-n-2', title: 'Stress-test context window up to 1M tokens', completed: true, assignedTo: 'nova-chen' },
+      { id: 'st-n-3', title: 'Publish quantitative model benchmark leaderboard', completed: false, assignedTo: 'nova-chen' },
+    ],
+    createdAt: Date.now() - 1200000,
+  },
+  {
+    id: 'tsk-toby-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: '24/7 Continuous Telemetry Auto-Debugger & Healer',
+    description: 'Maintain continuous background telemetry diagnostics, clear V8 memory heap leaks, monitor event loop latency, and auto-deploy self-healing patches.',
+    assignedTo: 'toby',
+    status: 'running',
+    progress: 95,
+    priority: 'critical',
+    output: 'Continuous telemetry sweep running. System health at 99.9%. Zero heap leaks.',
+    codeSnippet: `// Toby Flenderson Continuous Healer\nexport function runSelfHealingCycle() {\n  if (global.gc) global.gc();\n  return { heapCleaned: true, eventLoopLagMs: 1.2, healthScore: 99.9 };\n}`,
+    subtasks: [
+      { id: 'st-tb-1', title: 'Continuous telemetry diagnostic sweep', completed: true, assignedTo: 'toby' },
+      { id: 'st-tb-2', title: 'Execute automated heap garbage collection cycle', completed: true, assignedTo: 'toby' },
+      { id: 'st-tb-3', title: 'Deploy real-time self-healing code patches', completed: false, assignedTo: 'toby' },
+    ],
+    createdAt: Date.now() - 900000,
+  },
+  {
+    id: 'tsk-ruflo-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Full-Stack Dynamic Feature Sandbox & Hot-Reloader',
+    description: 'Build modular React/TypeScript widgets, validate sandbox VM isolation, and expose transaction-safe API microservices live without downtime.',
+    assignedTo: 'ruflo-coder',
+    status: 'running',
+    progress: 80,
+    priority: 'critical',
+    output: 'Dynamic feature sandbox operational. Live code reloading verified.',
+    codeSnippet: `// Ruflo Coder Hot-Reload Engine\nexport function mountSandboxWidget(widgetDef) {\n  return { mounted: true, status: "READY", endpoint: "/api/features" };\n}`,
+    subtasks: [
+      { id: 'st-rf-1', title: 'Verify sandbox execution VM isolation', completed: true, assignedTo: 'ruflo-coder' },
+      { id: 'st-rf-2', title: 'Compile dynamic feature widget registry', completed: true, assignedTo: 'ruflo-coder' },
+      { id: 'st-rf-3', title: 'Hot-reload active workspace UI modules', completed: false, assignedTo: 'ruflo-coder' },
+    ],
+    createdAt: Date.now() - 600000,
+  },
+  {
+    id: 'tsk-cline-01',
+    projectId: 'prj-alpha',
+    missionId: 'mis-01',
+    title: 'Autonomous MCP Tool Calling & Full-Stack Web Dev',
+    description: 'Execute autonomous multi-file edits, invoke MCP terminal tools, scaffold modern React components, and verify interactive browser DOM diffs.',
+    assignedTo: 'cline',
+    status: 'running',
+    progress: 85,
+    priority: 'critical',
+    output: 'MCP tool protocol connected. Autonomous web component scaffold verified.',
+    codeSnippet: `// Cline Autonomous Web Dev Specialist\nexport function executeMcpCommand(tool, args) {\n  return { success: true, tool, args, diffApplied: true };\n}`,
+    subtasks: [
+      { id: 'st-cl-1', title: 'Connect Model Context Protocol (MCP) tool harness', completed: true, assignedTo: 'cline' },
+      { id: 'st-cl-2', title: 'Scaffold responsive React 19 component specs', completed: true, assignedTo: 'cline' },
+      { id: 'st-cl-3', title: 'Run autonomous browser interactive verification', completed: false, assignedTo: 'cline' },
+    ],
+    createdAt: Date.now() - 300000,
   }
 ];
 
@@ -1398,10 +1626,31 @@ export class CompanyDB {
     }
 
     this.seedMissingEmployees();
+    if (this.seedFleetTasks()) {
+      changed = true;
+    }
 
     if (changed) {
       this.save();
     }
+  }
+
+  public seedFleetTasks(): boolean {
+    if (!this.cache.tasks) {
+      this.cache.tasks = [];
+    }
+
+    let modified = false;
+    for (const t of INITIAL_TASKS) {
+      const existing = this.cache.tasks.find(
+        (existingTask) => existingTask.id === t.id || (existingTask.assignedTo === t.assignedTo && existingTask.status !== 'completed')
+      );
+      if (!existing) {
+        this.cache.tasks.push({ ...t, createdAt: Date.now() });
+        modified = true;
+      }
+    }
+    return modified;
   }
 
   private seedMissingEmployees() {
@@ -1886,6 +2135,15 @@ export class CompanyDB {
     this.cache.tasks = this.cache.tasks.filter((t) => t.id !== task.id);
     this.cache.tasks.push(task);
     this.save();
+    return task;
+  }
+
+  public reassignTask(taskId: string, newAssignedTo: string) {
+    const task = this.cache.tasks.find((t) => t.id === taskId);
+    if (task) {
+      task.assignedTo = newAssignedTo;
+      this.save();
+    }
     return task;
   }
 

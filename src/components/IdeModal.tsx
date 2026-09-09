@@ -26,8 +26,10 @@ import {
   ArrowUpRight,
   Sliders,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Monitor
 } from 'lucide-react';
+import { DeveloperComputerSuite } from './DeveloperComputerSuite';
 
 interface IdeModalProps {
   isOpen: boolean;
@@ -44,7 +46,7 @@ export const IdeModal: React.FC<IdeModalProps> = ({
   onSaveFeature,
   onExecuteCode,
 }) => {
-  const [activeTab, setActiveTab] = useState<'ide' | 'website_builder' | 'software_builder' | 'self_healing' | 'cloudrun'>('ide');
+  const [activeTab, setActiveTab] = useState<'developer_suite' | 'ide' | 'website_builder' | 'software_builder' | 'self_healing' | 'cloudrun'>('developer_suite');
   const [featureName, setFeatureName] = useState(featureToEdit?.name || 'Autonomous Fleet Pipeline');
 
   // Autonomous Software Builder UI State
@@ -340,10 +342,22 @@ return generateCloudRunRoute();`
           </div>
 
           {/* Module Mode Tabs */}
-          <div className="flex items-center bg-[#1d2021] p-1 rounded-lg border border-[#3c3836] gap-1">
+          <div className="flex items-center bg-[#1d2021] p-1 rounded-lg border border-[#3c3836] gap-1 overflow-x-auto">
+            <button
+              onClick={() => { soundFx.playClick(); setActiveTab('developer_suite'); }}
+              className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+                activeTab === 'developer_suite'
+                  ? 'bg-[#fabd2f] text-[#1d2021]'
+                  : 'text-[#a89984] hover:text-[#ebdbb2]'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              <span>Developer OS & Apps</span>
+            </button>
+
             <button
               onClick={() => { soundFx.playClick(); setActiveTab('ide'); }}
-              className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                 activeTab === 'ide'
                   ? 'bg-[#fabd2f] text-[#1d2021]'
                   : 'text-[#a89984] hover:text-[#ebdbb2]'
@@ -421,6 +435,13 @@ return generateCloudRunRoute();`
             <button onClick={() => setAppliedBadge(null)} className="cursor-pointer">
               <X className="w-3.5 h-3.5" />
             </button>
+          </div>
+        )}
+
+        {/* TAB 0: AUTONOMOUS DEVELOPER OS & COMPUTER APPS */}
+        {activeTab === 'developer_suite' && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <DeveloperComputerSuite onClose={onClose} />
           </div>
         )}
 

@@ -60,7 +60,7 @@ interface CommandCenterProps {
   logs: AgentLog[];
   tasks: FleetTask[];
   onAddTask: (task: Partial<FleetTask>) => void;
-  onExecutePrompt: (prompt: string, attachedFile?: AttachedFile) => Promise<void>;
+  onExecutePrompt: (prompt: string, attachedFile?: AttachedFile) => Promise<any>;
   onExecuteCode: (code: string) => Promise<{ success: boolean; logs: string[]; output: any }>;
   onOpenIde: () => void;
   autoMode: boolean;
@@ -139,8 +139,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   } | null>(null);
   const [voiceTriggerNotice, setVoiceTriggerNotice] = useState<{
     message: string;
-    missionName: string;
-    timestamp: number;
+    missionName?: string;
+    timestamp?: number;
+    type?: string;
   } | null>(null);
   const [isInitializingMission, setIsInitializingMission] = useState(false);
   const audioCaptureRef = useRef<AudioCaptureController | null>(null);
@@ -619,7 +620,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     ) || selectedAgent;
 
     soundFx.playSuccessChime();
-    onSelectAgent(targetAgent);
+    onSelectAgent(targetAgent.id);
 
     setVoiceTriggerNotice({
       message: `Delegated to ${targetAgent.name}: "${taskDescription}"`,
@@ -2236,6 +2237,34 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 >
                   <Sparkles className="w-3 h-3 text-amber-900" />
                   <span>Predictive Assignment: {predictiveAssignment ? 'ON' : 'OFF'}</span>
+                </button>
+
+                <button
+                  onClick={async () => {
+                    soundFx.playNotification();
+                    try {
+                      const res = await fetch('/api/tasks/auto-assign-fleet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ agentId: selectedAgent.id }),
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        if (data.tasks && data.tasks.length > 0) {
+                          for (const t of data.tasks) {
+                            onAddTask(t);
+                          }
+                        }
+                      }
+                    } catch (e) {
+                      console.error('Failed to auto-assign tasks:', e);
+                    }
+                  }}
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shadow-sm"
+                  title="Assign operational tasks to all fleet agents across all departments"
+                >
+                  <Sparkles className="w-3 h-3 text-emerald-200" />
+                  <span>⚡ Assign All Agents</span>
                 </button>
 
                 <button

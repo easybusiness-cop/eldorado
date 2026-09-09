@@ -156,8 +156,8 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     },
     {
       id: 'ide',
-      label: 'IDE',
-      icon: <Code className="w-3.5 h-3.5" />,
+      label: 'Dev Suite & IDE',
+      icon: <Code className="w-3.5 h-3.5 text-[#fabd2f]" />,
       onClick: onOpenIde,
       primary: true,
     },

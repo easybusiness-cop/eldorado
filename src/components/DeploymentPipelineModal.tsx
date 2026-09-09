@@ -127,7 +127,7 @@ export const DeploymentPipelineModal: React.FC<DeploymentPipelineModalProps> = (
     setCurrentStep('published');
     addLog(`✅ Domain registered: ${userDomainInput}`);
     addLog(`🎉 SUCCESS! Website successfully published and live at https://${userDomainInput}`);
-    onAddTask({
+    (onAddTask as any)({
       title: `Publish Website to ${userDomainInput}`,
       department: 'Executive',
       priority: 'high',

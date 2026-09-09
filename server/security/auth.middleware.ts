@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { getSupabaseAdmin } from "../../src/utils/supabaseAdmin.ts";
+import { normalizeSupabaseUrl } from "../routes/supabase.routes";
 
 export type RuffloCapability =
   | "system:read"
@@ -64,13 +65,18 @@ function isDevelopmentAuthEnabled(): boolean {
 }
 
 function getSupabaseAuthClient() {
-  const url =
+  const rawUrl =
     process.env.SUPABASE_URL ||
     process.env.VITE_SUPABASE_URL;
 
-  const key =
+  const key = (
     process.env.SUPABASE_PUBLISHABLE_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    ""
+  ).trim();
+
+  const url = normalizeSupabaseUrl(rawUrl);
 
   if (!url || !key) {
     throw new Error("Supabase authentication is not configured.");

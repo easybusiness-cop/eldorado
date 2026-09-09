@@ -126,7 +126,7 @@ export const RuffloIntelligenceChatbot: React.FC<RuffloIntelligenceChatbotProps>
       lower.includes('what does this website do') ||
       lower.includes('what is this website')
     ) {
-      const activeTasks = tasks.filter((t) => t.status === 'running' || t.status === 'in_progress');
+      const activeTasks = tasks.filter((t) => t.status === 'running' || (t.status as string) === 'in_progress');
       const completedTasks = tasks.filter((t) => t.status === 'completed');
       const workingAgents = agents.filter((a) => a.status === 'working');
 

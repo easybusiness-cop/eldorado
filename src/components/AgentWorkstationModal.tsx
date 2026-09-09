@@ -26,6 +26,7 @@ import {
   Check,
   Atom,
 } from 'lucide-react';
+import { DeveloperComputerSuite } from './DeveloperComputerSuite';
 import { soundFx } from '../utils/speech';
 import { runAgentStandardWorkflow, WorkflowExecutionState, STANDARD_WORKFLOW_STAGES } from '../utils/agentWorkflowEngine';
 
@@ -42,7 +43,7 @@ export const AgentWorkstationModal: React.FC<AgentWorkstationModalProps> = ({
   onClose,
   logs = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<'workflow' | 'browser' | 'ide' | 'database' | 'software' | 'quantum'>('workflow');
+  const [activeTab, setActiveTab] = useState<'workflow' | 'browser' | 'ide' | 'database' | 'software' | 'quantum' | 'developer_suite'>('workflow');
   const [browserUrl, setBrowserUrl] = useState<string>(() => agent ? `https://github.com/dunder-mifflin/${agent.id}-workspace` : '');
   const [browserSearchQuery, setBrowserSearchQuery] = useState<string>('TypeScript async optimization guidelines');
   const [isExecuting, setIsExecuting] = useState(false);
@@ -338,6 +339,21 @@ export const AgentWorkstationModal: React.FC<AgentWorkstationModalProps> = ({
             >
               <Atom className="w-3.5 h-3.5 text-[#bdae93]" />
               <span>Quantum Search (Grover Engine)</span>
+            </button>
+
+            <button
+              onClick={() => {
+                soundFx.playClick();
+                setActiveTab('developer_suite');
+              }}
+              className={`px-3 py-1.5 rounded-t text-xs font-bold flex items-center gap-2 border-t-2 transition-colors whitespace-nowrap ${
+                activeTab === 'developer_suite'
+                  ? 'bg-[#282828] text-[#fabd2f] border-[#fabd2f]'
+                  : 'bg-[#1b1917] text-[#a89984] hover:text-[#ebdbb2] border-transparent'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5 text-[#fabd2f]" />
+              <span>Developer OS & Computer Apps</span>
             </button>
           </div>
 
@@ -887,6 +903,13 @@ export const AgentWorkstationModal: React.FC<AgentWorkstationModalProps> = ({
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB 7: DEVELOPER OS & COMPUTER APPS */}
+          {activeTab === 'developer_suite' && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <DeveloperComputerSuite onClose={onClose} />
             </div>
           )}
         </div>

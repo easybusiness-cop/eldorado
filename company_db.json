@@ -1389,11 +1389,11 @@
       "memorySummary": "Currently overseeing fleet transition to a real fully persistent Company Operating System.",
       "trainingState": "PRODUCTION",
       "kpis": {
-        "tasksCompleted": 82,
+        "tasksCompleted": 83,
         "accuracyScore": 98,
         "uptimeBonusPercent": 15,
-        "tokensProcessed": 294700,
-        "totalCost": 12.4537275
+        "tokensProcessed": 295506,
+        "totalCost": 12.453787949999999
       },
       "trainingRecord": {
         "completedLevels": [
@@ -1402,15 +1402,16 @@
           3
         ],
         "currentLevel": 4,
-        "competencyScore": 65,
+        "competencyScore": 70,
         "competencyGrade": "L2",
         "certifications": [],
         "practicalProjectsCompleted": [
           "tsk-1788372154158",
           "tsk-1788709525325",
-          "tsk-1788764618902"
+          "tsk-1788764618902",
+          "tsk-1788898135271"
         ],
-        "hoursTrained": 6,
+        "hoursTrained": 8,
         "skillsMatrix": {}
       }
     },
@@ -1500,26 +1501,33 @@
       "memorySummary": "Verified sandbox containment on Node VM execution. Localhost/private IP ranges strictly locked.",
       "trainingState": "PRODUCTION",
       "kpis": {
-        "tasksCompleted": 117,
+        "tasksCompleted": 122,
         "accuracyScore": 100,
         "uptimeBonusPercent": 15,
-        "tokensProcessed": 329105,
-        "totalCost": 15.600322875
+        "tokensProcessed": 333835,
+        "totalCost": 15.600677625000001
       },
       "trainingRecord": {
         "completedLevels": [
           1,
-          2
+          2,
+          3,
+          4
         ],
-        "currentLevel": 3,
-        "competencyScore": 60,
-        "competencyGrade": "L2",
+        "currentLevel": 5,
+        "competencyScore": 85,
+        "competencyGrade": "L4",
         "certifications": [],
         "practicalProjectsCompleted": [
           "tsk-1788705978876",
-          "tsk-1788764675311"
+          "tsk-1788764675311",
+          "tsk-1788897019930",
+          "tsk-1788897267535",
+          "tsk-1788897328424",
+          "tsk-1788897863233",
+          "tsk-1788898026845"
         ],
-        "hoursTrained": 4,
+        "hoursTrained": 14,
         "skillsMatrix": {}
       }
     },
@@ -1554,11 +1562,25 @@
       "memorySummary": "Optimized outreach pipelines for Project Alpha. User retention up 18.4%.",
       "trainingState": "PRODUCTION",
       "kpis": {
-        "tasksCompleted": 62,
+        "tasksCompleted": 63,
         "accuracyScore": 96,
         "uptimeBonusPercent": 10,
-        "tokensProcessed": 180000,
-        "totalCost": 8.5
+        "tokensProcessed": 180928,
+        "totalCost": 8.5000696
+      },
+      "trainingRecord": {
+        "completedLevels": [
+          1
+        ],
+        "currentLevel": 2,
+        "competencyScore": 55,
+        "competencyGrade": "L2",
+        "certifications": [],
+        "practicalProjectsCompleted": [
+          "tsk-1788896981598"
+        ],
+        "hoursTrained": 2,
+        "skillsMatrix": {}
       }
     },
     {
@@ -1808,24 +1830,30 @@
       "memorySummary": "Developed the dynamic multi-agent trajectory visualization overlays for D3 performance charts.",
       "trainingState": "PRODUCTION",
       "kpis": {
-        "tasksCompleted": 148,
+        "tasksCompleted": 152,
         "accuracyScore": 99.8,
         "uptimeBonusPercent": 15,
-        "tokensProcessed": 904945,
-        "totalCost": 42.10129241875
+        "tokensProcessed": 908587,
+        "totalCost": 42.10156556875
       },
       "trainingRecord": {
         "completedLevels": [
-          1
+          1,
+          2,
+          3
         ],
-        "currentLevel": 2,
-        "competencyScore": 55,
-        "competencyGrade": "L2",
+        "currentLevel": 4,
+        "competencyScore": 75,
+        "competencyGrade": "L3",
         "certifications": [],
         "practicalProjectsCompleted": [
-          "tsk-1788709525212"
+          "tsk-1788709525212",
+          "tsk-1788897019843",
+          "tsk-1788897267402",
+          "tsk-1788897328348",
+          "tsk-1788897863280"
         ],
-        "hoursTrained": 2,
+        "hoursTrained": 10,
         "skillsMatrix": {}
       }
     },
@@ -5014,7 +5042,7 @@
       "missionId": "mis-01",
       "title": "Bootstrap Transactional Storage Schema",
       "description": "Implement a highly robust, fully transactional, JSON-file-backed database manager complete with atomic file renames to guarantee data integrity.",
-      "assignedTo": "sub-eng-backend",
+      "assignedTo": "dwight",
       "status": "completed",
       "progress": 100,
       "priority": "critical",
@@ -6809,9 +6837,2696 @@
           "verificationId": "v-123"
         }
       ]
+    },
+    {
+      "id": "tsk-1788896981598",
+      "projectId": "prj-alpha",
+      "title": "B2B Client Acquisition Strategy",
+      "description": "📢 Have Jim design a marketing funnel",
+      "assignedTo": "jim",
+      "status": "completed",
+      "progress": 100,
+      "priority": "high",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788896981598-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "jim"
+        },
+        {
+          "id": "tsk-1788896981598-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "jim"
+        },
+        {
+          "id": "tsk-1788896981598-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "jim"
+        }
+      ],
+      "createdAt": 1788896981598,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788896981640,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "jim",
+          "timestamp": "2026-09-08T19:49:41.640Z",
+          "verificationId": "v-465"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897019843",
+      "projectId": "prj-alpha",
+      "title": "Execute User Objective: hey...",
+      "description": "Cline initiated software execution for user briefing directive.",
+      "assignedTo": "cline",
+      "status": "completed",
+      "progress": 100,
+      "priority": "high",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897019843-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897019843-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897019843-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "cline"
+        }
+      ],
+      "createdAt": 1788897019843,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"hey...\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"hey\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: hey...\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897019969,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "cline",
+          "timestamp": "2026-09-08T19:50:19.969Z",
+          "verificationId": "v-348"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897019930",
+      "projectId": "prj-alpha",
+      "title": "Security & AST Audit for Grokbot Briefing",
+      "description": "Dwight completed security audit on briefing payload.",
+      "assignedTo": "dwight",
+      "status": "completed",
+      "progress": 100,
+      "priority": "critical",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897019930-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897019930-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897019930-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "dwight"
+        }
+      ],
+      "createdAt": 1788897019930,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897020058,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "dwight",
+          "timestamp": "2026-09-08T19:50:20.058Z",
+          "verificationId": "v-877"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897267402",
+      "projectId": "prj-alpha",
+      "title": "Execute User Objective: hey\n---\nhloo...",
+      "description": "Cline initiated software execution for user briefing directive.",
+      "assignedTo": "cline",
+      "status": "completed",
+      "progress": 100,
+      "priority": "high",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897267402-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897267402-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897267402-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "cline"
+        }
+      ],
+      "createdAt": 1788897267402,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"hey\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"hey\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: hey\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897267447,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "cline",
+          "timestamp": "2026-09-08T19:54:27.447Z",
+          "verificationId": "v-113"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897267535",
+      "projectId": "prj-alpha",
+      "title": "Security & AST Audit for Grokbot Briefing",
+      "description": "Dwight completed security audit on briefing payload.",
+      "assignedTo": "dwight",
+      "status": "completed",
+      "progress": 100,
+      "priority": "critical",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897267535-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897267535-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897267535-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "dwight"
+        }
+      ],
+      "createdAt": 1788897267535,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897267573,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "dwight",
+          "timestamp": "2026-09-08T19:54:27.573Z",
+          "verificationId": "v-139"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897328424",
+      "projectId": "prj-alpha",
+      "title": "Security & AST Audit for Grokbot Briefing",
+      "description": "Dwight completed security audit on briefing payload.",
+      "assignedTo": "dwight",
+      "status": "completed",
+      "progress": 100,
+      "priority": "critical",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897328424-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897328424-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897328424-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "dwight"
+        }
+      ],
+      "createdAt": 1788897328424,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897328497,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "dwight",
+          "timestamp": "2026-09-08T19:55:28.497Z",
+          "verificationId": "v-474"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897328348",
+      "projectId": "prj-alpha",
+      "title": "Execute User Objective: hey...",
+      "description": "Cline initiated software execution for user briefing directive.",
+      "assignedTo": "cline",
+      "status": "completed",
+      "progress": 100,
+      "priority": "high",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897328348-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897328348-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897328348-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "cline"
+        }
+      ],
+      "createdAt": 1788897328349,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"hey...\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"hey\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: hey...\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897328593,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "cline",
+          "timestamp": "2026-09-08T19:55:28.593Z",
+          "verificationId": "v-634"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897863233",
+      "projectId": "prj-alpha",
+      "title": "Security & AST Audit for Grokbot Briefing",
+      "description": "Dwight completed security audit on briefing payload.",
+      "assignedTo": "dwight",
+      "status": "completed",
+      "progress": 100,
+      "priority": "critical",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897863233-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897863233-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788897863233-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "dwight"
+        }
+      ],
+      "createdAt": 1788897863233,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897863335,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "dwight",
+          "timestamp": "2026-09-08T20:04:23.335Z",
+          "verificationId": "v-253"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788897863280",
+      "projectId": "prj-alpha",
+      "title": "Execute User Objective: Build software and clean codes...",
+      "description": "Cline initiated software execution for user briefing directive.",
+      "assignedTo": "cline",
+      "status": "completed",
+      "progress": 100,
+      "priority": "high",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788897863280-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897863280-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "tsk-1788897863280-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "cline"
+        }
+      ],
+      "createdAt": 1788897863280,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"Build software and clean codes...\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"build-software-and-clean-codes\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: Build software and clean codes...\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788897863408,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "cline",
+          "timestamp": "2026-09-08T20:04:23.408Z",
+          "verificationId": "v-932"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788898026845",
+      "projectId": "prj-alpha",
+      "title": "Perimeter Security & Vulnerability Scan",
+      "description": "🛡️ Assign Dwight to run a security audit",
+      "assignedTo": "dwight",
+      "status": "completed",
+      "progress": 100,
+      "priority": "high",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788898026845-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788898026845-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "dwight"
+        },
+        {
+          "id": "tsk-1788898026845-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "dwight"
+        }
+      ],
+      "createdAt": 1788898026845,
+      "output": "{\n  \"language\": \"javascript\",\n  \"code\": \"// Auto-generated by Rufflo LocalProvider (independent)\\nfunction solve() {\\n  const objective = \\\"** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\\\";\\n  const result = {\\n    success: true,\\n    module: \\\"maximum-fleet-alignment-zero-f\\\",\\n    objective,\\n    message: \\\"Executed by independent local reasoning engine\\\",\\n    timestamp: new Date().toISOString()\\n  };\\n  if (typeof __result !== \\\"undefined\\\") __result = result;\\n  console.log(\\\"[LocalProvider]\\\", JSON.stringify(result));\\n  return result;\\n}\\nsolve();\",\n  \"explanation\": \"Local independent code generated for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788898026889,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "dwight",
+          "timestamp": "2026-09-08T20:07:06.889Z",
+          "verificationId": "v-861"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788898135271",
+      "projectId": "prj-alpha",
+      "title": "Test Task",
+      "description": "Test task",
+      "assignedTo": "michael",
+      "status": "completed",
+      "progress": 100,
+      "priority": "medium",
+      "organizationId": "org-default",
+      "subtasks": [
+        {
+          "id": "tsk-1788898135271-sub-1",
+          "title": "Security and authority check",
+          "completed": true,
+          "assignedTo": "michael"
+        },
+        {
+          "id": "tsk-1788898135271-sub-2",
+          "title": "Context synthesis & LLM execution",
+          "completed": true,
+          "assignedTo": "michael"
+        },
+        {
+          "id": "tsk-1788898135271-sub-3",
+          "title": "Logging metrics & auditing results",
+          "completed": true,
+          "assignedTo": "michael"
+        }
+      ],
+      "createdAt": 1788898135271,
+      "output": "{\n  \"planSummary\": \"Structured plan for: ** Maximum Fleet Alignment, Zero Friction, Flawless Execution.\",\n  \"recommendedPhases\": [\n    \"Understand\",\n    \"Design\",\n    \"Implement\",\n    \"Validate\",\n    \"Synthesize\"\n  ],\n  \"notes\": \"Generated by independent LocalProvider\",\n  \"source\": \"local\"\n}",
+      "completedAt": 1788898135320,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "michael",
+          "timestamp": "2026-09-08T20:08:55.320Z",
+          "verificationId": "v-783"
+        }
+      ]
+    },
+    {
+      "id": "tsk-1788898411294",
+      "title": "Test",
+      "description": "",
+      "assignedTo": "michael",
+      "status": "queued",
+      "progress": 0,
+      "priority": "medium",
+      "subtasks": [],
+      "createdAt": 1788898411294
+    },
+    {
+      "id": "tsk-pam-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Agent Academy Curriculum & Inter-Office SOPs",
+      "description": "Maintain Scranton office SOPs, structure standardized onboarding workflows for newly provisioned agents, and conduct quarterly team pulse surveys.",
+      "assignedTo": "pam",
+      "status": "running",
+      "progress": 70,
+      "priority": "medium",
+      "output": "CSE Agent Academy Level 8 syllabus updated with autonomous tooling certification.",
+      "codeSnippet": "// Pam Beesly People Ops & Academy Standard\nexport function onboardAgent(agentProfile) {\n  return { certified: true, level: 8, sopChecklistCompleted: true };\n}",
+      "subtasks": [
+        {
+          "id": "st-p-1",
+          "title": "Update CSE Agent Academy Level 8 training syllabus",
+          "completed": true,
+          "assignedTo": "pam"
+        },
+        {
+          "id": "st-p-2",
+          "title": "Standardize inter-office remote compliance handbook",
+          "completed": true,
+          "assignedTo": "pam"
+        },
+        {
+          "id": "st-p-3",
+          "title": "Review quarterly department psychological safety index",
+          "completed": false,
+          "assignedTo": "pam"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-ryan-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Omnichannel Social Media Growth & Viral Hooks",
+      "description": "Format multi-platform viral threads, analyze platform engagement algorithms, and schedule high-retention content drops across social channels.",
+      "assignedTo": "ryan",
+      "status": "running",
+      "progress": 60,
+      "priority": "high",
+      "output": "5 viral short-form hooks generated and scheduled across Twitter/X and LinkedIn.",
+      "codeSnippet": "// Ryan Howard Viral Distribution\nexport function scheduleViralHooks(hooks) {\n  return { queued: hooks.length, estimatedImpressions: \"250K+\" };\n}",
+      "subtasks": [
+        {
+          "id": "st-r-1",
+          "title": "Generate 5 viral short-form hooks and scripts",
+          "completed": true,
+          "assignedTo": "ryan"
+        },
+        {
+          "id": "st-r-2",
+          "title": "Analyze platform algorithm updates for Twitter/X",
+          "completed": true,
+          "assignedTo": "ryan"
+        },
+        {
+          "id": "st-r-3",
+          "title": "Schedule weekly engagement distribution queue",
+          "completed": false,
+          "assignedTo": "ryan"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-stanley-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Open-Source Repo Deep Analysis & Package Auditing",
+      "description": "Inspect GitHub repository dependencies, verify licensing compliance, benchmark autonomous agent architectures, and extract developer specifications.",
+      "assignedTo": "stanley",
+      "status": "running",
+      "progress": 75,
+      "priority": "medium",
+      "output": "40 open-source agent repositories indexed. Architecture patterns cataloged.",
+      "codeSnippet": "// Stanley Hudson Repo Spec Parser\nexport function auditRepoDependencies(repo) {\n  return { clean: true, licensed: \"MIT/Apache-2.0\", vulnCount: 0 };\n}",
+      "subtasks": [
+        {
+          "id": "st-s-1",
+          "title": "Scan top 40 open-source agent architectures",
+          "completed": true,
+          "assignedTo": "stanley"
+        },
+        {
+          "id": "st-s-2",
+          "title": "Verify package licenses and security vulnerability status",
+          "completed": true,
+          "assignedTo": "stanley"
+        },
+        {
+          "id": "st-s-3",
+          "title": "Index technical documentation into central repository",
+          "completed": false,
+          "assignedTo": "stanley"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-thorne-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Distributed Vector Indexing & ArXiv Synthesis",
+      "description": "Synthesize neural embeddings across 50,000 frontier AI papers, evaluate quantization loss, and compile distributed citation graph indexes.",
+      "assignedTo": "dr-thorne",
+      "status": "running",
+      "progress": 85,
+      "priority": "critical",
+      "output": "Distributed vector index constructed with 4-bit quantization. Memory efficiency up 38%.",
+      "codeSnippet": "// Dr. Thorne Vector Quantization Engine\nexport function quantizeEmbeddings(vectors, bits = 4) {\n  return { quantized: true, compressionRatio: 3.8, loss: 0.002 };\n}",
+      "subtasks": [
+        {
+          "id": "st-th-1",
+          "title": "Vectorize high-priority arXiv reasoning papers",
+          "completed": true,
+          "assignedTo": "dr-thorne"
+        },
+        {
+          "id": "st-th-2",
+          "title": "Benchmark 4-bit attention kernel latency savings",
+          "completed": true,
+          "assignedTo": "dr-thorne"
+        },
+        {
+          "id": "st-th-3",
+          "title": "Shard vector embeddings across cluster memory",
+          "completed": false,
+          "assignedTo": "dr-thorne"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-nova-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Frontier Model Reasoning & Attention Stress-Testing",
+      "description": "Benchmark frontier models across MATH-500 and GPQA, execute quadratic vs linear attention stress-tests, and verify long-context needle-in-haystack retrieval.",
+      "assignedTo": "nova-chen",
+      "status": "running",
+      "progress": 90,
+      "priority": "high",
+      "output": "Attention stress-tests completed up to 1M context tokens with 99.4% needle accuracy.",
+      "codeSnippet": "// Nova Chen Model Benchmark Evaluator\nexport function runReasoningBenchmark(model) {\n  return { passRate: 94.2, contextScore: 99.4, latencyMs: 142 };\n}",
+      "subtasks": [
+        {
+          "id": "st-n-1",
+          "title": "Run multi-hop reasoning evaluation harness",
+          "completed": true,
+          "assignedTo": "nova-chen"
+        },
+        {
+          "id": "st-n-2",
+          "title": "Stress-test context window up to 1M tokens",
+          "completed": true,
+          "assignedTo": "nova-chen"
+        },
+        {
+          "id": "st-n-3",
+          "title": "Publish quantitative model benchmark leaderboard",
+          "completed": false,
+          "assignedTo": "nova-chen"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-toby-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "24/7 Continuous Telemetry Auto-Debugger & Healer",
+      "description": "Maintain continuous background telemetry diagnostics, clear V8 memory heap leaks, monitor event loop latency, and auto-deploy self-healing patches.",
+      "assignedTo": "toby",
+      "status": "running",
+      "progress": 95,
+      "priority": "critical",
+      "output": "Continuous telemetry sweep running. System health at 99.9%. Zero heap leaks.",
+      "codeSnippet": "// Toby Flenderson Continuous Healer\nexport function runSelfHealingCycle() {\n  if (global.gc) global.gc();\n  return { heapCleaned: true, eventLoopLagMs: 1.2, healthScore: 99.9 };\n}",
+      "subtasks": [
+        {
+          "id": "st-tb-1",
+          "title": "Continuous telemetry diagnostic sweep",
+          "completed": true,
+          "assignedTo": "toby"
+        },
+        {
+          "id": "st-tb-2",
+          "title": "Execute automated heap garbage collection cycle",
+          "completed": true,
+          "assignedTo": "toby"
+        },
+        {
+          "id": "st-tb-3",
+          "title": "Deploy real-time self-healing code patches",
+          "completed": false,
+          "assignedTo": "toby"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-ruflo-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Full-Stack Dynamic Feature Sandbox & Hot-Reloader",
+      "description": "Build modular React/TypeScript widgets, validate sandbox VM isolation, and expose transaction-safe API microservices live without downtime.",
+      "assignedTo": "ruflo-coder",
+      "status": "running",
+      "progress": 80,
+      "priority": "critical",
+      "output": "Dynamic feature sandbox operational. Live code reloading verified.",
+      "codeSnippet": "// Ruflo Coder Hot-Reload Engine\nexport function mountSandboxWidget(widgetDef) {\n  return { mounted: true, status: \"READY\", endpoint: \"/api/features\" };\n}",
+      "subtasks": [
+        {
+          "id": "st-rf-1",
+          "title": "Verify sandbox execution VM isolation",
+          "completed": true,
+          "assignedTo": "ruflo-coder"
+        },
+        {
+          "id": "st-rf-2",
+          "title": "Compile dynamic feature widget registry",
+          "completed": true,
+          "assignedTo": "ruflo-coder"
+        },
+        {
+          "id": "st-rf-3",
+          "title": "Hot-reload active workspace UI modules",
+          "completed": false,
+          "assignedTo": "ruflo-coder"
+        }
+      ],
+      "createdAt": 1788898422212
+    },
+    {
+      "id": "tsk-cline-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "Autonomous MCP Tool Calling & Full-Stack Web Dev",
+      "description": "Execute autonomous multi-file edits, invoke MCP terminal tools, scaffold modern React components, and verify interactive browser DOM diffs.",
+      "assignedTo": "cline",
+      "status": "running",
+      "progress": 85,
+      "priority": "critical",
+      "output": "MCP tool protocol connected. Autonomous web component scaffold verified.",
+      "codeSnippet": "// Cline Autonomous Web Dev Specialist\nexport function executeMcpCommand(tool, args) {\n  return { success: true, tool, args, diffApplied: true };\n}",
+      "subtasks": [
+        {
+          "id": "st-cl-1",
+          "title": "Connect Model Context Protocol (MCP) tool harness",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "st-cl-2",
+          "title": "Scaffold responsive React 19 component specs",
+          "completed": true,
+          "assignedTo": "cline"
+        },
+        {
+          "id": "st-cl-3",
+          "title": "Run autonomous browser interactive verification",
+          "completed": false,
+          "assignedTo": "cline"
+        }
+      ],
+      "createdAt": 1788898422212
     }
   ],
   "audits": [
+    {
+      "id": "aud-gw-1788964895684",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid, foreign, or unauthorized organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-09T14:41:35.689Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788964895684-7204"
+    },
+    {
+      "id": "aud-evt-1788964822751-635",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:40:22.751Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788964822751"
+    },
+    {
+      "id": "aud-evt-1788964821780-663",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:40:21.780Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788964821780"
+    },
+    {
+      "id": "aud-evt-1788964821713-529",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:40:21.714Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788964821714"
+    },
+    {
+      "id": "aud-evt-1788964819841-176",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:40:19.841Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788964819841"
+    },
+    {
+      "id": "aud-evt-1788964819757-234",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:40:19.757Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788964819757"
+    },
+    {
+      "id": "aud-gw-1788964494385",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid, foreign, or unauthorized organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-09T14:34:54.389Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788964494385-6034"
+    },
+    {
+      "id": "aud-gw-1788963650901",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid, foreign, or unauthorized organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-09-09T14:20:50.905Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788963650901-7039"
+    },
+    {
+      "id": "aud-gw-1788963626076",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Identity Verification Failed: Employee 'pete' not registered in roster.",
+      "timestamp": "2026-09-09T14:20:26.081Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788963626076-3610"
+    },
+    {
+      "id": "aud-dev-1788963621975",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "computer_app.security_scanner",
+      "action": "Executed action: Scan Codebase for Leaked API Keys",
+      "inputHash": "Z2l0IHN0YXR1cw==",
+      "result": "SUCCESS in 0ms",
+      "timestamp": "2026-09-09T14:20:21.975Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-1788963621975"
+    },
+    {
+      "id": "aud-dev-1788963617212",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "computer_app.redis_workbench",
+      "action": "Executed action: Flush Expired Agent Cache Keys",
+      "inputHash": "bm9kZSAtZSAnY29u",
+      "result": "SUCCESS in 0ms",
+      "timestamp": "2026-09-09T14:20:17.212Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-1788963617212"
+    },
+    {
+      "id": "aud-evt-1788963422697-701",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:17:02.697Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788963422697"
+    },
+    {
+      "id": "aud-evt-1788963421700-321",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:17:01.700Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788963421700"
+    },
+    {
+      "id": "aud-evt-1788963421598-493",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:17:01.598Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788963421598"
+    },
+    {
+      "id": "aud-evt-1788963419519-781",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:16:59.519Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788963419519"
+    },
+    {
+      "id": "aud-evt-1788963419436-963",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T14:16:59.436Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788963419436"
+    },
+    {
+      "id": "aud-evt-1788958636930-77",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:57:16.930Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958636930"
+    },
+    {
+      "id": "aud-evt-1788958635809-21",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:57:15.809Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958635809"
+    },
+    {
+      "id": "aud-evt-1788958339019-400",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:52:19.019Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958339019"
+    },
+    {
+      "id": "aud-evt-1788958338011-963",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:52:18.011Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958338011"
+    },
+    {
+      "id": "aud-evt-1788958337943-832",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:52:17.943Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958337943"
+    },
+    {
+      "id": "aud-evt-1788958336127-321",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:52:16.127Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958336127"
+    },
+    {
+      "id": "aud-evt-1788958336042-603",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:52:16.042Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788958336042"
+    },
+    {
+      "id": "aud-dev-1788958005670",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "computer_app.terminal",
+      "action": "Executed action: node -v && ls -la package.json",
+      "inputHash": "bm9kZSAtdiAmJiBs",
+      "result": "SUCCESS in 18ms",
+      "timestamp": "2026-09-09T12:46:45.670Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-1788958005670"
+    },
+    {
+      "id": "aud-dev-1788957993087",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "computer_app.vscode",
+      "action": "Executed action: Format & Lint Active File",
+      "inputHash": "bnB4IHByZXR0aWVy",
+      "result": "SUCCESS in 0ms",
+      "timestamp": "2026-09-09T12:46:33.087Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-1788957993087"
+    },
+    {
+      "id": "aud-evt-1788957729304-652",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:42:09.304Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788957729304"
+    },
+    {
+      "id": "aud-evt-1788957728059-314",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:42:08.059Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788957728059"
+    },
+    {
+      "id": "aud-evt-1788957727975-455",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:42:07.975Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788957727975"
+    },
+    {
+      "id": "aud-evt-1788957726220-612",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:42:06.220Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788957726220"
+    },
+    {
+      "id": "aud-evt-1788957726136-315",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-09T12:42:06.136Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788957726136"
+    },
+    {
+      "id": "aud-reassign-1788899063248",
+      "agentId": "michael",
+      "taskId": "tsk-alpha-01",
+      "tool": "task.auto_delegate",
+      "action": "Auto-delegated task \"Bootstrap Transactional Storage Schema\" to employee dwight",
+      "inputHash": "ZHdpZ2h0",
+      "result": "SUCCESS: Task workload rebalanced. Transferred assignment to dwight.",
+      "timestamp": "2026-09-08T20:24:23.248Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-reassign-1788899063248"
+    },
+    {
+      "id": "aud-assign-1788899059004",
+      "agentId": "michael",
+      "tool": "fleet.auto_assign",
+      "action": "Dispatched operational tasks across all autonomous fleet agents",
+      "inputHash": "YXV0by1hc3NpZ24tYWxs",
+      "result": "SUCCESS: Initialized and assigned active tasks for 90 queue items across all departments.",
+      "timestamp": "2026-09-08T20:24:19.004Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-assign-1788899059004"
+    },
+    {
+      "id": "aud-evt-1788898755359-11",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:19:15.359Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898755359"
+    },
+    {
+      "id": "aud-evt-1788898754374-877",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:19:14.374Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898754374"
+    },
+    {
+      "id": "aud-evt-1788898754290-647",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:19:14.290Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898754290"
+    },
+    {
+      "id": "aud-evt-1788898751978-853",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:19:11.978Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898751978"
+    },
+    {
+      "id": "aud-evt-1788898751840-820",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:19:11.840Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898751840"
+    },
+    {
+      "id": "aud-assign-1788898428424",
+      "agentId": "michael",
+      "tool": "fleet.auto_assign",
+      "action": "Dispatched operational tasks across all autonomous fleet agents",
+      "inputHash": "YXV0by1hc3NpZ24tYWxs",
+      "result": "SUCCESS: Initialized and assigned active tasks for 90 queue items across all departments.",
+      "timestamp": "2026-09-08T20:13:48.424Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-assign-1788898428424"
+    },
+    {
+      "id": "aud-tsk-1788898411302",
+      "agentId": "michael",
+      "taskId": "tsk-1788898411294",
+      "tool": "task.create",
+      "action": "Assigned task \"Test\" to undefined",
+      "inputHash": "VGVzdA==",
+      "result": "SUCCESS: Pushed to assignment queue for employee undefined",
+      "timestamp": "2026-09-08T20:13:31.302Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-tsk-1788898411302"
+    },
+    {
+      "id": "aud-evt-1788898164164-357",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:09:24.165Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898164165"
+    },
+    {
+      "id": "aud-evt-1788898163093-980",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:09:23.093Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898163093"
+    },
+    {
+      "id": "aud-evt-1788898163036-815",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:09:23.036Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898163036"
+    },
+    {
+      "id": "aud-comp-1788898135367",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898135271",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Test Task\"",
+      "inputHash": "ewogICJwbGFuU3VtbWFy",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000060",
+      "timestamp": "2026-09-08T20:08:55.367Z",
+      "riskLevel": "medium",
+      "approvalRequired": false,
+      "executionId": "ex-1788898135271"
+    },
+    {
+      "id": "aud-evt-1788898135305-852",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898135271",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Test Task\" is running under execution loop. Priority: medium",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:08:55.305Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898135305"
+    },
+    {
+      "id": "aud-1788898135271",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898135271",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Test Task\"",
+      "inputHash": "VGVzdCB0YXNr",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T20:08:55.271Z",
+      "riskLevel": "medium",
+      "approvalRequired": false,
+      "executionId": "ex-1788898135271"
+    },
+    {
+      "id": "aud-evt-1788898135263-206",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Test Task\" assigned to employee: michael",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:08:55.263Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898135263"
+    },
+    {
+      "id": "aud-evt-1788898029623-80",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:07:09.623Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898029623"
+    },
+    {
+      "id": "aud-evt-1788898028796-449",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:07:08.796Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898028796"
+    },
+    {
+      "id": "aud-evt-1788898028711-316",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:07:08.711Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898028711"
+    },
+    {
+      "id": "aud-comp-1788898026946",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898026845",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Perimeter Security & Vulnerability Scan\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000071",
+      "timestamp": "2026-09-08T20:07:06.947Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788898026846"
+    },
+    {
+      "id": "aud-prom-1788898026911",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898026845",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Dwight Schrute",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Dwight Schrute has advanced to CSE Level 5 (Grade L4) after completing project task.",
+      "timestamp": "2026-09-08T20:07:06.911Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788898026911"
+    },
+    {
+      "id": "aud-evt-1788898026877-761",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898026845",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Perimeter Security & Vulnerability Scan\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:07:06.877Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898026877"
+    },
+    {
+      "id": "aud-1788898026846",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788898026845",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Perimeter Security & Vulnerability Scan\"",
+      "inputHash": "8J+boe+4jyBBc3NpZ24g",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T20:07:06.846Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788898026846"
+    },
+    {
+      "id": "aud-evt-1788898026837-714",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Perimeter Security & Vulnerability Scan\" assigned to employee: dwight",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:07:06.837Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788898026837"
+    },
+    {
+      "id": "aud-comp-1788897863468",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863280",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Execute User Objective: Build software and clean c\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000070",
+      "timestamp": "2026-09-08T20:04:23.468Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897863280"
+    },
+    {
+      "id": "aud-prom-1788897863431",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863280",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Cline",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Cline has advanced to CSE Level 4 (Grade L3) after completing project task.",
+      "timestamp": "2026-09-08T20:04:23.431Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788897863431"
+    },
+    {
+      "id": "aud-comp-1788897863397",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863233",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000071",
+      "timestamp": "2026-09-08T20:04:23.397Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897863234"
+    },
+    {
+      "id": "aud-prom-1788897863357",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863233",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Dwight Schrute",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Dwight Schrute has advanced to CSE Level 5 (Grade L3) after completing project task.",
+      "timestamp": "2026-09-08T20:04:23.357Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788897863357"
+    },
+    {
+      "id": "aud-evt-1788897863311-877",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863280",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Execute User Objective: Build software and clean codes...\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:04:23.311Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897863311"
+    },
+    {
+      "id": "aud-1788897863280",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863280",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Execute User Objective: Build software and clean c\"",
+      "inputHash": "Q2xpbmUgaW5pdGlhdGVk",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T20:04:23.280Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897863280"
+    },
+    {
+      "id": "aud-evt-1788897863273-85",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Execute User Objective: Build software and clean codes...\" assigned to employee: cline",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:04:23.273Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897863273"
+    },
+    {
+      "id": "aud-evt-1788897863264-135",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863233",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Security & AST Audit for Grokbot Briefing\" is running under execution loop. Priority: critical",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:04:23.264Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897863264"
+    },
+    {
+      "id": "aud-1788897863234",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897863233",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "RHdpZ2h0IGNvbXBsZXRl",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T20:04:23.234Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897863234"
+    },
+    {
+      "id": "aud-evt-1788897863226-172",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Security & AST Audit for Grokbot Briefing\" assigned to employee: dwight",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T20:04:23.226Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897863226"
+    },
+    {
+      "id": "aud-gw-1788897862838",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "project-writer",
+      "action": "write_file",
+      "inputHash": "eyJwYXRoIjoibW9kdWxl",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-default",
+      "timestamp": "2026-09-08T20:04:22.843Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1788897862838-2590"
+    },
+    {
+      "id": "aud-evt-1788897576517-129",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:59:36.517Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897576517"
+    },
+    {
+      "id": "aud-evt-1788897575611-868",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:59:35.611Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897575611"
+    },
+    {
+      "id": "aud-evt-1788897575555-9",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:59:35.555Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897575555"
+    },
+    {
+      "id": "aud-evt-1788897515974-913",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:58:35.974Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897515974"
+    },
+    {
+      "id": "aud-evt-1788897514639-541",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:58:34.639Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897514639"
+    },
+    {
+      "id": "aud-evt-1788897514559-844",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:58:34.559Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897514559"
+    },
+    {
+      "id": "aud-comp-1788897328634",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328348",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Execute User Objective: hey...\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000068",
+      "timestamp": "2026-09-08T19:55:28.634Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897328349"
+    },
+    {
+      "id": "aud-comp-1788897328586",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328424",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000071",
+      "timestamp": "2026-09-08T19:55:28.586Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897328424"
+    },
+    {
+      "id": "aud-prom-1788897328522",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328424",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Dwight Schrute",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Dwight Schrute has advanced to CSE Level 4 (Grade L3) after completing project task.",
+      "timestamp": "2026-09-08T19:55:28.522Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788897328522"
+    },
+    {
+      "id": "aud-evt-1788897328464-1",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328424",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Security & AST Audit for Grokbot Briefing\" is running under execution loop. Priority: critical",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:55:28.464Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897328464"
+    },
+    {
+      "id": "aud-1788897328424",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328424",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "RHdpZ2h0IGNvbXBsZXRl",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:55:28.424Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897328424"
+    },
+    {
+      "id": "aud-evt-1788897328407-169",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Security & AST Audit for Grokbot Briefing\" assigned to employee: dwight",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:55:28.407Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897328407"
+    },
+    {
+      "id": "aud-evt-1788897328397-991",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328348",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Execute User Objective: hey...\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:55:28.397Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897328397"
+    },
+    {
+      "id": "aud-1788897328349",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897328348",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Execute User Objective: hey...\"",
+      "inputHash": "Q2xpbmUgaW5pdGlhdGVk",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:55:28.349Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897328349"
+    },
+    {
+      "id": "aud-evt-1788897328339-949",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Execute User Objective: hey...\" assigned to employee: cline",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:55:28.339Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897328339"
+    },
+    {
+      "id": "aud-comp-1788897267619",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267535",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000071",
+      "timestamp": "2026-09-08T19:54:27.619Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897267535"
+    },
+    {
+      "id": "aud-evt-1788897267564-954",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267535",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Security & AST Audit for Grokbot Briefing\" is running under execution loop. Priority: critical",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:54:27.564Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897267564"
+    },
+    {
+      "id": "aud-1788897267535",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267535",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "RHdpZ2h0IGNvbXBsZXRl",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:54:27.535Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897267535"
+    },
+    {
+      "id": "aud-evt-1788897267528-691",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Security & AST Audit for Grokbot Briefing\" assigned to employee: dwight",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:54:27.528Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897267528"
+    },
+    {
+      "id": "aud-comp-1788897267506",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267402",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Execute User Objective: hey\n---\nhloo...\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000068",
+      "timestamp": "2026-09-08T19:54:27.506Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897267402"
+    },
+    {
+      "id": "aud-prom-1788897267471",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267402",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Cline",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Cline has advanced to CSE Level 4 (Grade L2) after completing project task.",
+      "timestamp": "2026-09-08T19:54:27.471Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788897267471"
+    },
+    {
+      "id": "aud-evt-1788897267432-916",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267402",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Execute User Objective: hey\n---\nhloo...\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:54:27.432Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897267432"
+    },
+    {
+      "id": "aud-1788897267402",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897267402",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Execute User Objective: hey\n---\nhloo...\"",
+      "inputHash": "Q2xpbmUgaW5pdGlhdGVk",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:54:27.402Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897267402"
+    },
+    {
+      "id": "aud-evt-1788897267394-133",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Execute User Objective: hey\n---\nhloo...\" assigned to employee: cline",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:54:27.394Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897267394"
+    },
+    {
+      "id": "aud-comp-1788897020148",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019930",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000071",
+      "timestamp": "2026-09-08T19:50:20.148Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897019930"
+    },
+    {
+      "id": "aud-prom-1788897020082",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019930",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Dwight Schrute",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Dwight Schrute has advanced to CSE Level 4 (Grade L2) after completing project task.",
+      "timestamp": "2026-09-08T19:50:20.082Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788897020082"
+    },
+    {
+      "id": "aud-comp-1788897020047",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019843",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"Execute User Objective: hey...\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000068",
+      "timestamp": "2026-09-08T19:50:20.047Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897019843"
+    },
+    {
+      "id": "aud-prom-1788897019990",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019843",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Cline",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Cline has advanced to CSE Level 3 (Grade L2) after completing project task.",
+      "timestamp": "2026-09-08T19:50:19.990Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788897019990"
+    },
+    {
+      "id": "aud-evt-1788897019959-203",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019930",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Security & AST Audit for Grokbot Briefing\" is running under execution loop. Priority: critical",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:50:19.959Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897019959"
+    },
+    {
+      "id": "aud-1788897019930",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019930",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Security & AST Audit for Grokbot Briefing\"",
+      "inputHash": "RHdpZ2h0IGNvbXBsZXRl",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:50:19.930Z",
+      "riskLevel": "critical",
+      "approvalRequired": true,
+      "executionId": "ex-1788897019930"
+    },
+    {
+      "id": "aud-evt-1788897019889-286",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Security & AST Audit for Grokbot Briefing\" assigned to employee: dwight",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:50:19.889Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897019889"
+    },
+    {
+      "id": "aud-evt-1788897019872-97",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019843",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"Execute User Objective: hey...\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:50:19.872Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897019872"
+    },
+    {
+      "id": "aud-1788897019843",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788897019843",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"Execute User Objective: hey...\"",
+      "inputHash": "Q2xpbmUgaW5pdGlhdGVk",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:50:19.843Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788897019843"
+    },
+    {
+      "id": "aud-evt-1788897019835-482",
+      "agentId": "cline",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"Execute User Objective: hey...\" assigned to employee: cline",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:50:19.835Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788897019835"
+    },
+    {
+      "id": "aud-evt-1788896983642-495",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:43.642Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896983642"
+    },
+    {
+      "id": "aud-comp-1788896981694",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788896981598",
+      "tool": "agent.execution_loop",
+      "action": "Task Completed: \"B2B Client Acquisition Strategy\"",
+      "inputHash": "ewogICJsYW5ndWFnZSI6",
+      "result": "SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $0.000070",
+      "timestamp": "2026-09-08T19:49:41.694Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788896981599"
+    },
+    {
+      "id": "aud-prom-1788896981660",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788896981598",
+      "tool": "cse_academy",
+      "action": "Agent Promotion: Jim Halpert",
+      "inputHash": "CERT-GEN-AUTO",
+      "result": "🎉 PROMOTION UNLOCKED! Agent Jim Halpert has advanced to CSE Level 2 (Grade L2) after completing project task.",
+      "timestamp": "2026-09-08T19:49:41.660Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "prom-1788896981660"
+    },
+    {
+      "id": "aud-evt-1788896981630-743",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788896981598",
+      "tool": "event_bus",
+      "action": "Event \"TASK_EXECUTION_LOOP_STARTED\" triggered: Approved: \"B2B Client Acquisition Strategy\" is running under execution loop. Priority: high",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:41.630Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896981630"
+    },
+    {
+      "id": "aud-1788896981599",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788896981598",
+      "tool": "agent.execution_loop",
+      "action": "Task Ingestion: \"B2B Client Acquisition Strategy\"",
+      "inputHash": "8J+ToiBIYXZlIEppbSBk",
+      "result": "APPROVED: Permissions check passed. Active execution context generated.",
+      "timestamp": "2026-09-08T19:49:41.599Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "ex-1788896981599"
+    },
+    {
+      "id": "aud-evt-1788896981591-732",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"TASK_INGESTED\" triggered: System ingested task \"B2B Client Acquisition Strategy\" assigned to employee: jim",
+      "inputHash": "eyJwcm9qZWN0SWQiOiJw",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:41.591Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896981591"
+    },
+    {
+      "id": "aud-evt-1788896963670-510",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:23.670Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896963670"
+    },
+    {
+      "id": "aud-evt-1788896962053-648",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:22.053Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896962053"
+    },
+    {
+      "id": "aud-evt-1788896961986-551",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:21.987Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896961987"
+    },
+    {
+      "id": "aud-evt-1788896960347-832",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:20.347Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896960347"
+    },
+    {
+      "id": "aud-evt-1788896960273-161",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:49:20.274Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896960274"
+    },
+    {
+      "id": "aud-evt-1788896394313-140",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:39:54.313Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896394313"
+    },
+    {
+      "id": "aud-evt-1788896393367-263",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:39:53.367Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896393367"
+    },
+    {
+      "id": "aud-evt-1788896393282-432",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:39:53.282Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896393282"
+    },
+    {
+      "id": "aud-evt-1788896390928-62",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:39:50.928Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896390928"
+    },
+    {
+      "id": "aud-evt-1788896390857-157",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:39:50.857Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896390857"
+    },
+    {
+      "id": "aud-evt-1788896052043-900",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:34:12.043Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788896052043"
+    },
+    {
+      "id": "aud-evt-1788895926140-584",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:32:06.140Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895926140"
+    },
+    {
+      "id": "aud-evt-1788895925184-667",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:32:05.184Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895925184"
+    },
+    {
+      "id": "aud-evt-1788895925119-519",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:32:05.119Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895925119"
+    },
+    {
+      "id": "aud-evt-1788895923468-525",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:32:03.468Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895923468"
+    },
+    {
+      "id": "aud-evt-1788895923399-696",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:32:03.399Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895923399"
+    },
+    {
+      "id": "aud-evt-1788895617388-859",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:26:57.388Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895617388"
+    },
+    {
+      "id": "aud-evt-1788895615902-205",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:26:55.902Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895615902"
+    },
+    {
+      "id": "aud-evt-1788895615827-492",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:26:55.827Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895615827"
+    },
+    {
+      "id": "aud-evt-1788895613771-670",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:26:53.771Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895613771"
+    },
+    {
+      "id": "aud-evt-1788895613688-315",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:26:53.688Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895613688"
+    },
+    {
+      "id": "aud-evt-1788895028140-923",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:17:08.140Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895028140"
+    },
+    {
+      "id": "aud-evt-1788895026938-114",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:17:06.938Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895026938"
+    },
+    {
+      "id": "aud-evt-1788895026881-79",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:17:06.881Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895026881"
+    },
+    {
+      "id": "aud-evt-1788895025189-233",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:17:05.189Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895025189"
+    },
+    {
+      "id": "aud-evt-1788895025114-667",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:17:05.114Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788895025114"
+    },
+    {
+      "id": "aud-evt-1788894658032-767",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:10:58.032Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894658032"
+    },
+    {
+      "id": "aud-evt-1788894657138-496",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:10:57.138Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894657138"
+    },
+    {
+      "id": "aud-evt-1788894657078-103",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:10:57.078Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894657078"
+    },
+    {
+      "id": "aud-evt-1788894655396-375",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:10:55.396Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894655396"
+    },
+    {
+      "id": "aud-evt-1788894655326-886",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:10:55.326Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894655326"
+    },
+    {
+      "id": "aud-evt-1788894100445-355",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:01:40.445Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894100445"
+    },
+    {
+      "id": "aud-evt-1788894099507-332",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:01:39.507Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894099507"
+    },
+    {
+      "id": "aud-evt-1788894099450-550",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:01:39.450Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894099450"
+    },
+    {
+      "id": "aud-evt-1788894097770-54",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:01:37.770Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894097770"
+    },
+    {
+      "id": "aud-evt-1788894097700-350",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T19:01:37.700Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788894097700"
+    },
+    {
+      "id": "aud-evt-1788893744774-600",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T18:55:44.774Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788893744774"
+    },
+    {
+      "id": "aud-evt-1788893743875-417",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T18:55:43.875Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788893743875"
+    },
+    {
+      "id": "aud-evt-1788893743868-62",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T18:55:43.868Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788893743868"
+    },
+    {
+      "id": "aud-evt-1788893742057-701",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T18:55:42.057Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788893742057"
+    },
+    {
+      "id": "aud-evt-1788893742045-99",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-09-08T18:55:42.045Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1788893742045"
+    },
     {
       "id": "aud-evt-1788790562630-596",
       "agentId": "system",
@@ -10727,6 +13442,196 @@
       "classifiedAs": "INTERNAL",
       "author": "dwight",
       "timestamp": "2026-09-07T07:04:35.389Z"
+    },
+    {
+      "id": "mem-prom-1788896981667",
+      "namespace": "agent.jim",
+      "departmentId": "marketing",
+      "key": "task.execution.1788896981667",
+      "content": "Earned promotion to CSE Academy Level 2 and Grade L2 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "jim",
+      "timestamp": "2026-09-08T19:49:41.667Z"
+    },
+    {
+      "id": "mem-1788896981687",
+      "namespace": "agent.jim",
+      "departmentId": "marketing",
+      "key": "task.execution.1788896981687",
+      "content": "Successfully completed mission task \"B2B Client Acquisition Strategy\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "jim",
+      "timestamp": "2026-09-08T19:49:41.687Z"
+    },
+    {
+      "id": "mem-prom-1788897019997",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897019997",
+      "content": "Earned promotion to CSE Academy Level 3 and Grade L2 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T19:50:19.997Z"
+    },
+    {
+      "id": "mem-1788897020040",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897020040",
+      "content": "Successfully completed mission task \"Execute User Objective: hey...\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T19:50:20.040Z"
+    },
+    {
+      "id": "mem-prom-1788897020089",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897020089",
+      "content": "Earned promotion to CSE Academy Level 4 and Grade L2 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T19:50:20.089Z"
+    },
+    {
+      "id": "mem-1788897020139",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897020139",
+      "content": "Successfully completed mission task \"Security & AST Audit for Grokbot Briefing\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T19:50:20.139Z"
+    },
+    {
+      "id": "mem-prom-1788897267477",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897267478",
+      "content": "Earned promotion to CSE Academy Level 4 and Grade L2 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T19:54:27.478Z"
+    },
+    {
+      "id": "mem-1788897267500",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897267500",
+      "content": "Successfully completed mission task \"Execute User Objective: hey\n---\nhloo...\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T19:54:27.500Z"
+    },
+    {
+      "id": "mem-1788897267611",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897267611",
+      "content": "Successfully completed mission task \"Security & AST Audit for Grokbot Briefing\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T19:54:27.611Z"
+    },
+    {
+      "id": "mem-prom-1788897328543",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897328544",
+      "content": "Earned promotion to CSE Academy Level 4 and Grade L3 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T19:55:28.544Z"
+    },
+    {
+      "id": "mem-1788897328579",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897328579",
+      "content": "Successfully completed mission task \"Security & AST Audit for Grokbot Briefing\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T19:55:28.579Z"
+    },
+    {
+      "id": "mem-1788897328627",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897328627",
+      "content": "Successfully completed mission task \"Execute User Objective: hey...\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T19:55:28.627Z"
+    },
+    {
+      "id": "mem-prom-1788897863365",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897863365",
+      "content": "Earned promotion to CSE Academy Level 5 and Grade L3 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T20:04:23.365Z"
+    },
+    {
+      "id": "mem-1788897863390",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788897863390",
+      "content": "Successfully completed mission task \"Security & AST Audit for Grokbot Briefing\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T20:04:23.390Z"
+    },
+    {
+      "id": "mem-prom-1788897863438",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897863438",
+      "content": "Earned promotion to CSE Academy Level 4 and Grade L3 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T20:04:23.438Z"
+    },
+    {
+      "id": "mem-1788897863461",
+      "namespace": "agent.cline",
+      "departmentId": "engineering",
+      "key": "task.execution.1788897863461",
+      "content": "Successfully completed mission task \"Execute User Objective: Build software and clean codes...\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "cline",
+      "timestamp": "2026-09-08T20:04:23.461Z"
+    },
+    {
+      "id": "mem-prom-1788898026918",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788898026918",
+      "content": "Earned promotion to CSE Academy Level 5 and Grade L4 by completing practical project task.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T20:07:06.918Z"
+    },
+    {
+      "id": "mem-1788898026939",
+      "namespace": "agent.dwight",
+      "departmentId": "security",
+      "key": "task.execution.1788898026939",
+      "content": "Successfully completed mission task \"Perimeter Security & Vulnerability Scan\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "dwight",
+      "timestamp": "2026-09-08T20:07:06.939Z"
+    },
+    {
+      "id": "mem-1788898135359",
+      "namespace": "agent.michael",
+      "departmentId": "executive",
+      "key": "task.execution.1788898135359",
+      "content": "Successfully completed mission task \"Test Task\" in workspace of project \"Project Alpha (Company OS Integration)\". Generated code snippet: false.",
+      "classifiedAs": "INTERNAL",
+      "author": "michael",
+      "timestamp": "2026-09-08T20:08:55.359Z"
     }
   ],
   "employees": [

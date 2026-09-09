@@ -14,6 +14,7 @@ import {
   INITIAL_AGENTS,
   INITIAL_DYNAMIC_FEATURES,
   INITIAL_TRIGGERS,
+  INITIAL_FLEET_TASKS,
 } from './constants/initialAgents';
 import { soundFx, speakText } from './utils/speech';
 import { TopNavigation } from './components/TopNavigation';
@@ -106,7 +107,7 @@ export default function App() {
   const [agents, setAgents] = useState<Agent[]>(() => INITIAL_AGENTS);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(() => INITIAL_AGENTS[0]?.id || 'michael');
   const [logs, setLogs] = useState<AgentLog[]>([]);
-  const [tasks, setTasks] = useState<FleetTask[]>([]);
+  const [tasks, setTasks] = useState<FleetTask[]>(() => INITIAL_FLEET_TASKS);
   const [dynamicFeatures, setDynamicFeatures] = useState<DynamicFeature[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('munderdiffl_user_profile');
@@ -292,8 +293,10 @@ export default function App() {
             setMissions(data.missions);
             setAudits(data.audits);
             setAccounts(data.accounts);
-            if (data.tasks) {
+            if (data.tasks && data.tasks.length > 0) {
               setTasks(data.tasks);
+            } else {
+              setTasks(INITIAL_FLEET_TASKS);
             }
             if (data.employees) {
               setAgents((prev) => {
@@ -567,7 +570,7 @@ export default function App() {
         ];
         const message = topics[Math.floor(Math.random() * topics.length)];
 
-        const commLog = {
+        const commLog: AgentLog = {
           id: `comm-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
           timestamp: new Date().toLocaleTimeString(),
           level: 'info',
@@ -962,6 +965,15 @@ export default function App() {
           // Add the newly created/updated task to the local queue
           setTasks((prev) => [data.task, ...prev].filter((t, index, self) => self.findIndex(tx => tx.id === t.id) === index));
           
+          // Update the agent's status to 'working' and currentTask
+          setAgents((prev) =>
+            prev.map((a) =>
+              a.id === assignedTo
+                ? { ...a, status: 'working', currentTask: title }
+                : a
+            )
+          );
+
           if (data.success) {
             // Success notification and trigger agent thought logging
             const targetEmp = agents.find((a) => a.id === assignedTo);
@@ -993,6 +1005,51 @@ export default function App() {
       }
     } catch (e) {
       console.error('Failed to create and execute task under agent execution loop:', e);
+    }
+  };
+
+  // Auto-delegate / reassign task to balance workload
+  const handleReassignTask = async (taskId: string, newAssignedTo: string) => {
+    try {
+      // 1. Optimistic local update of tasks
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, assignedTo: newAssignedTo } : t))
+      );
+
+      const targetEmp = agents.find((a) => a.id === newAssignedTo);
+      const targetName = targetEmp ? targetEmp.name : newAssignedTo;
+      const reassignedTask = tasks.find((t) => t.id === taskId);
+      const taskTitle = reassignedTask ? reassignedTask.title : taskId;
+
+      // Update target agent status to working if previously idle
+      setAgents((prev) =>
+        prev.map((a) => {
+          if (a.id === newAssignedTo) {
+            return { ...a, status: 'working', currentTask: taskTitle };
+          }
+          return a;
+        })
+      );
+
+      setLogs((prev) => [
+        {
+          id: `log-reassign-${Date.now()}`,
+          timestamp: new Date().toLocaleTimeString(),
+          level: 'info',
+          agentId: newAssignedTo,
+          message: `[Auto-Delegation] Task "${taskTitle}" reallocated to ${targetName}. Workload balanced across autonomous fleet.`,
+        },
+        ...prev,
+      ]);
+
+      // 2. Persist to backend
+      await fetch('/api/tasks/reassign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId, newAssignedTo }),
+      });
+    } catch (e) {
+      console.error('Failed to auto-delegate task:', e);
     }
   };
 
@@ -1606,7 +1663,7 @@ export default function App() {
                           color={getAgentColor(agents.find(a => a.id === log.agentId)?.department || '')}
                           agent={agents.find(a => a.id === log.agentId)?.name || 'System'}
                           action={log.message.slice(0, 60) + (log.message.length > 60 ? '...' : '')}
-                          time={log.timestamp}
+                          time={typeof log.timestamp === 'number' ? new Date(log.timestamp).toLocaleTimeString() : String(log.timestamp)}
                         />
                       ))}
                     </div>
@@ -1691,6 +1748,7 @@ export default function App() {
         onImportRepoTool={handleImportRepoTool}
         onTriggerManualHeal={handleTriggerManualHeal}
         onAddTask={handleAddTask}
+        onReassignTask={handleReassignTask}
         onAddAgent={handleAddAgent}
         onUpdateAgent={(updatedAgent) => {
           setAgents((prev) => prev.map((a) => (a.id === updatedAgent.id ? updatedAgent : a)));

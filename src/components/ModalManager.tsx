@@ -93,12 +93,13 @@ interface ModalManagerProps {
   onAddFeature: (feat: Partial<DynamicFeature>) => void;
   onSaveFeature: (feat: DynamicFeature) => void;
   onExecuteCode: (code: string) => Promise<{ success: boolean; logs: string[]; output: any }>;
-  onExecutePrompt: (prompt: string, attachedFile?: AttachedFile) => Promise<void>;
+  onExecutePrompt: (prompt: string, attachedFile?: AttachedFile) => Promise<any>;
   onAnalyzeWebContent: (content: string, title: string) => void;
   onMountToIde: (code: string, title: string) => void;
   onImportRepoTool: (feature: Partial<DynamicFeature>) => void;
   onTriggerManualHeal: () => Promise<void>;
   onAddTask: (task: Partial<FleetTask>) => void;
+  onReassignTask?: (taskId: string, newAssignedTo: string) => Promise<void> | void;
   onAddAgent?: (agent: Agent) => void;
   onUpdateAgent: (agent: Agent) => void;
   onTaskCreated: (task: any) => void;
@@ -138,6 +139,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
   onImportRepoTool,
   onTriggerManualHeal,
   onAddTask,
+  onReassignTask,
   onAddAgent,
   onUpdateAgent,
   onTaskCreated,
@@ -251,6 +253,17 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         isOpen={state.isDebuggerOpen}
         onClose={() => onClose('isDebuggerOpen')}
         onTriggerHeal={onTriggerManualHeal}
+        telemetry={{
+          uptime: 3600,
+          cyclesRun: 142,
+          healthScore: 99.8,
+          patchesApplied: 12,
+          activeWorkers: 9,
+          heapUsedMB: 114,
+          heapTotalMB: 512,
+          rssMB: 180,
+          logs: []
+        }}
       />
 
       <SystemModulesModal
@@ -305,7 +318,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
               title: 'n8n Automation Event Task',
               description: prompt,
               priority: 'high',
-              status: 'pending',
+              status: 'queued',
             });
           }
         }}
@@ -320,7 +333,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
               title: 'Telegram Autonomous Fleet Task',
               description: prompt,
               priority: 'high',
-              status: 'pending',
+              status: 'queued',
             });
           }
         }}
@@ -359,6 +372,8 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onClose={() => onClose('isAgentDetailOpen')}
         agent={selectedAgent}
         tasks={tasks}
+        agents={agents}
+        onReassignTask={onReassignTask}
         onOpenWorkstation={() => {
           closeAll();
           onOpen('isWorkstationOpen');
