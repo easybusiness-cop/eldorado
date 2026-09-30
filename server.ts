@@ -37,6 +37,7 @@ import { chaosSimulationRouter } from "./server/routes/chaos-simulation.routes.t
 import { composioRouter } from "./server/routes/composio.routes.ts";
 import { integrationRouter } from "./server/routes/integrations.ts";
 import departmentRoutes from "./server/routes/department.routes.ts";
+import corporationRouter from "./server/routes/corporation.routes.ts";
 
 import fs from "fs";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
@@ -160,6 +161,7 @@ app.use("/api/recommendations", recommendationsRouter);
 app.use("/api/microservices", microservicesRouter);
 app.use("/api/composio", composioRouter);
 app.use("/api/integrations", integrationRouter);
+app.use("/api/corporation", corporationRouter);
 app.use("/api", chaosSimulationRouter);
 
 

@@ -260,10 +260,12 @@ The user interface provides instant access to all autonomous operations:
 1. **Global Command Palette (`Cmd + K` or `Ctrl + K`)**:
    - Fuzzy search indexing all agents, active tasks, standard operating procedures, and building floors.
    - Arrow-key traversal (`↑` / `↓`) and direct selection execution.
-2. **Command Center & Fleet Roster**:
-   - Agent cards displaying clearance, authority, and status.
-   - Quantum superposition alignment controls.
-   - Text-to-speech voice engine toggle to vocalize agent thoughts.
+2. **Command Center & Fleet Telemetry Grid**:
+   - **Agent Fleet Telemetry Grid**: Live multi-agent status matrix with real-time throughput metrics (tokens/second, lifetime tokens, active mission).
+   - **Dynamic Heartbeat Visual Animation**: Agent avatars pulse with an organic, cardiac-paced glowing halo (`avatar-heartbeat` & `avatar-heartbeat-ring`) where pulse cadence (resting 2.4s down to 0.75s peak) and glow intensity/scale vary dynamically with the agent's real-time token processing load factor ($0.0 - 1.0$).
+   - **Micro-Sparkline Heartbeat Variability Tooltip (`SmartSuggestionTooltip.tsx` & `HeartbeatVariabilitySparkline.tsx`)**: Hovering over any agent card reveals a high-resolution 60-second SVG sparkline graph plotting the agent's Heartbeat Variability (HRV in milliseconds RMSSD) alongside the instantaneous Token Processing Load curve. Highlights Pearson correlation ($r = +0.85$ to $+0.99$) between token processing volume and pulse intensity, with interactive scrubbing, cadence (BPM), and AI next-best-mission recommendations.
+   - Quantum superposition alignment controls and quantum path difficulty scores.
+   - Text-to-speech voice engine toggle to vocalize agent thoughts in real-time.
 3. **13-Floor Interactive HQ Floorplan Viewer**:
    - Visual architectural layout of all 13 floors with active agent counts and departmental statuses.
 4. **IDE Dev Suite & Autonomous Software Builder (`IdeModal.tsx`)**:
@@ -284,6 +286,22 @@ The user interface provides instant access to all autonomous operations:
    - Test and feed live external APIs (Weather, Crypto, Custom REST) into agent reasoning streams.
 10. **Deployment Pipeline & Hotfix Manager (`DeploymentPipelineModal.tsx`)**:
     - Manage hotfix releases, review patches, and promote builds to production.
+11. **Virtual AI Corporation Command Center (`VirtualCorporationView.tsx`)**:
+    - **Continuous Optimization & Autonomous Remediation Engine ("Start Working On It")**: Comprehensive scanner and automated remediation pipeline addressing the six core operational inefficiencies:
+      - *Repetitive Work*: Identifies redundant manual executions and deploys event-driven background daemons with deduplicating semantic state caches (saving up to 16.5 hrs/week).
+      - *Bottlenecks*: Detects single-point approvals and overloaded employees (>85% workload), dynamically rebalancing queues across peer specialists and updating delegation policies.
+      - *Expensive Processes*: Isolates context-dump operations and circular multi-model reasoning loops, introducing AST pre-filtering and complexity-tiered routing to slash monthly token expenditure by over 60%.
+      - *Slow Workflows*: Analyzes sequential await chains and sleep timeouts, refactoring DAGs into asynchronous Fan-Out/Fan-In concurrent matrix pipelines (reducing turnaround latency from 38 mins to 1.4 mins).
+      - *Failures as First-Class Memory*: Resolves 429 gateway rate-limits and container memory boundaries with adaptive token-bucket leaky limiters and self-healing circuit breakers.
+      - *Unnecessary Manual Steps*: Replaces conservative manual confirmation gates with zero-touch, policy-guarded validation logging to the immutable audit ledger.
+    - **Company Brain Strategic War Room**: Live AI executive reasoning answering the 8 canonical strategic questions (Objectives, Work Required, Workforce Assignment, Resources, Missing Info, Risks, Past Precedents, Next Actions).
+    - **Organizational Hierarchy & Persistent Employee Dossier**: Deep organizational tree from Founder and Executive Office down to Teams and Specialists with verified skill proficiencies, sandboxed computer environments, and performance KPIs.
+    - **Cross-Departmental Projects & Programs Matrix**: Multi-tier tracking from Portfolios and Programs down to Milestones and Tasks with cross-department staffing.
+    - **World Intelligence & Continuous Discovery Stream**: Real-time radar scanning arXiv, GitHub, and frontier AI developments with automated relevance scoring and department distribution.
+    - **Persistent Workflows**: Multi-stage business processes with dependency enforcement, compensation rollbacks, and approval gates.
+    - **Explicit Decisions Ledger**: Consequential decisions documented with alternatives, evidence, risks, and actual measured outcomes.
+    - **Failures as First-Class Knowledge**: Comprehensive failure analysis repository tracking root causes, attempted fixes, and permanent prevention strategies.
+    - **Zero-Trust Governance & Audit Trail**: Traceable ledger recording WHO, WHAT, WHEN, WHY, TOOL, AUTH, INPUT, and RESULT.
 
 ---
 
@@ -292,6 +310,31 @@ The user interface provides instant access to all autonomous operations:
 ### Core System & Health
 - `GET /api/health` | `GET /healthz` | `GET /health`: System health, process uptime, and timestamp.
 - `GET /api/telemetry`: V8 memory, CPU, leak indices, and active system alerts.
+
+### Virtual Corporation & Company Brain Subsystems
+- `GET /api/corporation/overview`: Full corporate overview, capital balance, valuation, and subsystem summary.
+- `GET /api/corporation/departments`: Complete list of corporate departments with team structures and headcount.
+- `POST /api/corporation/departments`: Dynamically create or reorganize corporate departments.
+- `GET /api/corporation/employees`: Complete persistent virtual employee roster with full capabilities, clearance, and metrics.
+- `GET /api/corporation/employees/:id`: Individual persistent employee dossier.
+- `POST /api/corporation/employees`: Deliberately commission a persistent virtual employee to fill verified capability gaps.
+- `POST /api/corporation/brain/consult`: Query the Executive Company Brain on strategy, work, workforce, or risks.
+- `GET /api/corporation/projects`: List portfolios, programs, projects, milestones, and corporate tasks.
+- `POST /api/corporation/projects`: Create and staff a cross-departmental corporate project.
+- `GET /api/corporation/discoveries`: List world intelligence discoveries and tech adoption statuses.
+- `POST /api/corporation/discoveries/scan`: Trigger an autonomous world discovery sweep across research and open-source models.
+- `GET /api/corporation/knowledge`: Query the 11-layer corporate knowledge engine.
+- `POST /api/corporation/knowledge`: Record verified knowledge items with full provenance.
+- `GET /api/corporation/workflows`: Retrieve persistent multi-agent business process workflows.
+- `POST /api/corporation/workflows/:id/advance`: Advance or approve a workflow step.
+- `GET /api/corporation/decisions`: Retrieve all documented corporate decision records.
+- `POST /api/corporation/decisions`: Propose or execute an explicit structured decision.
+- `GET /api/corporation/failures`: Retrieve failure records with root causes and permanent prevention strategies.
+- `GET /api/corporation/audit`: Searchable zero-trust governance audit log.
+- `GET /api/corporation/optimizer/audit`: Comprehensive multi-pillar diagnostic scan covering repetitive work, bottlenecks, expensive processes, slow workflows, failures, and manual steps.
+- `POST /api/corporation/optimizer/remediate`: Executes autonomous remediation pipelines ("Start Working On It"), resolving tracked operational inefficiencies, rebalancing workloads, and recording outcomes in Company Memory.
+- `GET /api/corporation/optimizer/inefficiencies`: List all detected operational inefficiencies with live metrics and root-cause analyses.
+- `GET /api/corporation/optimizer/inefficiencies/:id`: Retrieve single inefficiency diagnostics and verified remediation receipts.
 
 ### Orchestration & Software Construction
 - `POST /api/orchestrator/run`: Triggers the Master Orchestrator (Plan → Research → Code → Execute → Critic → Synthesizer).

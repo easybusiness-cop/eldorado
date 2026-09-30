@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Zap, CheckCircle2, Clock, Gauge, ArrowRight, BrainCircuit } from 'lucide-react';
 import { Agent } from '../types';
 import { getSmartTaskSuggestion, SmartTaskSuggestion } from '../utils/smartTaskSuggestions';
+import { HeartbeatVariabilitySparkline } from './HeartbeatVariabilitySparkline';
 import { soundFx } from '../utils/speech';
 
 interface SmartSuggestionTooltipProps {
@@ -73,7 +74,7 @@ export const SmartSuggestionTooltip: React.FC<SmartSuggestionTooltipProps> = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: position === 'bottom' ? -4 : 4, scale: 0.96 }}
           transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          className={`absolute ${getPositionClasses()} z-50 pointer-events-auto w-[320px] max-w-[90vw] text-left font-sans select-none`}
+          className={`absolute ${getPositionClasses()} z-50 pointer-events-auto w-[345px] max-w-[92vw] text-left font-sans select-none`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Main Card Container */}
@@ -106,7 +107,7 @@ export const SmartSuggestionTooltip: React.FC<SmartSuggestionTooltipProps> = ({
             </div>
 
             {/* Suggested Task Content */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <div>
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border flex items-center gap-1 ${priorityBadge.bg}`}>
@@ -121,6 +122,9 @@ export const SmartSuggestionTooltip: React.FC<SmartSuggestionTooltipProps> = ({
                   {suggestion.title}
                 </h4>
               </div>
+
+              {/* Micro-sparkline Graph: 60s Heartbeat Variability & Token Processing Load Correlation */}
+              <HeartbeatVariabilitySparkline agent={agent} />
 
               {/* Skill Matching Badges */}
               <div className="rounded-lg bg-black/40 border border-white/5 p-2 space-y-1.5">

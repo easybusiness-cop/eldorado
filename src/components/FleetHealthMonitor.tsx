@@ -441,16 +441,41 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
 
                   <div className="flex items-center justify-between mb-1 relative z-10">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      {agent.avatar && agent.avatar.startsWith('http') ? (
-                        <img 
-                          src={agent.avatar} 
-                          alt={agent.name} 
-                          referrerPolicy="no-referrer"
-                          className="w-4 h-4 rounded-full object-cover shrink-0 border border-white/20" 
-                        />
-                      ) : (
-                        <span className="text-xs shrink-0">{agent.avatar || '🤖'}</span>
-                      )}
+                      <div
+                        className="agent-avatar-heartbeat shrink-0 rounded-full flex items-center justify-center"
+                        style={{
+                          ['--heartbeat-speed' as any]: tier.pulseSpeed !== '0s' ? tier.pulseSpeed : '2.4s',
+                          ['--heartbeat-scale-1' as any]: '0.03',
+                          ['--heartbeat-scale-2' as any]: '0.06',
+                          ['--heartbeat-blur-1' as any]: '4px',
+                          ['--heartbeat-blur-2' as any]: '8px',
+                          ['--heartbeat-blur-3' as any]: '10px',
+                          ['--heartbeat-blur-4' as any]: '14px',
+                          ['--heartbeat-spread-1' as any]: '1px',
+                          ['--heartbeat-spread-2' as any]: '2px',
+                          ['--heartbeat-spread-3' as any]: '2px',
+                          ['--heartbeat-spread-4' as any]: '3px',
+                          ['--heartbeat-glow-1' as any]: tier.glowColor,
+                          ['--heartbeat-glow-2' as any]: tier.glowColor,
+                          ['--heartbeat-glow-peak' as any]: tier.color,
+                          ['--heartbeat-glow-outer' as any]: tier.glowColor,
+                          ['--heartbeat-ring-color' as any]: `${tier.color}88`,
+                          ['--ring-initial-opacity' as any]: isWorking ? '0.6' : '0.25',
+                          ['--ring-peak-opacity' as any]: isWorking ? '0.8' : '0.4',
+                          ['--ring-scale' as any]: isWorking ? '0.1' : '0.05',
+                        }}
+                      >
+                        {agent.avatar && agent.avatar.startsWith('http') ? (
+                          <img 
+                            src={agent.avatar} 
+                            alt={agent.name} 
+                            referrerPolicy="no-referrer"
+                            className="w-4 h-4 rounded-full object-cover shrink-0 border border-white/20" 
+                          />
+                        ) : (
+                          <span className="text-xs shrink-0">{agent.avatar || '🤖'}</span>
+                        )}
+                      </div>
                       <span className="font-bold text-[11px] text-white truncate max-w-[70px]">{agent.name}</span>
                     </div>
 

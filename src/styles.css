@@ -863,6 +863,88 @@ kbd {
   border-radius: 12px;
   font-weight: 900;
   font-size: 15px;
+  position: relative;
+  overflow: visible;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle Heartbeat glowing pulse animation for agent avatars in Fleet Telemetry */
+@keyframes avatar-heartbeat {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--heartbeat-glow-1, rgba(52, 211, 153, 0.2)),
+                0 0 0 0 var(--heartbeat-glow-2, rgba(52, 211, 153, 0.1));
+  }
+  14% {
+    transform: scale(calc(1 + var(--heartbeat-scale-1, 0.035)));
+    box-shadow: 0 0 var(--heartbeat-blur-1, 6px) var(--heartbeat-spread-1, 1px) var(--heartbeat-glow-1, rgba(52, 211, 153, 0.5)),
+                0 0 var(--heartbeat-blur-2, 12px) var(--heartbeat-spread-2, 2px) var(--heartbeat-glow-2, rgba(52, 211, 153, 0.3));
+  }
+  26% {
+    transform: scale(1.008);
+    box-shadow: 0 0 calc(var(--heartbeat-blur-1, 6px) * 0.4) 0 var(--heartbeat-glow-1, rgba(52, 211, 153, 0.2)),
+                0 0 calc(var(--heartbeat-blur-2, 12px) * 0.4) 0 var(--heartbeat-glow-2, rgba(52, 211, 153, 0.1));
+  }
+  38% {
+    transform: scale(calc(1 + var(--heartbeat-scale-2, 0.065)));
+    box-shadow: 0 0 var(--heartbeat-blur-3, 10px) var(--heartbeat-spread-3, 3px) var(--heartbeat-glow-peak, rgba(52, 211, 153, 0.7)),
+                0 0 var(--heartbeat-blur-4, 20px) var(--heartbeat-spread-4, 5px) var(--heartbeat-glow-outer, rgba(52, 211, 153, 0.4));
+  }
+  60% {
+    transform: scale(1);
+    box-shadow: 0 0 calc(var(--heartbeat-blur-1, 6px) * 0.3) 0 var(--heartbeat-glow-1, rgba(52, 211, 153, 0.15)),
+                0 0 calc(var(--heartbeat-blur-2, 12px) * 0.3) 0 var(--heartbeat-glow-2, rgba(52, 211, 153, 0.05));
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--heartbeat-glow-1, rgba(52, 211, 153, 0.1)),
+                0 0 0 0 var(--heartbeat-glow-2, rgba(52, 211, 153, 0.05));
+  }
+}
+
+@keyframes avatar-heartbeat-ring {
+  0% {
+    transform: scale(1);
+    opacity: var(--ring-initial-opacity, 0.4);
+  }
+  38% {
+    transform: scale(calc(1.1 + var(--ring-scale, 0.08)));
+    opacity: var(--ring-peak-opacity, 0.75);
+  }
+  68% {
+    transform: scale(calc(1.24 + var(--ring-scale, 0.16)));
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.agent-avatar-heartbeat {
+  will-change: transform, box-shadow;
+  animation: avatar-heartbeat var(--heartbeat-speed, 2.2s) cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+}
+
+.agent-avatar-heartbeat::after {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  border: 1.5px solid var(--heartbeat-ring-color, rgba(52, 211, 153, 0.45));
+  pointer-events: none;
+  opacity: 0;
+  animation: avatar-heartbeat-ring var(--heartbeat-speed, 2.2s) cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-avatar-heartbeat {
+    animation: none;
+    box-shadow: 0 0 8px 1px var(--heartbeat-glow-1, rgba(52, 211, 153, 0.3));
+  }
+  .agent-avatar-heartbeat::after {
+    display: none;
+  }
 }
 
 .agent-info {

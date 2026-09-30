@@ -28,6 +28,7 @@ import { MunderdifflinDashboard } from './components/MunderdifflinDashboard';
 import { RuffloIntelligence } from './components/RuffloIntelligence';
 import { SmartTaskSuggestion } from './utils/smartTaskSuggestions';
 import { SmartSuggestionTooltip } from './components/SmartSuggestionTooltip';
+import { VirtualCorporationView } from './components/corporation/VirtualCorporationView';
 import { initializeSystemRuntime, sendAndApplySystemCode } from './utils/systemRuntime';
 import { Zap } from 'lucide-react';
 import { VoiceWaveform } from './components/VoiceWaveform';
@@ -1124,7 +1125,7 @@ export default function App() {
   };
 
   
-  const [workspaceTab, setWorkspaceTab] = useState<'command' | 'fleet' | 'network'>('command');
+  const [workspaceTab, setWorkspaceTab] = useState<'command' | 'fleet' | 'network' | 'corporation'>('command');
   const [activeDepartment, setActiveDepartment] = useState("Overview");
   const [command, setCommand] = useState("");
 
@@ -1235,6 +1236,10 @@ export default function App() {
             <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "network" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('network'); }}>
               <Icon>🌐</Icon>
               <span>Company Network</span>
+            </button>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "corporation" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('corporation'); }}>
+              <Icon>🏢</Icon>
+              <span>Virtual Corporation</span>
             </button>
             <button className={`nav-item ${activeDepartment === "Munderdifflin" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Munderdifflin'); }}>
               <Icon>📋</Icon>
@@ -1414,8 +1419,8 @@ export default function App() {
                       </button>
                       <div>
                         <div className="eyebrow">RUFFLO / {activeDepartment === "Munderdifflin" ? "SCRANTON BRANCH" : activeDepartment === "Overview" ? "COMMAND NETWORK" : activeDepartment.toUpperCase()}</div>
-                        <h1>{activeDepartment === "Overview" ? (workspaceTab === 'command' ? "Rufflo Intelligence" : workspaceTab === 'fleet' ? "Agent Fleet Telemetry" : "Company Intelligence Network") : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
-                        <p>{activeDepartment === "Munderdifflin" ? "Autonomous task dispatch, live telemetry, and agent output memos." : "Coordinate autonomous agents, missions, knowledge and software operations."}</p>
+                        <h1>{activeDepartment === "Overview" ? (workspaceTab === 'command' ? "Rufflo Intelligence" : workspaceTab === 'fleet' ? "Agent Fleet Telemetry" : workspaceTab === 'corporation' ? "Virtual AI Corporation" : "Company Intelligence Network") : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
+                        <p>{activeDepartment === "Munderdifflin" ? "Autonomous task dispatch, live telemetry, and agent output memos." : workspaceTab === 'corporation' ? "Enterprise organizational hierarchy, persistent AI employees, projects, decisions, and continuous discovery." : "Coordinate autonomous agents, missions, knowledge and software operations."}</p>
                       </div>
                     </div>
                     <div className="workspace-actions">
@@ -1441,6 +1446,12 @@ export default function App() {
                             onClick={() => setWorkspaceTab('fleet')}
                           >
                             👥 Fleet
+                          </button>
+                          <button
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'corporation' ? 'bg-[#00d9ff]/20 text-[#00d9ff] border border-[#00d9ff]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
+                            onClick={() => setWorkspaceTab('corporation')}
+                          >
+                            🏢 Corporation
                           </button>
                           <button
                             className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'network' ? 'bg-[#a78bfa]/20 text-[#a78bfa] border border-[#a78bfa]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
@@ -1555,6 +1566,10 @@ export default function App() {
                         </div>
                       )}
                     </div>
+                  ) : workspaceTab === 'corporation' ? (
+                    <div className="flex-1 min-h-[820px] flex flex-col rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#0d0f17]">
+                      <VirtualCorporationView />
+                    </div>
                   ) : (
                     <>
                       <div className="metric-grid">
@@ -1646,6 +1661,45 @@ export default function App() {
                           const tier = getAgentThroughputTier(agent, isWorking);
                           const formattedTokens = formatTokenThroughput(agent.tokensProcessed || 0);
 
+                          // Subtle Heartbeat glowing pulse dynamics calculated from token processing volume
+                          const tokens = agent.tokensProcessed || 0;
+                          const tokenLoadFactor = Math.min(1, Math.max(0, tokens / 4500));
+
+                          // Pulse speed cadence: resting rate (~2.4s) down to ultra peak throughput (~0.75s)
+                          const heartbeatSpeed = isWorking
+                            ? (tokens > 4000 ? '0.75s' : tokens > 1500 ? '1.05s' : tokens > 500 ? '1.45s' : '1.85s')
+                            : (tokens > 4000 ? '1.3s' : tokens > 1500 ? '1.7s' : tokens > 500 ? '2.1s' : '2.5s');
+
+                          const heartbeatScale1 = (0.025 + tokenLoadFactor * 0.035).toFixed(3);
+                          const heartbeatScale2 = (0.045 + tokenLoadFactor * 0.055).toFixed(3);
+
+                          const blur1 = `${Math.round(5 + tokenLoadFactor * 7)}px`;
+                          const blur2 = `${Math.round(8 + tokenLoadFactor * 12)}px`;
+                          const blur3 = `${Math.round(10 + tokenLoadFactor * 16)}px`;
+                          const blur4 = `${Math.round(16 + tokenLoadFactor * 22)}px`;
+                          const spread1 = `${Math.round(1 + tokenLoadFactor * 2)}px`;
+                          const spread2 = `${Math.round(2 + tokenLoadFactor * 3)}px`;
+                          const spread3 = `${Math.round(2 + tokenLoadFactor * 4)}px`;
+                          const spread4 = `${Math.round(3 + tokenLoadFactor * 5)}px`;
+
+                          const pulseHex = isWorking ? tier.color : (tokens > 1000 ? tier.color : agentColor);
+                          const toRgba = (hex: string, alpha: number) => {
+                            const cleanHex = hex.replace('#', '');
+                            if (cleanHex.length === 6) {
+                              const r = parseInt(cleanHex.substring(0, 2), 16);
+                              const g = parseInt(cleanHex.substring(2, 4), 16);
+                              const b = parseInt(cleanHex.substring(4, 6), 16);
+                              return `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})`;
+                            }
+                            return tier.glowColor || 'rgba(52, 211, 153, 0.4)';
+                          };
+
+                          const heartbeatGlow1 = toRgba(pulseHex, 0.2 + tokenLoadFactor * 0.35);
+                          const heartbeatGlow2 = toRgba(pulseHex, 0.35 + tokenLoadFactor * 0.45);
+                          const heartbeatGlowPeak = toRgba(pulseHex, 0.55 + tokenLoadFactor * 0.4);
+                          const heartbeatGlowOuter = toRgba(pulseHex, 0.25 + tokenLoadFactor * 0.35);
+                          const ringColor = toRgba(pulseHex, 0.3 + tokenLoadFactor * 0.5);
+
                           return (
                             <button
                               key={agent.id}
@@ -1682,8 +1736,42 @@ export default function App() {
                               )}
 
                               <div className="agent-card-top">
-                                <div className="agent-avatar" style={{ background: `linear-gradient(135deg, ${agentColor}, #151722)` }}>
-                                  {agent.name.charAt(0)}
+                                <div
+                                  className="agent-avatar agent-avatar-heartbeat"
+                                  style={{
+                                    background: `linear-gradient(135deg, ${agentColor}, #151722)`,
+                                    ['--heartbeat-speed' as any]: heartbeatSpeed,
+                                    ['--heartbeat-scale-1' as any]: heartbeatScale1,
+                                    ['--heartbeat-scale-2' as any]: heartbeatScale2,
+                                    ['--heartbeat-blur-1' as any]: blur1,
+                                    ['--heartbeat-blur-2' as any]: blur2,
+                                    ['--heartbeat-blur-3' as any]: blur3,
+                                    ['--heartbeat-blur-4' as any]: blur4,
+                                    ['--heartbeat-spread-1' as any]: spread1,
+                                    ['--heartbeat-spread-2' as any]: spread2,
+                                    ['--heartbeat-spread-3' as any]: spread3,
+                                    ['--heartbeat-spread-4' as any]: spread4,
+                                    ['--heartbeat-glow-1' as any]: heartbeatGlow1,
+                                    ['--heartbeat-glow-2' as any]: heartbeatGlow2,
+                                    ['--heartbeat-glow-peak' as any]: heartbeatGlowPeak,
+                                    ['--heartbeat-glow-outer' as any]: heartbeatGlowOuter,
+                                    ['--heartbeat-ring-color' as any]: ringColor,
+                                    ['--ring-initial-opacity' as any]: (0.2 + tokenLoadFactor * 0.4).toFixed(2),
+                                    ['--ring-peak-opacity' as any]: (0.45 + tokenLoadFactor * 0.45).toFixed(2),
+                                    ['--ring-scale' as any]: (tokenLoadFactor * 0.12).toFixed(2),
+                                  }}
+                                  title={`${agent.name} • Token Processing Load: ${formattedTokens} tokens (${tier.label})`}
+                                >
+                                  {agent.avatar && agent.avatar.startsWith('http') ? (
+                                    <img
+                                      src={agent.avatar}
+                                      alt={agent.name}
+                                      className="w-full h-full object-cover rounded-[10px]"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  ) : (
+                                    agent.avatar || agent.name.charAt(0)
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   {isWorking && (
