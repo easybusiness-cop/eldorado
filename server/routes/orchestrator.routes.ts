@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { MasterOrchestrator } from "../core/orchestration/master-orchestrator";
-import { modelRouter } from "../ai/providers";
+import { MasterOrchestrator } from "../core/orchestration/master-orchestrator.ts";
+import { modelRouter } from "../ai/providers/index.ts";
 
 export const orchestratorRouter = Router();
 

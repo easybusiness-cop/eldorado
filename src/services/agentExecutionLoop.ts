@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
-import { companyDb, AgentContract, DBTask, ProjectPortfolio, AuditEvent } from "../db/companyDb";
-import { toolGateway, isSoftwareEngineerAgent } from "../../apps/control-plane/integrations/gateway/tool.gateway";
-import { repositoryEngineer } from "../../server/agents/repository/repository-engineer";
-import { modelRouter } from "../../server/ai/providers/index";
+import { companyDb, AgentContract, DBTask, ProjectPortfolio, AuditEvent } from "../db/companyDb.ts";
+import { toolGateway, isSoftwareEngineerAgent } from "../../apps/control-plane/integrations/gateway/tool.gateway.ts";
+import { repositoryEngineer } from "../../server/agents/repository/repository-engineer.ts";
+import { modelRouter } from "../../server/ai/providers/index.ts";
 
 export function isEngineeringTask(task: { title: string; description: string }): boolean {
   const text = `${task.title} ${task.description}`.toLowerCase();

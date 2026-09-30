@@ -1,12 +1,13 @@
-export enum CapabilityCategory {
-  ENGINEERING = "engineering",
-  MARKETING = "marketing",
-  RESEARCH = "research",
-  EXECUTIVE = "executive",
-  SYSTEM = "system",
-  OPERATIONS = "operations",
-  FINANCE = "finance"
-}
+export const CapabilityCategory = {
+  ENGINEERING: "engineering",
+  MARKETING: "marketing",
+  RESEARCH: "research",
+  EXECUTIVE: "executive",
+  SYSTEM: "system",
+  OPERATIONS: "operations",
+  FINANCE: "finance",
+} as const;
+export type CapabilityCategory = (typeof CapabilityCategory)[keyof typeof CapabilityCategory];
 
 export interface Capability {
   id: string;

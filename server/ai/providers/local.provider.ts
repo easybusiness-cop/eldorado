@@ -1,4 +1,4 @@
-import { ModelProvider, ModelGenerateOptions, ModelGenerateResult } from "./model-provider";
+import { ModelProvider, ModelGenerateOptions, ModelGenerateResult } from "./model-provider.ts";
 
 /**
  * Strong local reasoning provider.

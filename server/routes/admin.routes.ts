@@ -2,7 +2,7 @@ import { Router } from "express";
 import { callGeminiResilient } from "../ai/geminiService.ts";
 import { SecurityAuthorizationService } from "../security/secrets.ts";
 import { SecurityAuditLedger } from "../security/auditLedger.ts";
-import { CapabilityRegistry } from "../../apps/control-plane/integrations/registry/capability.registry";
+import { CapabilityRegistry } from "../../apps/control-plane/integrations/registry/capability.registry.ts";
 
 export const adminRouter = Router();
 

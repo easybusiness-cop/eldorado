@@ -348,7 +348,7 @@ export class WorkforceManager {
           .replace(/[_-]/g, " ")
           .replace(/\b\w/g, (c) => c.toUpperCase());
 
-        let category = CapabilityCategory.ENGINEERING;
+        let category: CapabilityCategory = CapabilityCategory.ENGINEERING;
         const lowerDept = (preferredDepartment || "").toLowerCase();
         if (lowerDept === "research") category = CapabilityCategory.RESEARCH;
         if (lowerDept === "marketing") category = CapabilityCategory.MARKETING;

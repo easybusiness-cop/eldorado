@@ -1,5 +1,5 @@
-import { ModelProvider, ModelGenerateOptions, ModelGenerateResult } from "./model-provider";
-import { callGeminiResilient, getGeminiClient } from "../geminiService";
+import { ModelProvider, ModelGenerateOptions, ModelGenerateResult } from "./model-provider.ts";
+import { callGeminiResilient, getGeminiClient } from "../geminiService.ts";
 
 /**
  * Optional Gemini provider.

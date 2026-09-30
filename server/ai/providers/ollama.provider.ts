@@ -3,7 +3,7 @@ import {
   ModelGenerateOptions,
   ModelGenerateResult,
   StreamCallback,
-} from "./model-provider";
+} from "./model-provider.ts";
 
 /**
  * Ollama Provider – fully local models with streaming support

@@ -6,7 +6,7 @@ import {
   HQMeeting,
   HQMemoryEntry,
   CrossDeptWorkflow
-} from '../types';
+} from '../types.ts';
 
 export const INITIAL_FLOORS: HQFloorInfo[] = [
   {

@@ -4,12 +4,12 @@
  * Open-source composition style – pure TypeScript + existing ToolGateway + CapabilityRegistry.
  */
 
-import { toolGateway } from "../../../apps/control-plane/integrations/gateway/tool.gateway";
-import { CapabilityRegistry } from "../../../apps/control-plane/integrations/registry/capability.registry";
+import { toolGateway } from "../../../apps/control-plane/integrations/gateway/tool.gateway.ts";
+import { CapabilityRegistry } from "../../../apps/control-plane/integrations/registry/capability.registry.ts";
 import { randomUUID } from "node:crypto";
-import { knowledgeGraph } from "../memory/knowledge-graph";
-import { SoftwareBuilder } from "../builder/software-builder";
-import { modelRouter } from "../../ai/providers";
+import { knowledgeGraph } from "../memory/knowledge-graph.ts";
+import { SoftwareBuilder } from "../builder/software-builder.ts";
+import { modelRouter } from "../../ai/providers/index.ts";
 
 export type OrchestratorRole =
   | "planner"

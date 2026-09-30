@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { knowledgeGraph } from "../core/memory/knowledge-graph";
+import { knowledgeGraph } from "../core/memory/knowledge-graph.ts";
 
 export const knowledgeRouter = Router();
 

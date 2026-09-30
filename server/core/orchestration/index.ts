@@ -1,7 +1,7 @@
-export { MasterOrchestrator } from "./master-orchestrator";
+export { MasterOrchestrator } from "./master-orchestrator.ts";
 export type {
   OrchestratorPlan,
   OrchestratorStep,
   OrchestratorRole,
   RunOrchestratorOptions,
-} from "./master-orchestrator";
+} from "./master-orchestrator.ts";

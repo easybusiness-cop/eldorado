@@ -1,4 +1,4 @@
-import { companyDb, AgentContract, DBTask, AuditEvent } from '../db/companyDb';
+import { companyDb, AgentContract, DBTask, AuditEvent } from '../db/companyDb.ts';
 import {
   HQFloorInfo,
   HQDepartmentDetails,
@@ -7,7 +7,7 @@ import {
   CrossDeptWorkflow,
   OrgChartNode,
   HQBuildingSummary
-} from '../types';
+} from '../types.ts';
 
 class HQService {
   public getHQSummary(): HQBuildingSummary {

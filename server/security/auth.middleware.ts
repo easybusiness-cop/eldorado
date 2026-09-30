@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { getSupabaseAdmin } from "../../src/utils/supabaseAdmin.ts";
-import { normalizeSupabaseUrl } from "../routes/supabase.routes";
+import { normalizeSupabaseUrl } from "../routes/supabase.routes.ts";
 
 export type RuffloCapability =
   | "system:read"

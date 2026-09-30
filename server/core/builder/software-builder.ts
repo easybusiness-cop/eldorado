@@ -3,9 +3,9 @@
  * Plans → Generates real code with Gemini → Writes files → Integrates → Runs smoke test
  */
 
-import { toolGateway } from "../../../apps/control-plane/integrations/gateway/tool.gateway";
-import { knowledgeGraph } from "../memory/knowledge-graph";
-import { modelRouter } from "../../ai/providers";
+import { toolGateway } from "../../../apps/control-plane/integrations/gateway/tool.gateway.ts";
+import { knowledgeGraph } from "../memory/knowledge-graph.ts";
+import { modelRouter } from "../../ai/providers/index.ts";
 import { randomUUID } from "node:crypto";
 
 export interface BuildRequest {

@@ -1,12 +1,13 @@
 import { capabilityRegistry } from "./capability.registry.ts";
 
-export enum RoleCategory {
-  ENGINEERING = "engineering",
-  MARKETING = "marketing",
-  RESEARCH = "research",
-  EXECUTIVE = "executive",
-  OPERATIONS = "operations"
-}
+export const RoleCategory = {
+  ENGINEERING: "engineering",
+  MARKETING: "marketing",
+  RESEARCH: "research",
+  EXECUTIVE: "executive",
+  OPERATIONS: "operations"
+} as const;
+export type RoleCategory = (typeof RoleCategory)[keyof typeof RoleCategory];
 
 export interface RoleDefinition {
   id: string;

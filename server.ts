@@ -38,6 +38,7 @@ import { composioRouter } from "./server/routes/composio.routes.ts";
 import { integrationRouter } from "./server/routes/integrations.ts";
 import departmentRoutes from "./server/routes/department.routes.ts";
 
+import fs from "fs";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
 import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
@@ -45,9 +46,18 @@ import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.NODE_ENV === "production"
-  ? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3000)
-  : 3000;
+const distPath = path.join(process.cwd(), "dist");
+const hasDist = fs.existsSync(path.join(distPath, "index.html"));
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  Boolean(process.env.K_SERVICE || process.env.K_REVISION) ||
+  hasDist;
+
+if (isProduction && !process.env.NODE_ENV) {
+  process.env.NODE_ENV = "production";
+}
+
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const engineering = new EngineeringDepartmentEngineer();
 const masterMeta = new MasterMetaAgent();
 
@@ -82,8 +92,8 @@ app.use(
   })
 );
 
-// Health Check
-app.get("/api/health", (req, res) => {
+// Health Check (Support /api/health, /healthz, and /health for Cloud Run and load balancers)
+app.get(["/api/health", "/healthz", "/health"], (req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
 
@@ -199,7 +209,7 @@ app.post("/api/meta/improve", async (_req, res) => {
 
 // Start Server with Vite Dev/Prod Middleware and WebSocket Engine
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
+  if (!isProduction) {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
@@ -209,7 +219,6 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));

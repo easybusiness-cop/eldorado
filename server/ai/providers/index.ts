@@ -1,6 +1,6 @@
-export * from "./model-provider";
-export * from "./local.provider";
-export * from "./gemini.provider";
-export * from "./ollama.provider";
-export * from "./model-router";
-export { modelRouter } from "./model-router";
+export * from "./model-provider.ts";
+export * from "./local.provider.ts";
+export * from "./gemini.provider.ts";
+export * from "./ollama.provider.ts";
+export * from "./model-router.ts";
+export { modelRouter } from "./model-router.ts";
