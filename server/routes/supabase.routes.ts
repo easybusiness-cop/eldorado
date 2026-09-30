@@ -16,6 +16,13 @@ export function normalizeSupabaseUrl(rawUrl?: string | null): string {
   return url;
 }
 
+function withTimeout<T>(promise: PromiseLike<T>, ms = 2500, timeoutError = "Supabase probe timed out"): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error(timeoutError)), ms)),
+  ]);
+}
+
 supabaseRouter.get("/diagnostic", async (req, res) => {
   const startTime = Date.now();
   const rawUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim();
@@ -46,17 +53,19 @@ supabaseRouter.get("/diagnostic", async (req, res) => {
   try {
     const supabase = createClient(url, key);
     
-    // Probe profiles table with wildcard to support all valid schema variants
-    const { data: profiles, error: profileErr } = await supabase
-      .from("profiles")
-      .select("*")
-      .limit(3);
+    // Probe profiles table with wildcard with strict timeout
+    const { data: profiles, error: profileErr } = await withTimeout(
+      supabase.from("profiles").select("*").limit(3),
+      2500,
+      "Timeout probing Supabase 'profiles' table"
+    );
 
-    // Probe threads or organization memberships
-    const { data: threads, error: threadErr } = await supabase
-      .from("threads")
-      .select("*")
-      .limit(3);
+    // Probe threads or organization memberships with strict timeout
+    const { data: threads, error: threadErr } = await withTimeout(
+      supabase.from("threads").select("*").limit(3),
+      2500,
+      "Timeout probing Supabase 'threads' table"
+    );
 
     const latencyMs = Date.now() - startTime;
 
@@ -87,11 +96,16 @@ supabaseRouter.get("/diagnostic", async (req, res) => {
     });
   } catch (err: any) {
     console.error("[Server Supabase Exception]:", err?.message || err);
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
-      status: "error",
+      status: "timeout_or_unreachable",
       message: err?.message || "Server exception during Supabase verification",
       latencyMs: Date.now() - startTime,
+      environment: {
+        hasUrl: true,
+        hasKey: true,
+        urlPreview: `${url.slice(0, 25)}...`,
+      },
     });
   }
 });

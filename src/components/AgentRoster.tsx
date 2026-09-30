@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Agent } from '../types';
 import { soundFx } from '../utils/speech';
 import { MessageSquare, Zap } from 'lucide-react';
+import { SmartSuggestionTooltip } from './SmartSuggestionTooltip';
+import { SmartTaskSuggestion } from '../utils/smartTaskSuggestions';
 
 interface AgentRosterProps {
   agents: Agent[];
   selectedAgentId: string;
   onSelectAgent: (agentId: string) => void;
   onTalkToAgent: (agentId: string) => void;
+  onAssignTask?: (agentId: string, suggestion: SmartTaskSuggestion) => void;
 }
 
 export const AgentRoster: React.FC<AgentRosterProps> = ({
@@ -15,12 +18,16 @@ export const AgentRoster: React.FC<AgentRosterProps> = ({
   selectedAgentId,
   onSelectAgent,
   onTalkToAgent,
+  onAssignTask,
 }) => {
+  const [hoveredAgentId, setHoveredAgentId] = useState<string | null>(null);
+
   return (
     <div className="w-full bg-[#ebdbb2] dark:bg-[#1d2021] border-t-2 border-[#d5c4a1] dark:border-[#3c3836] p-2 select-none overflow-x-auto shadow-xl">
       <div className="flex items-center gap-2 min-w-max">
         {agents.map((agent) => {
           const isSelected = agent.id === selectedAgentId;
+          const isHovered = hoveredAgentId === agent.id;
 
           // Custom role badges inspired by munderdiffl screenshot
           const roleTag =
@@ -40,16 +47,26 @@ export const AgentRoster: React.FC<AgentRosterProps> = ({
             <div
               key={agent.id}
               id={`agent-card-${agent.id}`}
+              onMouseEnter={() => setHoveredAgentId(agent.id)}
+              onMouseLeave={() => setHoveredAgentId(null)}
               onClick={() => {
                 soundFx.playClick();
                 onSelectAgent(agent.id);
               }}
-              className={`flex items-center gap-2 px-2.5 py-1.5 rounded border transition-all cursor-pointer min-w-[170px] ${
+              className={`relative flex items-center gap-2 px-2.5 py-1.5 rounded border transition-all cursor-pointer min-w-[170px] ${
                 isSelected
                   ? 'bg-[#fbf1c7] dark:bg-[#282828] border-[#fabd2f] ring-2 ring-[#fabd2f]/40 shadow-md'
                   : 'bg-[#ebdbb2]/80 dark:bg-[#181615] border-[#d5c4a1] dark:border-[#3c3836] hover:border-[#bdae93] dark:hover:border-[#504945]'
               }`}
             >
+              {/* Smart Suggestion Hover Tooltip */}
+              <SmartSuggestionTooltip
+                agent={agent}
+                isVisible={isHovered}
+                position="top"
+                onAssignTask={onAssignTask}
+              />
+
               {/* Pixel Avatar Box */}
               <div
                 className="flex items-center justify-center w-8 h-8 rounded border text-lg relative shrink-0 shadow-inner"

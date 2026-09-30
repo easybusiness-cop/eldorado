@@ -55,6 +55,13 @@ export interface SupabaseDiagnosticResult {
   };
 }
 
+function withClientTimeout<T>(promise: PromiseLike<T>, ms = 3000, errorMsg = 'Supabase network request timed out'): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms)),
+  ]);
+}
+
 let cachedClient: SupabaseClient | null = null;
 
 export function getSupabaseClient(): { client: SupabaseClient | null; isConfigured: boolean; url: string } {
@@ -163,7 +170,14 @@ export async function runSupabaseDiagnostic(): Promise<SupabaseDiagnosticResult>
   try {
     // 2. Authenticated User Check
     addLog('info', 'Executing supabase.auth.getUser() verification...');
-    const { data: authData, error: authError } = await client.auth.getUser();
+    const { data: authData, error: authError } = await withClientTimeout(
+      client.auth.getUser(),
+      3000,
+      'Auth verification timed out'
+    ).catch((err) => ({
+      data: null,
+      error: { message: err?.message || 'Timeout' } as any,
+    }));
 
     if (authError) {
       addLog('warn', `Auth verification returned notice: ${authError.message}`, authError);
@@ -188,11 +202,18 @@ export async function runSupabaseDiagnostic(): Promise<SupabaseDiagnosticResult>
 
     let profileFetched = false;
     if (targetUserId) {
-      const { data: profileRow, error: profileError } = await client
-        .from('profiles')
-        .select('*')
-        .eq('id', targetUserId)
-        .maybeSingle();
+      const { data: profileRow, error: profileError } = await withClientTimeout(
+        client
+          .from('profiles')
+          .select('*')
+          .eq('id', targetUserId)
+          .maybeSingle(),
+        3000,
+        'Profile query timed out'
+      ).catch((err) => ({
+        data: null,
+        error: { message: err?.message || 'Timeout' } as any,
+      }));
 
       if (profileError) {
         addLog('error', `Failed to query 'profiles' table: ${profileError.message}`, {
@@ -220,10 +241,17 @@ export async function runSupabaseDiagnostic(): Promise<SupabaseDiagnosticResult>
 
     if (!profileFetched) {
       // General connectivity probe if table/user query wasn't matched
-      const { data: sampleProfiles, error: pingError } = await client
-        .from('profiles')
-        .select('*')
-        .limit(1);
+      const { data: sampleProfiles, error: pingError } = await withClientTimeout(
+        client
+          .from('profiles')
+          .select('*')
+          .limit(1),
+        3000,
+        'Profiles probe timed out'
+      ).catch((err) => ({
+        data: null,
+        error: { message: err?.message || 'Timeout' } as any,
+      }));
 
       if (pingError) {
         if (pingError.code === '42P01') {
@@ -256,14 +284,28 @@ export async function runSupabaseDiagnostic(): Promise<SupabaseDiagnosticResult>
       orgQuery = orgQuery.eq('user_id', targetUserId);
     }
 
-    const { data: orgData, error: orgError } = await orgQuery;
+    const { data: orgData, error: orgError } = await withClientTimeout(
+      orgQuery,
+      3000,
+      'Organization query timed out'
+    ).catch((err) => ({
+      data: null,
+      error: { message: err?.message || 'Timeout' } as any,
+    }));
 
     if (orgError) {
       // Fallback query on 'organization_memberships'
-      const { data: fallbackOrgs, error: fallbackError } = await client
-        .from('organization_memberships')
-        .select('*')
-        .limit(5);
+      const { data: fallbackOrgs, error: fallbackError } = await withClientTimeout(
+        client
+          .from('organization_memberships')
+          .select('*')
+          .limit(5),
+        2500,
+        'Fallback memberships query timed out'
+      ).catch((err) => ({
+        data: null,
+        error: { message: err?.message || 'Timeout' } as any,
+      }));
 
       if (!fallbackError && fallbackOrgs && fallbackOrgs.length > 0) {
         orgsVerified = true;
@@ -279,7 +321,11 @@ export async function runSupabaseDiagnostic(): Promise<SupabaseDiagnosticResult>
         addLog('success', `Fetched ${organizationMemberships.length} organization memberships from fallback table.`, fallbackOrgs);
       } else {
         // Check threads table for workspace data
-        const { data: threadData } = await client.from('threads').select('*').limit(5);
+        const { data: threadData } = await withClientTimeout(
+          client.from('threads').select('*').limit(5),
+          2500,
+          'Threads query timed out'
+        ).catch(() => ({ data: null }));
         if (threadData && threadData.length > 0) {
           orgsVerified = true;
           organizationMemberships = threadData.map((t: any) => ({

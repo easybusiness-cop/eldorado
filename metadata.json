@@ -1,6 +1,6 @@
 {
-  "name": "Rufflo Agent Fleet - Munderdiffl.in Command Center",
-  "description": "Interactive autonomous multi-agent simulation and command center with unlimited virtual workforce, continuous live web research radar, autonomous learning loops, and dynamic coding agents.",
+  "name": "Rufflo Intelligence - Autonomous AI & Administrator Hub",
+  "description": "Unified Rufflo Intelligence bot that analyzes, summarizes user requests, and dispatches executive task briefings directly to the fleet administrator for autonomous execution.",
   "requestFramePermissions": ["microphone", "camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

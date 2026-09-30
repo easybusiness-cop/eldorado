@@ -129,6 +129,10 @@ class SoundFX {
       osc.stop(now + 0.3);
     } catch (e) {}
   }
+
+  playError() {
+    this.playWarning();
+  }
 }
 
 export const soundFx = new SoundFX();

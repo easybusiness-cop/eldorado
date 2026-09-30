@@ -30,7 +30,14 @@ import { n8nRouter } from "./server/routes/n8n.routes.ts";
 import { telegramRouter } from "./server/routes/telegram.routes.ts";
 import { loadBalancerRouter } from "./server/routes/load-balancer.routes.ts";
 import { developerSuiteRouter } from "./server/routes/developer-suite.routes.ts";
+import { apiGatewayRouter } from "./server/routes/api-gateway.routes.ts";
+import { recommendationsRouter } from "./server/routes/recommendations.routes.ts";
+import { microservicesRouter } from "./server/routes/microservices.routes.ts";
+import { chaosSimulationRouter } from "./server/routes/chaos-simulation.routes.ts";
+import { composioRouter } from "./server/routes/composio.routes.ts";
+import { integrationRouter } from "./server/routes/integrations.ts";
 import departmentRoutes from "./server/routes/department.routes.ts";
+
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
 import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
@@ -38,7 +45,9 @@ import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.NODE_ENV === "production"
+  ? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3000)
+  : 3000;
 const engineering = new EngineeringDepartmentEngineer();
 const masterMeta = new MasterMetaAgent();
 
@@ -136,6 +145,13 @@ app.use("/api/n8n", n8nRouter);
 app.use("/api/telegram", telegramRouter);
 app.use("/api/load-balancer", loadBalancerRouter);
 app.use("/api/developer", developerSuiteRouter);
+app.use("/api/gateway", apiGatewayRouter);
+app.use("/api/recommendations", recommendationsRouter);
+app.use("/api/microservices", microservicesRouter);
+app.use("/api/composio", composioRouter);
+app.use("/api/integrations", integrationRouter);
+app.use("/api", chaosSimulationRouter);
+
 
 // Intelligent Engineering Department Endpoint
 app.post("/api/objectives/engineering", requireCapability("task:run"), async (req, res) => {
@@ -185,7 +201,10 @@ app.post("/api/meta/improve", async (_req, res) => {
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: process.env.DISABLE_HMR === "true" ? false : undefined,
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);

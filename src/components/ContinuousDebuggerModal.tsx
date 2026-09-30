@@ -14,6 +14,7 @@ import {
   Server,
   Database,
   Lock,
+  Flame,
 } from 'lucide-react';
 
 interface ContinuousDebuggerModalProps {
@@ -21,6 +22,7 @@ interface ContinuousDebuggerModalProps {
   onClose: () => void;
   telemetry: SystemTelemetry;
   onTriggerHeal: () => Promise<void>;
+  onOpenCrisisSimulation?: () => void;
 }
 
 export const ContinuousDebuggerModal: React.FC<ContinuousDebuggerModalProps> = ({
@@ -28,6 +30,7 @@ export const ContinuousDebuggerModal: React.FC<ContinuousDebuggerModalProps> = (
   onClose,
   telemetry,
   onTriggerHeal,
+  onOpenCrisisSimulation,
 }) => {
   const [isHealing, setIsHealing] = useState(false);
   const [filterLevel, setFilterLevel] = useState<'all' | 'success' | 'info' | 'warn'>('all');
@@ -158,14 +161,29 @@ export const ContinuousDebuggerModal: React.FC<ContinuousDebuggerModalProps> = (
             ))}
           </div>
 
-          <button
-            onClick={handleManualHeal}
-            disabled={isHealing}
-            className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-[#1d2021] font-bold text-xs rounded flex items-center gap-1.5 shadow-md transition-colors"
-          >
-            <RotateCcw className={`w-3.5 h-3.5 ${isHealing ? 'animate-spin' : ''}`} />
-            <span>{isHealing ? 'Injecting Patch...' : 'Trigger Instant Memory Sweep & Patch'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {onOpenCrisisSimulation && (
+              <button
+                onClick={() => {
+                  soundFx.playClick();
+                  onOpenCrisisSimulation();
+                }}
+                className="px-3 py-1.5 bg-[#fb4934] hover:bg-red-500 text-white font-bold text-xs rounded flex items-center gap-1.5 shadow-md transition-colors"
+              >
+                <Flame className="w-3.5 h-3.5" />
+                <span>Simulate Outage (Chaos Lab)</span>
+              </button>
+            )}
+
+            <button
+              onClick={handleManualHeal}
+              disabled={isHealing}
+              className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-[#1d2021] font-bold text-xs rounded flex items-center gap-1.5 shadow-md transition-colors"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 ${isHealing ? 'animate-spin' : ''}`} />
+              <span>{isHealing ? 'Injecting Patch...' : 'Trigger Instant Memory Sweep & Patch'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Continuous Stream Output */}

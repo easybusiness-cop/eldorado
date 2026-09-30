@@ -102,7 +102,25 @@ export class ComposioAuthService {
     return Array.from(this.connections.values());
   }
 
+  public setConnectionStatus(provider: string, status: Partial<IntegrationConnectionStatus>): void {
+    const existing = this.connections.get(provider);
+    if (existing) {
+      this.connections.set(provider, { ...existing, ...status });
+    } else {
+      this.connections.set(provider, {
+        id: `conn-${provider}`,
+        name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} Integration`,
+        provider: provider as any,
+        connected: status.connected ?? true,
+        authType: 'oauth',
+        scopes: [],
+        ...status,
+      });
+    }
+  }
+
   public async syncConnectionsFromComposio(): Promise<void> {
+
     if (!composioClient.isConfigured()) return;
     try {
       const sdk = composioClient.getSDK();
@@ -139,15 +157,82 @@ export class ComposioAuthService {
     }
   }
 
-  public setConnectionStatus(provider: string, status: Partial<IntegrationConnectionStatus>): IntegrationConnectionStatus {
-    const existing = this.connections.get(provider);
-    if (!existing) {
-      throw new Error(`Unknown provider: ${provider}`);
+  public async initiateConnection(
+    provider: string,
+    userId: string = 'default_user'
+  ): Promise<{
+    success: boolean;
+    redirectUrl?: string;
+    connectionId?: string;
+    message: string;
+    isRealComposio: boolean;
+  }> {
+    if (composioClient.isConfigured()) {
+      try {
+        const sdk = composioClient.getSDK();
+        // Try authorize on toolkit first
+        const authRes: any = await (sdk.toolkits as any).authorize(provider, userId).catch(async (authErr: any) => {
+          // If toolkit slug needs direct link fallback
+          console.warn(`[Composio Auth] toolkits.authorize fallback for ${provider}:`, authErr?.message);
+          return await (sdk.connectedAccounts as any).link(userId, provider);
+        });
+
+        const redirectUrl = authRes?.redirectUrl || authRes?.url || authRes?.authUrl;
+        const connectionId = authRes?.id || authRes?.connectionRequestId || `conn-${provider}-${Date.now()}`;
+
+        return {
+          success: true,
+          redirectUrl,
+          connectionId,
+          message: `Composio OAuth initiated for ${provider}. Follow redirect URL to grant authorization.`,
+          isRealComposio: true,
+        };
+      } catch (err: any) {
+        console.error(`Composio authorization failed for ${provider}:`, err);
+        throw new Error(`Composio authorization error: ${err?.message || String(err)}`);
+      }
     }
-    const updated = { ...existing, ...status };
-    this.connections.set(provider, updated);
-    return updated;
+
+    // Direct / Local connection mode (when COMPOSIO_API_KEY is not yet populated)
+    const existing = this.connections.get(provider);
+    const mockRedirect = `https://composio.dev/auth/connect?toolkit=${encodeURIComponent(provider)}&app=rufflo-quantum-agent`;
+    
+    // Mark as locally configured/connected for rapid onboarding
+    this.setConnectionStatus(provider, {
+      connected: true,
+      accountEmailOrHandle: `${provider}-user@rufflo.internal`,
+      lastSync: new Date().toISOString(),
+    });
+
+    return {
+      success: true,
+      redirectUrl: mockRedirect,
+      connectionId: `local-conn-${provider}-${Date.now()}`,
+      message: `Connected ${provider} integration successfully (Local Simulation Mode). Set COMPOSIO_API_KEY for live multi-tenant cloud OAuth.`,
+      isRealComposio: false,
+    };
+  }
+
+  public async deleteConnection(provider: string): Promise<boolean> {
+    const existing = this.connections.get(provider);
+    if (!existing) return false;
+
+    if (composioClient.isConfigured() && existing.id && !existing.id.startsWith('conn-') && !existing.id.startsWith('local-')) {
+      try {
+        const sdk = composioClient.getSDK();
+        await sdk.connectedAccounts.delete(existing.id);
+      } catch (err) {
+        console.error(`Error deleting connected account ${existing.id}:`, err);
+      }
+    }
+
+    this.setConnectionStatus(provider, {
+      connected: false,
+      accountEmailOrHandle: undefined,
+    });
+    return true;
   }
 }
 
 export const composioAuth = ComposioAuthService.getInstance();
+

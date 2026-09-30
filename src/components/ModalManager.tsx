@@ -36,11 +36,19 @@ import { TelegramHubModal } from './TelegramHubModal';
 import { ExecutiveSummaryModal, CascadeRunData } from './ExecutiveSummaryModal';
 import { PredictiveLoadBalancerModal } from './PredictiveLoadBalancerModal';
 import { FirebaseCrashalystHub } from './FirebaseCrashalystHub';
-import RuffloGrokbot from './RuffloGrokbot';
+import { OpenWebUIModal } from './OpenWebUIModal';
+import { ComposioHubModal } from './ComposioHubModal';
+import { ApiGatewayMicroservicesModal } from './ApiGatewayMicroservicesModal';
+
+import { CrisisSimulationModal } from './CrisisSimulationModal';
 import { Zap } from 'lucide-react';
 
 export interface ModalManagerState {
-  isGrokbotOpen?: boolean;
+  isComposioHubOpen?: boolean;
+  isCrisisSimulationOpen?: boolean;
+
+  isApiGatewayMicroservicesOpen?: boolean;
+  isOpenWebUiOpen?: boolean;
   isSearchOpen: boolean;
   isAuthOpen: boolean;
   isPreferencesOpen: boolean;
@@ -253,6 +261,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         isOpen={state.isDebuggerOpen}
         onClose={() => onClose('isDebuggerOpen')}
         onTriggerHeal={onTriggerManualHeal}
+        onOpenCrisisSimulation={() => onOpen('isCrisisSimulationOpen')}
         telemetry={{
           uptime: 3600,
           cyclesRun: 142,
@@ -460,13 +469,48 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onClose={() => onClose('isCrashalystOpen')}
       />
 
-      <RuffloGrokbot
-        isOpen={!!state.isGrokbotOpen}
-        onClose={() => onClose('isGrokbotOpen')}
+      <OpenWebUIModal
+        isOpen={!!state.isOpenWebUiOpen}
+        onClose={() => onClose('isOpenWebUiOpen')}
         userProfile={userProfile}
-        onTaskCreated={onTaskCreated}
-        onLogCreated={onLogCreated}
+        agents={agents}
+        onAddTask={onAddTask}
+        onExecuteCode={onExecuteCode}
       />
+
+      <ApiGatewayMicroservicesModal
+        isOpen={!!state.isApiGatewayMicroservicesOpen}
+        onClose={() => onClose('isApiGatewayMicroservicesOpen')}
+      />
+
+      <CrisisSimulationModal
+        isOpen={!!state.isCrisisSimulationOpen}
+        onClose={() => onClose('isCrisisSimulationOpen')}
+        onOpenIdeWithCode={(code, name) => {
+          setFeatureToEditInIde({
+            id: `sys-chaos-${Date.now()}`,
+            name,
+            code,
+            description: 'Chaos Resilience Hotfix Patch',
+            icon: 'Zap',
+            category: 'code',
+            enabled: true,
+            addedByAgent: 'Rufflo Resilience Daemon',
+            createdAt: Date.now(),
+          });
+          onOpen('isIdeOpen');
+        }}
+        onCodeApplied={onCodeApplied}
+        onTriggerManualHeal={onTriggerManualHeal}
+      />
+
+      <ComposioHubModal
+        isOpen={!!state.isComposioHubOpen}
+        onClose={() => onClose('isComposioHubOpen')}
+        agents={agents}
+        onAddTask={onAddTask}
+      />
+
 
       {autoApplyToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 pointer-events-auto">

@@ -11,7 +11,7 @@ import { RuffloLoopPanel } from './RuffloLoopPanel';
 import { MasterMetaPanel } from './MasterMetaPanel';
 import { EngineeringDepartmentPanel } from './EngineeringDepartmentPanel';
 import { SpiderWebPanel } from './SpiderWebPanel';
-import RuffloGrokbot from './RuffloGrokbot';
+import { OpenWebUIModal } from './OpenWebUIModal';
 import confetti from 'canvas-confetti';
 import { runAgentStandardWorkflow, STANDARD_WORKFLOW_STAGES, WorkflowExecutionState } from '../utils/agentWorkflowEngine';
 import {
@@ -51,6 +51,8 @@ import {
   Radio,
   Target,
   Rocket,
+  Bot,
+  Flame,
 } from 'lucide-react';
 
 interface CommandCenterProps {
@@ -74,7 +76,12 @@ interface CommandCenterProps {
   missions?: any[];
   audits?: any[];
   accounts?: any[];
+  isOpenWebUiOpen?: boolean;
+  onToggleOpenWebUi?: (open: boolean) => void;
+  onOpenCrisisSimulation?: () => void;
+  onOpenComposioHub?: () => void;
 }
+
 
 type TabType =
   | 'department'
@@ -118,8 +125,20 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   missions = [],
   audits = [],
   accounts = [],
+  isOpenWebUiOpen: controlledOpenWebUiOpen,
+  onToggleOpenWebUi,
+  onOpenCrisisSimulation,
+  onOpenComposioHub,
 }) => {
-  const [showGrokbot, setShowGrokbot] = useState(false);
+
+  const [internalOpenWebUiOpen, setInternalOpenWebUiOpen] = useState(false);
+
+  const isOpenWebUiModalOpen = controlledOpenWebUiOpen !== undefined ? controlledOpenWebUiOpen : internalOpenWebUiOpen;
+  const setOpenWebUiModalOpen = (open: boolean) => {
+    if (onToggleOpenWebUi) onToggleOpenWebUi(open);
+    else setInternalOpenWebUiOpen(open);
+  };
+
   const [activeTab, setActiveTab] = useState<TabType>('department');
   const [inputPrompt, setInputPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -996,23 +1015,39 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* Header Right Actions */}
         <div className="flex items-center gap-2 text-xs">
           <button
-            id="btn-open-grokbot"
+            id="btn-open-intelligence"
             onClick={() => {
               soundFx.playClick();
-              setShowGrokbot(true);
+              onSetWorkspaceTab?.('command');
             }}
             style={{
               background: "#3d6b4f",
               color: "#fff",
               border: "none",
-              padding: "10px 18px",
+              padding: "7px 14px",
               borderRadius: 8,
               fontWeight: "600",
               cursor: "pointer",
             }}
-            title="Open Interactive Rufflo Grokbot AI"
+            className="flex items-center gap-1.5 hover:bg-[#4d8664] transition-all shadow-sm"
+            title="Open Interactive Rufflo Intelligence Engine"
           >
-            Open Grokbot
+            <Sparkles className="w-3 h-3 text-emerald-300" />
+            <span>Intelligence</span>
+          </button>
+
+          <button
+            id="btn-open-webui"
+            onClick={() => {
+              soundFx.playClick();
+              setOpenWebUiModalOpen(true);
+            }}
+            className="px-3 py-1.5 rounded-lg bg-[#282828] hover:bg-[#32302f] border border-emerald-500/40 text-emerald-400 font-bold text-[11px] flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+            title="Launch Open WebUI (Active v0.5.8 Integration)"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <Bot className="w-3.5 h-3.5" />
+            <span>Open WebUI</span>
           </button>
 
           <button
@@ -1049,6 +1084,21 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <span>auto</span>
           </button>
 
+          {onOpenCrisisSimulation && (
+            <button
+              id="btn-open-chaos-lab"
+              onClick={() => {
+                soundFx.playClick();
+                onOpenCrisisSimulation();
+              }}
+              className="px-2 py-1 rounded text-[11px] font-bold bg-[#fb4934]/20 hover:bg-[#fb4934]/35 text-[#fb4934] border border-[#fb4934]/50 flex items-center gap-1 shadow-sm transition-all"
+              title="Open Live Chaos Scenario Outage Injector"
+            >
+              <Flame className="w-3 h-3 text-[#fb4934] animate-pulse" />
+              <span>Chaos Lab</span>
+            </button>
+          )}
+
           <button
             id="btn-open-ide"
             onClick={() => {
@@ -1066,7 +1116,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
       {/* Tab rail */}
       <div
-        className="flex items-center gap-1 px-2 py-1.5 overflow-x-auto no-scrollbar"
+        className="flex items-center gap-1 px-2 py-1.5 flex-wrap overflow-y-auto max-h-[120px] no-scrollbar"
         style={{ borderBottom: '1px solid var(--border-0)', background: 'var(--bg-2)' }}
       >
         {tabs.map((tab) => {
@@ -1082,7 +1132,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               }}
               className="rufflo-btn"
               style={{
-                height: 30,
+                 
                 background: isActive ? 'var(--accent-dim)' : 'transparent',
                 borderColor: isActive ? 'var(--border-accent)' : 'transparent',
                 color: isActive ? 'var(--accent)' : 'var(--text-2)',
@@ -1283,10 +1333,35 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* 2. Connected Integrations View */}
         {activeTab === 'integrations' && (
           <div className="space-y-4">
+            {/* Composio Action Banner */}
+            <div className="p-3.5 rounded-xl bg-[#fe8019]/10 border border-[#fe8019]/30 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#fe8019] text-[#1d2021] flex items-center justify-center font-bold">
+                  ⚡
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-[#fbf1c7]">Composio Tool & Action Gateway</div>
+                  <div className="text-[11px] text-[#ebdbb2]/80">
+                    Connect GitHub, Slack, Gmail, Notion, HackerNews, and execute autonomous tool calls.
+                  </div>
+                </div>
+              </div>
+              {onOpenComposioHub && (
+                <button
+                  id="open-composio-hub-commandcenter-btn"
+                  onClick={onOpenComposioHub}
+                  className="px-3 py-1.5 rounded-lg bg-[#fe8019] hover:bg-[#fabd2f] text-[#1d2021] font-bold text-xs flex items-center gap-1.5 transition-all shadow"
+                >
+                  Launch Composio Studio
+                </button>
+              )}
+            </div>
+
             <div className="flex items-center justify-between pb-1 border-b border-[#d5c4a1] dark:border-[#3c3836]">
               <span className="font-bold text-xs uppercase tracking-wider text-[#8f3f71] dark:text-[#d3869b]">Connected Integrations</span>
               <span className="text-[10px] text-[#7c6f64] dark:text-[#928374] font-bold">({accounts.filter(a => a.status === 'CONNECTED').length} Online)</span>
             </div>
+
 
             <div className="space-y-3">
               {accounts.map((acc) => {
@@ -2729,12 +2804,12 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => setShowGrokbot(true)}
-                className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#3d6b4f] hover:bg-[#3d6b4f]/80 text-white border border-[#3d6b4f] flex items-center gap-1 transition-colors cursor-pointer"
-                title="Launch Rufflo Grokbot Conversational Harness"
+                onClick={() => setOpenWebUiModalOpen(true)}
+                className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#282828] hover:bg-[#32302f] text-emerald-400 border border-emerald-500/40 flex items-center gap-1 transition-colors cursor-pointer"
+                title="Launch Open WebUI Workspace"
               >
-                <Sparkles className="w-2.5 h-2.5 text-emerald-300" />
-                <span>Chat Grokbot</span>
+                <Bot className="w-2.5 h-2.5" />
+                <span>Open WebUI</span>
               </button>
             </div>
           </div>
@@ -2826,12 +2901,15 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
       </div>
 
-      {/* Rufflo Grokbot Modal */}
-      {showGrokbot && (
-        <RuffloGrokbot
-          isOpen={showGrokbot}
-          onClose={() => setShowGrokbot(false)}
-          onTaskCreated={onAddTask}
+      {/* Open WebUI Modal */}
+      {isOpenWebUiModalOpen && (
+        <OpenWebUIModal
+          isOpen={isOpenWebUiModalOpen}
+          onClose={() => setOpenWebUiModalOpen(false)}
+          userProfile={userProfile}
+          agents={agents}
+          onAddTask={onAddTask}
+          onExecuteCode={onExecuteCode}
         />
       )}
     </div>

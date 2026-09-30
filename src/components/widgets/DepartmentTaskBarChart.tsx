@@ -190,35 +190,41 @@ export const DepartmentTaskBarChart: React.FC<DepartmentTaskBarChartProps> = ({
         return activeFilter === d.key ? 1.0 : 0.2;
       })
       .attr('cursor', 'pointer')
-      .on('mouseover', (event, d) => {
-        d3.select(event.currentTarget)
-          .transition()
-          .duration(150)
-          .attr('opacity', 1)
-          .attr('transform', 'scale(1.02)');
+      .on('mouseover', (event: MouseEvent, d) => {
+        const target = event.currentTarget as SVGRectElement | null;
+        if (target) {
+          d3.select(target)
+            .transition()
+            .duration(150)
+            .attr('opacity', 1)
+            .attr('transform', 'scale(1.02)');
 
-        const completionRate = d.total > 0 ? `${Math.round((d.value / d.total) * 100)}%` : '0%';
-        const rectBox = event.currentTarget.getBoundingClientRect();
-        const containerBox = containerRef.current?.getBoundingClientRect();
+          const completionRate = d.total > 0 ? `${Math.round((d.value / d.total) * 100)}%` : '0%';
+          const rectBox = target.getBoundingClientRect();
+          const containerBox = containerRef.current?.getBoundingClientRect();
 
-        if (containerBox) {
-          setTooltip({
-            visible: true,
-            x: rectBox.left - containerBox.left + rectBox.width / 2,
-            y: rectBox.top - containerBox.top - 10,
-            department: d.department,
-            key: d.key,
-            value: d.value,
-            completionRate,
-          });
+          if (containerBox) {
+            setTooltip({
+              visible: true,
+              x: rectBox.left - containerBox.left + rectBox.width / 2,
+              y: rectBox.top - containerBox.top - 10,
+              department: d.department,
+              key: d.key,
+              value: d.value,
+              completionRate,
+            });
+          }
         }
       })
-      .on('mouseout', (event, d) => {
-        d3.select(event.currentTarget)
-          .transition()
-          .duration(150)
-          .attr('opacity', activeFilter === 'all' || activeFilter === d.key ? 0.9 : 0.2)
-          .attr('transform', 'scale(1)');
+      .on('mouseout', (event: MouseEvent, d) => {
+        const target = event.currentTarget as SVGRectElement | null;
+        if (target) {
+          d3.select(target)
+            .transition()
+            .duration(150)
+            .attr('opacity', activeFilter === 'all' || activeFilter === d.key ? 0.9 : 0.2)
+            .attr('transform', 'scale(1)');
+        }
 
         setTooltip(null);
       })

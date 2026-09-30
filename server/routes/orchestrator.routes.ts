@@ -228,8 +228,8 @@ orchestratorRouter.post("/orchestrator/run-stream", async (req, res) => {
   }
 });
 
-// In-Memory Grokbot Conversation Memory Store
-const grokbotMemoryStore: Array<{
+// In-Memory Intelligence Conversation Memory Store
+const intelligenceMemoryStore: Array<{
   id: string;
   timestamp: string;
   executiveSummary: string;
@@ -241,7 +241,7 @@ const grokbotMemoryStore: Array<{
 
 /**
  * POST /api/orchestrator/briefing
- * Summarizes a user conversation with Rufflo Grokbot, records it in persistent memory,
+ * Summarizes a user conversation with Rufflo Quantum Intelligence, records it in persistent memory,
  * and automatically dispatches the briefing to the Administrator Orchestrator.
  */
 orchestratorRouter.post("/orchestrator/briefing", async (req, res) => {
@@ -270,7 +270,7 @@ orchestratorRouter.post("/orchestrator/briefing", async (req, res) => {
     try {
       const { callGeminiResilient } = await import("../ai/geminiService.ts");
       const systemPrompt = `You are the Executive Intelligence Summarizer for Rufflo OS.
-Analyze the following conversation between the user (${userName}) and Rufflo Grokbot:
+Analyze the following conversation between the user (${userName}) and Rufflo Quantum Intelligence:
 
 ${conversationText}
 
@@ -278,7 +278,7 @@ Produce a JSON briefing summary matching this exact schema:
 {
   "executiveSummary": "A concise 2-sentence summary of what the user wants built, investigated, or achieved.",
   "keyTopics": ["Topic 1", "Topic 2", "Topic 3"],
-  "adminSpeech": "Michael Scott Administrator speech confirming receipt of the briefing from Rufflo Grokbot and delegating work to employees.",
+  "adminSpeech": "Michael Scott Administrator speech confirming receipt of the briefing from Rufflo Quantum Intelligence and delegating work to employees.",
   "subtasks": [
     {
       "id": "subtask-1",
@@ -301,11 +301,11 @@ Produce a JSON briefing summary matching this exact schema:
 
       summary = JSON.parse(rawAiResponse || "{}");
     } catch (aiErr) {
-      console.warn("[Grokbot Briefing AI Fallback] Utilizing resilient local summarizer engine.");
+      console.warn("[Intelligence Briefing AI Fallback] Utilizing resilient local summarizer engine.");
       summary = {
-        executiveSummary: `User (${userName}) requested: "${userText.slice(0, 140)}...". Grokbot processed and derived actionable fleet work items.`,
+        executiveSummary: `User (${userName}) requested: "${userText.slice(0, 140)}...". Quantum Intelligence processed and derived actionable fleet work items.`,
         keyTopics: ["Fleet Tasking", "AI Workflow", "Rufflo Automation"],
-        adminSpeech: `Attention team! Rufflo Grokbot just delivered a direct briefing from ${userName}: "${userText.slice(0, 80)}...". I am dispatching Cline, Ruflo Coder, and Dwight immediately!`,
+        adminSpeech: `Attention team! Rufflo Quantum Intelligence just delivered a direct briefing from ${userName}: "${userText.slice(0, 80)}...". I am dispatching Cline, Ruflo Coder, and Dwight immediately!`,
         subtasks: [
           {
             id: `subtask-${Date.now()}-1`,
@@ -313,12 +313,12 @@ Produce a JSON briefing summary matching this exact schema:
             assignedTo: "cline",
             priority: "high",
             shellCommands: ["npm run build:check", "git status"],
-            executableCode: `console.log("Executing Grokbot directive for: ${userText.slice(0, 30).replace(/"/g, '\\"')}");`,
+            executableCode: `console.log("Executing intelligence directive for: ${userText.slice(0, 30).replace(/"/g, '\\"')}");`,
             outputSummary: `Cline initiated software execution for user briefing directive.`,
           },
           {
             id: `subtask-${Date.now()}-2`,
-            title: `Security & AST Audit for Grokbot Briefing`,
+            title: `Security & AST Audit for Intelligence Briefing`,
             assignedTo: "dwight",
             priority: "critical",
             shellCommands: ["npx eslint . --quiet"],
@@ -339,27 +339,27 @@ Produce a JSON briefing summary matching this exact schema:
       messagesCount: messages.length,
     };
 
-    grokbotMemoryStore.unshift(memoryEntry);
+    intelligenceMemoryStore.unshift(memoryEntry);
 
     return res.json({
       success: true,
       briefing: memoryEntry,
     });
   } catch (err: any) {
-    console.error("[Grokbot Briefing Route Error]", err);
+    console.error("[Intelligence Briefing Route Error]", err);
     return res.status(500).json({ success: false, error: err.message });
   }
 });
 
 /**
  * GET /api/orchestrator/memory
- * Retrieves all stored Grokbot chat briefings & persistent memories
+ * Retrieves all stored intelligence chat briefings & persistent memories
  */
 orchestratorRouter.get("/orchestrator/memory", (_req, res) => {
   return res.json({
     success: true,
-    totalBriefings: grokbotMemoryStore.length,
-    memories: grokbotMemoryStore,
+    totalBriefings: intelligenceMemoryStore.length,
+    memories: intelligenceMemoryStore,
   });
 });
 

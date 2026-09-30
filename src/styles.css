@@ -790,17 +790,16 @@ kbd {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.012);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, background 0.35s ease;
-  transform-style: preserve-3d;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .agent-card:hover {
-  transform: translateY(-6px) scale(1.035) rotateX(4deg) rotateY(-4deg) translateZ(12px);
-  border-color: rgba(124, 92, 255, 0.45);
-  background: rgba(124, 92, 255, 0.045);
-  box-shadow: 0 16px 35px rgba(124, 92, 255, 0.2), 0 6px 16px rgba(0, 0, 0, 0.35);
-  z-index: 10;
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(0, 217, 255, 0.5);
+  background: rgba(0, 217, 255, 0.04);
+  box-shadow: 0 16px 35px rgba(0, 217, 255, 0.15), 0 6px 16px rgba(0, 0, 0, 0.4);
+  z-index: 40;
 }
 
 .agent-card.selected {
@@ -1368,6 +1367,12 @@ kbd {
   .topbar {
     padding: 0 12px;
   }
+  .brand {
+    min-width: auto;
+  }
+  .brand-name {
+    display: none;
+  }
   .brand-subtitle,
   .system-health,
   .global-search {
@@ -1375,17 +1380,41 @@ kbd {
   }
   .main-grid {
     grid-template-columns: 1fr;
-    height: auto;
+    height: calc(100vh - var(--topbar-h, 56px));
     max-height: none;
-    overflow-y: auto;
+    overflow: hidden;
   }
   .sidebar {
     display: none;
   }
+  .sidebar.mobile-show {
+    display: flex !important;
+    position: fixed;
+    top: var(--topbar-h, 56px);
+    left: 0;
+    width: 260px;
+    height: calc(100vh - var(--topbar-h, 56px));
+    z-index: 1000;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.75);
+    animation: slide-in-left-drawer 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes slide-in-left-drawer {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
   .workspace {
-    padding: 16px 14px 60px;
-    height: auto;
-    overflow-y: visible;
+    padding: 16px 14px 16px;
+    height: 100%;
+    overflow: hidden;
+  }
+  .workspace-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
   }
   .workspace-header {
     display: flex;
@@ -1430,22 +1459,21 @@ kbd {
    ========================================== */
 
 html, body {
-  
-  
+  overflow-x: hidden;
   min-height: 100vh;
 }
 
 .rufflo-app {
   min-height: 100vh;
   position: relative;
-  
-  
+  overflow-x: hidden;
 }
 
 .main-grid {
   min-height: 100vh;
   height: auto;
   align-items: stretch;
+  overflow-x: hidden;
 }
 
 .workspace {
@@ -1503,3 +1531,48 @@ div[role="dialog"],
   max-height: none;
 }
 
+/* Unified Rufflo Intelligence expanded layout */
+.main-grid.no-copilot {
+  grid-template-columns: 240px minmax(0, 1fr) !important;
+}
+@media (max-width: 1400px) {
+  .main-grid.no-copilot {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 1100px) {
+  .main-grid.no-copilot {
+    grid-template-columns: 200px minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 768px) {
+  .main-grid.no-copilot {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .nav-item {
+    height: 44px; /* Larger touch target for options */
+    font-size: 16px;
+  }
+  .workspace-actions button {
+    padding: 8px 12px;
+    font-size: 13px;
+    height: auto;
+  }
+  select, .rufflo-select, option {
+    font-size: 16px !important; /* Prevents iOS zoom and increases option size */
+    padding: 12px !important;
+  }
+  .rufflo-btn {
+    height: 40px;
+    font-size: 14px;
+    padding: 0 16px;
+  }
+  .rufflo-topbar .rufflo-btn {
+    height: 36px;
+  }
+}

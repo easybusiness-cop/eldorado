@@ -23,24 +23,81 @@ export function CompanyDatabaseModal({ isOpen, onClose }: CompanyDatabaseModalPr
     setLoading(true);
     try {
       if (activeTab === 'tasks') {
-        const { data, error } = await supabase
-          .from('active_tasks')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(50);
-        if (error) throw error;
-        setTasks(data || []);
+        let loadedTasks: any[] = [];
+        try {
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000));
+          const queryPromise = supabase
+            .from('active_tasks')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
+          const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+          if (!error && data && data.length > 0) {
+            loadedTasks = data;
+          }
+        } catch {
+          // Supabase unavailable, fallback to backend company database
+        }
+
+        if (loadedTasks.length === 0) {
+          const hqRes = await fetch('/api/company/details');
+          if (hqRes.ok) {
+            const hqData = await hqRes.json();
+            if (hqData.tasks) {
+              loadedTasks = hqData.tasks.map((t: any) => ({
+                id: t.id,
+                title: t.title,
+                status: t.status,
+                description: t.description,
+                assigned_to: t.assignedTo || 'Unassigned',
+                department: t.department || 'Operations',
+                created_at: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
+              }));
+            }
+          }
+        }
+        setTasks(loadedTasks);
       } else {
-        const { data, error } = await supabase
-          .from('agent_logs')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(50);
-        if (error) throw error;
-        setLogs(data || []);
+        let loadedLogs: any[] = [];
+        try {
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000));
+          const queryPromise = supabase
+            .from('agent_logs')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
+          const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+          if (!error && data && data.length > 0) {
+            loadedLogs = data;
+          }
+        } catch {
+          // Supabase unavailable, fallback to backend audit ledger
+        }
+
+        if (loadedLogs.length === 0) {
+          const hqRes = await fetch('/api/company/details');
+          if (hqRes.ok) {
+            const hqData = await hqRes.json();
+            if (hqData.audits) {
+              loadedLogs = hqData.audits.map((a: any) => ({
+                id: a.id,
+                action: a.action,
+                agent_name: a.agentId,
+                created_at: a.timestamp || new Date().toISOString(),
+                details: {
+                  tool: a.tool,
+                  result: a.result,
+                  riskLevel: a.riskLevel,
+                  approvedBy: a.approvedBy,
+                },
+              }));
+            }
+          }
+        }
+        setLogs(loadedLogs);
       }
     } catch (err) {
-      console.error('Error fetching Supabase data:', err);
+      console.warn('[CompanyDatabaseModal] Data fetch fallback active:', err);
     } finally {
       setLoading(false);
     }

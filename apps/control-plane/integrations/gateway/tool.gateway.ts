@@ -113,6 +113,7 @@ export class ToolGateway {
       let normalizedTool = req.tool;
       if (normalizedTool === "database") normalizedTool = "postgresql";
       if (normalizedTool === "web") normalizedTool = "google-search";
+      if (normalizedTool === "browser" || normalizedTool === "browser-use") normalizedTool = "computer-use";
 
       // 2b. Strict Software Engineering Capabilities Gate
       const isEngTool = normalizedTool === "github" || normalizedTool === "git" || req.action.includes("commit") || req.action.includes("pull_request") || req.action.includes("alter_schema");

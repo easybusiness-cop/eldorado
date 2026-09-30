@@ -822,3 +822,25 @@ button {
   animation-duration: 3.6s, 3.6s, 3.6s;
   opacity: 0.4;
 }
+
+@media (max-width: 768px) {
+  .rufflo-brand {
+    min-width: auto;
+  }
+  .rufflo-brand-text, .rufflo-brand-sub {
+    display: none;
+  }
+  .rufflo-topbar {
+    padding: 0 8px;
+    gap: 8px;
+  }
+  .rufflo-topbar .rufflo-btn span {
+    display: none;
+  }
+  .rufflo-btn {
+    padding: 0 8px;
+  }
+  .rufflo-top-actions {
+    margin-left: 0;
+  }
+}

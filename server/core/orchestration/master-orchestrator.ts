@@ -218,6 +218,17 @@ export class MasterOrchestrator {
       lower.includes("latest") ||
       lower.includes("search");
 
+    const needsBrowser =
+      lower.includes("browser") ||
+      lower.includes("browse") ||
+      lower.includes("navigate") ||
+      lower.includes("playwright") ||
+      lower.includes("scrape") ||
+      lower.includes("extract from") ||
+      lower.includes("screenshot") ||
+      lower.includes("dom") ||
+      /https?:\/\//i.test(objective);
+
     const needsBuild =
       lower.includes("build") ||
       lower.includes("create") ||
@@ -234,7 +245,47 @@ export class MasterOrchestrator {
       lower.includes("class") ||
       lower.includes("function");
 
-    if (needsResearch) {
+    if (needsBrowser) {
+      const urlMatch = objective.match(/https?:\/\/[^\s"',)]+/i);
+      const targetUrl = urlMatch ? urlMatch[0] : (lower.includes("github") ? "https://github.com" : "https://news.ycombinator.com");
+
+      steps.push({
+        id: `step-${randomUUID().slice(0, 8)}`,
+        role: "executor",
+        agentId: agents.executor || "pete",
+        objective: `Execute Browser-Use navigation to: ${targetUrl}`,
+        tool: "computer-use",
+        action: "navigate",
+        parameters: { url: targetUrl },
+        status: "pending",
+      });
+
+      if (lower.includes("screenshot")) {
+        steps.push({
+          id: `step-${randomUUID().slice(0, 8)}`,
+          role: "executor",
+          agentId: agents.executor || "pete",
+          objective: `Capture screenshot of active webpage via Browser-Use engine`,
+          tool: "computer-use",
+          action: "screenshot",
+          parameters: { fullPage: true },
+          status: "pending",
+        });
+      } else {
+        steps.push({
+          id: `step-${randomUUID().slice(0, 8)}`,
+          role: "executor",
+          agentId: agents.executor || "pete",
+          objective: `Extract clean text and DOM structure from ${targetUrl}`,
+          tool: "computer-use",
+          action: "extract_text",
+          parameters: { selector: "body" },
+          status: "pending",
+        });
+      }
+    }
+
+    if (needsResearch && !needsBrowser) {
       steps.push({
         id: `step-${randomUUID().slice(0, 8)}`,
         role: "researcher",

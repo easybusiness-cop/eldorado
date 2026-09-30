@@ -965,6 +965,22 @@ const INITIAL_EMPLOYEES: AgentContract[] = [
     kpis: { tasksCompleted: 48, accuracyScore: 98, uptimeBonusPercent: 15, tokensProcessed: 245000, totalCost: 12.45 }
   },
   {
+    id: 'quantum-orchestrator',
+    name: 'Quantum Intelligence Orchestrator',
+    role: 'Autonomous Fleet & Research Intelligence Assistant',
+    department: 'engineering',
+    reportsTo: 'michael',
+    jobDescription: 'Executes autonomous multi-hop research, live web browser navigation via Playwright, DOM extraction, code design, and chat briefings.',
+    skills: ['Autonomous Web Research', 'Browser-Use Automation', 'Playwright Integration', 'DOM Scraping', 'Full-Stack Architecture', 'Knowledge Synthesis'],
+    tools: ['browser-use', 'computer-use', 'google-search', 'code-execution', 'project-writer', 'terminal'],
+    permissions: { filesystem: 'project', network: 'unrestricted', production: true, secrets: 'full' },
+    authorityLevel: 6,
+    status: 'active',
+    memorySummary: 'Integrated with Quantum Intelligence Engine and Master Orchestrator streaming channel.',
+    trainingState: 'PRODUCTION',
+    kpis: { tasksCompleted: 92, accuracyScore: 99.8, uptimeBonusPercent: 15, tokensProcessed: 680000, totalCost: 18.20 }
+  },
+  {
     id: 'ruflo',
     name: 'Ruflo',
     role: 'Chief Technology Officer (CTO)',

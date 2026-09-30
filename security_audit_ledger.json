@@ -1,5 +1,57 @@
 [
   {
+    "eventId": "evt-1789890991453-0ac5ks",
+    "timestamp": "2026-09-20T07:56:31.453Z",
+    "actor": "ruflo_coder",
+    "tenant": "munderdiffl-default-tenant",
+    "action": "SYSTEM_CODE_EXECUTION",
+    "resource": "system_runtime",
+    "policyDecision": "allow",
+    "riskScore": 0,
+    "riskLevel": "LOW",
+    "findings": [],
+    "isolationLevel": "EPHEMERAL_CONTAINER_MICROVM",
+    "networkIsolated": true,
+    "credentialsStripped": true,
+    "durationMs": 55
+  },
+  {
+    "eventId": "evt-1789890991286-t02nxm",
+    "timestamp": "2026-09-20T07:56:31.286Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
+    "eventId": "evt-1789890825480-l71jok",
+    "timestamp": "2026-09-20T07:53:45.480Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
     "eventId": "evt-1788964895702-zjq4nr",
     "timestamp": "2026-09-09T14:41:35.702Z",
     "actor": "anonymous-intruder",

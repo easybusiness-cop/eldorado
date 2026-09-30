@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Agent, FleetTask } from '../types';
 import { knowledgeBaseService } from '../services/knowledgeBaseService';
 import { soundFx } from '../utils/speech';
+import { ChatMarkdownRenderer } from './chat/ChatMarkdownRenderer';
+import { ChatMessageActions } from './chat/ChatMessageActions';
 
 interface ChatMessage {
   id: string;
@@ -328,9 +330,19 @@ export const RuffloIntelligenceChatbot: React.FC<RuffloIntelligenceChatbotProps>
                     <span className="text-[#928374] font-normal">{msg.timestamp}</span>
                   </div>
                 )}
-                <div className="whitespace-pre-wrap font-sans text-xs">
-                  {msg.text}
+                <div className="text-xs">
+                  <ChatMarkdownRenderer content={msg.text} role={isUser ? 'user' : 'assistant'} />
                 </div>
+
+                {/* Assistant Toolbar */}
+                {!isUser && (
+                  <ChatMessageActions
+                    content={msg.text}
+                    modelName="Rufflo Fleet Intelligence"
+                    timestamp={msg.timestamp}
+                    onRegenerate={() => handleSendCommand(messages[messages.length - 2]?.text || "Regenerate")}
+                  />
+                )}
 
                 {/* Action Card inside Bot Message */}
                 {msg.actionTaken && (

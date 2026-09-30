@@ -42,8 +42,8 @@ systemTelemetryRouter.get("/system-telemetry", (req, res) => {
   });
 });
 
-systemTelemetryRouter.post("/debugger/trigger-heal", (req, res) => {
-  const { reason = "Manual Operator Trigger" } = req.body;
+const handleTriggerHeal = (req: any, res: any) => {
+  const reason = (req.body && req.body.reason) || (req.query && req.query.reason) || "Operator Trigger";
   debugTelemetry.patchesApplied += 1;
   debugTelemetry.healthScore = 99.9;
   const now = new Date().toLocaleTimeString();
@@ -64,7 +64,10 @@ systemTelemetryRouter.post("/debugger/trigger-heal", (req, res) => {
     healthScore: debugTelemetry.healthScore,
     message: "Self-healing routine executed successfully.",
   });
-});
+};
+
+systemTelemetryRouter.post("/debugger/trigger-heal", handleTriggerHeal);
+systemTelemetryRouter.get("/debugger/trigger-heal", handleTriggerHeal);
 
 systemTelemetryRouter.post("/telemetry/fix-issue", (req, res) => {
   const { issueId = "auto-scan" } = req.body;

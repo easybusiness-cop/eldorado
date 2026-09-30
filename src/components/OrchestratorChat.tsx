@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import { ChatMarkdownRenderer } from "./chat/ChatMarkdownRenderer";
+import { ChatMessageActions } from "./chat/ChatMessageActions";
 
 interface ChatMessage {
   id: string;
@@ -260,8 +262,8 @@ export function OrchestratorChat() {
             style={{
               alignSelf: m.role === "user" ? "flex-end" : "flex-start",
               maxWidth: "92%",
-              padding: "8px 12px",
-              borderRadius: 8,
+              padding: "10px 14px",
+              borderRadius: 10,
               background:
                 m.role === "user"
                   ? "#2d4a3e"
@@ -272,34 +274,50 @@ export function OrchestratorChat() {
                   : "#252525",
               color: "#ddd",
               fontSize: 13,
-              whiteSpace: "pre-wrap",
               border:
-                m.role === "progress" ? "1px dashed #444" : "1px solid transparent",
+                m.role === "progress" ? "1px dashed #444" : "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
             }}
           >
             <div
               style={{
-                fontSize: 11,
-                color: "#888",
-                marginBottom: 4,
-                letterSpacing: 0.3,
+                fontSize: 10.5,
+                color: m.role === "user" ? "#6ee7b7" : "#888",
+                marginBottom: 6,
+                letterSpacing: 0.5,
+                fontWeight: "bold",
               }}
             >
               {m.role.toUpperCase()}
             </div>
-            {m.content}
+
+            {m.role === "progress" ? (
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontFamily: "inherit" }}>
+                {m.content}
+              </pre>
+            ) : (
+              <ChatMarkdownRenderer content={m.content} role={m.role === "user" ? "user" : "assistant"} />
+            )}
+
             {m.meta && (
               <div
                 style={{
                   marginTop: 6,
                   fontSize: 11,
-                  color: "#777",
+                  color: "#94a3b8",
                   borderTop: "1px solid #333",
                   paddingTop: 6,
                 }}
               >
                 {m.meta}
               </div>
+            )}
+
+            {m.role === "assistant" && (
+              <ChatMessageActions
+                content={m.content}
+                modelName="Master Orchestrator"
+              />
             )}
           </div>
         ))}

@@ -28,6 +28,8 @@ import {
   Workflow,
   Send,
   Flame,
+  Bot,
+  Network,
 } from 'lucide-react';
 
 interface TopNavigationProps {
@@ -59,7 +61,11 @@ interface TopNavigationProps {
   onOpenTelegram?: () => void;
   onOpenCrashalyst?: () => void;
   onOpenPredictiveLoadBalancer?: () => void;
-  onOpenGrokbot?: () => void;
+  onOpenApiGatewayMicroservices?: () => void;
+  onOpenComposioHub?: () => void;
+  onOpenOpenWebUI?: () => void;
+
+  onOpenCrisisSimulation?: () => void;
   dynamicFeatureCount: number;
   systemModulesCount: number;
   autoMode: boolean;
@@ -109,7 +115,11 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     onOpenTelegram,
     onOpenCrashalyst,
     onOpenPredictiveLoadBalancer,
-    onOpenGrokbot,
+    onOpenApiGatewayMicroservices,
+    onOpenComposioHub,
+    onOpenOpenWebUI,
+    onOpenCrisisSimulation,
+
     dynamicFeatureCount,
     systemModulesCount,
     autoMode,
@@ -139,12 +149,37 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
 
   const primary: NavItem[] = [
     {
-      id: 'grokbot',
-      label: 'Rufflo Grokbot',
-      icon: <Sparkles className="w-3.5 h-3.5 text-emerald-400" />,
-      onClick: onOpenGrokbot,
+      id: 'chaos-lab',
+      label: 'Chaos Lab',
+      icon: <Flame className="w-3.5 h-3.5 text-[#fb4934] animate-pulse" />,
+      onClick: onOpenCrisisSimulation,
       primary: true,
-      hidden: !onOpenGrokbot,
+      hidden: !onOpenCrisisSimulation,
+    },
+    {
+      id: 'composio',
+      label: 'Composio Tools',
+      icon: <Zap className="w-3.5 h-3.5 text-[#fe8019]" />,
+      onClick: onOpenComposioHub,
+      primary: true,
+      hidden: !onOpenComposioHub,
+    },
+    {
+      id: 'api-gateway',
+      label: 'API Gateway & Mesh',
+
+      icon: <Network className="w-3.5 h-3.5 text-emerald-400" />,
+      onClick: onOpenApiGatewayMicroservices,
+      primary: true,
+      hidden: !onOpenApiGatewayMicroservices,
+    },
+    {
+      id: 'open-webui',
+      label: 'Open WebUI',
+      icon: <Bot className="w-3.5 h-3.5 text-emerald-300" />,
+      onClick: onOpenOpenWebUI,
+      primary: true,
+      hidden: !onOpenOpenWebUI,
     },
     {
       id: 'search',
@@ -216,7 +251,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
   ].filter((i) => !i.hidden);
 
   const overflow: NavItem[] = [
+    { id: 'chaos-lab', label: 'Chaos Crisis Injector', icon: <Flame className="w-3.5 h-3.5 text-[#fb4934]" />, onClick: onOpenCrisisSimulation, hidden: !onOpenCrisisSimulation },
+    { id: 'composio', label: 'Composio Integrations & Tools', icon: <Zap className="w-3.5 h-3.5 text-[#fe8019]" />, onClick: onOpenComposioHub, hidden: !onOpenComposioHub },
     { id: 'dashboard', label: 'Agents dashboard', icon: <Layers className="w-3.5 h-3.5" />, onClick: onOpenMunderdifflinDashboard, hidden: !onOpenMunderdifflinDashboard },
+
     { id: 'comms', label: 'Agent communication', icon: <Phone className="w-3.5 h-3.5" />, onClick: onOpenAgentCommunication, hidden: !onOpenAgentCommunication },
     { id: 'skills', label: 'Skill matrix', icon: <Brain className="w-3.5 h-3.5" />, onClick: onOpenAgentSkillMatrix, hidden: !onOpenAgentSkillMatrix },
     { id: 'sops', label: 'SOPs & data', icon: <Shield className="w-3.5 h-3.5" />, onClick: onOpenAgentSops, hidden: !onOpenAgentSops },

@@ -95,6 +95,15 @@ export class CapabilityRegistry {
       { id: "computer-use.evaluate", tool: "computer-use", action: "evaluate", description: "Evaluate JS in page", category: "system", baseRisk: "HIGH" },
       { id: "computer-use.close", tool: "computer-use", action: "close", description: "Close the browser", category: "system", baseRisk: "LOW" },
 
+      // Browser Use (alias namespace)
+      { id: "browser-use.navigate", tool: "browser-use", action: "navigate", description: "Navigate browser to URL via Browser-Use engine", category: "system", baseRisk: "MEDIUM" },
+      { id: "browser-use.click", tool: "browser-use", action: "click", description: "Click an element in web page", category: "system", baseRisk: "MEDIUM" },
+      { id: "browser-use.type", tool: "browser-use", action: "type", description: "Type text into web element", category: "system", baseRisk: "MEDIUM" },
+      { id: "browser-use.extract_text", tool: "browser-use", action: "extract_text", description: "Extract clean DOM text via Browser-Use", category: "system", baseRisk: "LOW" },
+      { id: "browser-use.screenshot", tool: "browser-use", action: "screenshot", description: "Take browser screenshot", category: "system", baseRisk: "LOW" },
+      { id: "browser-use.evaluate", tool: "browser-use", action: "evaluate", description: "Evaluate DOM JS expression", category: "system", baseRisk: "HIGH" },
+      { id: "browser-use.close", tool: "browser-use", action: "close", description: "Close active browser session", category: "system", baseRisk: "LOW" },
+
       // Project Writer
       { id: "project-writer.write_file", tool: "project-writer", action: "write_file", description: "Write a source file", category: "development", baseRisk: "MEDIUM", requiresEngineeringRole: true },
       { id: "project-writer.read_file", tool: "project-writer", action: "read_file", description: "Read a source file", category: "development", baseRisk: "LOW", requiresEngineeringRole: true },
@@ -150,6 +159,14 @@ export class CapabilityRegistry {
     ];
 
     grant("ruflo", fullEngineering);
+    grant("quantum-orchestrator", [
+      ...fullEngineering,
+      "browser-use.navigate", "browser-use.click", "browser-use.type",
+      "browser-use.extract_text", "browser-use.screenshot", "browser-use.evaluate", "browser-use.close",
+      "stripe.create_invoice", "stripe.inspect_balance",
+      "slack.post_message",
+      "cloud_storage.upload", "cloud_storage.download", "cloud_storage.list",
+    ]);
     grant("michael", [
       ...fullEngineering,
       "stripe.create_invoice", "stripe.inspect_balance",

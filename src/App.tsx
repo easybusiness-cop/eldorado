@@ -25,8 +25,9 @@ import { CascadeRunData } from './components/ExecutiveSummaryModal';
 import { generateExecutiveSummaryMarkdown } from './utils/markdownGenerator';
 import { DepartmentHubView } from './components/DepartmentHubView';
 import { MunderdifflinDashboard } from './components/MunderdifflinDashboard';
-import { RuffloIntelligenceChatbot } from './components/RuffloIntelligenceChatbot';
-
+import { RuffloIntelligence } from './components/RuffloIntelligence';
+import { SmartTaskSuggestion } from './utils/smartTaskSuggestions';
+import { SmartSuggestionTooltip } from './components/SmartSuggestionTooltip';
 import { initializeSystemRuntime, sendAndApplySystemCode } from './utils/systemRuntime';
 import { Zap } from 'lucide-react';
 import { VoiceWaveform } from './components/VoiceWaveform';
@@ -161,7 +162,11 @@ export default function App() {
     isExecutiveSummaryOpen: false,
     isPredictiveLoadBalancerOpen: false,
     isCrashalystOpen: false,
-    isGrokbotOpen: false,
+    isApiGatewayMicroservicesOpen: false,
+    isComposioHubOpen: false,
+    isOpenWebUiOpen: false,
+
+    isCrisisSimulationOpen: false,
   });
 
   const [executiveSummaryRun, setExecutiveSummaryRun] = useState<CascadeRunData | null>(null);
@@ -206,7 +211,9 @@ export default function App() {
       isExecutiveSummaryOpen: false,
       isPredictiveLoadBalancerOpen: false,
       isCrashalystOpen: false,
-      isGrokbotOpen: false,
+      isApiGatewayMicroservicesOpen: false,
+      isOpenWebUiOpen: false,
+      isCrisisSimulationOpen: false,
     });
   };
 
@@ -242,11 +249,15 @@ export default function App() {
   const setIsMunderdifflinDashboardOpen = createModalSetter('isMunderdifflinDashboardOpen');
   const setIsDynamicKbOpen = createModalSetter('isDynamicKbOpen');
 
+  const [showOtherPanels, setShowOtherPanels] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
   // Initial tab to display when MunderdifflinDashboard is launched
   const [dashboardInitialTab, setDashboardInitialTab] = useState<'roster_and_assign' | 'monitor' | 'outputs' | 'knowledge' | 'pipelines' | 'communication' | 'skills' | 'sops'>('roster_and_assign');
 
   const [systemModulesCount, setSystemModulesCount] = useState<number>(1);
   const [featureToEditInIde, setFeatureToEditInIde] = useState<DynamicFeature | null>(null);
+  const [hoveredCardAgentId, setHoveredCardAgentId] = useState<string | null>(null);
   const [autoApplyToast, setAutoApplyToast] = useState<{
     show: boolean;
     agentName: string;
@@ -1053,6 +1064,38 @@ export default function App() {
     }
   };
 
+  // Assign recommended next mission directly from Smart Suggestion tooltip
+  const handleAssignSmartTask = (agentId: string, suggestion: SmartTaskSuggestion) => {
+    setAgents((prev) =>
+      prev.map((a) => {
+        if (a.id === agentId) {
+          return {
+            ...a,
+            status: 'working',
+            currentTask: suggestion.title,
+            tokensProcessed: (a.tokensProcessed || 0) + 240,
+          };
+        }
+        return a;
+      })
+    );
+
+    const targetAgent = agents.find((a) => a.id === agentId);
+    const agentName = targetAgent ? targetAgent.name : agentId;
+
+    setLogs((prev) => [
+      {
+        id: `log-smart-${Date.now()}`,
+        timestamp: new Date().toLocaleTimeString(),
+        level: 'info',
+        agentId,
+        message: `[Smart Suggestion] Queued mission "${suggestion.title}" to ${agentName} based on verified skillset in "${suggestion.primarySkill}" (${suggestion.matchScore}% suitability match).`,
+      },
+      ...prev,
+    ]);
+    soundFx.playSuccess();
+  };
+
   // Add newly provisioned agent to fleet & persist locally
   const handleAddAgent = (newAgent: Agent) => {
     const agentWithState = {
@@ -1144,7 +1187,11 @@ export default function App() {
         onOpenTelegram={() => { closeAllModals(); openModal('isTelegramOpen'); }}
         onOpenPredictiveLoadBalancer={() => { closeAllModals(); openModal('isPredictiveLoadBalancerOpen'); }}
         onOpenCrashalyst={() => { closeAllModals(); openModal('isCrashalystOpen'); }}
-        onOpenGrokbot={() => { closeAllModals(); openModal('isGrokbotOpen'); }}
+        onOpenApiGatewayMicroservices={() => { closeAllModals(); openModal('isApiGatewayMicroservicesOpen'); }}
+        onOpenComposioHub={() => { closeAllModals(); openModal('isComposioHubOpen'); }}
+        onOpenOpenWebUI={() => { closeAllModals(); openModal('isOpenWebUiOpen'); }}
+
+        onOpenCrisisSimulation={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
         onOpenPublicApiHub={() => { closeAllModals(); openModal('isPublicApiOpen'); }}
         onOpenMunderdifflinDashboard={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); openModal('isMunderdifflinDashboardOpen'); }}
         onOpenAgentCommunication={() => { closeAllModals(); setDashboardInitialTab('communication'); openModal('isMunderdifflinDashboardOpen'); }}
@@ -1172,9 +1219,9 @@ export default function App() {
 
       {/* MAIN */}
       <div className="rufflo-main">
-        <main className="main-grid rufflo-content animate-in">
+        <main className="main-grid rufflo-content animate-in no-copilot">
         {/* LEFT SIDEBAR */}
-        <aside className="sidebar">
+        <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-show' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
           <div className="sidebar-section">
             <div className="section-label">COMMAND</div>
             <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "command" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('command'); }}>
@@ -1303,6 +1350,18 @@ export default function App() {
 
           <div className="sidebar-section bottom-section">
             <div className="section-label">SYSTEM</div>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}>
+              <Icon>🔥</Icon>
+              <span className="text-[#fb4934] font-bold">Chaos Crisis Injector</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isApiGatewayMicroservicesOpen'); }}>
+              <Icon>🌐</Icon>
+              <span className="text-[#34d399] font-bold">API Gateway & Mesh</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isOpenWebUiOpen'); }}>
+              <Icon>🌐</Icon>
+              <span className="text-[#34d399] font-bold">Open WebUI</span>
+            </button>
             <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}>
               <Icon>⚡</Icon>
               <span className="text-[#38bdf8] font-bold">Supabase Sync</span>
@@ -1336,16 +1395,41 @@ export default function App() {
 
         {/* CENTER */}
         <section className="workspace" style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-          <div className="flex-1 flex flex-col min-h-0">
+          {isMobileMenuOpen && (
+            <div 
+              className="fixed inset-0 top-[56px] bg-black/60 backdrop-blur-xs z-[999] md:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+          <div className="workspace-content flex flex-col">
                   <div className="workspace-header">
-                    <div>
-                      <div className="eyebrow">RUFFLO / {activeDepartment === "Munderdifflin" ? "SCRANTON BRANCH" : activeDepartment === "Overview" ? "COMMAND NETWORK" : activeDepartment.toUpperCase()}</div>
-                      <h1>{activeDepartment === "Overview" ? (workspaceTab === 'command' ? "Command Center" : workspaceTab === 'fleet' ? "Agent Fleet Telemetry" : "Company Intelligence Network") : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
-                      <p>{activeDepartment === "Munderdifflin" ? "Autonomous task dispatch, live telemetry, and agent output memos." : "Coordinate autonomous agents, missions, knowledge and software operations."}</p>
+                    <div className="flex items-start gap-3">
+                      <button 
+                        className="md:hidden p-2 mt-1 bg-[#121216] rounded-lg border border-white/10 text-[#fabd2f] hover:bg-[#181822] transition-colors flex items-center justify-center cursor-pointer"
+                        style={{ minWidth: '40px', minHeight: '40px' }}
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle Navigation Sidebar"
+                      >
+                        {isMobileMenuOpen ? "✕" : "☰"}
+                      </button>
+                      <div>
+                        <div className="eyebrow">RUFFLO / {activeDepartment === "Munderdifflin" ? "SCRANTON BRANCH" : activeDepartment === "Overview" ? "COMMAND NETWORK" : activeDepartment.toUpperCase()}</div>
+                        <h1>{activeDepartment === "Overview" ? (workspaceTab === 'command' ? "Rufflo Intelligence" : workspaceTab === 'fleet' ? "Agent Fleet Telemetry" : "Company Intelligence Network") : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
+                        <p>{activeDepartment === "Munderdifflin" ? "Autonomous task dispatch, live telemetry, and agent output memos." : "Coordinate autonomous agents, missions, knowledge and software operations."}</p>
+                      </div>
                     </div>
                     <div className="workspace-actions">
+                      {activeDepartment === 'Overview' && workspaceTab === 'command' && (
+                        <button
+                          className="secondary-button"
+                          style={{ borderColor: showOtherPanels ? '#8ec07c' : '#a89984', color: showOtherPanels ? '#8ec07c' : '#a89984' }}
+                          onClick={() => setShowOtherPanels(!showOtherPanels)}
+                        >
+                          {showOtherPanels ? '⚡ Hide System Panels' : '⚙️ Show System Panels'}
+                        </button>
+                      )}
                       {activeDepartment === 'Overview' && (
-                        <div className="flex items-center gap-1 bg-[#121216] p-1 rounded-lg border border-white/10 mr-2">
+                        <div className="flex flex-wrap items-center gap-1 bg-[#121216] p-1 rounded-lg border border-white/10 mr-2">
                           <button
                             className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'command' ? 'bg-[#fabd2f]/20 text-[#fabd2f] border border-[#fabd2f]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
                             onClick={() => setWorkspaceTab('command')}
@@ -1379,6 +1463,14 @@ export default function App() {
                         onClick={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}
                       >
                         🧠 Knowledge
+                      </button>
+                      <button
+                        className="secondary-button"
+                        style={{ borderColor: '#fb4934', color: '#fb4934' }}
+                        onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                        title="Open Live Chaos Scenario Outage Injector"
+                      >
+                        🔥 Chaos Lab
                       </button>
                       <button className="secondary-button" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>+ New Mission</button>
                       <button className="primary-button" onClick={handleTriggerStandup}><span>▶</span> Run Operation</button>
@@ -1415,24 +1507,53 @@ export default function App() {
                       />
                     </div>
                   ) : workspaceTab === 'command' ? (
-                    <div className="flex-1 min-h-0 flex flex-col">
-                      <CommandCenter
+                    <div className="flex-1 min-h-0 flex flex-col gap-6">
+                      <RuffloIntelligence
+                        userProfile={userProfile}
                         agents={agents}
-                        selectedAgent={selectedAgent}
-                        onSelectAgent={setSelectedAgentId}
-                        logs={logs}
                         tasks={tasks}
                         onAddTask={handleAddTask}
-                        onExecutePrompt={handleExecutePrompt}
-                        onExecuteCode={handleExecuteCode}
-                        onOpenIde={() => { closeAllModals(); openModal('isIdeOpen'); }}
-                        autoMode={autoMode}
-                        onToggleAutoMode={() => setAutoMode(!autoMode)}
-                        userProfile={userProfile}
-                        telemetry={telemetry}
-                        onSetWorkspaceTab={setWorkspaceTab}
-                        departments={departments}
+                        onUpdateTask={(task) => {
+                          setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
+                        }}
+                        onAddLog={(log) => {
+                          const newLog = {
+                            id: log.id || `log-intel-${Date.now()}`,
+                            timestamp: log.timestamp || new Date().toLocaleTimeString(),
+                            level: log.level || 'info',
+                            agentId: log.agentId || 'scott',
+                            message: log.message || '',
+                          };
+                          setLogs((prev) => prev.some(l => l.id === newLog.id) ? prev : [newLog, ...prev]);
+                        }}
                       />
+                      {showOtherPanels && (
+                        <div className="mt-6 border-t border-white/10 pt-6 animate-in">
+                          <h3 className="text-sm font-semibold text-[#fabd2f] mb-4 uppercase tracking-wider flex items-center gap-2">
+                            <span>⚙️</span> Advanced CommandCenter Console
+                          </h3>
+                          <CommandCenter
+                            agents={agents}
+                            selectedAgent={selectedAgent}
+                            onSelectAgent={setSelectedAgentId}
+                            logs={logs}
+                            tasks={tasks}
+                            onAddTask={handleAddTask}
+                            onExecutePrompt={handleExecutePrompt}
+                            onExecuteCode={handleExecuteCode}
+                            onOpenIde={() => { closeAllModals(); openModal('isIdeOpen'); }}
+                            autoMode={autoMode}
+                            onToggleAutoMode={() => setAutoMode(!autoMode)}
+                            userProfile={userProfile}
+                            telemetry={telemetry}
+                            onSetWorkspaceTab={setWorkspaceTab}
+                            departments={departments}
+                            onOpenCrisisSimulation={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                            onOpenComposioHub={() => { closeAllModals(); openModal('isComposioHubOpen'); }}
+                          />
+
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -1528,6 +1649,7 @@ export default function App() {
                           return (
                             <button
                               key={agent.id}
+                              id={`agent-card-main-${agent.id}`}
                               className={`agent-card ${selectedAgent?.id === agent.id ? "selected" : ""} ${isWorking ? "processing-pulse" : ""}`}
                               style={{
                                 ['--pulse-duration' as any]: tier.pulseSpeed,
@@ -1537,8 +1659,18 @@ export default function App() {
                                 ['--pulse-glow-mid' as any]: tier.glowColor,
                                 ['--pulse-glow-end' as any]: 'transparent',
                               }}
+                              onMouseEnter={() => setHoveredCardAgentId(agent.id)}
+                              onMouseLeave={() => setHoveredCardAgentId(null)}
                               onClick={() => { closeAllModals(); setSelectedAgentId(agent.id); openModal('isAgentDetailOpen'); }}
                             >
+                              {/* Smart Suggestion Hover Tooltip */}
+                              <SmartSuggestionTooltip
+                                agent={agent}
+                                isVisible={hoveredCardAgentId === agent.id}
+                                position="top"
+                                onAssignTask={handleAssignSmartTask}
+                              />
+
                               {/* Subtle pulse halo glow overlay */}
                               {isWorking && (
                                 <div
@@ -1672,18 +1804,6 @@ export default function App() {
               )}
             </div>
         </section>
-
-        {/* RIGHT COPILOT: RUFFLO INTELLIGENCE CHATBOT */}
-        <aside className="copilot flex flex-col   p-0 border-l border-[#3c3836]">
-          <RuffloIntelligenceChatbot
-            agents={agents}
-            tasks={tasks}
-            onExecutePrompt={handleExecutePrompt}
-            onOpenDashboard={() => { closeAllModals(); setIsMunderdifflinDashboardOpen(true); }}
-            onOpenKnowledgeBase={() => { closeAllModals(); setIsDynamicKbOpen(true); }}
-            onAssignTask={handleAddTask}
-          />
-        </aside>
       </main>
     </div>
 

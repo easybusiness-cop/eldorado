@@ -8,6 +8,7 @@ import { AgentSkillMatrix } from './AgentSkillMatrix';
 import { AgentSops } from './AgentSops';
 import { DepartmentTaskBarChart } from './widgets/DepartmentTaskBarChart.tsx';
 import { FirebaseCrashalystHub } from './FirebaseCrashalystHub.tsx';
+import { SmartSuggestionTooltip } from './SmartSuggestionTooltip';
 import { Flame, Sparkles, BrainCircuit, Zap, CheckCircle2 } from 'lucide-react';
 
 interface MunderdifflinDashboardProps {
@@ -460,6 +461,7 @@ export const MunderdifflinDashboard: React.FC<MunderdifflinDashboardProps> = ({
 
   // Selected completed task for detailed output view
   const [inspectedTaskId, setInspectedTaskId] = useState<string | null>(null);
+  const [hoveredRosterAgentId, setHoveredRosterAgentId] = useState<string | null>(null);
 
   // Dynamic Knowledge Base state
   const [knowledgeEntries, setKnowledgeEntries] = useState<KnowledgeEntry[]>([]);
@@ -1140,7 +1142,7 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
 
         {/* TOP CONTROLS & TAB NAVIGATION */}
         <div className="flex items-center gap-2">
-          <nav className="flex bg-[#d5c4a1] p-1 rounded border border-[#bdae93]">
+           <nav className="flex flex-wrap bg-[#d5c4a1] p-1 rounded border border-[#bdae93]">
             <button
               id="tab-roster-assign"
               onClick={() => { soundFx.playClick(); setActiveTab('roster_and_assign'); }}
@@ -1355,17 +1357,53 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                     return (
                       <div
                         key={agent.id}
+                        id={`dashboard-roster-item-${agent.id}`}
+                        onMouseEnter={() => setHoveredRosterAgentId(agent.id)}
+                        onMouseLeave={() => setHoveredRosterAgentId(null)}
                         onClick={() => {
                           soundFx.playClick();
                           setTargetAgentId(agent.id);
                           onSelectAgent(agent.id);
                         }}
-                        className={`p-2.5 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-between ${
+                        className={`relative p-2.5 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-between overflow-visible ${
                           isSelected
                             ? 'bg-[#fbf1c7] border-[#b57614] shadow-sm ring-1 ring-[#b57614]'
                             : 'bg-[#f9f5d7] border-[#d5c4a1] hover:bg-[#fbf1c7]'
                         }`}
                       >
+                        {/* Smart Suggestion Tooltip on hover */}
+                        <SmartSuggestionTooltip
+                          agent={agent}
+                          isVisible={hoveredRosterAgentId === agent.id}
+                          position="top"
+                          onAssignTask={(agentId, sug) => {
+                            let cat: KnowledgeCategory = 'coding';
+                            const lowerCat = sug.category.toLowerCase();
+                            if (lowerCat.includes('cyber') || lowerCat.includes('soc') || lowerCat.includes('security')) {
+                              cat = 'hacking';
+                            } else if (lowerCat.includes('finance') || lowerCat.includes('analytics')) {
+                              cat = 'finance';
+                            } else if (lowerCat.includes('growth') || lowerCat.includes('outreach') || lowerCat.includes('marketing')) {
+                              cat = 'marketing';
+                            } else if (lowerCat.includes('social')) {
+                              cat = 'social_media';
+                            }
+
+                            const prio: 'low' | 'medium' | 'high' | 'critical' = 
+                              sug.priority === 'critical' ? 'critical' :
+                              sug.priority === 'high' ? 'high' :
+                              sug.priority === 'low' ? 'low' : 'medium';
+
+                            handleDispatchTask({
+                              title: sug.title,
+                              prompt: sug.reasoning,
+                              priority: prio,
+                              category: cat,
+                              agentId,
+                            });
+                          }}
+                        />
+
                         <div className="flex items-center gap-3">
                           <div
                             className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-xs text-white"
