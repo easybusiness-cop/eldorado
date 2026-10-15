@@ -1,4 +1,4 @@
-import { companyDb } from "../../../src/db/companyDb";
+import { companyDb } from "../../../src/db/companyDb.ts";
 
 export interface EnterpriseEvent {
   id: string;

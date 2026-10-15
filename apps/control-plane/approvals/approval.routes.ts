@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ApprovalService } from "./approval.service";
-import { toolGateway } from "../integrations/gateway/tool.gateway";
+import { ApprovalService } from "./approval.service.ts";
+import { toolGateway } from "../integrations/gateway/tool.gateway.ts";
 
 const router = Router();
 

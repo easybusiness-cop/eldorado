@@ -134,7 +134,7 @@ export const HeartbeatVariabilitySparkline: React.FC<HeartbeatVariabilitySparkli
         </div>
 
         {/* Real-time HRV Metric */}
-        <div className="flex items-center gap-1.5 text-[9px] font-mono text-zinc-400">
+        <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-400">
           <span className="text-zinc-500">HRV:</span>
           <span className="text-cyan-300 font-bold">{hrvMs}ms</span>
           <span className="text-zinc-600">·</span>
@@ -244,21 +244,21 @@ export const HeartbeatVariabilitySparkline: React.FC<HeartbeatVariabilitySparkli
         </svg>
 
         {/* Time Domain Labels */}
-        <div className="flex items-center justify-between text-[8px] font-mono text-zinc-500 mt-1 px-0.5">
+        <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 mt-1 px-0.5">
           <span>-60s</span>
-          <span className="text-zinc-600">Heartbeat Variability Window</span>
+          <span className="text-zinc-500">Heartbeat Variability Window</span>
           <span>-30s</span>
           <span className="text-cyan-400 font-bold">Now</span>
         </div>
       </div>
 
       {/* Correlation & Comparative Load Legend */}
-      <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5 text-[9px] font-mono">
+      <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5 text-[11px] font-mono">
         {/* Token Processing Load Readout */}
-        <div className="flex items-center gap-1 bg-white/[0.03] px-2 py-1 rounded border border-white/5">
-          <Zap className="w-3 h-3 text-amber-400 shrink-0" />
+        <div className="flex items-center gap-1.5 bg-white/[0.03] px-2 py-1.5 rounded border border-white/5">
+          <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
           <div className="flex flex-col truncate">
-            <span className="text-[7.5px] uppercase text-zinc-500 font-sans font-semibold">
+            <span className="text-[10px] uppercase text-zinc-400 font-sans font-semibold tracking-wider">
               Token Processing
             </span>
             <span className="text-amber-300 font-bold truncate">
@@ -268,15 +268,15 @@ export const HeartbeatVariabilitySparkline: React.FC<HeartbeatVariabilitySparkli
         </div>
 
         {/* Pulse Intensity Readout */}
-        <div className="flex items-center gap-1 bg-white/[0.03] px-2 py-1 rounded border border-white/5">
-          <Activity className="w-3 h-3 text-cyan-400 shrink-0" />
+        <div className="flex items-center gap-1.5 bg-white/[0.03] px-2 py-1.5 rounded border border-white/5">
+          <Activity className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
           <div className="flex flex-col truncate">
-            <span className="text-[7.5px] uppercase text-zinc-500 font-sans font-semibold">
+            <span className="text-[10px] uppercase text-zinc-400 font-sans font-semibold tracking-wider">
               Pulse Intensity
             </span>
             <span className="text-cyan-300 font-bold truncate">
               {hoveredPoint ? hoveredPoint.pulseIntensity : currentPulseIntensity}%
-              <span className="text-zinc-500 text-[8px] ml-1 font-normal">
+              <span className="text-zinc-400 text-[10px] ml-1 font-normal">
                 ({activePoint?.bpm || currentBpm} bpm)
               </span>
             </span>
@@ -285,14 +285,14 @@ export const HeartbeatVariabilitySparkline: React.FC<HeartbeatVariabilitySparkli
       </div>
 
       {/* Correlation Metric Footer */}
-      <div className="flex items-center justify-between text-[8.5px] font-mono bg-cyan-950/20 border border-cyan-500/20 rounded px-2 py-1 text-zinc-300">
-        <div className="flex items-center gap-1">
-          <GitCommit className="w-3 h-3 text-cyan-400" />
+      <div className="flex items-center justify-between text-[10px] font-mono bg-cyan-950/20 border border-cyan-500/20 rounded px-2.5 py-1 text-zinc-300">
+        <div className="flex items-center gap-1.5">
+          <GitCommit className="w-3.5 h-3.5 text-cyan-400" />
           <span>
             Correlation: <strong className="text-cyan-300 font-bold">r = +{correlationCoefficient}</strong>
           </span>
         </div>
-        <span className="text-zinc-400 text-[8px] italic truncate max-w-[150px]">
+        <span className="text-zinc-400 text-[10px] italic truncate max-w-[150px]">
           {telemetry.correlationLabel}
         </span>
       </div>

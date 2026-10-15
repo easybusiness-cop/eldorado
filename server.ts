@@ -26,7 +26,6 @@ import { repositoryRouter } from "./server/routes/repository.routes.ts";
 import { supabaseRouter } from "./server/routes/supabase.routes.ts";
 import { objectivesRouter } from "./server/routes/objectives.routes.ts";
 import { orchestratorRouter } from "./server/routes/orchestrator.routes.ts";
-import { n8nRouter } from "./server/routes/n8n.routes.ts";
 import { telegramRouter } from "./server/routes/telegram.routes.ts";
 import { loadBalancerRouter } from "./server/routes/load-balancer.routes.ts";
 import { developerSuiteRouter } from "./server/routes/developer-suite.routes.ts";
@@ -48,15 +47,9 @@ dotenv.config();
 
 const app = express();
 const distPath = path.join(process.cwd(), "dist");
-const hasDist = fs.existsSync(path.join(distPath, "index.html"));
-const isProduction =
-  process.env.NODE_ENV === "production" ||
-  Boolean(process.env.K_SERVICE || process.env.K_REVISION) ||
-  hasDist;
-
-if (isProduction && !process.env.NODE_ENV) {
-  process.env.NODE_ENV = "production";
-}
+const indexPath = path.join(distPath, "index.html");
+const hasDist = fs.existsSync(indexPath);
+const isProduction = process.env.NODE_ENV === "production" && hasDist;
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const engineering = new EngineeringDepartmentEngineer();
@@ -152,7 +145,6 @@ app.use("/api", enterpriseControlRouter);
 app.use("/api", autonomyRouter);
 app.use("/api", objectivesRouter);
 app.use("/api", orchestratorRouter);
-app.use("/api/n8n", n8nRouter);
 app.use("/api/telegram", telegramRouter);
 app.use("/api/load-balancer", loadBalancerRouter);
 app.use("/api/developer", developerSuiteRouter);
@@ -209,6 +201,11 @@ app.post("/api/meta/improve", async (_req, res) => {
   }
 });
 
+// 404 handler for unmatched /api routes to prevent falling through to SPA HTML
+app.all("/api/*", (req, res) => {
+  res.status(404).json({ error: `API route not found: ${req.method} ${req.path}` });
+});
+
 // Start Server with Vite Dev/Prod Middleware and WebSocket Engine
 async function startServer() {
   if (!isProduction) {
@@ -222,8 +219,15 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api") || req.path.startsWith("/ws")) {
+        return next();
+      }
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send("Application index.html not found");
+      }
     });
   }
 

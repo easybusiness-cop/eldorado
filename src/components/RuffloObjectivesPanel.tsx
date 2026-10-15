@@ -284,7 +284,7 @@ export const RuffloObjectivesPanel: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[9px] font-bold uppercase mb-1 text-[#7c6f64] dark:text-[#a89984]">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-[#7c6f64] dark:text-[#a89984]">
                     Max Recovery (Attempts)
                   </label>
                   <input
@@ -297,7 +297,7 @@ export const RuffloObjectivesPanel: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold uppercase mb-1 text-[#7c6f64] dark:text-[#a89984]">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-[#7c6f64] dark:text-[#a89984]">
                     Max Time (Wall ms)
                   </label>
                   <input
@@ -386,11 +386,11 @@ export const RuffloObjectivesPanel: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <span className="text-[10px] font-bold text-[#b57614] dark:text-[#fabd2f]">
+                      <span className="text-[11px] font-bold text-[#b57614] dark:text-[#fabd2f]">
                         {obj.id}
                       </span>
                       <span
-                        className={`text-[9px] px-1.5 py-0.2 rounded border font-mono ${getStatusBadge(
+                        className={`text-[10px] px-1.5 py-0.5 rounded border font-mono ${getStatusBadge(
                           obj.status
                         )}`}
                       >
@@ -521,10 +521,10 @@ export const RuffloObjectivesPanel: React.FC = () => {
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-[#7c6f64] dark:text-[#928374]">
+                          <span className="text-[11px] font-bold text-[#7c6f64] dark:text-[#928374]">
                             #{idx + 1}
                           </span>
-                          <span className={`text-[9px] px-1.5 py-0.2 rounded font-mono ${getStepTypeBadge(step.type)}`}>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${getStepTypeBadge(step.type)}`}>
                             {step.type}
                           </span>
                           <h4 className="font-bold text-xs text-[#3c3836] dark:text-[#ebdbb2]">
@@ -534,12 +534,12 @@ export const RuffloObjectivesPanel: React.FC = () => {
 
                         <div className="flex items-center gap-2">
                           {step.durationMs && (
-                            <span className="text-[9px] text-[#7c6f64] dark:text-[#928374]">
+                            <span className="text-[10px] font-mono text-[#7c6f64] dark:text-[#928374]">
                               {step.durationMs}ms
                             </span>
                           )}
                           <span
-                            className={`text-[9px] px-1.5 py-0.2 rounded border font-bold ${
+                            className={`text-[10px] px-1.5 py-0.5 rounded border font-mono font-bold ${
                               step.status === "RUNNING"
                                 ? "bg-amber-500/20 text-amber-600 border-amber-500/40 animate-pulse"
                                 : step.status === "COMPLETED"
@@ -556,7 +556,7 @@ export const RuffloObjectivesPanel: React.FC = () => {
 
                       {/* Step Internal Command Details */}
                       {step.command && (
-                        <div className="text-[10px] bg-[#fbf1c7] dark:bg-[#1d2021] p-2 rounded border border-[#d5c4a1] dark:border-[#3c3836] font-mono overflow-x-auto">
+                        <div className="text-[11px] bg-[#fbf1c7] dark:bg-[#1d2021] p-2 rounded border border-[#d5c4a1] dark:border-[#3c3836] font-mono overflow-x-auto">
                           <div className="text-rose-400 dark:text-[#fabd2f] font-semibold mb-0.5">
                             $ {step.command}
                           </div>
@@ -570,7 +570,7 @@ export const RuffloObjectivesPanel: React.FC = () => {
 
                       {/* Evaluation Scores (if they exist) */}
                       {step.evaluationScores && (
-                        <div className="grid grid-cols-4 gap-1.5 p-1.5 bg-[#ebdbb2]/20 dark:bg-black/25 rounded text-[9px] border border-[#d5c4a1]/40 dark:border-[#3c3836]/40">
+                        <div className="grid grid-cols-4 gap-1.5 p-2 bg-[#ebdbb2]/20 dark:bg-black/25 rounded text-[10px] font-mono border border-[#d5c4a1]/40 dark:border-[#3c3836]/40">
                           <div>
                             <span className="text-[#7c6f64] dark:text-[#a89984] block font-semibold">Correctness</span>
                             <span className="font-bold text-emerald-600 dark:text-emerald-400">{step.evaluationScores.correctness}/100</span>

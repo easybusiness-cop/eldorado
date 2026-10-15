@@ -1,4 +1,4 @@
-import { RiskRule } from "./risk.types";
+import { RiskRule } from "./risk.types.ts";
 
 export const riskRules: RiskRule[] = [
   {

@@ -553,10 +553,10 @@ export function SpiderWebPanel({ agents: fleetAgents }: SpiderWebPanelProps) {
                         <span className="font-mono text-xs font-bold text-white truncate max-w-[130px]">
                           {agent.name}
                         </span>
-                        <span className="text-[10px] text-[#928374] font-mono">({agent.id})</span>
+                        <span className="text-[11px] text-[#928374] font-mono">({agent.id})</span>
                       </div>
                       <span
-                        className={`text-[9px] uppercase font-mono px-1.5 py-0.5 rounded font-bold ${
+                        className={`text-[10px] uppercase font-mono px-1.5 py-0.5 rounded font-bold ${
                           isDropped
                             ? 'bg-[#fb4934]/20 text-[#fb4934]'
                             : isBusy
@@ -568,21 +568,21 @@ export function SpiderWebPanel({ agents: fleetAgents }: SpiderWebPanelProps) {
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-[#a89984] mb-1.5 truncate">{agent.role}</div>
+                    <div className="text-xs text-[#a89984] mb-1.5 truncate">{agent.role}</div>
 
                     {/* Active Task snippet */}
                     {agent.task ? (
-                      <div className="p-2 rounded bg-black/50 border border-[#3c3836] flex flex-col gap-1 text-[11px]">
+                      <div className="p-2 rounded bg-black/50 border border-[#3c3836] flex flex-col gap-1 text-xs">
                         <div className="flex items-center justify-between font-mono">
                           <span className="font-bold text-[#fabd2f]">{agent.task.id}</span>
-                          <span className="text-[9px] px-1 rounded bg-[#ffaa00]/20 text-[#ffaa00]">
+                          <span className="text-[10px] px-1 rounded bg-[#ffaa00]/20 text-[#ffaa00]">
                             P{agent.task.priority} (stream active)
                           </span>
                         </div>
                         <div className="text-[#ebdbb2] truncate">{agent.task.desc}</div>
 
                         {agent.collaboratorId && (
-                          <div className="text-[9px] text-[#00e5ff] font-mono flex items-center gap-1 mt-0.5">
+                          <div className="text-[10px] text-[#00e5ff] font-mono flex items-center gap-1 mt-0.5">
                             <LinkIcon className="w-2.5 h-2.5" />
                             <span>Mesh Link: {agent.collaboratorId}</span>
                           </div>
@@ -1048,12 +1048,12 @@ export function SpiderWebPanel({ agents: fleetAgents }: SpiderWebPanelProps) {
                 <button
                   type="button"
                   onClick={() => autoSolveNext()}
-                  className="px-2 py-0.5 text-[9px] font-mono rounded bg-[#22ff88]/20 text-[#22ff88] hover:bg-[#22ff88]/30 font-bold"
+                  className="px-2 py-0.5 text-[10px] font-mono rounded bg-[#22ff88]/20 text-[#22ff88] hover:bg-[#22ff88]/30 font-bold"
                   title="Auto-solve top task immediately"
                 >
                   Solve Next
                 </button>
-                <span className="text-[10px] font-mono text-[#fabd2f]">{taskQueue.length} Queued</span>
+                <span className="text-[11px] font-mono text-[#fabd2f]">{taskQueue.length} Queued</span>
               </div>
             </div>
 
@@ -1069,7 +1069,7 @@ export function SpiderWebPanel({ agents: fleetAgents }: SpiderWebPanelProps) {
                       <span className="font-mono text-xs font-bold text-[#83a598]">{task.id}</span>
                     </div>
                     <span
-                      className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
                         task.priority === 1
                           ? 'bg-[#ffaa00]/20 text-[#ffaa00]'
                           : task.priority === 2
@@ -1081,7 +1081,7 @@ export function SpiderWebPanel({ agents: fleetAgents }: SpiderWebPanelProps) {
                     </span>
                   </div>
                   <div className="text-xs text-[#ebdbb2] leading-snug">{task.desc}</div>
-                  <div className="text-[9px] font-mono text-[#7c6f64] flex items-center justify-between">
+                  <div className="text-[10px] font-mono text-[#7c6f64] flex items-center justify-between">
                     <span className="flex items-center gap-1">
                       <Lock className="w-2.5 h-2.5" />
                       <span className="truncate max-w-[120px]">{task.signature}</span>
@@ -1166,7 +1166,7 @@ export function SpiderWebPanel({ agents: fleetAgents }: SpiderWebPanelProps) {
                   <h3 className="text-sm font-bold text-white font-mono">{selectedAgent.name}</h3>
                   <span className="text-xs font-mono text-[#928374]">({selectedAgent.id})</span>
                   <span
-                    className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded font-bold ${
+                    className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded font-bold ${
                       selectedAgent.status === 'busy'
                         ? 'bg-[#fabd2f]/20 text-[#fabd2f]'
                         : selectedAgent.status === 'dropped'

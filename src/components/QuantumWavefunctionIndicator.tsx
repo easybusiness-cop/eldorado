@@ -295,10 +295,10 @@ export const QuantumWavefunctionIndicator: React.FC<QuantumWavefunctionIndicator
               <span className="font-mono font-extrabold text-xs tracking-wider text-[#fbf1c7]">
                 QUANTUM WAVEFUNCTION COLLAPSE
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-[#7c5cff]/20 text-[#c4b5fd] border border-[#7c5cff]/40">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#7c5cff]/20 text-[#c4b5fd] border border-[#7c5cff]/40">
                 GROVER ORACLE N=4
               </span>
-              <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${
+              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
                 waveState === 'collapsed'
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                   : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
@@ -444,13 +444,13 @@ export const QuantumWavefunctionIndicator: React.FC<QuantumWavefunctionIndicator
                 </h4>
 
                 {/* Description */}
-                <p className="text-[10px] text-[#a89984] line-clamp-2 h-7 leading-relaxed mb-3">
+                <p className="text-[11px] text-[#a89984] line-clamp-2 h-7 leading-relaxed mb-3">
                   {opt.description}
                 </p>
 
                 {/* Amplitude Bar */}
                 <div className="space-y-1 mb-2">
-                  <div className="flex items-center justify-between text-[9px] font-mono">
+                  <div className="flex items-center justify-between text-[10px] font-mono">
                     <span className="text-[#a89984]">Amplitude |α|²:</span>
                     <span className={`font-bold ${isWinner ? 'text-emerald-400' : 'text-[#a89984]'}`}>
                       {(opt.amplitude * 100).toFixed(1)}%
@@ -469,7 +469,7 @@ export const QuantumWavefunctionIndicator: React.FC<QuantumWavefunctionIndicator
                 </div>
 
                 {/* Metrics Footer */}
-                <div className="pt-2 border-t border-[#3c3836]/50 flex items-center justify-between text-[10px] font-mono">
+                <div className="pt-2 border-t border-[#3c3836]/50 flex items-center justify-between text-[11px] font-mono">
                   <span className="text-[#7c6f64]">Complexity: <strong className={isWinner ? 'text-emerald-400' : 'text-[#fabd2f]'}>{(opt.complexityScore * 10).toFixed(1)}/10</strong></span>
                   <span className="text-[#7c6f64]">{opt.estLatencyMs}ms</span>
                 </div>
@@ -479,7 +479,7 @@ export const QuantumWavefunctionIndicator: React.FC<QuantumWavefunctionIndicator
         </div>
 
         {/* Selected Pathway Details Drawer */}
-        <div className="mt-4 p-3 rounded-lg bg-[#201d1c] border border-[#3c3836] flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[11px] font-mono">
+        <div className="mt-4 p-3 rounded-lg bg-[#201d1c] border border-[#3c3836] flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs font-mono">
           <div className="flex items-center gap-2.5">
             <div className={`p-1.5 rounded ${inspectedStrategy.isWinner ? 'bg-emerald-500/20 text-emerald-400' : 'bg-[#fabd2f]/20 text-[#fabd2f]'}`}>
               <GitBranch className="w-4 h-4" />
@@ -488,20 +488,20 @@ export const QuantumWavefunctionIndicator: React.FC<QuantumWavefunctionIndicator
               <div className="flex items-center gap-2">
                 <span className="text-[#fbf1c7] font-bold">Selected Path: {inspectedStrategy.braKet} {inspectedStrategy.name}</span>
                 {inspectedStrategy.isWinner && (
-                  <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.2 rounded border border-emerald-500/30">
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
                     EASIEST / CLEANEST PATHWAY
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-[#a89984] mt-0.5">
+              <p className="text-[11px] text-[#a89984] mt-0.5">
                 {inspectedStrategy.description} • Latency: ~{inspectedStrategy.estLatencyMs}ms • Steps: {inspectedStrategy.steps}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] text-[#a89984]">Path Status:</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+            <span className="text-[11px] text-[#a89984]">Path Status:</span>
+            <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
               inspectedStrategy.isWinner
                 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                 : 'bg-[#3c3836] text-[#a89984]'

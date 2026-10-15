@@ -56,7 +56,6 @@ interface SearchModalProps {
   onOpenCompanyDb?: () => void;
   onOpenPublicApi?: () => void;
   onOpenWebExplorer?: () => void;
-  onOpenN8n?: () => void;
   onOpenTelegram?: () => void;
 }
 
@@ -81,7 +80,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onOpenCompanyDb,
   onOpenPublicApi,
   onOpenWebExplorer,
-  onOpenN8n,
   onOpenTelegram,
 }) => {
   const [query, setQuery] = useState('');
@@ -247,18 +245,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         action: () => {
           onClose();
           onOpenPublicApi?.();
-        },
-      },
-      {
-        id: 'tool-n8n',
-        category: 'tools',
-        title: 'n8n Workflow Automation Bridge',
-        subtitle: 'Bi-directional webhooks, node triggers & automated agent chains',
-        badge: 'Automation',
-        icon: <Workflow className="w-4 h-4 text-[#ff6d5a]" />,
-        action: () => {
-          onClose();
-          onOpenN8n?.();
         },
       },
       {

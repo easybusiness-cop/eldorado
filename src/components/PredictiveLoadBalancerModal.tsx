@@ -442,7 +442,7 @@ export const PredictiveLoadBalancerModal: React.FC<PredictiveLoadBalancerModalPr
                         </div>
                         <div className="text-right">
                           <div className="text-lg font-black font-mono text-[#fabd2f]">{profile.overallEfficiencyScore}%</div>
-                          <span className="text-[9px] uppercase font-mono text-[#a89984]">Peak Rating</span>
+                          <span className="text-[10px] uppercase font-mono text-[#a89984]">Peak Rating</span>
                         </div>
                       </div>
 

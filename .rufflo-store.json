@@ -75,5 +75,82 @@
     ],
     "createdAt": "2026-09-20T07:53:56.388Z",
     "updatedAt": "2026-09-20T07:53:56.516Z"
+  },
+  "obj-1791189078414": {
+    "id": "obj-1791189078414",
+    "goal": "Run compliance checks, verify environment variables, and audit folder permissions",
+    "constraints": [
+      "Execution limit 30 seconds",
+      "Strict local mode"
+    ],
+    "successCriteria": [
+      "Audit logs generated",
+      "Status is COMPLETED"
+    ],
+    "status": "RUNNING",
+    "steps": [
+      {
+        "id": "replan-step-obj-1791189078414-2-0",
+        "name": "Correction Step 1",
+        "type": "BUILD",
+        "status": "RUNNING",
+        "command": "echo 'corrective step run'",
+        "expected": "",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1791189078414-2-1",
+        "name": "Correction Step 2",
+        "type": "BUILD",
+        "status": "PENDING",
+        "command": "echo 'corrective step run'",
+        "expected": "",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1791189078414-2-2",
+        "name": "Correction Step 3",
+        "type": "BUILD",
+        "status": "PENDING",
+        "command": "echo 'corrective step run'",
+        "expected": "",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1791189078414-2-3",
+        "name": "Correction Step 4",
+        "type": "BUILD",
+        "status": "PENDING",
+        "command": "echo 'corrective step run'",
+        "expected": "",
+        "artifacts": []
+      },
+      {
+        "id": "replan-step-obj-1791189078414-2-4",
+        "name": "Correction Step 5",
+        "type": "BUILD",
+        "status": "PENDING",
+        "command": "echo 'corrective step run'",
+        "expected": "",
+        "artifacts": []
+      }
+    ],
+    "currentStepIndex": 0,
+    "failures": [
+      "Step [Execution Step 1] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered.",
+      "Step [Correction Step 1] Failed: Unauthorized step execution: Agent \"ruflo-coder\" is not registered."
+    ],
+    "recoveryAttempts": 2,
+    "maxRecoveryAttempts": 2,
+    "maxWallTimeMs": 60000,
+    "budgetExhausted": false,
+    "evidence": [
+      "Objective initialized successfully.",
+      "Planner successfully mapped objective execution plan.",
+      "Failure occurred. Activating Replan recovery attempt 1/2...",
+      "Failure occurred. Activating Replan recovery attempt 2/2..."
+    ],
+    "createdAt": "2026-10-05T08:31:18.414Z",
+    "updatedAt": "2026-10-05T08:31:19.054Z"
   }
 }

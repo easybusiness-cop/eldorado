@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Agent, InterAgentThread, InterAgentMessage, SkillMatrixCategory } from '../types';
-import { soundFx } from '../utils/speech';
+import { Agent, InterAgentThread, InterAgentMessage, SkillMatrixCategory } from '../types.ts';
+import { soundFx } from '../utils/speech.ts';
 import { Atom, MessageSquare, Sparkles, Filter, Search, ChevronDown, ChevronUp, Copy, Check, Send, Users, Shield, TrendingUp, Zap } from 'lucide-react';
 
 interface AgentCommunicationThreadsProps {

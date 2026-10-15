@@ -1,4 +1,4 @@
-import { BaseAdapter, ToolExecutionContext } from "./base.adapter";
+import { BaseAdapter, ToolExecutionContext } from "./base.adapter.ts";
 
 export class WebResearchAdapter extends BaseAdapter {
   get provider(): string {

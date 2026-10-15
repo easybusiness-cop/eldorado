@@ -807,26 +807,26 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
               <span className="font-bold text-xs text-[#fbf1c7] tracking-wider">
                 D3 FLEET PERFORMANCE TELEMETRY
               </span>
-              <span className="flex items-center gap-1 text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.2 rounded border border-emerald-500/30 font-bold">
+              <span className="flex items-center gap-1 text-[10px] font-mono tracking-wider bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30 font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 LIVE D3 ENGINE
               </span>
             </div>
-            <p className="text-[10px] text-[#a89984]">
+            <p className="text-xs text-[#a89984]">
               Real-time token velocity, agent efficiency matrix & task success rates
             </p>
           </div>
         </div>
 
         {/* View Mode Switcher */}
-        <div className="flex items-center gap-1 bg-[#1d2021] p-0.5 rounded border border-[#3c3836] text-[10px]">
+        <div className="flex items-center gap-1 bg-[#1d2021] p-1 rounded border border-[#3c3836] text-xs">
           {(
             [
-              { id: 'overview', label: 'Bento Overview', icon: <Layers className="w-3 h-3" /> },
-              { id: 'wavefunction', label: 'Wavefunction Collapse', icon: <Atom className="w-3 h-3 text-emerald-400" /> },
-              { id: 'tokens', label: 'Tokens Stream', icon: <TrendingUp className="w-3 h-3" /> },
-              { id: 'efficiency', label: 'Agent Efficiency', icon: <Zap className="w-3 h-3" /> },
-              { id: 'tasks', label: 'Task Success & Health', icon: <CheckCircle2 className="w-3 h-3" /> },
+              { id: 'overview', label: 'Bento Overview', icon: <Layers className="w-3.5 h-3.5" /> },
+              { id: 'wavefunction', label: 'Wavefunction Collapse', icon: <Atom className="w-3.5 h-3.5 text-emerald-400" /> },
+              { id: 'tokens', label: 'Tokens Stream', icon: <TrendingUp className="w-3.5 h-3.5" /> },
+              { id: 'efficiency', label: 'Agent Efficiency', icon: <Zap className="w-3.5 h-3.5" /> },
+              { id: 'tasks', label: 'Task Success & Health', icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
             ] as { id: ChartViewMode; label: string; icon: React.ReactNode }[]
           ).map((m) => (
             <button
@@ -835,7 +835,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                 soundFx.playClick();
                 setViewMode(m.id);
               }}
-              className={`px-2 py-1 rounded flex items-center gap-1 transition-colors font-bold whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded flex items-center gap-1.5 transition-colors font-bold whitespace-nowrap ${
                 viewMode === m.id
                   ? 'bg-[#fabd2f] text-[#1d2021]'
                   : 'text-[#a89984] hover:text-[#ebdbb2] hover:bg-[#282828]'
@@ -848,13 +848,13 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
         </div>
 
         {/* Streaming & Time Filter Controls */}
-        <div className="flex items-center gap-1.5 text-[10px]">
+        <div className="flex items-center gap-1.5 text-xs">
           <button
             onClick={() => {
               soundFx.playClick();
               setIsLiveStreaming(!isLiveStreaming);
             }}
-            className={`px-2 py-1 rounded border flex items-center gap-1 font-bold transition-colors ${
+            className={`px-2.5 py-1 rounded border flex items-center gap-1.5 font-bold transition-colors ${
               isLiveStreaming
                 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
                 : 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
@@ -874,7 +874,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                   soundFx.playClick();
                   setTimeWindow(w);
                 }}
-                className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                   timeWindow === w ? 'bg-[#504945] text-[#fabd2f]' : 'text-[#a89984]'
                 }`}
               >
@@ -1007,7 +1007,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                 {/* Primary Metric Hero */}
                 <div className="p-2 rounded bg-[#282828] border border-[#3c3836] flex items-center justify-between">
                   <div>
-                    <div className="text-[9px] text-[#a89984] font-bold">
+                    <div className="text-[10px] text-[#a89984] font-bold uppercase tracking-wider">
                       {selectedAgentFilter === 'all' ? 'FLEET TOTAL TOKENS' : 'SELECTED AGENT TOKENS'}
                     </div>
                     <div className="text-base font-extrabold text-[#fbf1c7]">
@@ -1015,7 +1015,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-[#b8bb26] bg-[#b8bb26]/10 px-1.5 py-0.5 rounded border border-[#b8bb26]/20">
+                    <span className="text-[11px] font-bold text-[#b8bb26] bg-[#b8bb26]/10 px-2 py-0.5 rounded border border-[#b8bb26]/20">
                       {avgEfficiency}% Avg Eff
                     </span>
                   </div>
@@ -1024,7 +1024,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                 {/* Individual Agent Contributions Table */}
                 {hoveredData.agentContributions && hoveredData.agentContributions.length > 0 && (
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px] font-bold text-[#a89984] pt-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-[#a89984] pt-1">
                       <span>AGENT BREAKDOWN & EFFICIENCY</span>
                       <span>TOKENS (% SHARE)</span>
                     </div>
@@ -1039,7 +1039,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                               soundFx.playClick();
                               onSelectAgent?.(ag.id);
                             }}
-                            className={`p-1.5 rounded flex items-center justify-between text-[11px] transition-colors cursor-pointer border ${
+                            className={`p-1.5 rounded flex items-center justify-between text-xs transition-colors cursor-pointer border ${
                               isFocused
                                 ? 'bg-[#32302f] border-[#fabd2f] text-[#fbf1c7]'
                                 : 'bg-[#1d2021]/80 border-[#3c3836] hover:border-[#fabd2f]/50 hover:bg-[#282828]'
@@ -1053,7 +1053,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                               <span className="font-bold truncate">
                                 {ag.avatar} {ag.name}
                               </span>
-                              <span className="text-[9px] text-[#a89984] font-normal truncate">
+                              <span className="text-[10px] text-[#a89984] font-normal truncate">
                                 ({ag.role.split(' ')[0]})
                               </span>
                             </div>
@@ -1063,12 +1063,12 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                                 <span className="font-bold text-[#ebdbb2]">
                                   {ag.tokens.toLocaleString()}
                                 </span>
-                                <span className="text-[9px] text-[#a89984] block">
+                                <span className="text-[10px] text-[#a89984] block">
                                   {ag.sharePct}%
                                 </span>
                               </div>
                               <span
-                                className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
                                   ag.efficiencyScore >= 90
                                     ? 'bg-[#b8bb26]/20 text-[#b8bb26] border-[#b8bb26]/30'
                                     : 'bg-[#fabd2f]/20 text-[#fabd2f] border-[#fabd2f]/30'
@@ -1081,7 +1081,7 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                         );
                       })}
                     </div>
-                    <div className="text-[9px] text-[#a89984] text-center pt-1 italic">
+                    <div className="text-[10px] text-[#a89984] text-center pt-1 italic">
                       Click any agent row to inspect persona & tasks
                     </div>
                   </div>
@@ -1097,33 +1097,33 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                     <span className="text-base">{hoveredData.avatar}</span>
                     <span>{hoveredData.fullName}</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#b8bb26]/20 text-[#b8bb26] border border-[#b8bb26]/30">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#b8bb26]/20 text-[#b8bb26] border border-[#b8bb26]/30">
                     {hoveredData.efficiencyScore}% EFFICIENCY
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
                   <div className="p-1.5 bg-[#1d2021] rounded border border-[#3c3836]">
-                    <span className="text-[#a89984] block text-[9px]">TOKENS PROCESSED</span>
+                    <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider">TOKENS PROCESSED</span>
                     <strong className="text-[#ebdbb2] font-mono">
                       {hoveredData.tokensProcessed?.toLocaleString()}
                     </strong>
                   </div>
                   <div className="p-1.5 bg-[#1d2021] rounded border border-[#3c3836]">
-                    <span className="text-[#a89984] block text-[9px]">FLEET WORKLOAD SHARE</span>
+                    <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider">FLEET WORKLOAD SHARE</span>
                     <strong className="text-[#b8bb26] font-mono">{hoveredData.tokenShare}%</strong>
                   </div>
                   <div className="p-1.5 bg-[#1d2021] rounded border border-[#3c3836]">
-                    <span className="text-[#a89984] block text-[9px]">TASK SUCCESS RATE</span>
+                    <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider">TASK SUCCESS RATE</span>
                     <strong className="text-emerald-400 font-mono">{hoveredData.successRate}%</strong>
                   </div>
                   <div className="p-1.5 bg-[#1d2021] rounded border border-[#3c3836]">
-                    <span className="text-[#a89984] block text-[9px]">LIVE THROUGHPUT</span>
+                    <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider">LIVE THROUGHPUT</span>
                     <strong className="text-[#83a598] font-mono">{hoveredData.tokensPerSec} tok/s</strong>
                   </div>
                 </div>
 
-                <div className="text-[9px] text-[#a89984] bg-[#282828] p-1.5 rounded border border-[#3c3836]">
+                <div className="text-[10px] text-[#a89984] bg-[#282828] p-1.5 rounded border border-[#3c3836]">
                   <strong>Efficiency Formula:</strong> Task Success (45%) + Token Throughput (40%) + Uptime Bonus (15%)
                 </div>
               </div>
@@ -1136,11 +1136,11 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
                   <span className="font-bold text-[#fabd2f]">{hoveredData.label} Tasks</span>
                   <span className="font-bold text-emerald-400 text-sm">{hoveredData.pct}%</span>
                 </div>
-                <div className="flex justify-between text-[11px] pt-1">
+                <div className="flex justify-between text-xs pt-1">
                   <span className="text-[#a89984]">Task Count:</span>
                   <strong className="text-[#ebdbb2]">{hoveredData.count}</strong>
                 </div>
-                <div className="text-[9px] text-[#a89984] pt-1">
+                <div className="text-[10px] text-[#a89984] pt-1">
                   Contributes directly to overall fleet health resilience.
                 </div>
               </div>
@@ -1356,22 +1356,22 @@ export const FleetD3PerformanceChart: React.FC<FleetD3PerformanceChartProps> = (
             </div>
 
             {/* Token Velocity Metrics Table */}
-            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-[#3c3836] text-[11px]">
-              <div className="p-1.5 bg-[#1d2021] rounded">
-                <span className="text-[#a89984] block text-[9px]">PEAK VELOCITY</span>
-                <span className="font-bold text-emerald-400">~680 tokens/sec</span>
+            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-[#3c3836] text-xs">
+              <div className="p-2 bg-[#1d2021] rounded border border-white/5">
+                <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider mb-0.5">PEAK VELOCITY</span>
+                <span className="font-bold text-emerald-400 font-mono">~680 tokens/sec</span>
               </div>
-              <div className="p-1.5 bg-[#1d2021] rounded">
-                <span className="text-[#a89984] block text-[9px]">AVERAGE LATENCY</span>
-                <span className="font-bold text-[#83a598]">142 ms</span>
+              <div className="p-2 bg-[#1d2021] rounded border border-white/5">
+                <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider mb-0.5">AVERAGE LATENCY</span>
+                <span className="font-bold text-[#83a598] font-mono">142 ms</span>
               </div>
-              <div className="p-1.5 bg-[#1d2021] rounded">
-                <span className="text-[#a89984] block text-[9px]">MEMORY HEAP</span>
-                <span className="font-bold text-[#fabd2f]">{telemetry?.heapUsedMB ?? 28.4} MB</span>
+              <div className="p-2 bg-[#1d2021] rounded border border-white/5">
+                <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider mb-0.5">MEMORY HEAP</span>
+                <span className="font-bold text-[#fabd2f] font-mono">{telemetry?.heapUsedMB ?? 28.4} MB</span>
               </div>
-              <div className="p-1.5 bg-[#1d2021] rounded">
-                <span className="text-[#a89984] block text-[9px]">AUTO-PATCHES</span>
-                <span className="font-bold text-[#d3869b]">#{telemetry?.patchesApplied ?? 14} Applied</span>
+              <div className="p-2 bg-[#1d2021] rounded border border-white/5">
+                <span className="text-[#a89984] block text-[10px] uppercase font-bold tracking-wider mb-0.5">AUTO-PATCHES</span>
+                <span className="font-bold text-[#d3869b] font-mono">#{telemetry?.patchesApplied ?? 14} Applied</span>
               </div>
             </div>
           </div>

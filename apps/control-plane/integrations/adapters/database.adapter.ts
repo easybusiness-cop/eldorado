@@ -1,5 +1,5 @@
-import { BaseAdapter, ToolExecutionContext } from "./base.adapter";
-import { companyDb } from "../../../../src/db/companyDb";
+import { BaseAdapter, ToolExecutionContext } from "./base.adapter.ts";
+import { companyDb } from "../../../../src/db/companyDb.ts";
 
 export class DatabaseAdapter extends BaseAdapter {
   get provider(): string {

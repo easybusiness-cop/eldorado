@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Agent, FleetTask, UserProfile, AppliedSystemModule, SystemTelemetry } from '../types';
-import { AdminEngineDashboard } from './AdminEngineDashboard';
-import { soundFx, speakText } from '../utils/speech';
+import { Agent, FleetTask, UserProfile, AppliedSystemModule, SystemTelemetry } from '../types.ts';
+import { AdminEngineDashboard } from './AdminEngineDashboard.tsx';
+import { soundFx, speakText } from '../utils/speech.ts';
 import confetti from 'canvas-confetti';
 import {
   Sparkles,

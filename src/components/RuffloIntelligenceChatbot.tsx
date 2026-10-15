@@ -276,7 +276,7 @@ export const RuffloIntelligenceChatbot: React.FC<RuffloIntelligenceChatbotProps>
             <div className="text-xs font-black text-[#fabd2f] tracking-wide">
               Rufflo Intelligence
             </div>
-            <div className="text-[9px] text-[#928374]">
+            <div className="text-[11px] text-[#928374]">
               Autonomous Fleet Command & Chatbot
             </div>
           </div>
@@ -325,7 +325,7 @@ export const RuffloIntelligenceChatbot: React.FC<RuffloIntelligenceChatbotProps>
                 }`}
               >
                 {!isUser && (
-                  <div className="text-[9px] font-bold text-[#fabd2f] mb-1 flex items-center justify-between">
+                  <div className="text-[10px] font-mono font-bold text-[#fabd2f] mb-1 flex items-center justify-between">
                     <span>RUFFLO INTELLIGENCE</span>
                     <span className="text-[#928374] font-normal">{msg.timestamp}</span>
                   </div>
@@ -417,7 +417,7 @@ export const RuffloIntelligenceChatbot: React.FC<RuffloIntelligenceChatbotProps>
         </div>
 
         <div className="flex items-center justify-between mt-1.5">
-          <div className="text-[9px] text-[#7c6f64]">
+          <div className="text-[11px] text-[#7c6f64]">
             Try: <span className="text-[#a89984] cursor-pointer hover:underline" onClick={() => handleSendCommand('Assign Dwight to audit security')}>"Assign Dwight..."</span> or <span className="text-[#a89984] cursor-pointer hover:underline" onClick={() => handleSendCommand('Search knowledge base for marketing')}>"Search KB..."</span>
           </div>
 

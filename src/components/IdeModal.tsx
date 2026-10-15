@@ -948,13 +948,13 @@ return generateCloudRunRoute();`
                 <div className="p-3 rounded-lg bg-[#1d2021] border border-[#3c3836]">
                   <div className="text-[10px] text-[#928374] font-bold">INGRESS NETWORK BIND</div>
                   <div className="font-bold text-emerald-300 mt-1">0.0.0.0:3000</div>
-                  <div className="text-[9px] text-[#7c6f64] mt-0.5">Container Port 3000 (Required)</div>
+                  <div className="text-[11px] text-[#7c6f64] font-mono mt-0.5">Container Port 3000 (Required)</div>
                 </div>
 
                 <div className="p-3 rounded-lg bg-[#1d2021] border border-[#3c3836]">
-                  <div className="text-[10px] text-[#928374] font-bold">CLIENT ASSETS</div>
+                  <div className="text-[11px] text-[#928374] font-bold uppercase font-mono">CLIENT ASSETS</div>
                   <div className="font-bold text-[#fabd2f] mt-1">dist/ (Vite SPA)</div>
-                  <div className="text-[9px] text-[#7c6f64] mt-0.5">Static bundle + Express fallback</div>
+                  <div className="text-[11px] text-[#7c6f64] font-mono mt-0.5">Static bundle + Express fallback</div>
                 </div>
               </div>
 

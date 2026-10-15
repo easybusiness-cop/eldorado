@@ -1,4 +1,4 @@
-import { ISecretProvider, DevEnvSecretProvider, VaultCompatibleSecretProvider } from "./secret.provider";
+import { ISecretProvider, DevEnvSecretProvider, VaultCompatibleSecretProvider } from "./secret.provider.ts";
 
 export class SecretService {
   private static provider: ISecretProvider = process.env.NODE_ENV === "production"

@@ -31,7 +31,6 @@ import { DeploymentPipelineModal } from './DeploymentPipelineModal';
 import { MunderdifflinDashboard } from './MunderdifflinDashboard';
 import { DynamicKnowledgeBaseModal } from './DynamicKnowledgeBaseModal';
 import { SupabaseDiagnosticModal } from './SupabaseDiagnosticModal';
-import { N8nIntegrationModal } from './N8nIntegrationModal';
 import { TelegramHubModal } from './TelegramHubModal';
 import { ExecutiveSummaryModal, CascadeRunData } from './ExecutiveSummaryModal';
 import { PredictiveLoadBalancerModal } from './PredictiveLoadBalancerModal';
@@ -67,7 +66,6 @@ export interface ModalManagerState {
   isCompanyDbOpen: boolean;
   isAnalyticsOpen: boolean;
   isWorkspaceOpen: boolean;
-  isN8nOpen: boolean;
   isTelegramOpen: boolean;
   isPublicApiOpen: boolean;
   isSocialPluginOpen: boolean;
@@ -188,7 +186,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onOpenCompanyDb={() => onOpen('isCompanyDbOpen')}
         onOpenPublicApi={() => onOpen('isPublicApiOpen')}
         onOpenWebExplorer={() => onOpen('isWebOpen')}
-        onOpenN8n={() => onOpen('isN8nOpen')}
         onOpenTelegram={() => onOpen('isTelegramOpen')}
       />
 
@@ -316,21 +313,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       <GoogleWorkspaceHub
         isOpen={state.isWorkspaceOpen}
         onClose={() => onClose('isWorkspaceOpen')}
-      />
-
-      <N8nIntegrationModal
-        isOpen={state.isN8nOpen}
-        onClose={() => onClose('isN8nOpen')}
-        onTriggerAgentTask={(prompt) => {
-          if (onAddTask) {
-            onAddTask({
-              title: 'n8n Automation Event Task',
-              description: prompt,
-              priority: 'high',
-              status: 'queued',
-            });
-          }
-        }}
       />
 
       <TelegramHubModal

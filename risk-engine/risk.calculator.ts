@@ -1,5 +1,5 @@
-import { RiskLevel, RiskRule } from "./risk.types";
-import { riskRules } from "./risk.rules";
+import { RiskLevel, RiskRule } from "./risk.types.ts";
+import { riskRules } from "./risk.rules.ts";
 
 export class RiskCalculator {
   public static calculate(

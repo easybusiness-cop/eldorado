@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { SystemTelemetry } from '../types';
+import { SystemTelemetry } from '../types.ts';
 import { Activity, Cpu, HardDrive } from 'lucide-react';
 
 interface AdminEngineDashboardProps {

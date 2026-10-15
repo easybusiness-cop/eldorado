@@ -1,6 +1,6 @@
-import { Integration } from "./integration.types";
-import { IntegrationRegistry } from "./integration.registry";
-import { IntegrationSchema } from "./integration.schema";
+import { Integration } from "./integration.types.ts";
+import { IntegrationRegistry } from "./integration.registry.ts";
+import { IntegrationSchema } from "./integration.schema.ts";
 
 export class IntegrationService {
   public static listIntegrations(orgId: string): Integration[] {

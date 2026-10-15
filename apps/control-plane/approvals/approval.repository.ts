@@ -1,4 +1,4 @@
-import { ApprovalRequest, ApprovalStatus } from "./approval.types";
+import type { ApprovalRequest, ApprovalStatus } from "./approval.types.ts";
 
 export class ApprovalRepository {
   private static approvals: Map<string, ApprovalRequest> = new Map();

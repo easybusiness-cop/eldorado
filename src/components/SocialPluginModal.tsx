@@ -314,7 +314,7 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
                             {p.provider} Plugin
                           </span>
                         </div>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
                           p.connected 
                             ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400'
                             : p.installed 
@@ -325,7 +325,7 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
                         </span>
                       </div>
 
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal line-clamp-2">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal line-clamp-2">
                         {p.description}
                       </p>
                     </button>
@@ -348,10 +348,10 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
                       <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
                         {currentPlugin.name}
                       </h4>
-                      <span className="text-[9px] text-slate-400">Package: <span className="font-bold text-slate-500">{currentPlugin.npmPackage}</span> • {currentPlugin.version}</span>
+                      <span className="text-[11px] text-slate-400">Package: <span className="font-bold text-slate-500">{currentPlugin.npmPackage}</span> • {currentPlugin.version}</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">{currentPlugin.developer}</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase">{currentPlugin.developer}</span>
                 </div>
 
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
@@ -360,10 +360,10 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
 
                 {/* Scopes Overview */}
                 <div className="p-3 bg-slate-50 dark:bg-[#181615] border border-slate-200 dark:border-[#3c3836] rounded-2xl space-y-2">
-                  <div className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider">Required OAuth Permissions</div>
+                  <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">Required OAuth Permissions</div>
                   <div className="flex flex-wrap gap-1.5">
                     {currentPlugin.scopes.map(sc => (
-                      <span key={sc} className="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-zinc-800 text-[9px] font-mono text-slate-600 dark:text-slate-400 font-semibold">
+                      <span key={sc} className="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-zinc-800 text-[10px] font-mono text-slate-600 dark:text-slate-400 font-semibold">
                         {sc}
                       </span>
                     ))}
@@ -393,7 +393,7 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
                           <div className="bg-indigo-600 h-full transition-all duration-300" style={{ width: `${installProgress}%` }} />
                         </div>
                         {/* Interactive install logs terminal */}
-                        <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[9px] text-emerald-400 max-h-[100px] overflow-y-auto space-y-0.5 leading-normal">
+                        <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-400 max-h-[100px] overflow-y-auto space-y-0.5 leading-normal">
                           {installLogs.map((log, index) => (
                             <div key={index}>{log}</div>
                           ))}
@@ -417,7 +417,7 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       Plugin SDK Active
                     </div>
-                    <span className="text-[10px] text-emerald-700 dark:text-emerald-500 leading-normal font-medium">
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-500 leading-normal font-medium">
                       The official connector libraries have been installed. Ready to link your physical account now.
                     </span>
                   </div>
@@ -439,7 +439,7 @@ export function SocialPluginModal({ isOpen, onClose, agents, onAccountAdded }: S
                             ✔
                           </div>
                           <div>
-                            <div className="text-[9px] font-mono font-bold text-slate-400 uppercase">LINKED ACCOUNT</div>
+                            <div className="text-[10px] font-mono font-bold text-slate-400 uppercase">LINKED ACCOUNT</div>
                             <h5 className="font-extrabold text-sm text-slate-900 dark:text-white">{currentPlugin.accountHandle}</h5>
                           </div>
                         </div>

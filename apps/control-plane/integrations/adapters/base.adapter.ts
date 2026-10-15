@@ -1,4 +1,4 @@
-import { RiskLevel } from "../registry/integration.types";
+import type { RiskLevel } from "../registry/integration.types.ts";
 
 export interface ToolExecutionContext {
   agentId: string;

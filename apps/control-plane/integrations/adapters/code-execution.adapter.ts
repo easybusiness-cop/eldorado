@@ -1,5 +1,5 @@
-import { BaseAdapter, ToolExecutionContext, ToolExecutionContract } from "./base.adapter";
-import { RiskLevel } from "../registry/integration.types";
+import { BaseAdapter, ToolExecutionContext, ToolExecutionContract } from "./base.adapter.ts";
+import type { RiskLevel } from "../registry/integration.types.ts";
 import * as vm from "node:vm";
 import * as fs from "node:fs";
 import * as path from "node:path";

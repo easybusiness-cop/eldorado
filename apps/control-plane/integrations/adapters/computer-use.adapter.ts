@@ -1,4 +1,4 @@
-import { BaseAdapter, ToolExecutionContext, ToolExecutionContract } from "./base.adapter";
+import { BaseAdapter, ToolExecutionContext, ToolExecutionContract } from "./base.adapter.ts";
 import { randomUUID } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";

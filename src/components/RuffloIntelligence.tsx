@@ -532,7 +532,7 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
                   className="px-2.5 py-1 rounded-full bg-[#1b2228] border border-amber-400/30 text-amber-300 hover:bg-[#253039] text-xs whitespace-nowrap transition-colors flex items-center gap-1.5"
                 >
                   <span>{rec.title}</span>
-                  <span className="text-[9px] bg-amber-400/10 px-1 rounded text-amber-200">
+                  <span className="text-[10px] font-mono bg-amber-400/10 px-1.5 py-0.2 rounded text-amber-200">
                     {Math.round(rec.score * 100)}% match
                   </span>
                 </button>
@@ -638,7 +638,7 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-semibold text-white truncate">{task.title}</span>
                       <span
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded uppercase ${
                           task.priority === "critical"
                             ? "bg-rose-500/20 text-rose-300"
                             : task.priority === "high"

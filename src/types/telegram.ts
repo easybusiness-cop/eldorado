@@ -8,9 +8,11 @@ export interface TelegramMessage {
   agentId?: string;
   text: string;
   timestamp: string;
+  views?: string;
   type: 'text' | 'command' | 'alert' | 'agent_action' | 'media';
   status?: 'sent' | 'delivered' | 'read' | 'pending';
   replyToId?: string | number;
+  mediaUrl?: string;
   metadata?: Record<string, any>;
 }
 
@@ -19,17 +21,18 @@ export interface TelegramChat {
   title: string;
   type: 'private' | 'group' | 'supergroup' | 'channel';
   username?: string;
-  memberCount: number;
+  memberCount: number | string;
   isJoined: boolean;
   avatar?: string;
   description?: string;
+  verified?: boolean;
   lastMessage?: {
     text: string;
     timestamp: string;
     sender: string;
   };
   pinnedMessage?: string;
-  category: 'fleet_operations' | 'engineering' | 'security' | 'executives' | 'public' | 'direct';
+  category: string;
   unreadCount?: number;
 }
 
@@ -41,9 +44,9 @@ export interface TelegramSearchFilters {
 
 export interface TelegramBotConfig {
   botToken?: string;
-  botUsername: string;
+  botUsername?: string;
   webhookUrl?: string;
-  mode: 'live_bot_api' | 'autonomous_agent_bridge';
-  autoReplyAgents: boolean;
-  allowedChannels: string[];
+  mode?: string;
+  connected?: boolean;
+  activeChannelsCount?: number;
 }

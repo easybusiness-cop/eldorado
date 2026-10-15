@@ -1,4 +1,4 @@
-import { RiskLevel } from "../integrations/registry/integration.types";
+import type { RiskLevel } from "../integrations/registry/integration.types.ts";
 
 export type ApprovalStatus =
   | "PENDING"

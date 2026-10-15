@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Agent, AgentCallSession } from '../types';
-import { soundFx, speakText } from '../utils/speech';
+import { Agent, AgentCallSession } from '../types.ts';
+import { soundFx, speakText } from '../utils/speech.ts';
 import {
   Phone,
   PhoneOff,

@@ -14,7 +14,7 @@ export class ResearchAgent {
     trace.push(`START: Research initiated for topic: ${topic}`);
 
     // 1. Break into subquestions
-    const queries = QueryPlanner.planQueries(topic);
+    const queries = await QueryPlanner.planQueries(topic);
     trace.push(`PLAN: Generated queries: ${queries.join(', ')}`);
 
     // 2. Discover sources
@@ -28,7 +28,7 @@ export class ResearchAgent {
     for (let i = 0; i < sources.length; i++) {
       const src = sources[i];
       const text = await this.reader.readSource(src.url);
-      const evidence = EvidenceExtractor.extractEvidence(text, topic);
+      const evidence = await EvidenceExtractor.extractEvidence(text, topic);
       findings.push(...evidence);
       citations.push(CitationBuilder.buildCitation(i + 1, src.url, src.title));
     }

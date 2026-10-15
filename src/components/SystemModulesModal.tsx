@@ -267,12 +267,12 @@ return applyCustomEnhancement(system);`
                     }`}
                   >
                     <div className="flex items-start justify-between gap-1">
-                      <div className="font-bold text-[#ebdbb2] text-[11px] truncate flex items-center gap-1">
-                        <Code className="w-3 h-3 text-[#83a598]" />
+                      <div className="font-semibold text-[#ebdbb2] text-xs truncate flex items-center gap-1.5">
+                        <Code className="w-3.5 h-3.5 text-[#83a598]" />
                         <span>{mod.name}</span>
                       </div>
                       <span
-                        className={`px-1.5 py-0.2 rounded text-[9px] font-bold uppercase ${
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
                           mod.status === 'active'
                             ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                             : 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -282,7 +282,7 @@ return applyCustomEnhancement(system);`
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-[#928374] mt-1.5">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-[#928374] mt-1.5">
                       <span>Source: {mod.source}</span>
                       <span>{new Date(mod.appliedAt).toLocaleTimeString()}</span>
                     </div>

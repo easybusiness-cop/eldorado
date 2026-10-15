@@ -9,34 +9,34 @@ import {
   UserPreferences,
   AttachedFile,
   SystemTelemetry,
-} from './types';
+} from './types.ts';
 import {
   INITIAL_AGENTS,
   INITIAL_DYNAMIC_FEATURES,
   INITIAL_TRIGGERS,
   INITIAL_FLEET_TASKS,
-} from './constants/initialAgents';
-import { soundFx, speakText } from './utils/speech';
-import { TopNavigation } from './components/TopNavigation';
-import { CommandCenter } from './components/CommandCenter';
-import { FleetHealthMonitor, getAgentThroughputTier, formatTokenThroughput } from './components/FleetHealthMonitor';
-import { ModalManager, ModalManagerState } from './components/ModalManager';
-import { CascadeRunData } from './components/ExecutiveSummaryModal';
-import { generateExecutiveSummaryMarkdown } from './utils/markdownGenerator';
-import { DepartmentHubView } from './components/DepartmentHubView';
-import { MunderdifflinDashboard } from './components/MunderdifflinDashboard';
-import { RuffloIntelligence } from './components/RuffloIntelligence';
-import { SmartTaskSuggestion } from './utils/smartTaskSuggestions';
-import { SmartSuggestionTooltip } from './components/SmartSuggestionTooltip';
-import { VirtualCorporationView } from './components/corporation/VirtualCorporationView';
-import { initializeSystemRuntime, sendAndApplySystemCode } from './utils/systemRuntime';
+} from './constants/initialAgents.ts';
+import { soundFx, speakText } from './utils/speech.ts';
+import { TopNavigation } from './components/TopNavigation.tsx';
+import { CommandCenter } from './components/CommandCenter.tsx';
+import { FleetHealthMonitor, getAgentThroughputTier, formatTokenThroughput } from './components/FleetHealthMonitor.tsx';
+import { ModalManager, ModalManagerState } from './components/ModalManager.tsx';
+import { CascadeRunData } from './components/ExecutiveSummaryModal.tsx';
+import { generateExecutiveSummaryMarkdown } from './utils/markdownGenerator.ts';
+import { DepartmentHubView } from './components/DepartmentHubView.tsx';
+import { MunderdifflinDashboard } from './components/MunderdifflinDashboard.tsx';
+import { RuffloIntelligence } from './components/RuffloIntelligence.tsx';
+import { SmartTaskSuggestion } from './utils/smartTaskSuggestions.ts';
+import { SmartSuggestionTooltip } from './components/SmartSuggestionTooltip.tsx';
+import { VirtualCorporationView } from './components/corporation/VirtualCorporationView.tsx';
+import { initializeSystemRuntime, sendAndApplySystemCode } from './utils/systemRuntime.ts';
 import { Zap } from 'lucide-react';
-import { VoiceWaveform } from './components/VoiceWaveform';
+import { VoiceWaveform } from './components/VoiceWaveform.tsx';
 import {
   initializeAgentQuantumState,
   runQuantumModelForTask,
   searchQuantumMemory,
-} from './utils/quantumEngine';
+} from './utils/quantumEngine.ts';
 
 const DEFAULT_USER: UserProfile = {
   id: 'usr-admin-01',
@@ -152,7 +152,6 @@ export default function App() {
     isCompanyDbOpen: false,
     isAnalyticsOpen: false,
     isWorkspaceOpen: false,
-    isN8nOpen: false,
     isTelegramOpen: false,
     isPublicApiOpen: false,
     isSocialPluginOpen: false,
@@ -201,7 +200,6 @@ export default function App() {
       isCompanyDbOpen: false,
       isAnalyticsOpen: false,
       isWorkspaceOpen: false,
-      isN8nOpen: false,
       isTelegramOpen: false,
       isPublicApiOpen: false,
       isSocialPluginOpen: false,
@@ -1125,7 +1123,7 @@ export default function App() {
   };
 
   
-  const [workspaceTab, setWorkspaceTab] = useState<'command' | 'fleet' | 'network' | 'corporation'>('command');
+  const [workspaceTab, setWorkspaceTab] = useState<'command' | 'corporation' | 'fleet' | 'network' | 'engineering' | 'integrations' | 'chaos'>('command');
   const [activeDepartment, setActiveDepartment] = useState("Overview");
   const [command, setCommand] = useState("");
 
@@ -1184,7 +1182,6 @@ export default function App() {
         onOpenAcademy={() => { closeAllModals(); openModal('isAcademyOpen'); }}
         onOpenMasterEvolution={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}
         onOpenWorkspace={() => { closeAllModals(); openModal('isWorkspaceOpen'); }}
-        onOpenN8n={() => { closeAllModals(); openModal('isN8nOpen'); }}
         onOpenTelegram={() => { closeAllModals(); openModal('isTelegramOpen'); }}
         onOpenPredictiveLoadBalancer={() => { closeAllModals(); openModal('isPredictiveLoadBalancerOpen'); }}
         onOpenCrashalyst={() => { closeAllModals(); openModal('isCrashalystOpen'); }}
@@ -1200,6 +1197,7 @@ export default function App() {
         onOpenAgentSops={() => { closeAllModals(); setDashboardInitialTab('sops'); openModal('isMunderdifflinDashboardOpen'); }}
         onOpenDynamicKnowledgeBase={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}
         onOpenSupabaseDiagnostic={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}
+        onSelectCorporationTab={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('corporation'); }}
         dynamicFeatureCount={dynamicFeatures.length}
         systemModulesCount={32}
         autoMode={autoMode}
@@ -1224,10 +1222,14 @@ export default function App() {
         {/* LEFT SIDEBAR */}
         <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-show' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
           <div className="sidebar-section">
-            <div className="section-label">COMMAND</div>
+            <div className="section-label">OPERATIONAL HUBS</div>
             <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "command" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('command'); }}>
               <Icon>⚡</Icon>
               <span>Command Center</span>
+            </button>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "corporation" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('corporation'); }}>
+              <Icon>🏢</Icon>
+              <span>Virtual Corporation</span>
             </button>
             <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "fleet" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('fleet'); }}>
               <Icon>👥</Icon>
@@ -1236,10 +1238,6 @@ export default function App() {
             <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "network" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('network'); }}>
               <Icon>🌐</Icon>
               <span>Company Network</span>
-            </button>
-            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "corporation" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('corporation'); }}>
-              <Icon>🏢</Icon>
-              <span>Virtual Corporation</span>
             </button>
             <button className={`nav-item ${activeDepartment === "Munderdifflin" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Munderdifflin'); }}>
               <Icon>📋</Icon>
@@ -1251,24 +1249,80 @@ export default function App() {
             </button>
             <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('skills'); openModal('isMunderdifflinDashboardOpen'); }}>
               <Icon>🎯</Icon>
-              <span>Skill Matrix</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); setDashboardInitialTab('sops'); openModal('isMunderdifflinDashboardOpen'); }}>
-              <Icon>📁</Icon>
-              <span>Agent SOPs & Data</span>
+              <span>Skill Matrix & SOPs</span>
             </button>
             <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}>
               <Icon>🧠</Icon>
-              <span>Knowledge Base</span>
+              <span>Knowledge Base & Radar</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>
-              <Icon>◉</Icon>
-              <span>Mission Control</span>
+          </div>
+
+          <div className="sidebar-section">
+            <div className="section-label">ENGINEERING SUITE</div>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "engineering" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('engineering'); }}>
+              <Icon>💻</Icon>
+              <span className="text-[#38bdf8] font-semibold">Software Builder Hub</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isIdeOpen'); }}>
+              <Icon>&lt;/&gt;</Icon>
+              <span>Cloud IDE Workbench</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isReposOpen'); }}>
+              <Icon>⌥</Icon>
+              <span>GitHub Repositories</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDeploymentPipelineOpen'); }}>
+              <Icon>↗</Icon>
+              <span>Deployments & Hotfixes</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}>
+              <Icon>_</Icon>
+              <span>Terminal & Profiler</span>
+            </button>
+          </div>
+
+          <div className="sidebar-section">
+            <div className="section-label">SYSTEM & INTEGRATIONS</div>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "integrations" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('integrations'); }}>
+              <Icon>⚡</Icon>
+              <span className="text-[#34d399] font-semibold">Integration Mesh</span>
+            </button>
+            <button className={`nav-item ${activeDepartment === "Overview" && workspaceTab === "chaos" ? "active" : ""}`} onClick={() => { closeAllModals(); setActiveDepartment('Overview'); setWorkspaceTab('chaos'); }}>
+              <Icon>🔥</Icon>
+              <span className="text-[#fb4934] font-semibold">Chaos Crisis Lab</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isApiGatewayMicroservicesOpen'); }}>
+              <Icon>🌐</Icon>
+              <span>API Gateway Mesh</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isComposioHubOpen'); }}>
+              <Icon>⚡</Icon>
+              <span>Composio 3P Tools</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}>
+              <Icon>🗄</Icon>
+              <span>Supabase Postgres</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isTelegramOpen'); }}>
+              <Icon>✈</Icon>
+              <span>Telegram Intelligence</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isPredictiveLoadBalancerOpen'); }}>
+              <Icon>⚖</Icon>
+              <span>Load Balancer</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAcademyOpen'); }}>
+              <Icon>🎓</Icon>
+              <span>Agent Academy</span>
+            </button>
+            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}>
+              <Icon>🚀</Icon>
+              <span>Meta-Evolution</span>
             </button>
           </div>
 
           <div className="sidebar-section relative">
-            <div className="section-label">ORGANIZATION</div>
+            <div className="section-label">DEPARTMENTS</div>
             {departmentsList.map(([name, symbol, color, deptKey]) => {
               const isActive = activeDepartment === name;
               return (
@@ -1281,7 +1335,6 @@ export default function App() {
                     color: isActive ? color : undefined,
                   }}
                 >
-                  {/* Smooth active background pill */}
                   {isActive && (
                     <motion.div
                       layoutId="active-department-bg"
@@ -1300,7 +1353,6 @@ export default function App() {
                   <span className="relative z-10">{name}</span>
                   <span className="department-count relative z-10" style={{ color: isActive ? color : undefined }}>{agents.filter((a) => a.department === deptKey).length}</span>
 
-                  {/* Animated active state underline */}
                   {isActive && (
                     <motion.div
                       layoutId="active-department-underline"
@@ -1317,86 +1369,19 @@ export default function App() {
             })}
           </div>
 
-          <div className="sidebar-section">
-            <div className="section-label">INTELLIGENCE</div>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSearchOpen'); }}>
-              <Icon>⌘</Icon>
-              <span>Memory</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAcademyOpen'); }}>
-              <Icon>◇</Icon>
-              <span>Knowledge</span>
-            </button>
-          </div>
-
-          <div className="sidebar-section">
-            <div className="section-label">DEVELOPMENT</div>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>
-              <Icon>▣</Icon>
-              <span>Projects</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isIdeOpen'); }}>
-              <Icon>&lt;/&gt;</Icon>
-              <span>Code</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}>
-              <Icon>_</Icon>
-              <span>Terminal</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isReposOpen'); }}>
-              <Icon>⌥</Icon>
-              <span>GitHub</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDeploymentPipelineOpen'); }}>
-              <Icon>↗</Icon>
-              <span>Deployments</span>
-            </button>
-          </div>
-
           <div className="sidebar-section bottom-section">
-            <div className="section-label">SYSTEM</div>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}>
-              <Icon>🔥</Icon>
-              <span className="text-[#fb4934] font-bold">Chaos Crisis Injector</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isApiGatewayMicroservicesOpen'); }}>
-              <Icon>🌐</Icon>
-              <span className="text-[#34d399] font-bold">API Gateway & Mesh</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isOpenWebUiOpen'); }}>
-              <Icon>🌐</Icon>
-              <span className="text-[#34d399] font-bold">Open WebUI</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}>
-              <Icon>⚡</Icon>
-              <span className="text-[#38bdf8] font-bold">Supabase Sync</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isN8nOpen'); }}>
-              <Icon>⚡</Icon>
-              <span className="text-[#ff6d5a] font-bold">n8n Workflows</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isTelegramOpen'); }}>
-              <Icon>✈</Icon>
-              <span className="text-[#24a1de] font-bold">Telegram Hub</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isSystemModulesOpen'); }}>
-              <Icon>⚡</Icon>
-              <span>Integrations</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}>
-              <Icon>◈</Icon>
-              <span>Security</span>
-            </button>
+            <div className="section-label">SETTINGS & AUDIT</div>
             <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>
               <Icon>≡</Icon>
-              <span>Logs</span>
+              <span>Governance & Logs</span>
             </button>
             <button className="nav-item" onClick={() => { closeAllModals(); openModal('isPreferencesOpen'); }}>
               <Icon>⚙</Icon>
-              <span>Settings</span>
+              <span>System Preferences</span>
             </button>
           </div>
         </aside>
+
 
         {/* CENTER */}
         <section className="workspace" style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -1417,76 +1402,136 @@ export default function App() {
                       >
                         {isMobileMenuOpen ? "✕" : "☰"}
                       </button>
-                      <div>
-                        <div className="eyebrow">RUFFLO / {activeDepartment === "Munderdifflin" ? "SCRANTON BRANCH" : activeDepartment === "Overview" ? "COMMAND NETWORK" : activeDepartment.toUpperCase()}</div>
-                        <h1>{activeDepartment === "Overview" ? (workspaceTab === 'command' ? "Rufflo Intelligence" : workspaceTab === 'fleet' ? "Agent Fleet Telemetry" : workspaceTab === 'corporation' ? "Virtual AI Corporation" : "Company Intelligence Network") : activeDepartment === "Munderdifflin" ? "Munder Diffl.in Agents" : activeDepartment}</h1>
-                        <p>{activeDepartment === "Munderdifflin" ? "Autonomous task dispatch, live telemetry, and agent output memos." : workspaceTab === 'corporation' ? "Enterprise organizational hierarchy, persistent AI employees, projects, decisions, and continuous discovery." : "Coordinate autonomous agents, missions, knowledge and software operations."}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400 mb-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                          <span className="font-semibold text-zinc-300">RUFFLO OS</span>
+                          <span className="text-zinc-600">/</span>
+                          <span>
+                            {activeDepartment === "Munderdifflin"
+                              ? "SCRANTON BRANCH"
+                              : activeDepartment === "Overview"
+                              ? (workspaceTab === 'corporation' ? "VIRTUAL CORPORATION" : workspaceTab === 'engineering' ? "SOFTWARE BUILDER" : workspaceTab === 'integrations' ? "INTEGRATION MESH" : workspaceTab === 'chaos' ? "CHAOS SRE LAB" : workspaceTab.toUpperCase())
+                              : activeDepartment.toUpperCase()}
+                          </span>
+                          <span className="text-zinc-600">·</span>
+                          <span className="text-zinc-400 font-normal">{agents.length} Agents Online</span>
+                        </div>
+                        <h1 className="text-lg md:text-xl font-bold text-white tracking-tight">
+                          {activeDepartment === "Overview" ? (
+                            workspaceTab === 'command' ? "Rufflo Command Intelligence" :
+                            workspaceTab === 'corporation' ? "Virtual AI Corporation & Optimizer" :
+                            workspaceTab === 'fleet' ? "Agent Fleet Telemetry & Matrix" :
+                            workspaceTab === 'engineering' ? "Software Builder & Cloud IDE" :
+                            workspaceTab === 'integrations' ? "Enterprise Integration Mesh" :
+                            workspaceTab === 'chaos' ? "Chaos Crisis & Outage Lab" :
+                            "Company Network Topology"
+                          ) : activeDepartment === "Munderdifflin" ? (
+                            "Munder Diffl.in Scranton Branch Operations"
+                          ) : (
+                            `${activeDepartment} Department Hub`
+                          )}
+                        </h1>
+                        <p className="text-xs text-zinc-400 mt-1 max-w-3xl leading-relaxed">
+                          {activeDepartment === "Munderdifflin"
+                            ? "Autonomous branch tasks, sales dispatch, and agent output memos."
+                            : workspaceTab === 'corporation'
+                            ? "Executive strategic reasoning, persistent AI workforce, autonomous optimizer engine, decisions, and continuous discovery."
+                            : workspaceTab === 'engineering'
+                            ? "Autonomous 10-Agent software engineering engine generating production code, smoke-tests, and live deployments."
+                            : workspaceTab === 'chaos'
+                            ? "Real-world operational crisis injection to stress-test circuit breakers and Toby's Self-Healing daemon."
+                            : workspaceTab === 'integrations'
+                            ? "Enterprise connectors for Composio SaaS, Supabase PostgreSQL, Telegram Bot API, ArXiv Open Science, and API microservices mesh."
+                            : "Autonomous AI agents, workflows, knowledge base, microservices, and software operations."}
+                        </p>
                       </div>
                     </div>
-                    <div className="workspace-actions">
+
+                    {/* Header Action Toolbar */}
+                    <div className="workspace-actions flex-wrap gap-2 mt-3 sm:mt-0">
                       {activeDepartment === 'Overview' && workspaceTab === 'command' && (
                         <button
-                          className="secondary-button"
-                          style={{ borderColor: showOtherPanels ? '#8ec07c' : '#a89984', color: showOtherPanels ? '#8ec07c' : '#a89984' }}
+                          type="button"
+                          className="h-8 px-2.5 rounded-md text-xs font-medium border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
                           onClick={() => setShowOtherPanels(!showOtherPanels)}
                         >
-                          {showOtherPanels ? '⚡ Hide System Panels' : '⚙️ Show System Panels'}
+                          {showOtherPanels ? 'Hide Console Panels' : 'Console Panels'}
                         </button>
                       )}
-                      {activeDepartment === 'Overview' && (
-                        <div className="flex flex-wrap items-center gap-1 bg-[#121216] p-1 rounded-lg border border-white/10 mr-2">
-                          <button
-                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'command' ? 'bg-[#fabd2f]/20 text-[#fabd2f] border border-[#fabd2f]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
-                            onClick={() => setWorkspaceTab('command')}
-                          >
-                            ⚡ Command
-                          </button>
-                          <button
-                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'fleet' ? 'bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
-                            onClick={() => setWorkspaceTab('fleet')}
-                          >
-                            👥 Fleet
-                          </button>
-                          <button
-                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'corporation' ? 'bg-[#00d9ff]/20 text-[#00d9ff] border border-[#00d9ff]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
-                            onClick={() => setWorkspaceTab('corporation')}
-                          >
-                            🏢 Corporation
-                          </button>
-                          <button
-                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${workspaceTab === 'network' ? 'bg-[#a78bfa]/20 text-[#a78bfa] border border-[#a78bfa]/40 shadow-sm' : 'text-[#8a857c] hover:text-[#f4f1ea]'}`}
-                            onClick={() => setWorkspaceTab('network')}
-                          >
-                            🌐 Network
-                          </button>
-                        </div>
-                      )}
+                      
                       <button
-                        className="secondary-button"
-                        style={{ borderColor: '#fabd2f', color: '#fabd2f' }}
+                        type="button"
+                        className="h-8 px-2.5 rounded-md text-xs font-medium border border-zinc-700/80 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                         onClick={() => setActiveDepartment(activeDepartment === 'Munderdifflin' ? 'Overview' : 'Munderdifflin')}
                       >
-                        {activeDepartment === 'Munderdifflin' ? '← Overview Grid' : '📋 Munderdiffl.in'}
+                        {activeDepartment === 'Munderdifflin' ? '← Overview Grid' : 'Scranton Branch'}
                       </button>
                       <button
-                        className="secondary-button"
-                        style={{ borderColor: '#b8bb26', color: '#b8bb26' }}
+                        type="button"
+                        className="h-8 px-2.5 rounded-md text-xs font-medium border border-zinc-700/80 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                         onClick={() => { closeAllModals(); openModal('isDynamicKbOpen'); }}
                       >
-                        🧠 Knowledge
+                        Knowledge Radar
                       </button>
                       <button
-                        className="secondary-button"
-                        style={{ borderColor: '#fb4934', color: '#fb4934' }}
+                        type="button"
+                        className="h-8 px-2.5 rounded-md text-xs font-medium border border-zinc-700/80 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                         onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
-                        title="Open Live Chaos Scenario Outage Injector"
+                        title="Open Chaos Outage Injector"
                       >
-                        🔥 Chaos Lab
+                        Chaos Lab
                       </button>
-                      <button className="secondary-button" onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}>+ New Mission</button>
-                      <button className="primary-button" onClick={handleTriggerStandup}><span>▶</span> Run Operation</button>
+                      <button 
+                        type="button"
+                        className="h-8 px-3 rounded-md text-xs font-medium border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 transition-colors cursor-pointer"
+                        onClick={() => { closeAllModals(); openModal('isAdminOrchestratorOpen'); }}
+                      >
+                        + New Mission
+                      </button>
+                      <button 
+                        type="button"
+                        className="h-8 px-3.5 rounded-md text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                        onClick={handleTriggerStandup}
+                      >
+                        <span>▶</span>
+                        <span>Run Operation</span>
+                      </button>
                     </div>
                   </div>
+
+                  {/* Refined Segmented Control for Core Workspaces */}
+                  {activeDepartment === 'Overview' && (
+                    <div className="mb-4 flex items-center gap-1 bg-zinc-900/70 p-1 rounded-lg border border-zinc-800/80 overflow-x-auto no-scrollbar shadow-xs">
+                      {[
+                        { id: 'command', label: 'Command Center', icon: '⚡' },
+                        { id: 'corporation', label: 'Virtual Corporation', icon: '🏢' },
+                        { id: 'fleet', label: 'Agent Fleet', icon: '👥' },
+                        { id: 'engineering', label: 'Software Builder', icon: '💻' },
+                        { id: 'integrations', label: 'Integration Mesh', icon: '⚡' },
+                        { id: 'chaos', label: 'Chaos & SRE', icon: '🔥' },
+                        { id: 'network', label: 'Company Network', icon: '🌐' },
+                      ].map((tab) => {
+                        const isActive = workspaceTab === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            className={`h-7 px-3 rounded-md text-xs font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
+                              isActive
+                                ? 'bg-zinc-800 text-white shadow-xs border border-zinc-700 font-semibold'
+                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                            }`}
+                            onClick={() => setWorkspaceTab(tab.id as any)}
+                          >
+                            <span>{tab.icon}</span>
+                            <span>{tab.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
 
                   {activeDepartment === "Munderdifflin" ? (
                     <div className="flex-1 min-h-0 mt-4 rounded-xl border border-white/10 shadow-lg overflow-hidden">
@@ -1569,6 +1614,309 @@ export default function App() {
                   ) : workspaceTab === 'corporation' ? (
                     <div className="flex-1 min-h-[820px] flex flex-col rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#0d0f17]">
                       <VirtualCorporationView />
+                    </div>
+                  ) : workspaceTab === 'engineering' ? (
+                    <div className="flex-1 flex flex-col gap-5">
+                      {/* Top Engineering Suite Banner */}
+                      <div className="rounded-xl border border-blue-500/30 bg-gradient-to-r from-blue-950/40 via-[#10172b] to-cyan-950/30 p-5 shadow-xl shadow-blue-950/20">
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                💻
+                              </span>
+                              <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                                Autonomous Software Construction Engine
+                              </h2>
+                            </div>
+                            <p className="text-xs text-zinc-300">
+                              Autonomous 10-Agent Engineering Department generating production TypeScript, React components, and microservices with smoke-test execution.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className="px-3 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-zinc-950 font-bold rounded-lg text-xs shadow-lg shadow-blue-500/30 hover:brightness-110 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isIdeOpen'); }}
+                            >
+                              <span>&lt;/&gt;</span>
+                              <span>Launch Cloud IDE</span>
+                            </button>
+                            <button
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isReposOpen'); }}
+                            >
+                              <span>⌥</span>
+                              <span>GitHub</span>
+                            </button>
+                            <button
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isDeploymentPipelineOpen'); }}
+                            >
+                              <span>↗</span>
+                              <span>Deployments</span>
+                            </button>
+                            <button
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}
+                            >
+                              <span>_</span>
+                              <span>Terminal</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Interactive Code Construction Workbench */}
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                        <div className="lg:col-span-2 rounded-xl border border-white/10 bg-[#121624] p-5 flex flex-col justify-between shadow-lg">
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">
+                                🛠 Rapid Autonomous Code Builder
+                              </span>
+                              <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">
+                                Sandboxed V8 Ready
+                              </span>
+                            </div>
+                            <p className="text-xs text-zinc-400 mb-4">
+                              Specify a target software module or microservice to generate, test, and inject into the running system automatically.
+                            </p>
+                            <div className="flex items-center gap-2 mb-3">
+                              <input
+                                type="text"
+                                className="flex-1 px-3 py-2 bg-black/50 border border-white/15 rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500"
+                                placeholder="e.g. Build an encrypted JWT session validator middleware with redis caching"
+                                defaultValue="Build a rate-limited telemetry ingestion middleware with circuit breaker fallback"
+                                id="software-builder-objective-input"
+                              />
+                              <button
+                                className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded-lg text-xs shadow-md shadow-cyan-500/30 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                                onClick={() => {
+                                  const input = document.getElementById('software-builder-objective-input') as HTMLInputElement;
+                                  handleExecuteCode(input?.value || 'Build telemetry middleware');
+                                }}
+                              >
+                                <span>⚡ Build & Smoke Test</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="rounded-lg bg-black/60 border border-white/10 p-3 font-mono text-[11px] text-zinc-300 space-y-1 mt-3">
+                            <div className="text-zinc-500">// Recent SoftwareBuilder Execution Stream</div>
+                            <div className="text-emerald-400">✓ AST Parse: 0 syntax errors detected</div>
+                            <div className="text-cyan-300">✓ Sandboxed Compilation: TypeScript 5.8 emit completed in 240ms</div>
+                            <div className="text-purple-300">✓ Unit Tests: 4/4 assertions passed with 100% branch coverage</div>
+                          </div>
+                        </div>
+
+                        {/* Quick Stats / Environment Matrix */}
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-5 space-y-4 shadow-lg">
+                          <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+                            <span>◈</span> System Runtime Status
+                          </h3>
+                          <div className="space-y-2.5 text-xs">
+                            <div className="flex justify-between items-center py-1 border-b border-white/5">
+                              <span className="text-zinc-400">Node Environment</span>
+                              <span className="font-mono text-emerald-400">v20.x (Sandboxed)</span>
+                            </div>
+                            <div className="flex justify-between items-center py-1 border-b border-white/5">
+                              <span className="text-zinc-400">Active Repositories</span>
+                              <span className="font-mono text-cyan-300">3 Connected</span>
+                            </div>
+                            <div className="flex justify-between items-center py-1 border-b border-white/5">
+                              <span className="text-zinc-400">Deployment Pipeline</span>
+                              <span className="font-mono text-emerald-400">Healthy (0 Hotfixes)</span>
+                            </div>
+                            <div className="flex justify-between items-center py-1 border-b border-white/5">
+                              <span className="text-zinc-400">Auto-Apply to System</span>
+                              <span className="font-mono text-amber-300">{userProfile.preferences.autoApplyCodeToSystem ? 'ENABLED' : 'DISABLED'}</span>
+                            </div>
+                          </div>
+                          <button
+                            className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isDebuggerOpen'); }}
+                          >
+                            Open SRE Diagnostics & Profiler →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : workspaceTab === 'integrations' ? (
+                    <div className="flex-1 flex flex-col gap-5">
+                      {/* Top Integrations Banner */}
+                      <div className="rounded-xl border border-teal-500/30 bg-gradient-to-r from-teal-950/40 via-[#10172b] to-emerald-950/30 p-5 shadow-xl shadow-teal-950/20">
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="p-1.5 rounded-lg bg-teal-500/20 text-teal-400 border border-teal-500/30">
+                                ⚡
+                              </span>
+                              <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                                Enterprise Integrations & SaaS Mesh
+                              </h2>
+                            </div>
+                            <p className="text-xs text-zinc-300">
+                              Direct connectors to Composio, Supabase PostgreSQL, Telegram Intelligence, Chromium Browser, and external API gateways.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className="px-3 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 text-zinc-950 font-bold rounded-lg text-xs shadow-lg shadow-teal-500/30 hover:brightness-110 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isComposioHubOpen'); }}
+                            >
+                              <span>⚡</span>
+                              <span>Composio Hub</span>
+                            </button>
+                            <button
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}
+                            >
+                              <span>🗄</span>
+                              <span>Supabase</span>
+                            </button>
+                            <button
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isWebOpen'); }}
+                            >
+                              <span>🌐</span>
+                              <span>Browser & Web Radar</span>
+                            </button>
+                            <button
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                              onClick={() => { closeAllModals(); openModal('isTelegramOpen'); }}
+                            >
+                              <span>✈</span>
+                              <span>Telegram</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Integrations Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-3 shadow">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white text-xs flex items-center gap-1.5">
+                              <span>⚡</span> Composio 3P SaaS Hub
+                            </span>
+                            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">CONNECTED</span>
+                          </div>
+                          <p className="text-xs text-zinc-400">Slack, GitHub, Jira, Gmail, Stripe automated connectors.</p>
+                          <button
+                            className="w-full py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-semibold text-cyan-300 border border-white/10 transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isComposioHubOpen'); }}
+                          >
+                            Open Composio Tools & Actions →
+                          </button>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-3 shadow">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white text-xs flex items-center gap-1.5">
+                              <span>🌐</span> API Gateway & Mesh
+                            </span>
+                            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">HEALTHY</span>
+                          </div>
+                          <p className="text-xs text-zinc-400">Multi-service routing with zero-trust token authentication.</p>
+                          <button
+                            className="w-full py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-semibold text-cyan-300 border border-white/10 transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isApiGatewayMicroservicesOpen'); }}
+                          >
+                            View Microservices Mesh →
+                          </button>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-3 shadow">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white text-xs flex items-center gap-1.5">
+                              <span>🗄</span> Supabase PostgreSQL
+                            </span>
+                            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">SYNCED</span>
+                          </div>
+                          <p className="text-xs text-zinc-400">Relational persistence for fleet tasks and audit ledgers.</p>
+                          <button
+                            className="w-full py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-semibold text-cyan-300 border border-white/10 transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isSupabaseDiagnosticOpen'); }}
+                          >
+                            Test Database Connection →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : workspaceTab === 'chaos' ? (
+                    <div className="flex-1 flex flex-col gap-5">
+                      {/* Top Chaos Banner */}
+                      <div className="rounded-xl border border-rose-500/30 bg-gradient-to-r from-rose-950/40 via-[#10172b] to-red-950/30 p-5 shadow-xl shadow-rose-950/20">
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                                🔥
+                              </span>
+                              <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                                Chaos Crisis & Outage Injection Workbench
+                              </h2>
+                            </div>
+                            <p className="text-xs text-zinc-300">
+                              Inject real-world operational failure scenarios to stress-test agent recovery, circuit breakers, and Toby's Self-Healing daemon.
+                            </p>
+                          </div>
+                          <button
+                            className="px-4 py-2 bg-gradient-to-r from-rose-500 to-red-600 text-white font-bold rounded-lg text-xs shadow-lg shadow-rose-500/30 hover:brightness-110 flex items-center gap-1.5 cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                          >
+                            <span>🔥</span>
+                            <span>Open Full Chaos Simulator</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Outage Scenarios Quick Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-2.5 shadow">
+                          <span className="text-xs font-bold text-rose-300 block">⚡ Gateway 504 Timeout</span>
+                          <p className="text-[11px] text-zinc-400 leading-relaxed">Simulates 100% upstream timeout on third-party tool APIs to test circuit breaker tripping.</p>
+                          <button
+                            className="w-full py-1.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 rounded text-xs font-bold transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                          >
+                            Inject Scenario →
+                          </button>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-2.5 shadow">
+                          <span className="text-xs font-bold text-amber-300 block">🗄 DB Split-Brain Desync</span>
+                          <p className="text-[11px] text-zinc-400 leading-relaxed">Forces replica discrepancy to evaluate distributed consensus and rollback rollback mechanics.</p>
+                          <button
+                            className="w-full py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded text-xs font-bold transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                          >
+                            Inject Scenario →
+                          </button>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-2.5 shadow">
+                          <span className="text-xs font-bold text-cyan-300 block">🔒 Auth Token Revocation</span>
+                          <p className="text-[11px] text-zinc-400 leading-relaxed">Simulates credential expiry to verify zero-trust re-authentication handshakes.</p>
+                          <button
+                            className="w-full py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 rounded text-xs font-bold transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                          >
+                            Inject Scenario →
+                          </button>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-[#121624] p-4 space-y-2.5 shadow">
+                          <span className="text-xs font-bold text-purple-300 block">💾 Sandbox Memory OOM</span>
+                          <p className="text-[11px] text-zinc-400 leading-relaxed">Simulates 512MB RAM exhaustion to verify dynamic container container resizing.</p>
+                          <button
+                            className="w-full py-1.5 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 rounded text-xs font-bold transition-colors cursor-pointer"
+                            onClick={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                          >
+                            Inject Scenario →
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <>
@@ -1815,15 +2163,15 @@ export default function App() {
                                 }}
                               >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <span style={{ color: '#00d9ff', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <span style={{ color: '#38bdf8', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
                                     <span>|ψ⟩</span> {agent.quantumState?.phase === 'superposition' ? 'Evaluating 4 Paths...' : 'Quantum Model'}
                                   </span>
-                                  <span style={{ color: '#34d399', fontSize: '9px', fontWeight: 'bold', background: 'rgba(52, 211, 153, 0.15)', padding: '1px 4px', borderRadius: '4px' }}>
+                                  <span style={{ color: '#34d399', fontSize: '10px', fontWeight: 700, fontFamily: 'var(--font-mono, monospace)', background: 'rgba(52, 211, 153, 0.15)', padding: '1px 5px', borderRadius: '4px' }}>
                                     Diff {agent.quantumState?.superpositionCandidates?.find(c => c.complexity === 'Minimal / Easiest')?.difficultyScore || 2}/10
                                   </span>
                                 </div>
-                                <div style={{ color: '#ebdbb2', fontSize: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  <span style={{ color: '#8ec07c', fontWeight: 'bold' }}>Easiest:</span> {agent.quantumState?.winningStrategyName || 'Direct Minimalist Patch'}
+                                <div style={{ color: '#cbd5e1', fontSize: '11px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  <span style={{ color: '#86efac', fontWeight: 600 }}>Easiest:</span> {agent.quantumState?.winningStrategyName || 'Direct Minimalist Patch'}
                                 </div>
                                 {/* Mini 4-state superposition wave indicator */}
                                 <div style={{ display: 'flex', gap: '3px', marginTop: '2px' }}>

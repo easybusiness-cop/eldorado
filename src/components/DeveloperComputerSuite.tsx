@@ -1171,22 +1171,22 @@ export default function App() {
                       <div className="bg-[#181615] border border-[#3c3836] rounded-xl p-3 text-center">
                         <div className="text-[10px] text-[#928374] font-bold">PERFORMANCE</div>
                         <div className="text-2xl font-extrabold text-[#8ec07c] my-1">98</div>
-                        <div className="text-[9px] text-[#8ec07c]">LCP 0.8s • Fast</div>
+                        <div className="text-[10px] font-mono text-[#8ec07c]">LCP 0.8s • Fast</div>
                       </div>
                       <div className="bg-[#181615] border border-[#3c3836] rounded-xl p-3 text-center">
                         <div className="text-[10px] text-[#928374] font-bold">ACCESSIBILITY</div>
                         <div className="text-2xl font-extrabold text-[#8ec07c] my-1">100</div>
-                        <div className="text-[9px] text-[#8ec07c]">WCAG AA Passed</div>
+                        <div className="text-[10px] font-mono text-[#8ec07c]">WCAG AA Passed</div>
                       </div>
                       <div className="bg-[#181615] border border-[#3c3836] rounded-xl p-3 text-center">
                         <div className="text-[10px] text-[#928374] font-bold">BEST PRACTICES</div>
                         <div className="text-2xl font-extrabold text-[#8ec07c] my-1">100</div>
-                        <div className="text-[9px] text-[#8ec07c]">HTTPS & CSP Ready</div>
+                        <div className="text-[10px] font-mono text-[#8ec07c]">HTTPS & CSP Ready</div>
                       </div>
                       <div className="bg-[#181615] border border-[#3c3836] rounded-xl p-3 text-center">
                         <div className="text-[10px] text-[#928374] font-bold">SEO OPTIMIZED</div>
                         <div className="text-2xl font-extrabold text-[#8ec07c] my-1">96</div>
-                        <div className="text-[9px] text-[#8ec07c]">Rich Structured Data</div>
+                        <div className="text-[10px] font-mono text-[#8ec07c]">Rich Structured Data</div>
                       </div>
                     </div>
                     <div className="flex gap-2">

@@ -1488,14 +1488,14 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                           <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-[#ebdbb2] text-[#504945]">
                             {preset.category}
                           </span>
-                          <span className={`text-[9px] font-bold uppercase ${preset.priority === 'critical' ? 'text-[#cc241d]' : 'text-[#b57614]'}`}>
+                          <span className={`text-[10px] font-mono font-bold uppercase ${preset.priority === 'critical' ? 'text-[#cc241d]' : 'text-[#b57614]'}`}>
                             {preset.priority}
                           </span>
                         </div>
                         <div className="font-bold text-xs text-[#282828] mb-1 group-hover:text-[#b57614] transition-colors">
                           {preset.title}
                         </div>
-                        <p className="text-[10px] text-[#7c6f64] line-clamp-2 leading-relaxed">
+                        <p className="text-[11px] text-[#7c6f64] line-clamp-2 leading-relaxed">
                           {preset.prompt}
                         </p>
                       </div>
@@ -1802,7 +1802,7 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                             <div>
                               <div className="font-bold text-sm text-[#282828] flex items-center gap-2">
                                 <span>{task.title}</span>
-                                <span className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${
+                                <span className={`text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border ${
                                   task.priority === 'critical' ? 'bg-[#cc241d]/20 text-[#cc241d] border-[#cc241d]/40' : 'bg-[#b57614]/20 text-[#b57614] border-[#b57614]/40'
                                 }`}>
                                   {task.priority}
@@ -1934,17 +1934,17 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-bold text-[#b57614]">
+                            <span className="text-[11px] font-bold text-[#b57614]">
                               {agent?.name || 'Assigned Agent'}
                             </span>
-                            <span className="text-[9px] text-[#7c6f64]">
+                            <span className="text-[11px] font-mono text-[#7c6f64]">
                               {task.completedAt ? new Date(task.completedAt).toLocaleTimeString() : 'Recent'}
                             </span>
                           </div>
                           <div className="font-bold text-xs text-[#282828] truncate">
                             {task.title}
                           </div>
-                          <p className="text-[10px] text-[#7c6f64] line-clamp-1 mt-0.5">
+                          <p className="text-[11px] text-[#7c6f64] line-clamp-1 mt-0.5">
                             {task.description}
                           </p>
                         </div>
@@ -2212,7 +2212,7 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
 
                     <div className="flex flex-wrap gap-1 mb-3">
                       {entry.tags.map((tag, ti) => (
-                        <span key={ti} className="text-[9px] px-1.5 py-0.2 rounded bg-[#ebdbb2] text-[#7c6f64] font-mono">
+                        <span key={ti} className="text-[10px] px-1.5 py-0.5 rounded bg-[#ebdbb2] text-[#7c6f64] font-mono">
                           #{tag}
                         </span>
                       ))}

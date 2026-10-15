@@ -205,12 +205,12 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
               <span className="font-bold text-xs tracking-wider text-white">
                 {monitorMode === 'quantum' ? 'QUANTUM SUPERPOSITION SEARCH ENGINE' : 'FLEET HEALTH & THROUGHPUT MONITOR'}
               </span>
-              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                 ACTIVE
               </span>
             </div>
-            <p className="text-[10px] text-[#70788e]">
+            <p className="text-xs text-zinc-400 mt-0.5">
               {monitorMode === 'quantum'
                 ? 'Multi-path superposition evaluation • Grover amplitude amplification • Wavefunction collapse to easiest build path'
                 : 'Real-time token velocity & autonomous processing telemetry'}
@@ -223,24 +223,24 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
           <div className="bg-black/50 p-1 rounded-lg border border-white/10 flex items-center gap-1 text-xs">
             <button
               onClick={() => setMonitorMode('quantum')}
-              className={`px-2.5 py-1 rounded text-[10px] font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition-all ${
                 monitorMode === 'quantum'
                   ? 'bg-[#00d9ff]/20 text-[#00d9ff] border border-[#00d9ff]/40 shadow-sm'
-                  : 'text-[#8b949e] hover:text-white'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Atom className="w-3 h-3" />
+              <Atom className="w-3.5 h-3.5" />
               <span>Quantum States (|ψ⟩)</span>
             </button>
             <button
               onClick={() => setMonitorMode('throughput')}
-              className={`px-2.5 py-1 rounded text-[10px] font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition-all ${
                 monitorMode === 'throughput'
                   ? 'bg-[#7c5cff]/20 text-[#c4b5fd] border border-[#7c5cff]/40 shadow-sm'
-                  : 'text-[#8b949e] hover:text-white'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Zap className="w-3 h-3 text-[#fabd2f]" />
+              <Zap className="w-3.5 h-3.5 text-[#fabd2f]" />
               <span>Throughput</span>
             </button>
           </div>
@@ -249,9 +249,9 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
             <button
               onClick={handleTriggerFleetQuantumSweep}
               disabled={isSimulatingQuantum}
-              className="px-2.5 py-1 rounded bg-gradient-to-r from-[#00d9ff]/20 to-[#7c5cff]/20 hover:from-[#00d9ff]/30 hover:to-[#7c5cff]/30 border border-[#00d9ff]/40 text-[#00d9ff] text-[10px] font-bold flex items-center gap-1.5 transition-all shadow cursor-pointer disabled:opacity-50"
+              className="px-2.5 py-1 rounded bg-gradient-to-r from-[#00d9ff]/20 to-[#7c5cff]/20 hover:from-[#00d9ff]/30 hover:to-[#7c5cff]/30 border border-[#00d9ff]/40 text-[#00d9ff] text-xs font-semibold flex items-center gap-1.5 transition-all shadow cursor-pointer disabled:opacity-50"
             >
-              <Sparkles className="w-3 h-3" />
+              <Sparkles className="w-3.5 h-3.5" />
               <span>{isSimulatingQuantum ? `Amplifying... ${sweepProgress}%` : 'Run Quantum Sweep'}</span>
             </button>
           )}
@@ -271,13 +271,13 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
       {/* QUANTUM SUPERPOSITION MATRIX VIEW */}
       {monitorMode === 'quantum' ? (
         <div className="mt-3 relative z-10">
-          <div className="flex items-center justify-between text-[10px] text-[#70788e] mb-2 font-bold tracking-wider uppercase">
-            <span className="flex items-center gap-1.5 text-[#00d9ff]">
-              <Layers className="w-3 h-3" />
+          <div className="flex items-center justify-between text-xs text-zinc-400 mb-2 font-semibold tracking-wider uppercase">
+            <span className="flex items-center gap-1.5 text-cyan-400">
+              <Layers className="w-3.5 h-3.5" />
               Agent Task Superposition Space (4 Qubits • 16 States Evaluated in Parallel)
             </span>
-            <span className="text-[9px] text-[#34d399] flex items-center gap-1">
-              <CheckCircle2 className="w-2.5 h-2.5" />
+            <span className="text-[11px] text-emerald-400 flex items-center gap-1 font-mono">
+              <CheckCircle2 className="w-3 h-3" />
               Oracle collapses to easiest build path
             </span>
           </div>
@@ -314,13 +314,13 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                         <span className="text-base shrink-0">{agent.avatar || '🤖'}</span>
                       )}
                       <div className="truncate">
-                        <div className="font-bold text-xs text-white truncate">{agent.name}</div>
-                        <div className="text-[9px] text-[#70788e] truncate">{agent.role}</div>
+                        <div className="font-semibold text-xs text-white truncate">{agent.name}</div>
+                        <div className="text-[11px] text-zinc-400 truncate">{agent.role}</div>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wider flex items-center gap-1 ${
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider flex items-center gap-1 ${
                         isEvaluating
                           ? 'bg-[#00d9ff]/20 text-[#00d9ff] border border-[#00d9ff]/30 animate-pulse'
                           : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25'
@@ -328,7 +328,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                         <Atom className="w-2.5 h-2.5" />
                         {isEvaluating ? 'SUPERPOSITION' : 'COLLAPSED'}
                       </span>
-                      <span className="text-[8px] text-[#8b949e] font-mono mt-0.5">
+                      <span className="text-[10px] text-zinc-400 font-mono mt-0.5">
                         |ψ⟩ 4-Qubits
                       </span>
                     </div>
@@ -336,9 +336,9 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
 
                   {/* Amplitude Distribution Spectrum */}
                   <div className="mb-2 bg-black/50 p-2 rounded-lg border border-white/5 space-y-1.5">
-                    <div className="text-[8px] text-[#8b949e] font-bold uppercase tracking-wider flex justify-between items-center">
+                    <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono flex justify-between items-center">
                       <span>Evaluated Pathways:</span>
-                      <span className="text-[#00d9ff]">Amplified Amplitude</span>
+                      <span className="text-cyan-400">Amplified Amplitude</span>
                     </div>
 
                     <div className="space-y-1">
@@ -347,12 +347,12 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                         const pct = Math.round(cand.probability * 100);
 
                         return (
-                          <div key={cand.id} className="text-[9px]">
-                            <div className="flex items-center justify-between mb-0.5 text-[8px]">
-                              <span className={`font-mono truncate max-w-[130px] ${isWinner ? 'text-[#34d399] font-bold' : 'text-[#8b949e]'}`}>
+                          <div key={cand.id} className="text-xs">
+                            <div className="flex items-center justify-between mb-0.5 text-[11px]">
+                              <span className={`font-mono truncate max-w-[130px] ${isWinner ? 'text-[#34d399] font-bold' : 'text-zinc-400'}`}>
                                 {cand.qubitState} {cand.strategy}
                               </span>
-                              <span className={`font-bold ${isWinner ? 'text-[#34d399]' : 'text-[#70788e]'}`}>
+                              <span className={`font-mono font-bold ${isWinner ? 'text-[#34d399]' : 'text-zinc-500'}`}>
                                 {pct}%
                               </span>
                             </div>
@@ -373,20 +373,20 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                   </div>
 
                   {/* Collapsed Easiest Way Banner */}
-                  <div className="bg-emerald-500/10 border border-emerald-500/25 p-1.5 rounded-lg flex items-center justify-between gap-1 text-[9px]">
-                    <div className="truncate flex items-center gap-1 text-emerald-400 font-bold">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <div className="bg-emerald-500/10 border border-emerald-500/25 p-1.5 rounded-lg flex items-center justify-between gap-1 text-[11px]">
+                    <div className="truncate flex items-center gap-1.5 text-emerald-400 font-semibold">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       <span className="truncate">Easiest Way: {winning?.strategy || 'Direct Optimization'}</span>
                     </div>
-                    <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[8px] shrink-0 font-bold">
+                    <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] shrink-0 font-bold font-mono">
                       Diff {winning?.difficultyScore ?? 2}/10
                     </span>
                   </div>
 
                   {/* Click to inspect prompt */}
                   <div className="mt-2 text-right">
-                    <span className="text-[8px] text-[#00d9ff] group-hover:underline inline-flex items-center gap-0.5">
-                      Inspect Wavefunction <ChevronRight className="w-2.5 h-2.5" />
+                    <span className="text-[11px] text-cyan-400 group-hover:underline inline-flex items-center gap-0.5 font-medium">
+                      Inspect Wavefunction <ChevronRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
@@ -397,9 +397,9 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
       ) : (
         /* THROUGHPUT TELEMETRY VIEW */
         <div className="mt-3 relative z-10">
-          <div className="text-[10px] text-[#70788e] font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+          <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2 flex items-center justify-between">
             <span>Worker Real-Time Throughput Pulses</span>
-            <span className="text-[9px] lowercase opacity-75">color intensity maps to token rate</span>
+            <span className="text-[11px] text-zinc-500 lowercase">color intensity maps to token rate</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -476,7 +476,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                           <span className="text-xs shrink-0">{agent.avatar || '🤖'}</span>
                         )}
                       </div>
-                      <span className="font-bold text-[11px] text-white truncate max-w-[70px]">{agent.name}</span>
+                      <span className="font-semibold text-xs text-white truncate max-w-[70px]">{agent.name}</span>
                     </div>
 
                     <span 
@@ -488,9 +488,9 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between text-[9px] relative z-10 mb-1">
+                  <div className="flex items-center justify-between text-[10px] relative z-10 mb-1">
                     <span 
-                      className="px-1 py-0.2 rounded font-bold uppercase tracking-tight"
+                      className="px-1.5 py-0.2 rounded font-bold uppercase tracking-tight font-mono"
                       style={{
                         backgroundColor: tier.bgBadge,
                         color: tier.textBadge
@@ -498,18 +498,18 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                     >
                       {isWorking ? `${tokenFormatted}/s` : 'IDLE'}
                     </span>
-                    <span className="text-[#70788e] text-[8px] font-mono">
+                    <span className="text-zinc-400 text-[10px] font-mono">
                       {agent.role.slice(0, 10)}
                     </span>
                   </div>
 
                   {/* Micro Quantum Superposition Pill */}
-                  <div className="relative z-10 text-[8px] text-[#00d9ff] bg-[#00d9ff]/10 px-1 py-0.5 rounded flex items-center justify-between border border-[#00d9ff]/20">
-                    <span className="font-mono flex items-center gap-0.5">
-                      <Atom className="w-2 h-2 text-[#00d9ff]" />
+                  <div className="relative z-10 text-[10px] text-cyan-300 bg-cyan-950/40 px-1.5 py-0.5 rounded flex items-center justify-between border border-cyan-500/20 font-mono">
+                    <span className="flex items-center gap-0.5">
+                      <Atom className="w-2.5 h-2.5 text-cyan-400" />
                       |ψ⟩ Easiest
                     </span>
-                    <span className="text-[#34d399] font-bold truncate max-w-[50px]">
+                    <span className="text-emerald-400 font-bold truncate max-w-[50px]">
                       {winning.strategy.slice(0, 8)}..
                     </span>
                   </div>
@@ -545,7 +545,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold text-white">{inspectedAgent.name}</h3>
-                    <span className="px-2 py-0.5 text-[9px] font-bold rounded bg-[#00d9ff]/20 text-[#00d9ff] border border-[#00d9ff]/40">
+                    <span className="px-2 py-0.5 text-[10px] font-mono font-bold tracking-wider rounded bg-[#00d9ff]/20 text-[#00d9ff] border border-[#00d9ff]/40">
                       QUANTUM DECISION ENGINE
                     </span>
                   </div>
@@ -610,7 +610,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                       >
                         <div className="flex items-center justify-between gap-2 mb-1.5">
                           <div className="flex items-center gap-2">
-                            <span className="px-1.5 py-0.5 rounded font-mono text-[9px] bg-white/5 border border-white/10 text-white font-bold">
+                            <span className="px-1.5 py-0.5 rounded font-mono text-[10px] bg-white/5 border border-white/10 text-white font-bold">
                               {cand.qubitState}
                             </span>
                             <span className={`text-xs font-bold ${isWinner ? 'text-emerald-300' : 'text-white'}`}>
@@ -619,7 +619,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider ${
                               isWinner
                                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                                 : 'bg-white/5 text-[#70788e]'

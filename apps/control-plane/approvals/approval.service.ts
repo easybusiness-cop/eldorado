@@ -1,6 +1,6 @@
-import { ApprovalRequest, ApprovalStatus } from "./approval.types";
-import { ApprovalRepository } from "./approval.repository";
-import { RiskLevel } from "../integrations/registry/integration.types";
+import type { ApprovalRequest, ApprovalStatus } from "./approval.types.ts";
+import { ApprovalRepository } from "./approval.repository.ts";
+import type { RiskLevel } from "../integrations/registry/integration.types.ts";
 
 export class ApprovalService {
   public static listApprovals(): ApprovalRequest[] {

@@ -166,23 +166,23 @@ export const RepoExplorerModal: React.FC<RepoExplorerModalProps> = ({
                       </span>
                     </div>
 
-                    <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-[#3c3836] text-[#fabd2f]">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono bg-[#3c3836] text-[#fabd2f]">
                       {repo.language}
                     </span>
                   </div>
 
-                  <p className="text-[10px] text-[#a89984] mt-1 line-clamp-2 leading-normal">
+                  <p className="text-[11px] text-[#a89984] mt-1 line-clamp-2 leading-normal">
                     {repo.description}
                   </p>
 
-                  <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#3c3836]/60 text-[9px] text-[#7c6f64]">
+                  <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#3c3836]/60 text-[11px] font-mono text-[#7c6f64]">
                     <div className="flex items-center gap-2">
                       <span className="flex items-center gap-0.5">
-                        <Star className="w-2.5 h-2.5 text-amber-400" />
+                        <Star className="w-3 h-3 text-amber-400" />
                         <span>{repo.stars}</span>
                       </span>
                       <span className="flex items-center gap-0.5">
-                        <GitFork className="w-2.5 h-2.5" />
+                        <GitFork className="w-3 h-3" />
                         <span>{repo.forks}</span>
                       </span>
                     </div>
@@ -218,7 +218,7 @@ export const RepoExplorerModal: React.FC<RepoExplorerModalProps> = ({
                     {selectedRepo.topics.map((t, i) => (
                       <span
                         key={i}
-                        className="text-[9px] px-1.5 py-0.2 rounded bg-[#181615] text-[#83a598] border border-[#3c3836]"
+                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#181615] text-[#83a598] border border-[#3c3836]"
                       >
                         #{t}
                       </span>

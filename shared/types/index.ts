@@ -107,7 +107,22 @@ export interface ToolExecutionResult {
 export interface IntegrationConnectionStatus {
   id: string;
   name: string;
-  provider: 'github' | 'gmail' | 'slack' | 'notion' | 'instagram' | 'youtube' | 'x' | 'linkedin' | 'custom';
+  provider:
+    | 'github'
+    | 'gmail'
+    | 'slack'
+    | 'notion'
+    | 'instagram'
+    | 'youtube'
+    | 'x'
+    | 'linkedin'
+    | 'telegram'
+    | 'hackernews'
+    | 'arxiv'
+    | 'browser'
+    | 'google_workspace'
+    | 'webhook'
+    | 'custom';
   connected: boolean;
   authType: 'oauth' | 'token' | 'api_key';
   scopes: string[];

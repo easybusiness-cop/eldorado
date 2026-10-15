@@ -29,7 +29,7 @@ interface PublicApiHubProps {
 interface ApiEndpoint {
   id: string;
   name: string;
-  category: 'weather' | 'finance' | 'testing' | 'placeholder';
+  category: 'weather' | 'finance' | 'testing' | 'placeholder' | 'science';
   description: string;
   url: string;
   method: 'GET' | 'POST';
@@ -97,15 +97,15 @@ const POPULAR_PUBLIC_APIS: ApiEndpoint[] = [
     defaultParams: {}
   },
   {
-    id: 'n8n_inbound_webhook',
-    name: 'n8n Inbound Webhook Orchestration',
-    category: 'testing',
-    description: 'Internal gateway endpoint receiving automated node triggers from self-hosted or cloud n8n workflows.',
-    url: '/api/n8n/webhook/fleet-task',
-    method: 'POST',
+    id: 'arxiv_ai_papers',
+    name: 'ArXiv AI & Computing Papers API',
+    category: 'science',
+    description: 'Live peer-reviewed computer science, AI, and software engineering papers from arXiv.org.',
+    url: '/api/integrations/arxiv?q=cat:cs.AI&limit=5',
+    method: 'GET',
     defaultParams: {
-      action: 'ASSIGN_TASK',
-      targetAgent: 'CoreCoder'
+      q: 'cat:cs.AI',
+      limit: '5'
     }
   }
 ];
