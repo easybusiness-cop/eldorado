@@ -1,25 +1,25 @@
 :root {
   --font-sans: "Plus Jakarta Sans", Inter, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
-  --text-0: #ffffff;
-  --text-1: #e2e8f0;
-  --text-2: #94a3b8;
-  --text-muted: #64748b;
-  --bg-0: #080c18;
-  --bg-1: #0f172a;
-  --bg-2: #1e293b;
-  --bg-card: rgba(15, 23, 42, 0.75);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-bright: rgba(56, 189, 248, 0.3);
+  --text-0: #0f172a;
+  --text-1: #334155;
+  --text-2: #64748b;
+  --text-muted: #94a3b8;
+  --bg-0: #f4f7fb;
+  --bg-1: #ffffff;
+  --bg-2: #f8fafc;
+  --bg-card: #ffffff;
+  --border-subtle: #e2e8f0;
+  --border-bright: #bfdbfe;
   
   /* Luminous Cyber Accents */
-  --accent-cyan: #00f0ff;
-  --accent-purple: #a855f7;
-  --accent-emerald: #10b981;
-  --accent-amber: #fbbf24;
-  --accent-rose: #f43f5e;
-  --accent-blue: #38bdf8;
-  --accent-indigo: #6366f1;
+  --accent-cyan: #0284c7;
+  --accent-purple: #7c3aed;
+  --accent-emerald: #059669;
+  --accent-amber: #b45309;
+  --accent-rose: #e11d48;
+  --accent-blue: #2563eb;
+  --accent-indigo: #4f46e5;
 
   font-family: var(--font-sans);
   color: var(--text-0);
@@ -42,7 +42,7 @@ body,
 }
 
 body {
-  background: radial-gradient(circle at 50% 0%, #0f1a36 0%, #080c18 65%, #05070e 100%);
+  background: var(--bg-0);
   color: var(--text-1);
 }
 

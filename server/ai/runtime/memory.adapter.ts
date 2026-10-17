@@ -1,52 +1,70 @@
-import { mastraMemoryStore, MemoryRecord } from '../mastra/memory/index.ts';
+import { mastraMemoryStore, type MemoryRecord } from '../mastra/memory/index.ts';
 
 export class MemoryAdapter {
-  /**
-   * Translates local memory store records to model messages or instructions.
-   */
-  public static getAdaptedContext(agentId: string, department: string, scopes: MemoryRecord['scope'][] = ['agent', 'department', 'company']): string {
+  public static async getRelevantContext(
+    agentId: string,
+    department: string,
+    query: string,
+    organizationId = 'org-default',
+  ): Promise<string> {
     const contextLines: string[] = [];
-    
-    // 1. Retrieve agent memories
-    if (scopes.includes('agent')) {
-      const agentMemories = mastraMemoryStore.getMemories(agentId, 5);
-      if (agentMemories.length > 0) {
-        contextLines.push('### Agent Private Short-term Memories:');
-        agentMemories.forEach(m => contextLines.push(`- [${new Date(m.timestamp).toLocaleDateString()}] ${m.content}`));
-      }
+    const searchQuery = query.slice(0, 2_000);
+
+    const [agentMemories, departmentMemories, companyMemories] = await Promise.all([
+      mastraMemoryStore.searchMemories(searchQuery, {
+        agentId,
+        scope: 'agent',
+        limit: 5,
+        organizationId,
+      }),
+      department
+        ? mastraMemoryStore.searchMemories(searchQuery, {
+            scope: 'department',
+            tag: department,
+            limit: 10,
+            organizationId,
+          })
+        : Promise.resolve([]),
+      mastraMemoryStore.searchMemories(searchQuery, {
+        scope: 'company',
+        limit: 5,
+        organizationId,
+      }),
+    ]);
+
+    if (agentMemories.length > 0) {
+      contextLines.push('### Relevant agent memories:');
+      agentMemories.forEach(({ memory }) => contextLines.push(`- ${memory.content.slice(0, 1_000)}`));
     }
 
-    // 2. Retrieve department memories
-    if (scopes.includes('department') && department) {
-      const deptMemories = mastraMemoryStore.getMemoriesByScope('department')
-        .filter(m => m.tags.includes(department))
-        .slice(0, 5);
+    if (department) {
+      const deptMemories = departmentMemories.slice(0, 5);
       if (deptMemories.length > 0) {
         contextLines.push(`### Department memories (${department}):`);
-        deptMemories.forEach(m => contextLines.push(`- ${m.content}`));
+        deptMemories.forEach(({ memory }) => contextLines.push(`- ${memory.content.slice(0, 1_000)}`));
       }
     }
 
-    // 3. Retrieve company/global memories
-    if (scopes.includes('company')) {
-      const companyMemories = mastraMemoryStore.getMemoriesByScope('company').slice(0, 5);
-      if (companyMemories.length > 0) {
-        contextLines.push('### Company-wide Context & Rules:');
-        companyMemories.forEach(m => contextLines.push(`- ${m.content}`));
-      }
+    if (companyMemories.length > 0) {
+      contextLines.push('### Company-wide Context & Rules:');
+      companyMemories.forEach(({ memory }) => contextLines.push(`- ${memory.content.slice(0, 1_000)}`));
     }
 
     return contextLines.join('\n');
   }
 
-  /**
-   * Persists a newly acquired memory in the corresponding memory scope.
-   */
-  public static persistMemory(agentId: string, department: string, content: string, scope: MemoryRecord['scope'] = 'agent', tags: string[] = []): MemoryRecord {
+  public static persistMemory(
+    agentId: string,
+    department: string,
+    content: string,
+    scope: MemoryRecord['scope'] = 'agent',
+    tags: string[] = [],
+    organizationId = 'org-default',
+  ): Promise<MemoryRecord> {
     const allTags = [...tags];
     if (department && !allTags.includes(department)) {
       allTags.push(department);
     }
-    return mastraMemoryStore.saveMemory(agentId, content, scope, allTags);
+    return mastraMemoryStore.saveMemory(agentId, content, scope, allTags, organizationId);
   }
 }

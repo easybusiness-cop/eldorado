@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { formatAiReply } from "./formatAiReply";
 import {
   Copy,
   Check,
@@ -84,17 +85,18 @@ export const ChatMarkdownRenderer: React.FC<ChatMarkdownRendererProps> = ({
   isStreaming = false,
 }) => {
   const [showThinking, setShowThinking] = useState(false);
+  const formattedContent = role === "assistant" ? formatAiReply(content) : content;
 
   // Extract <think>...</think> or <reasoning>...</reasoning> tags if present
   let thinkingContent: string | null = null;
-  let mainContent = content;
+  let mainContent = formattedContent;
 
-  const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/i) ||
-    content.match(/<reasoning>([\s\S]*?)<\/reasoning>/i);
+  const thinkMatch = formattedContent.match(/<think>([\s\S]*?)<\/think>/i) ||
+    formattedContent.match(/<reasoning>([\s\S]*?)<\/reasoning>/i);
 
   if (thinkMatch) {
     thinkingContent = thinkMatch[1].trim();
-    mainContent = content.replace(thinkMatch[0], "").trim();
+    mainContent = formattedContent.replace(thinkMatch[0], "").trim();
   }
 
   // Also check if content starts with a markdown thinking block
@@ -107,7 +109,7 @@ export const ChatMarkdownRenderer: React.FC<ChatMarkdownRendererProps> = ({
   }
 
   return (
-    <div className="w-full text-[13.5px] leading-relaxed text-[#e5e7eb]">
+    <div className="w-full min-w-0 break-words text-[13.5px] leading-7 text-[#e5e7eb]">
       {/* Collapsible Thinking / Reasoning Section (Gemini / OpenAI o1 style) */}
       {thinkingContent && (
         <div className="mb-3.5 rounded-lg border border-[#2d3748] bg-[#14181f]/80 overflow-hidden">
@@ -137,7 +139,7 @@ export const ChatMarkdownRenderer: React.FC<ChatMarkdownRendererProps> = ({
       )}
 
       {/* Main Formatted Markdown Content */}
-      <div className="chat-markdown-body space-y-2">
+      <div className="chat-markdown-body space-y-3 whitespace-pre-wrap [overflow-wrap:anywhere]">
         <Markdown
           remarkPlugins={[remarkGfm]}
           components={{

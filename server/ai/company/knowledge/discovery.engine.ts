@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { load as loadXml } from "cheerio";
 import { researchManager } from "./research.manager.ts";
 import { BrowserService } from "../../../tools/browser/browser.service.ts";
 import { getGeminiClient } from "../../geminiService.ts";
@@ -49,25 +50,24 @@ export class DiscoveryEngine {
   private discoveries: TechDiscovery[] = [];
   private isScanning = false;
   private continuousTimer: NodeJS.Timeout | null = null;
+  private continuousCategoryIndex = 0;
   private scanCount = 0;
   private lastScanTime?: string;
   private browserService: BrowserService;
 
   // Active sources monitored
   private readonly sources = [
-    "Google Search Grounding (Live)",
-    "arXiv CS.AI & CS.MA Preprints",
-    "Hacker News Algolia Tech Index",
-    "Wikipedia Open Knowledge Graph",
-    "GitHub Trending & Framework Releases",
-    "Enterprise AI & Market Radar",
+    "Google Search Grounding (when configured)",
+    "Hacker News Algolia live index",
+    "arXiv CS.AI and CS.SE preprints",
+    "BrowserService source-page enrichment",
   ];
 
   private constructor() {
     this.browserService = new BrowserService();
     this.seedInitialDiscoveries();
-    // Automatically start background continuous scanning loop (runs every 5 minutes)
-    this.startContinuousScanning(300_000);
+    // Rotate through research areas once per minute to keep online discovery current.
+    this.startContinuousScanning(60_000);
   }
 
   public static getInstance(): DiscoveryEngine {
@@ -183,10 +183,11 @@ export class DiscoveryEngine {
    * Starts the continuous scanning background loop.
    * Periodically scans for new technologies, research papers, and market developments.
    */
-  public startContinuousScanning(intervalMs = 300_000): void {
+  public startContinuousScanning(intervalMs = 60_000): void {
     if (this.continuousTimer) {
       clearInterval(this.continuousTimer);
     }
+    this.continuousCategoryIndex = 0;
 
     console.log(
       `[DiscoveryEngine] Continuous autonomous discovery loop active. Interval: ${Math.round(
@@ -197,7 +198,15 @@ export class DiscoveryEngine {
     this.continuousTimer = setInterval(async () => {
       try {
         console.log("[DiscoveryEngine] Continuous background scan trigger firing...");
-        await this.runDiscoveryCycle();
+        const categories: DiscoveryCategory[] = [
+          "technology",
+          "research_paper",
+          "market_development",
+        ];
+        const category =
+          categories[this.continuousCategoryIndex % categories.length];
+        this.continuousCategoryIndex += 1;
+        await this.runDiscoveryCycle([category]);
       } catch (err) {
         console.error("[DiscoveryEngine] Continuous scan error:", err);
       }
@@ -368,7 +377,7 @@ Output strictly the JSON array, no extra text.`,
       }
     }
 
-    // 2. Query Live Public Web APIs (Hacker News Algolia Tech Index + Wikipedia Open Knowledge)
+    // 2. Query live public APIs for stories and, for research, recent arXiv papers.
     if (newlyFound.length === 0) {
       try {
         const publicFindings = await this.queryPublicWebIntelligence(query, category);
@@ -383,18 +392,7 @@ Output strictly the JSON array, no extra text.`,
       }
     }
 
-    // 3. Fallback to rich dynamic domain catalog if network was unreachable
-    if (newlyFound.length === 0) {
-      const dynamicItems = this.generateDynamicDiscoveries(query, category);
-      for (const item of dynamicItems) {
-        if (!this.discoveries.some((d) => d.title.toLowerCase() === item.title.toLowerCase())) {
-          this.registerAndPropagate(item);
-          newlyFound.push(item);
-        }
-      }
-    }
-
-    // 4. For each newly discovered item, scrape deep content via BrowserService asynchronously
+    // 3. For each newly discovered item, scrape deep content via BrowserService asynchronously
     for (const disc of newlyFound) {
       this.deepBrowseAndEnrich(disc).catch((err) => {
         console.warn(`[DiscoveryEngine] Deep browsing failed for ${disc.url}:`, err.message);
@@ -438,16 +436,16 @@ Output strictly the JSON array, no extra text.`,
                 category,
                 title: hit.title,
                 url,
-                summary: `Community-validated breakthrough: "${hit.title}". Points: ${hit.points || 0}, Comments: ${hit.num_comments || 0}.`,
+                summary: `Hacker News story: "${hit.title}". Points: ${hit.points ?? 0}, Comments: ${hit.num_comments ?? 0}.`,
                 keyFindings: [
-                  `High community resonance with ${hit.points || 100}+ points`,
-                  `Discussed by engineering practitioners on open forums`,
-                  `Target domain: ${category.replace("_", " ")}`,
+                  `Hacker News reports ${hit.points ?? 0} points and ${hit.num_comments ?? 0} comments`,
+                  `Found in the Hacker News live story index`,
+                  `Search category: ${category.replace("_", " ")}`,
                 ],
                 technologies: tags,
                 departments: this.inferDepartments(category, tags),
                 severity: hit.points > 200 ? "critical" : "important",
-                relevanceScore: Math.min(0.7 + (hit.points || 50) / 1000, 0.98),
+                relevanceScore: Math.min(0.5 + (hit.points || 0) / 1000, 0.98),
                 searchQuery: query,
                 timestamp: new Date().toISOString(),
                 status: "discovered",
@@ -460,131 +458,58 @@ Output strictly the JSON array, no extra text.`,
       console.warn("[DiscoveryEngine] HN Algolia search error:", e.message);
     }
 
-    // Search Wikipedia Open Knowledge Graph
-    try {
-      const wikiQuery = encodeURIComponent(
-        category === "research_paper" ? "Machine learning artificial intelligence" : "Software engineering computing"
-      );
-      const res = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${wikiQuery}&format=json&srlimit=2`,
-        { headers: { "User-Agent": "RuffloDiscoveryEngine/2.0" } }
-      );
+    if (category === "research_paper") {
+      try {
+        const searchQuery = encodeURIComponent("cat:cs.AI OR cat:cs.SE");
+        const res = await fetch(
+          `https://export.arxiv.org/api/query?search_query=${searchQuery}&start=0&max_results=3&sortBy=submittedDate&sortOrder=descending`,
+          { headers: { "User-Agent": "RuffloDiscoveryEngine/2.0" } }
+        );
 
-      if (res.ok) {
-        const data = await res.json();
-        const searchResults = data?.query?.search;
-        if (Array.isArray(searchResults)) {
-          for (const item of searchResults) {
-            const cleanSnippet = (item.snippet || "").replace(/<[^>]+>/g, "");
-            findings.push({
-              id: `disc-${randomUUID().slice(0, 8)}`,
-              source: "Wikipedia Open Knowledge",
-              category,
-              title: item.title,
-              url: `https://en.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, "_"))}`,
-              summary: cleanSnippet || `Encyclopedic technical overview on ${item.title}`,
-              keyFindings: [
-                `Peer-reviewed baseline definition: ${cleanSnippet.slice(0, 100)}...`,
-                `Established foundational theoretical standard`,
-                `Contextualizes modern autonomous agent implementations`,
-              ],
-              technologies: [category, "foundational-theory", item.title.toLowerCase().replace(/[^a-z0-9]/g, "-")],
-              departments: this.inferDepartments(category, []),
-              severity: "info",
-              relevanceScore: 0.85,
-              searchQuery: query,
-              timestamp: new Date().toISOString(),
-              status: "discovered",
-            });
-          }
+        if (!res.ok) {
+          throw new Error(`arXiv returned HTTP ${res.status}`);
         }
+
+        const $ = loadXml(await res.text(), { xmlMode: true });
+        for (const element of $("entry").toArray()) {
+          const entry = $(element);
+          const title = entry.find("title").first().text().replace(/\s+/g, " ").trim();
+          const summary = entry.find("summary").first().text().replace(/\s+/g, " ").trim();
+          const url = entry.find("id").first().text().trim();
+          const technologies = entry
+            .find("category")
+            .toArray()
+            .map((categoryElement) => $(categoryElement).attr("term"))
+            .filter((term): term is string => Boolean(term))
+            .slice(0, 4);
+
+          if (!title || !summary || !url) {
+            continue;
+          }
+
+          findings.push({
+            id: `disc-${randomUUID().slice(0, 8)}`,
+            source: "arXiv Computer Science Preprints",
+            category,
+            title,
+            url,
+            summary,
+            keyFindings: [`arXiv abstract: ${summary.slice(0, 500)}`],
+            technologies,
+            departments: this.inferDepartments(category, technologies),
+            severity: "important",
+            relevanceScore: 0.85,
+            searchQuery: query,
+            timestamp: new Date().toISOString(),
+            status: "discovered",
+          });
+        }
+      } catch (error: any) {
+        console.warn("[DiscoveryEngine] arXiv search failed:", error.message);
       }
-    } catch (e: any) {
-      console.warn("[DiscoveryEngine] Wikipedia search error:", e.message);
     }
 
     return findings;
-  }
-
-  /**
-   * Generates dynamic, high-fidelity discoveries when network calls encounter transient blocks.
-   */
-  private generateDynamicDiscoveries(query: string, category: DiscoveryCategory): TechDiscovery[] {
-    const timestamp = new Date().toISOString();
-    const querySlug = query.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-
-    if (category === "research_paper") {
-      return [
-        {
-          id: `disc-${randomUUID().slice(0, 8)}`,
-          source: "arXiv cs.AI / cs.MA (Preprints)",
-          category: "research_paper",
-          title: `Autonomous Continuous Learning: Self-Supervised Knowledge Graph Construction in Multi-Agent Swarms`,
-          url: "https://arxiv.org/abs/2609.18234",
-          summary: `Demonstrates continuous intelligence ingestion where agent teams autonomously identify knowledge gaps, conduct web searches, and update shared semantic graphs without human supervision.`,
-          keyFindings: [
-            "Continuous background scanning prevents knowledge drift in long-running agent deployments",
-            "Autonomous research triggers reduce human intervention by 94%",
-            "Direct empirical proficiency updates in capability engines improve downstream task success",
-          ],
-          technologies: ["autonomous-learning", "continuous-discovery", "knowledge-graphs", "multi-agent"],
-          departments: ["research", "engineering"],
-          severity: "critical",
-          relevanceScore: 0.98,
-          searchQuery: query,
-          timestamp,
-          status: "discovered",
-        },
-      ];
-    }
-
-    if (category === "market_development") {
-      return [
-        {
-          id: `disc-${randomUUID().slice(0, 8)}`,
-          source: "Market & Cloud Intelligence Radar",
-          category: "market_development",
-          title: `Enterprise Shift Toward Unsupervised Agent Autonomy: 2026 Industry Report`,
-          url: "https://marketradar.corp/enterprise-ai-autonomy-2026",
-          summary: `Industry survey reveals 78% of enterprise leaders are replacing human-in-the-loop bottlenecks with autonomous verification and automatic skill calibration engines.`,
-          keyFindings: [
-            "Autonomous permissionless learning identified as primary driver of competitive velocity",
-            "Decentralized corporate departmental hierarchies outperform flat prompt orchestrators",
-            "Demand for real-time web exploration and browser tool integration increased by 310%",
-          ],
-          technologies: ["market-trends", "enterprise-autonomy", "browser-tools"],
-          departments: ["marketing", "operations", "research"],
-          severity: "important",
-          relevanceScore: 0.94,
-          searchQuery: query,
-          timestamp,
-          status: "discovered",
-        },
-      ];
-    }
-
-    return [
-      {
-        id: `disc-${randomUUID().slice(0, 8)}`,
-        source: "Global Tech Radar",
-        category: "technology",
-        title: `Playwright Headless Browser Agent Engine with Autonomous Visual DOM Parsing`,
-        url: "https://github.com/microsoft/playwright/releases/tag/v1.50.0",
-        summary: `Enhanced browser automation with resilient fallback rendering and automated semantic structure extraction for autonomous research agents.`,
-        keyFindings: [
-          "Zero-friction DOM content extraction for automated research pipelines",
-          "Resilient screenshot capture and fallback synthesis",
-          "Seamless integration into agent tool gateways",
-        ],
-        technologies: ["browser-use", "playwright", "scraping", "automation"],
-        departments: ["engineering", "research"],
-        severity: "important",
-        relevanceScore: 0.91,
-        searchQuery: query,
-        timestamp,
-        status: "discovered",
-      },
-    ];
   }
 
   /**

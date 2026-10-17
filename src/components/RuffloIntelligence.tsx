@@ -314,7 +314,7 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#121416] text-[#e5e7eb] select-text">
+    <div className="rufflo-intelligence w-full h-full flex flex-col bg-[#121416] text-[#e5e7eb] select-text">
       {/* Top Header */}
       <header className="px-6 py-4 bg-[#181b1e] border-b border-[#262b30] flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">

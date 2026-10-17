@@ -12,9 +12,12 @@ export class ToolAdapter {
       description: def.description,
       inputSchema: z.record(z.string(), z.any()).optional(), // Accepts dynamic input objects
       execute: async ({ input, context }) => {
-        // Retrieve agent context safely
-        const agentId = (context as any)?.agentId || 'system';
-        const orgId = (context as any)?.orgId || 'system-org';
+        const requestContext = (context as any)?.requestContext;
+        const agentId = requestContext?.get?.('agentId') || (context as any)?.agentId || 'system';
+        const orgId = requestContext?.get?.('orgId') || (context as any)?.orgId;
+        if (typeof orgId !== 'string' || !orgId.trim()) {
+          throw new Error('Authenticated organization context is required to execute this tool.');
+        }
         
         try {
           // Execute the tool under our platform gateway/execution logic

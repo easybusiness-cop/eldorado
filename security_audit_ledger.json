@@ -1,5 +1,23 @@
 [
   {
+    "eventId": "evt-1792270856153-l9zy9b",
+    "timestamp": "2026-10-17T21:00:56.153Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
     "eventId": "evt-1792099121021-c1b9jr",
     "timestamp": "2026-10-15T21:18:41.021Z",
     "actor": "anonymous-intruder",

@@ -2,10 +2,12 @@ export class MemoryPolicy {
   public static sanitizeContent(content: string): string {
     let clean = content;
     
-    // Redact API keys and passwords
-    clean = clean.replace(/ghp_[a-zA-Z0-9]{36}/g, '[REDACTED_GITHUB_TOKEN]');
-    clean = clean.replace(/sk-[a-zA-Z0-9]{48}/g, '[REDACTED_OPENAI_KEY]');
-    clean = clean.replace(/(?:password|passwd|secret)\s*=\s*[^\s;]+/gi, 'secret = [REDACTED]');
+    clean = clean.replace(/\b(?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{30,}\b/g, '[REDACTED_GITHUB_TOKEN]');
+    clean = clean.replace(/\bgithub_pat_[a-zA-Z0-9_]{30,}\b/g, '[REDACTED_GITHUB_TOKEN]');
+    clean = clean.replace(/\bsk-[a-zA-Z0-9_-]{20,}\b/g, '[REDACTED_API_KEY]');
+    clean = clean.replace(/\bAIza[0-9A-Za-z_-]{30,}\b/g, '[REDACTED_API_KEY]');
+    clean = clean.replace(/\bBearer\s+[a-zA-Z0-9._~+/-]+=*/gi, 'Bearer [REDACTED]');
+    clean = clean.replace(/\b(password|passwd|secret|api[_-]?key|access[_-]?token)\b\s*[:=]\s*["']?[^\s"',;]+["']?/gi, '$1=[REDACTED]');
 
     return clean;
   }

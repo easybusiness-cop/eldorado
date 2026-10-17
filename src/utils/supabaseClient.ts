@@ -1,17 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import { normalizeSupabaseUrl } from "../../shared/supabase-url.ts";
 
-export function normalizeSupabaseUrl(rawUrl?: string | null): string {
-  if (!rawUrl) return "";
-  let url = rawUrl.trim();
-  if (!url) return "";
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = `https://${url}`;
-  }
-  url = url.replace(/\/+$/, "");
-  url = url.replace(/\/(?:rest|auth)\/v1\/?$/i, "");
-  url = url.replace(/\/+$/, "");
-  return url;
-}
+export { normalizeSupabaseUrl } from "../../shared/supabase-url.ts";
 
 const env = (typeof import.meta !== "undefined" && (import.meta as any).env) || (typeof process !== "undefined" && process.env) || {};
 const rawSupabaseUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || "";
@@ -42,4 +32,3 @@ export const supabase = createClient(
     },
   }
 );
-

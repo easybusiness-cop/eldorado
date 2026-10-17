@@ -2,7 +2,6 @@ import { Agent as RealMastraAgent } from '@mastra/core/agent';
 import { BaseMastraAgent } from '../mastra/agents/base.agent.ts';
 import { ModelAdapter } from './model.adapter.ts';
 import { ToolAdapter } from './tool.adapter.ts';
-import { MemoryAdapter } from './memory.adapter.ts';
 import { mastraToolRegistry } from '../mastra/tools/index.ts';
 
 export class AgentAdapter {
@@ -21,21 +20,11 @@ export class AgentAdapter {
     const taskType = baseAgent.getDepartment() === 'engineering' ? 'coding' : 'general';
     const modelConfig = ModelAdapter.getModelConfig(taskType);
 
-    // 4. Inject adapted memory context into instructions
-    const memoryContext = MemoryAdapter.getAdaptedContext(
-      baseAgent.getId(),
-      baseAgent.getDepartment()
-    );
-    const combinedInstructions = [
-      baseAgent.getInstructions(),
-      memoryContext ? `\n\nMemory Context:\n${memoryContext}` : '',
-    ].filter(Boolean).join('\n');
-
-    // 5. Instantiate and return the real `@mastra/core/agent` Agent
+    // Memory is retrieved per execution so organization context cannot leak between tenants.
     return new RealMastraAgent({
       id: baseAgent.getId(),
       name: baseAgent.getName(),
-      instructions: combinedInstructions,
+      instructions: baseAgent.getInstructions(),
       model: modelConfig.model,
       tools: adaptedTools,
     });
