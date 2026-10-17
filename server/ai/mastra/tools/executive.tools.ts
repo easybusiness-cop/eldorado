@@ -190,12 +190,12 @@ export const companyMemoryReadTool: MastraToolDefinition = {
         : 5;
 
     const results =
-      CompanyMemoryService.quantumSearch(query, limit);
+      await CompanyMemoryService.search(query, limit, context.orgId);
 
     return {
       success: true,
       query,
-      count: results?.memories?.length || 0,
+      count: results.length,
       source: 'company_memory',
       results,
     };
@@ -534,6 +534,7 @@ export const taskDispatchTool: MastraToolDefinition = {
       await Dispatcher.dispatchToAgent(
         targetAgentId,
         task,
+        context.orgId,
       );
 
     return {

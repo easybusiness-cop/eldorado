@@ -118,6 +118,7 @@ export class AgentRuntime {
         await mastra.executeTaskWithAgent(
           agentId,
           `${task.title}\n${task.description}`,
+          task.organizationId,
         );
 
       const durationMs =

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Agent,
@@ -18,20 +18,20 @@ import {
 } from './constants/initialAgents.ts';
 import { soundFx, speakText } from './utils/speech.ts';
 import { TopNavigation } from './components/TopNavigation.tsx';
-import { CommandCenter } from './components/CommandCenter.tsx';
 import { FleetHealthMonitor, getAgentThroughputTier, formatTokenThroughput } from './components/FleetHealthMonitor.tsx';
-import { ModalManager, ModalManagerState } from './components/ModalManager.tsx';
-import { CascadeRunData } from './components/ExecutiveSummaryModal.tsx';
+import type { ModalManagerState } from './components/ModalManager.tsx';
+import type { CascadeRunData } from './components/ExecutiveSummaryModal.tsx';
 import { generateExecutiveSummaryMarkdown } from './utils/markdownGenerator.ts';
-import { DepartmentHubView } from './components/DepartmentHubView.tsx';
-import { MunderdifflinDashboard } from './components/MunderdifflinDashboard.tsx';
-import { RuffloIntelligence } from './components/RuffloIntelligence.tsx';
+const ModalManager = lazy(() => import('./components/ModalManager.tsx').then(({ ModalManager }) => ({ default: ModalManager })));
+const DepartmentHubView = lazy(() => import('./components/DepartmentHubView.tsx').then(({ DepartmentHubView }) => ({ default: DepartmentHubView })));
+const MunderdifflinDashboard = lazy(() => import('./components/MunderdifflinDashboard.tsx').then(({ MunderdifflinDashboard }) => ({ default: MunderdifflinDashboard })));
+const RuffloIntelligence = lazy(() => import('./components/RuffloIntelligence.tsx').then(({ RuffloIntelligence }) => ({ default: RuffloIntelligence })));
+const CommandCenter = lazy(() => import('./components/CommandCenter.tsx').then(({ CommandCenter }) => ({ default: CommandCenter })));
 import { SmartTaskSuggestion } from './utils/smartTaskSuggestions.ts';
 import { SmartSuggestionTooltip } from './components/SmartSuggestionTooltip.tsx';
-import { VirtualCorporationView } from './components/corporation/VirtualCorporationView.tsx';
+const VirtualCorporationView = lazy(() => import('./components/corporation/VirtualCorporationView.tsx').then(({ VirtualCorporationView }) => ({ default: VirtualCorporationView })));
 import { initializeSystemRuntime, sendAndApplySystemCode } from './utils/systemRuntime.ts';
 import { Zap } from 'lucide-react';
-import { VoiceWaveform } from './components/VoiceWaveform.tsx';
 import {
   initializeAgentQuantumState,
   runQuantumModelForTask,
@@ -129,8 +129,16 @@ export default function App() {
   });
 
   const [autoMode, setAutoMode] = useState<boolean>(true);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return localStorage.getItem('rufflo_theme') === 'dark' ? 'dark' : 'light';
+  });
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem('rufflo_theme', theme);
+  }, [theme]);
 
   // Centralized Modal Management
   const [modalState, setModalState] = useState<ModalManagerState>({
@@ -1535,85 +1543,95 @@ export default function App() {
 
                   {activeDepartment === "Munderdifflin" ? (
                     <div className="flex-1 min-h-0 mt-4 rounded-xl border border-white/10 shadow-lg overflow-hidden">
-                      <MunderdifflinDashboard
-                        agents={agents}
-                        tasks={tasks}
-                        onAddTask={handleAddTask}
-                        onAddAgent={handleAddAgent}
-                      />
+                      <Suspense fallback={<div className="p-4 text-sm text-zinc-400">Loading dashboard...</div>}>
+                        <MunderdifflinDashboard
+                          agents={agents}
+                          tasks={tasks}
+                          onAddTask={handleAddTask}
+                          onAddAgent={handleAddAgent}
+                        />
+                      </Suspense>
                     </div>
                   ) : activeDepartment !== "Overview" ? (
                     <div style={{ marginBottom: 24 }}>
-                      <DepartmentHubView
-                        departmentName={activeDepartment}
-                        departmentKey={departmentsList.find(d => d[0] === activeDepartment)?.[3] || 'executive'}
-                        departmentColor={getAgentColor(departmentsList.find(d => d[0] === activeDepartment)?.[3] || '')}
-                        departmentSymbol={departmentsList.find(d => d[0] === activeDepartment)?.[1] || '⌘'}
-                        agents={agents}
-                        tasks={tasks}
-                        onSelectAgent={(id) => {
-                          setSelectedAgentId(id);
-                        }}
-                        onOpenAgentDetail={(id) => {
-                          setSelectedAgentId(id);
-                          openModal('isAgentDetailOpen');
-                        }}
-                        onExecutePrompt={handleExecutePrompt}
-                        onBackToOverview={() => setActiveDepartment('Overview')}
-                      />
+                      <Suspense fallback={<div className="p-4 text-sm text-zinc-400">Loading department...</div>}>
+                        <DepartmentHubView
+                          departmentName={activeDepartment}
+                          departmentKey={departmentsList.find(d => d[0] === activeDepartment)?.[3] || 'executive'}
+                          departmentColor={getAgentColor(departmentsList.find(d => d[0] === activeDepartment)?.[3] || '')}
+                          departmentSymbol={departmentsList.find(d => d[0] === activeDepartment)?.[1] || '⌘'}
+                          agents={agents}
+                          tasks={tasks}
+                          onSelectAgent={(id) => {
+                            setSelectedAgentId(id);
+                          }}
+                          onOpenAgentDetail={(id) => {
+                            setSelectedAgentId(id);
+                            openModal('isAgentDetailOpen');
+                          }}
+                          onExecutePrompt={handleExecutePrompt}
+                          onBackToOverview={() => setActiveDepartment('Overview')}
+                        />
+                      </Suspense>
                     </div>
                   ) : workspaceTab === 'command' ? (
                     <div className="flex-1 min-h-0 flex flex-col gap-6">
-                      <RuffloIntelligence
-                        userProfile={userProfile}
-                        agents={agents}
-                        tasks={tasks}
-                        onAddTask={handleAddTask}
-                        onUpdateTask={(task) => {
-                          setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
-                        }}
-                        onAddLog={(log) => {
-                          const newLog = {
-                            id: log.id || `log-intel-${Date.now()}`,
-                            timestamp: log.timestamp || new Date().toLocaleTimeString(),
-                            level: log.level || 'info',
-                            agentId: log.agentId || 'scott',
-                            message: log.message || '',
-                          };
-                          setLogs((prev) => prev.some(l => l.id === newLog.id) ? prev : [newLog, ...prev]);
-                        }}
-                      />
+                      <Suspense fallback={<div className="p-4 text-sm text-zinc-400">Loading intelligence...</div>}>
+                        <RuffloIntelligence
+                          userProfile={userProfile}
+                          agents={agents}
+                          tasks={tasks}
+                          onAddTask={handleAddTask}
+                          onUpdateTask={(task) => {
+                            setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
+                          }}
+                          onAddLog={(log) => {
+                            const newLog = {
+                              id: log.id || `log-intel-${Date.now()}`,
+                              timestamp: log.timestamp || new Date().toLocaleTimeString(),
+                              level: log.level || 'info',
+                              agentId: log.agentId || 'scott',
+                              message: log.message || '',
+                            };
+                            setLogs((prev) => prev.some(l => l.id === newLog.id) ? prev : [newLog, ...prev]);
+                          }}
+                        />
+                      </Suspense>
                       {showOtherPanels && (
                         <div className="mt-6 border-t border-white/10 pt-6 animate-in">
                           <h3 className="text-sm font-semibold text-[#fabd2f] mb-4 uppercase tracking-wider flex items-center gap-2">
                             <span>⚙️</span> Advanced CommandCenter Console
                           </h3>
-                          <CommandCenter
-                            agents={agents}
-                            selectedAgent={selectedAgent}
-                            onSelectAgent={setSelectedAgentId}
-                            logs={logs}
-                            tasks={tasks}
-                            onAddTask={handleAddTask}
-                            onExecutePrompt={handleExecutePrompt}
-                            onExecuteCode={handleExecuteCode}
-                            onOpenIde={() => { closeAllModals(); openModal('isIdeOpen'); }}
-                            autoMode={autoMode}
-                            onToggleAutoMode={() => setAutoMode(!autoMode)}
-                            userProfile={userProfile}
-                            telemetry={telemetry}
-                            onSetWorkspaceTab={setWorkspaceTab}
-                            departments={departments}
-                            onOpenCrisisSimulation={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
-                            onOpenComposioHub={() => { closeAllModals(); openModal('isComposioHubOpen'); }}
-                          />
+                          <Suspense fallback={<div className="p-4 text-sm text-zinc-400">Loading command center...</div>}>
+                            <CommandCenter
+                              agents={agents}
+                              selectedAgent={selectedAgent}
+                              onSelectAgent={setSelectedAgentId}
+                              logs={logs}
+                              tasks={tasks}
+                              onAddTask={handleAddTask}
+                              onExecutePrompt={handleExecutePrompt}
+                              onExecuteCode={handleExecuteCode}
+                              onOpenIde={() => { closeAllModals(); openModal('isIdeOpen'); }}
+                              autoMode={autoMode}
+                              onToggleAutoMode={() => setAutoMode(!autoMode)}
+                              userProfile={userProfile}
+                              telemetry={telemetry}
+                              onSetWorkspaceTab={setWorkspaceTab}
+                              departments={departments}
+                              onOpenCrisisSimulation={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+                              onOpenComposioHub={() => { closeAllModals(); openModal('isComposioHubOpen'); }}
+                            />
+                          </Suspense>
 
                         </div>
                       )}
                     </div>
                   ) : workspaceTab === 'corporation' ? (
                     <div className="flex-1 min-h-[820px] flex flex-col rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#0d0f17]">
-                      <VirtualCorporationView />
+                      <Suspense fallback={<div className="p-4 text-sm text-zinc-400">Loading corporation view...</div>}>
+                        <VirtualCorporationView />
+                      </Suspense>
                     </div>
                   ) : workspaceTab === 'engineering' ? (
                     <div className="flex-1 flex flex-col gap-5">
@@ -2256,6 +2274,7 @@ export default function App() {
         <div>v4.0.0 · Secure Runtime</div>
       </footer>
 
+      <Suspense fallback={null}>
       <ModalManager
         state={modalState}
         onClose={closeModal}
@@ -2326,6 +2345,7 @@ export default function App() {
         executiveSummaryRun={executiveSummaryRun}
         executiveSummaryMarkdown={executiveSummaryMarkdown}
       />
+      </Suspense>
     </div>
   );
 }

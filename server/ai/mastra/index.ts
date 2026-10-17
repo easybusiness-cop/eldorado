@@ -16,8 +16,7 @@ export class MastraRuntime {
   public observability = productionMastraRuntime.observability;
   public router = productionMastraRuntime.router;
 
-  public executeTaskWithAgent(agentId: string, taskDescription: string) {
-    return productionMastraRuntime.executeTaskWithAgent(agentId, taskDescription);
+  public executeTaskWithAgent(agentId: string, taskDescription: string, organizationId = 'org-default') {
+    return productionMastraRuntime.executeTaskWithAgent(agentId, taskDescription, organizationId);
   }
 }
-

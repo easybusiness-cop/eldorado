@@ -5,39 +5,39 @@
    ========================================================= */
 :root {
   /* Surfaces */
-  --bg-0: #070708;
-  --bg-1: #0c0c0e;
-  --bg-2: #121216;
-  --bg-3: #18181e;
-  --bg-4: #1f1f27;
+  --bg-0: #f4f7fb;
+  --bg-1: #ffffff;
+  --bg-2: #f8fafc;
+  --bg-3: #f1f5f9;
+  --bg-4: #eaf0f7;
 
   /* Borders */
-  --border-0: rgba(255, 255, 255, 0.06);
-  --border-1: rgba(255, 255, 255, 0.10);
-  --border-2: rgba(255, 255, 255, 0.16);
-  --border-accent: rgba(250, 189, 47, 0.35);
+  --border-0: #e2e8f0;
+  --border-1: #d6deea;
+  --border-2: #b9c7d8;
+  --border-accent: rgba(37, 99, 235, 0.28);
 
   /* Text */
-  --text-0: #f4f1ea;
-  --text-1: #c8c2b6;
-  --text-2: #8a857c;
-  --text-3: #5c5852;
+  --text-0: #0f172a;
+  --text-1: #334155;
+  --text-2: #64748b;
+  --text-3: #94a3b8;
 
   /* Accents */
-  --accent: #fabd2f;
-  --accent-dim: rgba(250, 189, 47, 0.15);
-  --cyan: #38bdf8;
-  --green: #a3e635;
-  --red: #f87171;
-  --violet: #a78bfa;
-  --blue: #60a5fa;
+  --accent: #2563eb;
+  --accent-dim: #eff6ff;
+  --cyan: #0284c7;
+  --green: #059669;
+  --red: #dc2626;
+  --violet: #7c3aed;
+  --blue: #2563eb;
 
   /* Status */
-  --status-running: #38bdf8;
-  --status-ok: #a3e635;
-  --status-warn: #fabd2f;
-  --status-fail: #f87171;
-  --status-idle: #6b7280;
+  --status-running: #0284c7;
+  --status-ok: #059669;
+  --status-warn: #b45309;
+  --status-fail: #dc2626;
+  --status-idle: #94a3b8;
 
   /* Layout */
   --topbar-h: 56px;

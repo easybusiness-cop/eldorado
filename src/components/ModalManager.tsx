@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy as reactLazy, Suspense } from 'react';
 import {
   Agent,
   AgentLog,
@@ -7,40 +7,54 @@ import {
   UserProfile,
   AttachedFile,
 } from '../types';
-import { SearchModal } from './SearchModal';
-import { AuthModal } from './AuthModal';
-import { UserPreferencesDrawer } from './UserPreferencesDrawer';
-import { DynamicFeatures } from './DynamicFeatures';
-import { IdeModal } from './IdeModal';
-import { AgentCallModal } from './AgentCallModal';
-import { WebAccessModal } from './WebAccessModal';
-import { RepoExplorerModal } from './RepoExplorerModal';
-import { ContinuousDebuggerModal } from './ContinuousDebuggerModal';
-import { SystemModulesModal } from './SystemModulesModal';
-import { CseAgentAcademyModal } from './CseAgentAcademyModal';
-import { CompanyDatabaseModal } from './CompanyDatabaseModal';
-import { ExecutiveAnalyticsModal } from './ExecutiveAnalyticsModal';
-import { GoogleWorkspaceHub } from './GoogleWorkspaceHub';
-import { PublicApiHubModal } from './PublicApiHubModal';
-import { SocialPluginModal } from './SocialPluginModal';
-import { MasterSelfEvolutionModal } from './MasterSelfEvolutionModal';
-import { AdministratorOrchestratorModal } from './AdministratorOrchestratorModal';
-import { AgentDetailDrawer } from './AgentDetailDrawer';
-import { AgentWorkstationModal } from './AgentWorkstationModal';
-import { DeploymentPipelineModal } from './DeploymentPipelineModal';
-import { MunderdifflinDashboard } from './MunderdifflinDashboard';
-import { DynamicKnowledgeBaseModal } from './DynamicKnowledgeBaseModal';
-import { SupabaseDiagnosticModal } from './SupabaseDiagnosticModal';
-import { TelegramHubModal } from './TelegramHubModal';
-import { ExecutiveSummaryModal, CascadeRunData } from './ExecutiveSummaryModal';
-import { PredictiveLoadBalancerModal } from './PredictiveLoadBalancerModal';
-import { FirebaseCrashalystHub } from './FirebaseCrashalystHub';
-import { OpenWebUIModal } from './OpenWebUIModal';
-import { ComposioHubModal } from './ComposioHubModal';
-import { ApiGatewayMicroservicesModal } from './ApiGatewayMicroservicesModal';
+import type { CascadeRunData } from './ExecutiveSummaryModal';
 
-import { CrisisSimulationModal } from './CrisisSimulationModal';
+const SearchModal = lazy(() => import('./SearchModal').then(({ SearchModal }) => ({ default: SearchModal })));
+const AuthModal = lazy(() => import('./AuthModal').then(({ AuthModal }) => ({ default: AuthModal })));
+const UserPreferencesDrawer = lazy(() => import('./UserPreferencesDrawer').then(({ UserPreferencesDrawer }) => ({ default: UserPreferencesDrawer })));
+const DynamicFeatures = lazy(() => import('./DynamicFeatures').then(({ DynamicFeatures }) => ({ default: DynamicFeatures })));
+const IdeModal = lazy(() => import('./IdeModal').then(({ IdeModal }) => ({ default: IdeModal })));
+const AgentCallModal = lazy(() => import('./AgentCallModal').then(({ AgentCallModal }) => ({ default: AgentCallModal })));
+const WebAccessModal = lazy(() => import('./WebAccessModal').then(({ WebAccessModal }) => ({ default: WebAccessModal })));
+const RepoExplorerModal = lazy(() => import('./RepoExplorerModal').then(({ RepoExplorerModal }) => ({ default: RepoExplorerModal })));
+const ContinuousDebuggerModal = lazy(() => import('./ContinuousDebuggerModal').then(({ ContinuousDebuggerModal }) => ({ default: ContinuousDebuggerModal })));
+const SystemModulesModal = lazy(() => import('./SystemModulesModal').then(({ SystemModulesModal }) => ({ default: SystemModulesModal })));
+const CseAgentAcademyModal = lazy(() => import('./CseAgentAcademyModal').then(({ CseAgentAcademyModal }) => ({ default: CseAgentAcademyModal })));
+const CompanyDatabaseModal = lazy(() => import('./CompanyDatabaseModal').then(({ CompanyDatabaseModal }) => ({ default: CompanyDatabaseModal })));
+const ExecutiveAnalyticsModal = lazy(() => import('./ExecutiveAnalyticsModal').then(({ ExecutiveAnalyticsModal }) => ({ default: ExecutiveAnalyticsModal })));
+const GoogleWorkspaceHub = lazy(() => import('./GoogleWorkspaceHub').then(({ GoogleWorkspaceHub }) => ({ default: GoogleWorkspaceHub })));
+const PublicApiHubModal = lazy(() => import('./PublicApiHubModal').then(({ PublicApiHubModal }) => ({ default: PublicApiHubModal })));
+const SocialPluginModal = lazy(() => import('./SocialPluginModal').then(({ SocialPluginModal }) => ({ default: SocialPluginModal })));
+const MasterSelfEvolutionModal = lazy(() => import('./MasterSelfEvolutionModal').then(({ MasterSelfEvolutionModal }) => ({ default: MasterSelfEvolutionModal })));
+const AdministratorOrchestratorModal = lazy(() => import('./AdministratorOrchestratorModal').then(({ AdministratorOrchestratorModal }) => ({ default: AdministratorOrchestratorModal })));
+const AgentDetailDrawer = lazy(() => import('./AgentDetailDrawer').then(({ AgentDetailDrawer }) => ({ default: AgentDetailDrawer })));
+const AgentWorkstationModal = lazy(() => import('./AgentWorkstationModal').then(({ AgentWorkstationModal }) => ({ default: AgentWorkstationModal })));
+const DeploymentPipelineModal = lazy(() => import('./DeploymentPipelineModal').then(({ DeploymentPipelineModal }) => ({ default: DeploymentPipelineModal })));
+const MunderdifflinDashboard = lazy(() => import('./MunderdifflinDashboard').then(({ MunderdifflinDashboard }) => ({ default: MunderdifflinDashboard })));
+const DynamicKnowledgeBaseModal = lazy(() => import('./DynamicKnowledgeBaseModal').then(({ DynamicKnowledgeBaseModal }) => ({ default: DynamicKnowledgeBaseModal })));
+const SupabaseDiagnosticModal = lazy(() => import('./SupabaseDiagnosticModal').then(({ SupabaseDiagnosticModal }) => ({ default: SupabaseDiagnosticModal })));
+const TelegramHubModal = lazy(() => import('./TelegramHubModal').then(({ TelegramHubModal }) => ({ default: TelegramHubModal })));
+const ExecutiveSummaryModal = lazy(() => import('./ExecutiveSummaryModal').then(({ ExecutiveSummaryModal }) => ({ default: ExecutiveSummaryModal })));
+const PredictiveLoadBalancerModal = lazy(() => import('./PredictiveLoadBalancerModal').then(({ PredictiveLoadBalancerModal }) => ({ default: PredictiveLoadBalancerModal })));
+const FirebaseCrashalystHub = lazy(() => import('./FirebaseCrashalystHub').then(({ FirebaseCrashalystHub }) => ({ default: FirebaseCrashalystHub })));
+const OpenWebUIModal = lazy(() => import('./OpenWebUIModal').then(({ OpenWebUIModal }) => ({ default: OpenWebUIModal })));
+const ComposioHubModal = lazy(() => import('./ComposioHubModal').then(({ ComposioHubModal }) => ({ default: ComposioHubModal })));
+const ApiGatewayMicroservicesModal = lazy(() => import('./ApiGatewayMicroservicesModal').then(({ ApiGatewayMicroservicesModal }) => ({ default: ApiGatewayMicroservicesModal })));
+const CrisisSimulationModal = lazy(() => import('./CrisisSimulationModal').then(({ CrisisSimulationModal }) => ({ default: CrisisSimulationModal })));
 import { Zap } from 'lucide-react';
+
+function lazy<P extends object>(
+  load: () => Promise<{ default: React.ComponentType<P> }>,
+) {
+  const Component = reactLazy(load);
+  return function LazyModal(props: P) {
+    return (
+      <Suspense fallback={null}>
+        <Component {...props} />
+      </Suspense>
+    );
+  };
+}
 
 export interface ModalManagerState {
   isComposioHubOpen?: boolean;

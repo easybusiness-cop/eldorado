@@ -465,21 +465,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
           {/* Mega Menu Dropdown */}
           {menuOpen && (
             <div
-              className="animate-in fade-in zoom-in-95 duration-150"
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: 'calc(100% + 8px)',
-                width: 'min(92vw, 820px)',
-                maxHeight: '80vh',
-                overflowY: 'auto',
-                background: '#090d16',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
-                padding: '18px',
-                zIndex: 100,
-              }}
+              className="module-catalog animate-in fade-in zoom-in-95 duration-150"
             >
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
                 <div className="flex items-center gap-2">

@@ -1054,6 +1054,7 @@ export class CorporationStore {
       this.isDirty = false;
     } catch (err) {
       console.error('[CorporationStore] Failed to save to disk:', err);
+      throw new Error('Failed to persist the corporation database.', { cause: err });
     }
   }
 

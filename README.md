@@ -134,16 +134,15 @@ Located in `server/core/autonomy/corporate-cascade.engine.ts`, this mimics an en
 
 ### 3.5. Continuous Discovery & Unlimited Intelligence Engine
 Located in `server/ai/company/knowledge/discovery.engine.ts`, this provides unprompted market and technological awareness:
-- **6 Active Intelligence Sources**:
-  1. *Google Search Grounding (Live)* via Gemini Search tools.
-  2. *arXiv CS.AI & CS.MA Preprints* for multi-agent system breakthroughs.
-  3. *Hacker News Algolia Tech Index* for viral developer tooling.
-  4. *Wikipedia Open Knowledge Graph* for theoretical foundations.
-  5. *GitHub Trending & Releases* for framework releases.
-  6. *Enterprise AI & Market Radar* for industry venture and adoption trends.
-- **Continuous Background Loop**: Automatically triggers every 5 minutes.
+- **Live Intelligence Sources**:
+  1. *Google Search Grounding* via Gemini Search tools when configured.
+  2. *Hacker News Algolia* for live technology stories.
+  3. *arXiv CS.AI and CS.SE API* for computer science preprints.
+  4. *BrowserService* for fetching and enriching discovered source pages.
+- **Continuous Background Loop**: Runs one online discovery scan every minute, rotating between technology, research papers, and market developments (a complete category cycle takes about 3 minutes). Offline or empty searches return no new findings rather than synthetic articles.
 - **Proactive Research Pipeline (`ResearchManager`)**: When discoveries are registered, the system queues proactive deep research, dispatching researcher agents to scrape URLs via `BrowserService` without requiring user confirmation.
 - **Autonomous Knowledge Distribution (`KnowledgeDistribution`)**: Extracts actionable concepts and automatically injects them into the skills and memories of relevant employees across the company.
+- **Engineering Guardrail**: Research updates agent knowledge and capabilities; source-code changes are made through explicit engineering/build tasks rather than rewriting the running agents on every scan.
 
 ### 3.6. Spider Web Task-Ring Engine & WebSocket Mesh
 Located in `server/spider/task-ring.ts`, this provides low-latency inter-agent communication:
@@ -327,6 +326,11 @@ The user interface provides instant access to all autonomous operations:
 - `POST /api/corporation/knowledge`: Record verified knowledge items with full provenance.
 - `GET /api/corporation/workflows`: Retrieve persistent multi-agent business process workflows.
 - `POST /api/corporation/workflows/:id/advance`: Advance or approve a workflow step.
+- `POST /api/corporation/workflows/:id/approval`: Record an explicit `approved` or `rejected` decision with rationale for a step requiring human approval.
+- `GET /api/corporation/incidents`: List local incident simulations and department work packets.
+- `POST /api/corporation/incidents/simulate`: Create the fixed synthetic credential-exposure tabletop exercise. Requires `{ "confirmedSimulation": true }`; it does not contact external systems or perform containment.
+- `POST /api/corporation/incidents/:id/steps/:stepId/complete`: Record 5–2,000 characters of redacted work evidence for the current assigned department packet.
+- `POST /api/corporation/incidents/:id/approval`: Approve or reject the simulation disposition with 5–2,000 characters of rationale.
 - `GET /api/corporation/decisions`: Retrieve all documented corporate decision records.
 - `POST /api/corporation/decisions`: Propose or execute an explicit structured decision.
 - `GET /api/corporation/failures`: Retrieve failure records with root causes and permanent prevention strategies.
@@ -342,6 +346,13 @@ The user interface provides instant access to all autonomous operations:
 - `POST /api/objectives/engineering`: Executes the 10-Agent Engineering Department autonomous construction lifecycle.
 - `POST /api/engineering/builder/build`: Direct invocation of the `SoftwareBuilder` pipeline.
   - *Payload*: `{ "objective": string, "language": "typescript"|"react"|"javascript", "outputDir"?: string }`
+
+### Agent Memory
+- `POST /api/agent/memory`: Explicitly save an agent-scoped memory. The authenticated organization is assigned by the server; client-supplied organization IDs are not accepted.
+  - *Payload*: `{ "agentId": string, "content": string, "tags"?: string[] }`
+- `POST /api/agent/memory/search`: Search memories by `query`; optionally restrict to an `agentId`. Without an agent ID, only company-scoped memories are searched.
+  - *Payload*: `{ "query": string, "agentId"?: string, "limit"?: number }`
+- `POST /api/agent/memory/quantum-search`: Compatibility alias for the ranked memory-search endpoint; returns ordinary retrieval scores, not quantum metrics.
 
 ### Meta-Agent & Self-Improvement
 - `GET /api/meta/observe`: Returns department health score, success rates, and detected weak agents.
@@ -381,6 +392,13 @@ Rufflo uses a dual-engine persistent storage architecture:
    - Provides relational persistence for fleet tasks, objectives, and audit trails when credentials are provided.
 3. **Episodic Knowledge Graph (`.rufflo-memory/knowledge-graph.json`)**:
    - Persists concept nodes, execution edges, and document links across agent sessions.
+4. **Agent Memory (`agent_memories`, `server/ai/mastra/memory`)**:
+   - Uses organization-scoped Supabase rows and PostgreSQL full-text indexes in production.
+   - Uses an atomically replaced, git-ignored `.rufflo-memory/agent-memories.json` file in local development; set `RUFFLO_MEMORY_FILE` to override its location.
+   - Search ranks actual text and tag matches (lexical retrieval, not embeddings). Each agent retains the latest 50 records per organization; company and department memories are isolated by organization.
+   - Memory content is secret-redacted before storage; production memory operations fail closed if server-side Supabase credentials are missing.
+   - Apply `supabase/migrations/20261018000000_agent_memories.sql` before enabling production memory.
+   - Run `npm run test:memory` to verify local persistence, relevance ranking, organization isolation, and secret redaction.
 
 ---
 
@@ -424,6 +442,8 @@ Runs the backend with tsx and Vite in middleware mode on port `3000`:
 ```bash
 npm run dev
 ```
+
+When opened in VS Code, the workspace also starts the development server automatically. Allow automatic tasks for this workspace when VS Code asks. To enable them later, run **Tasks: Manage Automatic Tasks in Folder** from the Command Palette and select **Allow Automatic Tasks**. The app URL only loads while the server is running; the folder-open task starts it and waits for the server health check before reporting ready.
 
 ### 3. Type Checking
 Verifies type safety across all TypeScript files:
