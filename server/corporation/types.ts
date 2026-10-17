@@ -278,12 +278,17 @@ export interface WorkflowStep {
   stepId: string;
   title: string;
   assigneeRole: string;
+  assigneeName?: string;
+  assigneeEmployeeId?: string;
   requiredCapability: string;
   departmentId: string;
   timeoutMs: number;
   requiresHumanApproval: boolean;
   dependencies: string[];
   compensationAction?: string;
+  taskDescription?: string;
+  acceptanceCriteria?: string[];
+  artifactPaths?: string[];
   status: 'pending' | 'running' | 'waiting_approval' | 'completed' | 'failed' | 'compensated';
   outputResult?: any;
 }
@@ -444,4 +449,3 @@ export interface CompanyOptimizationAudit {
   overallEfficiencyBoostPercent: number;
   items: IdentifiedInefficiency[];
 }
-

@@ -326,6 +326,11 @@ The user interface provides instant access to all autonomous operations:
 - `POST /api/corporation/knowledge`: Record verified knowledge items with full provenance.
 - `GET /api/corporation/workflows`: Retrieve persistent multi-agent business process workflows.
 - `POST /api/corporation/workflows/:id/advance`: Advance or approve a workflow step.
+- `POST /api/corporation/workflows/:id/approval`: Record an explicit `approved` or `rejected` decision with rationale for a step requiring human approval.
+- `GET /api/corporation/incidents`: List local incident simulations and department work packets.
+- `POST /api/corporation/incidents/simulate`: Create the fixed synthetic credential-exposure tabletop exercise. Requires `{ "confirmedSimulation": true }`; it does not contact external systems or perform containment.
+- `POST /api/corporation/incidents/:id/steps/:stepId/complete`: Record 5–2,000 characters of redacted work evidence for the current assigned department packet.
+- `POST /api/corporation/incidents/:id/approval`: Approve or reject the simulation disposition with 5–2,000 characters of rationale.
 - `GET /api/corporation/decisions`: Retrieve all documented corporate decision records.
 - `POST /api/corporation/decisions`: Propose or execute an explicit structured decision.
 - `GET /api/corporation/failures`: Retrieve failure records with root causes and permanent prevention strategies.
