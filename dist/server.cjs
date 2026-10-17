@@ -30819,6 +30819,7 @@ var CorporationStore = class _CorporationStore {
       this.isDirty = false;
     } catch (err) {
       console.error("[CorporationStore] Failed to save to disk:", err);
+      throw new Error("Failed to persist the corporation database.", { cause: err });
     }
   }
   loadFromDisk() {
@@ -32174,6 +32175,247 @@ Metrics: ${beforeMetric} -> ${afterMetric}`,
 var corporateOptimizer = CorporateOptimizerService.getInstance();
 
 // server/routes/corporation.routes.ts
+var import_node_crypto19 = require("node:crypto");
+
+// server/incidents/incident-response.ts
+var import_node_crypto18 = require("node:crypto");
+var INCIDENT_STEPS = [
+  {
+    title: "Correlate local threat intelligence",
+    departmentId: "dept-corp-intel",
+    requiredCapability: "threat_intelligence",
+    taskDescription: "Review only the synthetic alert and locally available evidence; identify confirmed facts, unknowns, and scope.",
+    acceptanceCriteria: ["Separate observed facts from assumptions", "Do not browse external sources or contact third parties"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Assess severity and recommend containment",
+    departmentId: "dept-sec",
+    requiredCapability: "incident_triage",
+    taskDescription: "Classify the synthetic credential-exposure alert and document a reversible containment recommendation.",
+    acceptanceCriteria: ["Record severity and rationale", "Do not revoke credentials or change network access"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Implement and test local incident tooling",
+    departmentId: "dept-eng",
+    requiredCapability: "software_development",
+    taskDescription: "Implement deterministic incident-response task assignment, evidence recording, secret redaction, and approval gates.",
+    acceptanceCriteria: ["Type-check the implementation", "Test sequential task transitions and the executive approval gate"],
+    artifactPaths: ["server/incidents/incident-response.ts", "tests/incident-response.test.ts"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Review AI and model-routing telemetry",
+    departmentId: "dept-ai",
+    requiredCapability: "model_observability",
+    taskDescription: "Assess the supplied local model/provider status and list relevant gaps without inferring a compromise.",
+    acceptanceCriteria: ["Use only collected local status evidence", "Do not invoke unavailable providers or external APIs"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Prepare service-recovery runbook",
+    departmentId: "dept-cloud",
+    requiredCapability: "site_reliability",
+    taskDescription: "Prepare a local-only containment and recovery checklist; distinguish recommendations from executed operations.",
+    acceptanceCriteria: ["Document rollback and verification checks", "Do not access cloud accounts or deploy changes"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Assess financial impact",
+    departmentId: "dept-fin",
+    requiredCapability: "financial_analysis",
+    taskDescription: "Identify which financial facts are needed to assess exposure; report unknown values as unknown.",
+    acceptanceCriteria: ["Do not fabricate loss estimates or modify ledgers", "List required evidence for any estimate"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Review privacy and personnel impact",
+    departmentId: "dept-hr",
+    requiredCapability: "privacy_compliance",
+    taskDescription: "Determine what minimum personnel or privacy review would be appropriate for the synthetic event.",
+    acceptanceCriteria: ["Do not include real personal data", "Do not notify or contact employees"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Draft internal incident update",
+    departmentId: "dept-mkt",
+    requiredCapability: "incident_communications",
+    taskDescription: "Prepare an internal-only status draft that clearly marks unknowns and is not sent.",
+    acceptanceCriteria: ["Label the message as a draft", "Do not publish or send communications"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Identify customer-impact checks",
+    departmentId: "dept-sales",
+    requiredCapability: "customer_impact_analysis",
+    taskDescription: "Specify a customer-impact review checklist without querying accounts or contacting customers.",
+    acceptanceCriteria: ["Use no customer records", "Do not send customer communications"],
+    requiresHumanApproval: false
+  },
+  {
+    title: "Approve incident disposition",
+    departmentId: "dept-exec",
+    requiredCapability: "incident_approval",
+    taskDescription: "Review the recorded work packets and explicitly approve or reject the proposed local incident disposition.",
+    acceptanceCriteria: ["Record an explicit human decision", "Approval does not authorize external action or deployment"],
+    requiresHumanApproval: true
+  }
+];
+var IncidentWorkflowError = class extends Error {
+  constructor(message, statusCode, code) {
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+    this.name = "IncidentWorkflowError";
+  }
+};
+function createIncidentResponseSimulation(departments, options) {
+  const departmentById = new Map(departments.map((department) => [department.id, department]));
+  const now = options.now ?? (/* @__PURE__ */ new Date()).toISOString();
+  const steps = INCIDENT_STEPS.map((definition, index) => {
+    const department = departmentById.get(definition.departmentId);
+    if (!department) {
+      throw new IncidentWorkflowError(
+        `Required incident-response department is missing: ${definition.departmentId}`,
+        503,
+        "INCIDENT_DEPARTMENT_UNAVAILABLE"
+      );
+    }
+    const employeeId = department.headOfDepartmentId;
+    return {
+      stepId: `incident-step-${index + 1}`,
+      title: definition.title,
+      assigneeRole: department.headRole,
+      assigneeName: department.headName,
+      assigneeEmployeeId: employeeId || void 0,
+      requiredCapability: definition.requiredCapability,
+      departmentId: department.id,
+      timeoutMs: 60 * 60 * 1e3,
+      requiresHumanApproval: definition.requiresHumanApproval,
+      dependencies: index === 0 ? [] : [`incident-step-${index}`],
+      taskDescription: definition.taskDescription,
+      acceptanceCriteria: definition.acceptanceCriteria,
+      artifactPaths: definition.artifactPaths,
+      status: index === 0 ? "running" : "pending"
+    };
+  });
+  return {
+    id: options.id,
+    definitionName: "Incident Response Simulation: Synthetic Credential Exposure",
+    category: "security",
+    description: "Local tabletop exercise using a synthetic alert. No real credential, customer, vendor, cloud account, or external system is involved.",
+    initiatorEmployeeId: "emp-michael",
+    currentStepIndex: 0,
+    status: "running",
+    steps,
+    startedAt: now,
+    auditTrail: [
+      {
+        timestamp: now,
+        event: "Synthetic local incident simulation created; no external actions were authorized or executed.",
+        actor: "operator"
+      }
+    ]
+  };
+}
+function recordIncidentStepEvidence(workflow, stepId, evidence, now = (/* @__PURE__ */ new Date()).toISOString()) {
+  assertIncidentWorkflow(workflow);
+  const safeEvidence = typeof evidence === "string" ? evidence.trim() : "";
+  if (safeEvidence.length < 5 || safeEvidence.length > 2e3) {
+    throw new IncidentWorkflowError(
+      "Evidence must contain between 5 and 2,000 characters.",
+      400,
+      "INCIDENT_EVIDENCE_INVALID"
+    );
+  }
+  const currentStep = workflow.steps[workflow.currentStepIndex];
+  if (!currentStep || currentStep.stepId !== stepId) {
+    throw new IncidentWorkflowError("Only the current assigned work packet may be completed.", 409, "INCIDENT_STEP_OUT_OF_ORDER");
+  }
+  if (currentStep.requiresHumanApproval || workflow.status === "waiting_approval") {
+    throw new IncidentWorkflowError("This step requires an explicit human approval decision.", 409, "INCIDENT_APPROVAL_REQUIRED");
+  }
+  if (workflow.status !== "running") {
+    throw new IncidentWorkflowError("Incident workflow is not accepting work evidence.", 409, "INCIDENT_NOT_RUNNING");
+  }
+  const redactedEvidence = SecuritySecretService.redact(safeEvidence);
+  const next = structuredClone(workflow);
+  const completedStep = next.steps[next.currentStepIndex];
+  completedStep.status = "completed";
+  completedStep.outputResult = {
+    evidenceSummary: redactedEvidence,
+    evidenceSha256: (0, import_node_crypto18.createHash)("sha256").update(redactedEvidence).digest("hex"),
+    recordedAt: now,
+    recordedBy: "Local Operator"
+  };
+  next.auditTrail.push({
+    timestamp: now,
+    event: `Work evidence recorded for "${completedStep.title}" by Local Operator`,
+    actor: "local-operator"
+  });
+  next.currentStepIndex += 1;
+  const nextStep = next.steps[next.currentStepIndex];
+  if (!nextStep) {
+    next.status = "completed";
+    next.completedAt = now;
+    next.auditTrail.push({
+      timestamp: now,
+      event: "Incident-response simulation completed all work packets.",
+      actor: "system"
+    });
+  } else if (nextStep.requiresHumanApproval) {
+    nextStep.status = "waiting_approval";
+    next.status = "waiting_approval";
+  } else {
+    nextStep.status = "running";
+  }
+  return next;
+}
+function decideIncidentApproval(workflow, decision, notes, now = (/* @__PURE__ */ new Date()).toISOString()) {
+  assertIncidentWorkflow(workflow);
+  if (workflow.status !== "waiting_approval") {
+    throw new IncidentWorkflowError("Incident workflow is not waiting for approval.", 409, "INCIDENT_NOT_AWAITING_APPROVAL");
+  }
+  const currentStep = workflow.steps[workflow.currentStepIndex];
+  if (!currentStep?.requiresHumanApproval || currentStep.status !== "waiting_approval") {
+    throw new IncidentWorkflowError("No human approval is pending for this incident.", 409, "INCIDENT_APPROVAL_NOT_PENDING");
+  }
+  const next = structuredClone(workflow);
+  const approvalStep = next.steps[next.currentStepIndex];
+  approvalStep.status = decision === "approved" ? "completed" : "failed";
+  approvalStep.outputResult = {
+    decision,
+    notes: SecuritySecretService.redact(notes.trim()).slice(0, 2e3),
+    recordedAt: now
+  };
+  next.auditTrail.push({
+    timestamp: now,
+    event: `Human ${decision} incident disposition at "${approvalStep.title}".`,
+    actor: "operator"
+  });
+  if (decision === "rejected") {
+    next.status = "failed";
+    next.completedAt = now;
+    return next;
+  }
+  next.currentStepIndex += 1;
+  next.status = "completed";
+  next.completedAt = now;
+  next.auditTrail.push({
+    timestamp: now,
+    event: "Incident-response simulation completed after explicit human approval.",
+    actor: "system"
+  });
+  return next;
+}
+function assertIncidentWorkflow(workflow) {
+  if (!workflow.id.startsWith("sim-incident-")) {
+    throw new IncidentWorkflowError("This operation is limited to local incident simulations.", 400, "INCIDENT_SIMULATION_ONLY");
+  }
+}
+
+// server/routes/corporation.routes.ts
 var router2 = (0, import_express27.Router)();
 router2.get("/overview", (req, res) => {
   try {
@@ -32544,39 +32786,273 @@ router2.get("/workflows", (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+router2.get("/incidents", (_req, res) => {
+  const incidents = Array.from(corporationStore.workflows.values()).filter((workflow) => workflow.id.startsWith("sim-incident-")).sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+  res.json({ success: true, incidents });
+});
+router2.post("/incidents/simulate", (req, res) => {
+  if (req.body?.confirmedSimulation !== true) {
+    return res.status(400).json({
+      success: false,
+      code: "SIMULATION_CONFIRMATION_REQUIRED",
+      error: "Set confirmedSimulation=true to create the local synthetic incident exercise."
+    });
+  }
+  let incident;
+  try {
+    incident = createIncidentResponseSimulation(
+      Array.from(corporationStore.departments.values()),
+      { id: `sim-incident-${(0, import_node_crypto19.randomUUID)()}` }
+    );
+  } catch (error) {
+    if (error instanceof IncidentWorkflowError) {
+      return res.status(error.statusCode).json({ success: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+  const auditLogBeforeCreate = corporationStore.auditLog.slice();
+  corporationStore.workflows.set(incident.id, incident);
+  try {
+    corporationStore.recordAudit({
+      who: "Local Operator",
+      what: `Created local incident simulation ${incident.id}`,
+      why: "Operator-confirmed synthetic incident tabletop exercise",
+      withWhichTool: "incident-response-simulation",
+      usingWhichAuthorization: "local-development-operator",
+      withWhichInput: { simulation: true },
+      whatResulted: { workflowId: incident.id, assignedDepartments: incident.steps.length, externalActions: [] },
+      riskClassification: "LOW",
+      status: "allowed"
+    });
+  } catch (error) {
+    corporationStore.workflows.delete(incident.id);
+    corporationStore.auditLog = auditLogBeforeCreate;
+    throw error;
+  }
+  return res.status(201).json({
+    success: true,
+    simulation: true,
+    externalActions: [],
+    incident
+  });
+});
+router2.post("/incidents/:id/steps/:stepId/complete", (req, res) => {
+  const workflow = corporationStore.workflows.get(req.params.id);
+  if (!workflow) {
+    return res.status(404).json({ success: false, code: "INCIDENT_NOT_FOUND", error: "Incident simulation not found." });
+  }
+  try {
+    const next = recordIncidentStepEvidence(workflow, req.params.stepId, req.body?.evidence);
+    const auditLogBeforeUpdate = corporationStore.auditLog.slice();
+    corporationStore.workflows.set(next.id, next);
+    try {
+      corporationStore.recordAudit({
+        who: "Local Operator",
+        what: `Recorded evidence for incident ${next.id}`,
+        why: "Operator recorded evidence for the current department work packet",
+        withWhichTool: "incident-response-simulation",
+        usingWhichAuthorization: "local-development-operator",
+        withWhichInput: { incidentId: next.id, stepId: req.params.stepId },
+        whatResulted: { stepStatus: next.steps[next.currentStepIndex - 1]?.status },
+        riskClassification: "LOW",
+        status: "allowed"
+      });
+    } catch (error) {
+      corporationStore.workflows.set(workflow.id, workflow);
+      corporationStore.auditLog = auditLogBeforeUpdate;
+      throw error;
+    }
+    return res.json({ success: true, incident: next, externalActions: [] });
+  } catch (error) {
+    if (error instanceof IncidentWorkflowError) {
+      return res.status(error.statusCode).json({ success: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+});
+router2.post("/incidents/:id/approval", (req, res) => {
+  const workflow = corporationStore.workflows.get(req.params.id);
+  if (!workflow) {
+    return res.status(404).json({ success: false, code: "INCIDENT_NOT_FOUND", error: "Incident simulation not found." });
+  }
+  const decision = req.body?.decision;
+  if (decision !== "approved" && decision !== "rejected") {
+    return res.status(400).json({
+      success: false,
+      code: "INCIDENT_DECISION_INVALID",
+      error: "decision must be either 'approved' or 'rejected'."
+    });
+  }
+  if (typeof req.body?.notes !== "string" || req.body.notes.trim().length < 5 || req.body.notes.length > 2e3) {
+    return res.status(400).json({
+      success: false,
+      code: "INCIDENT_APPROVAL_NOTES_REQUIRED",
+      error: "Provide 5 to 2,000 characters of decision rationale."
+    });
+  }
+  try {
+    const next = decideIncidentApproval(workflow, decision, req.body.notes);
+    const auditLogBeforeUpdate = corporationStore.auditLog.slice();
+    corporationStore.workflows.set(next.id, next);
+    try {
+      corporationStore.recordAudit({
+        who: "Local Operator",
+        what: `${decision === "approved" ? "Approved" : "Rejected"} incident simulation ${next.id}`,
+        why: "Explicit human incident-disposition decision",
+        withWhichTool: "incident-response-simulation",
+        usingWhichAuthorization: "local-development-operator",
+        withWhichInput: { incidentId: next.id, decision },
+        whatResulted: { workflowStatus: next.status, externalActions: [] },
+        riskClassification: "LOW",
+        status: "allowed"
+      });
+    } catch (error) {
+      corporationStore.workflows.set(workflow.id, workflow);
+      corporationStore.auditLog = auditLogBeforeUpdate;
+      throw error;
+    }
+    return res.json({ success: true, incident: next, externalActions: [] });
+  } catch (error) {
+    if (error instanceof IncidentWorkflowError) {
+      return res.status(error.statusCode).json({ success: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+});
 router2.post("/workflows/:id/advance", (req, res) => {
   try {
     const wf = corporationStore.workflows.get(req.params.id);
     if (!wf) {
       return res.status(404).json({ success: false, error: "Workflow instance not found." });
     }
-    if (wf.currentStepIndex < wf.steps.length) {
-      const step = wf.steps[wf.currentStepIndex];
+    const updated = structuredClone(wf);
+    if (updated.currentStepIndex < updated.steps.length) {
+      const step = updated.steps[updated.currentStepIndex];
+      if (step.requiresHumanApproval || updated.status === "waiting_approval") {
+        return res.status(409).json({
+          success: false,
+          code: "WORKFLOW_APPROVAL_REQUIRED",
+          error: "This workflow step requires an explicit human approval decision."
+        });
+      }
       step.status = "completed";
       step.outputResult = { completedBy: step.assigneeRole, timestamp: (/* @__PURE__ */ new Date()).toISOString() };
-      wf.auditTrail.push({
+      updated.auditTrail.push({
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
         event: `Step "${step.title}" completed by ${step.assigneeRole}`,
         actor: step.assigneeRole
       });
-      wf.currentStepIndex += 1;
-      if (wf.currentStepIndex >= wf.steps.length) {
-        wf.status = "completed";
-        wf.completedAt = (/* @__PURE__ */ new Date()).toISOString();
-        wf.auditTrail.push({
+      updated.currentStepIndex += 1;
+      if (updated.currentStepIndex >= updated.steps.length) {
+        updated.status = "completed";
+        updated.completedAt = (/* @__PURE__ */ new Date()).toISOString();
+        updated.auditTrail.push({
           timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-          event: `Workflow "${wf.definitionName}" successfully completed all stages`,
+          event: `Workflow "${updated.definitionName}" successfully completed all stages`,
           actor: "system"
         });
       } else {
-        wf.steps[wf.currentStepIndex].status = "running";
+        const nextStep = updated.steps[updated.currentStepIndex];
+        if (nextStep.requiresHumanApproval) {
+          nextStep.status = "waiting_approval";
+          updated.status = "waiting_approval";
+        } else {
+          nextStep.status = "running";
+          updated.status = "running";
+        }
       }
     }
-    corporationStore.saveToDisk();
-    res.json({ success: true, workflow: wf });
+    const auditLogBeforeUpdate = corporationStore.auditLog.slice();
+    corporationStore.workflows.set(updated.id, updated);
+    try {
+      corporationStore.recordAudit({
+        who: "Local Operator",
+        what: `Advanced workflow ${updated.id}`,
+        why: "Operator advanced the current workflow step",
+        withWhichTool: "workflow-advance",
+        usingWhichAuthorization: "local-operator",
+        withWhichInput: { workflowId: updated.id },
+        whatResulted: { workflowStatus: updated.status, currentStepIndex: updated.currentStepIndex },
+        riskClassification: "LOW",
+        status: "allowed"
+      });
+    } catch (error) {
+      corporationStore.workflows.set(wf.id, wf);
+      corporationStore.auditLog = auditLogBeforeUpdate;
+      throw error;
+    }
+    res.json({ success: true, workflow: updated });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+router2.post("/workflows/:id/approval", (req, res) => {
+  const workflow = corporationStore.workflows.get(req.params.id);
+  if (!workflow) {
+    return res.status(404).json({ success: false, error: "Workflow instance not found." });
+  }
+  const decision = req.body?.decision;
+  const notes = req.body?.notes;
+  if (decision !== "approved" && decision !== "rejected") {
+    return res.status(400).json({ success: false, error: "decision must be either 'approved' or 'rejected'." });
+  }
+  if (typeof notes !== "string" || notes.trim().length < 5 || notes.length > 2e3) {
+    return res.status(400).json({ success: false, error: "Approval rationale must contain 5 to 2,000 characters." });
+  }
+  const currentStep = workflow.steps[workflow.currentStepIndex];
+  if (workflow.status !== "waiting_approval" || !currentStep?.requiresHumanApproval || currentStep.status !== "waiting_approval") {
+    return res.status(409).json({
+      success: false,
+      code: "WORKFLOW_APPROVAL_NOT_PENDING",
+      error: "This workflow is not waiting for an explicit human approval decision."
+    });
+  }
+  const originalWorkflow = workflow;
+  const originalAuditLog = corporationStore.auditLog.slice();
+  const updated = structuredClone(workflow);
+  const approvalStep = updated.steps[updated.currentStepIndex];
+  const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+  const safeNotes = SecuritySecretService.redact(notes.trim());
+  approvalStep.status = decision === "approved" ? "completed" : "failed";
+  approvalStep.outputResult = { decision, notes: safeNotes, recordedAt: timestamp };
+  updated.auditTrail.push({
+    timestamp,
+    event: `Human ${decision} workflow step "${approvalStep.title}".`,
+    actor: "operator"
+  });
+  if (decision === "approved") {
+    updated.currentStepIndex += 1;
+    if (updated.currentStepIndex >= updated.steps.length) {
+      updated.status = "completed";
+      updated.completedAt = timestamp;
+    } else {
+      const nextStep = updated.steps[updated.currentStepIndex];
+      nextStep.status = nextStep.requiresHumanApproval ? "waiting_approval" : "running";
+      updated.status = nextStep.requiresHumanApproval ? "waiting_approval" : "running";
+    }
+  } else {
+    updated.status = "failed";
+    updated.completedAt = timestamp;
+  }
+  corporationStore.workflows.set(updated.id, updated);
+  try {
+    corporationStore.recordAudit({
+      who: "Local Operator",
+      what: `${decision === "approved" ? "Approved" : "Rejected"} workflow ${updated.id}`,
+      why: "Explicit human approval decision",
+      withWhichTool: "workflow-approval",
+      usingWhichAuthorization: "local-operator",
+      withWhichInput: { workflowId: updated.id, decision },
+      whatResulted: { workflowStatus: updated.status },
+      riskClassification: "LOW",
+      status: "allowed"
+    });
+  } catch (error) {
+    corporationStore.workflows.set(originalWorkflow.id, originalWorkflow);
+    corporationStore.auditLog = originalAuditLog;
+    throw error;
+  }
+  return res.json({ success: true, workflow: updated });
 });
 router2.get("/decisions", (req, res) => {
   try {
