@@ -48,3 +48,12 @@ export interface ModelProvider {
     onChunk: StreamCallback
   ): Promise<ModelGenerateResult>;
 }
+
+export class ModelProviderUnavailableError extends Error {
+  readonly code = "MODEL_PROVIDER_UNAVAILABLE";
+
+  constructor(message = "No configured real model provider is available. Configure Gemini or start Ollama.") {
+    super(message);
+    this.name = "ModelProviderUnavailableError";
+  }
+}

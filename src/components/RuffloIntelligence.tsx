@@ -34,10 +34,10 @@ import {
   Lock
 } from "lucide-react";
 import { UserProfile, FleetTask, Agent, AgentLog } from "../types";
-import { intelligenceService, QUANTUM_MODELS, IntelligenceModel } from "../utils/intelligenceService";
+import { intelligenceService } from "../utils/intelligenceService";
 import { recommendationService, RecommendedItem } from "../utils/recommendationService";
+import { getSupabaseAccessToken } from "../utils/workspaceAuth";
 import { ChatMarkdownRenderer } from "./chat/ChatMarkdownRenderer";
-import { IntermediateTaskExecutionCard, IntermediateTaskData, IntermediateSubtask } from "./chat/IntermediateTaskExecutionCard";
 import { ChatMessageActions } from "./chat/ChatMessageActions";
 
 export interface IntelligenceMessage {
@@ -45,30 +45,6 @@ export interface IntelligenceMessage {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: string;
-  analysis?: {
-    intent: string;
-    targetDepartment: string;
-    complexity: "low" | "medium" | "high" | "critical";
-    estimatedDuration: string;
-    toolsRequired: string[];
-    riskAssessment: "Safe" | "Elevated" | "Enterprise Restricted";
-  };
-  briefing?: {
-    id: string;
-    title: string;
-    summary: string;
-    subtasks: Array<{
-      id: string;
-      title: string;
-      description: string;
-      assignedTo: string;
-      priority: "low" | "medium" | "high" | "critical";
-      status: "queued" | "running" | "completed";
-      progress: number;
-    }>;
-    dispatchedToAdmin: boolean;
-    dispatchedAt?: string;
-  };
 }
 
 interface RuffloIntelligenceProps {
@@ -84,16 +60,13 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
   userProfile,
   agents,
   tasks,
-  onAddTask,
-  onUpdateTask,
-  onAddLog,
 }) => {
   const [messages, setMessages] = useState<IntelligenceMessage[]>([
     {
       id: "msg-welcome",
       role: "assistant",
       content:
-        "Welcome to **RUFFLO INTELLIGENCE** — the single unified autonomous AI engine for Rufflo Autonomous Company OS.\n\nI am your single primary intelligence bot. Give me any objective, coding requirement, deep web research task, or architectural directive. I will:\n1. **Analyze** your request and evaluate intent, scope, and tooling.\n2. **Synthesize & Summarize** an executive task briefing with structured subtasks.\n3. **Send to the Fleet Administrator** to execute and manage across our autonomous workforce.",
+        "Welcome to **RUFFLO INTELLIGENCE**. This chat can request a response from the configured model provider when the backend is available.\n\nChat responses are proposals, not completed work. This screen does not automatically dispatch tasks, change files, or perform external actions. Use an authorized execution workflow for operations; its permissions, approvals, and verification evidence determine whether a task is actually complete.",
       timestamp: new Date().toISOString(),
     },
   ]);
@@ -101,10 +74,8 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"workspace" | "admin_queue" | "fleet_logs">("workspace");
-  const [selectedModel, setSelectedModel] = useState("gemini-2.5-flash");
   const [recommendations, setRecommendations] = useState<RecommendedItem[]>([]);
   const [liveAdminTasks, setLiveAdminTasks] = useState<FleetTask[]>([]);
-  const [autoDispatch, setAutoDispatch] = useState(true);
   const [activeAnalysisStage, setActiveAnalysisStage] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -140,6 +111,20 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
     const promptToSend = customPrompt || input;
     if (!promptToSend.trim() || isLoading) return;
 
+    const accessToken = await getSupabaseAccessToken();
+    if (!accessToken) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `auth-required-${Date.now()}`,
+          role: "system",
+          content: "Sign in with your Supabase account from Account Profile before requesting an intelligence response.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      return;
+    }
+
     setInput("");
     const userMsgId = `user-${Date.now()}`;
     const userMsg: IntelligenceMessage = {
@@ -151,7 +136,7 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
 
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
-    setActiveAnalysisStage("Analyzing user intent and architectural scope...");
+    setActiveAnalysisStage("Requesting a response from the configured model provider...");
 
     // Log user event to telemetry
     recommendationService.trackEvent({
@@ -166,10 +151,6 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
     });
 
     try {
-      // Step 1: Deep Analysis & Synthesis via Quantum Intelligence Engine
-      await new Promise((res) => setTimeout(res, 400));
-      setActiveAnalysisStage("Synthesizing executive subtasks & department routing...");
-
       const assistantMsgId = `asst-${Date.now()}`;
       let streamingContent = "";
 
@@ -190,7 +171,6 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
           content: m.content,
           timestamp: m.timestamp,
         })),
-        model: selectedModel,
         onToken: (token) => {
           streamingContent += token;
           setMessages((prev) =>
@@ -200,103 +180,26 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
           );
         },
         onStepStart: (step) => {
-          setActiveAnalysisStage(`Quantum Reasoning: ${step.objective.slice(0, 60)}...`);
+          setActiveAnalysisStage(step.objective);
         },
       });
 
-      // Step 2: Generate Structured Executive Briefing & Subtasks
-      setActiveAnalysisStage("Compiling executive briefing for Administrator Scott...");
-      const briefing = await intelligenceService.generateBriefing(promptToSend, [
-        ...messages.map(m => ({ id: m.id, role: m.role, content: m.content, timestamp: m.timestamp })),
-        { id: userMsgId, role: userMsg.role, content: userMsg.content, timestamp: userMsg.timestamp },
-        { id: assistantMsgId, role: "assistant", content: streamingContent, timestamp: new Date().toISOString() },
-      ]);
-
-      const isWeb = promptToSend.toLowerCase().includes("browse") || promptToSend.toLowerCase().includes("web") || promptToSend.toLowerCase().includes("search");
-      const isCode = promptToSend.toLowerCase().includes("code") || promptToSend.toLowerCase().includes("build") || promptToSend.toLowerCase().includes("api");
-
-      const analysisObj = {
-        intent: promptToSend.slice(0, 80),
-        targetDepartment: isCode ? "Engineering & Core Systems" : isWeb ? "Global Research & Scraping" : "Strategic Operations",
-        complexity: promptToSend.length > 120 ? ("high" as const) : ("medium" as const),
-        estimatedDuration: isCode ? "3.5 hrs" : "45 mins",
-        toolsRequired: isWeb
-          ? ["Browser-Use (Playwright)", "DOM Extractor", "Search Grounding"]
-          : ["TypeScript Compiler", "API Gateway Proxy", "Message Broker"],
-        riskAssessment: "Safe" as const,
-      };
-
-      const structuredSubtasks = briefing?.subtasks?.map((st, i) => ({
-        id: st.id || `task-admin-${Date.now()}-${i}`,
-        title: st.title,
-        description: st.description || st.title,
-        assignedTo: st.assignedDepartment === "engineering" ? "Ruflo (Lead Engineer)" : "Michael Scott (Fleet Admin)",
-        priority: (st.priority as any) || "high",
-        status: "queued" as const,
-        progress: 0,
-      })) || [
-        {
-          id: `task-admin-${Date.now()}-1`,
-          title: `Execute Objective: ${promptToSend.slice(0, 40)}`,
-          description: `Full autonomous implementation and deployment based on Rufflo Intelligence briefing.`,
-          assignedTo: "Michael Scott (Fleet Admin)",
-          priority: "high" as const,
-          status: "queued" as const,
-          progress: 0,
-        },
-      ];
-
-      const briefingPayload = {
-        id: briefing?.id || `briefing-${Date.now()}`,
-        title: `Strategic Directive: ${promptToSend.slice(0, 45)}`,
-        summary: briefing?.overview || `Synthesized actionable execution plan for prompt: "${promptToSend}"`,
-        subtasks: structuredSubtasks,
-        dispatchedToAdmin: true,
-        dispatchedAt: new Date().toLocaleTimeString(),
-      };
-
-      // Update the assistant message with the complete analysis & briefing
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === assistantMsgId
-            ? {
-                ...msg,
-                analysis: analysisObj,
-                briefing: briefingPayload,
-              }
-            : msg
-        )
-      );
-
-      // Step 3: Automatically Dispatch Subtasks directly to the Administrator
-      if (autoDispatch) {
-        structuredSubtasks.forEach((subtask, idx) => {
-          const newTask: FleetTask = {
-            id: subtask.id,
-            title: subtask.title,
-            description: subtask.description,
-            assignedTo: subtask.assignedTo,
-            status: "queued",
-            progress: 0,
-            priority: subtask.priority,
-            createdAt: Date.now(),
-          };
-          onAddTask(newTask);
-        });
-
-        onAddLog?.({
-          id: `log-admin-${Date.now()}`,
-          agentId: "scott",
-          agentName: "Administrator (Michael Scott)",
-          message: `⚡ Dispatched from RUFFLO INTELLIGENCE: "${briefingPayload.title}" with ${structuredSubtasks.length} actionable subtasks.`,
-          level: "success",
-          type: "action",
-          timestamp: new Date().toLocaleTimeString(),
-        });
-      }
-
       setActiveAnalysisStage(null);
     } catch (err: any) {
+      if (String(err?.message || "").includes("AUTH_TOKEN_MISSING")) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.role === "assistant" && !message.content
+              ? {
+                  ...message,
+                  content: "Your Supabase session is missing or expired. Sign in again from Account Profile to continue.",
+                }
+              : message
+          )
+        );
+        setActiveAnalysisStage(null);
+        return;
+      }
       console.error("Rufflo Intelligence Error:", err);
       setMessages((prev) => [
         ...prev,
@@ -325,11 +228,11 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight text-white m-0">RUFFLO INTELLIGENCE</h1>
               <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded-full">
-                Unified Autonomous Engine
+                Model Response
               </span>
             </div>
             <p className="text-xs text-[#9ca3af] m-0">
-              Single intelligence bot: Analyzes & summarises objectives ➔ Dispatches to Fleet Administrator
+              Model responses are proposals; task execution requires a verified workflow.
             </p>
           </div>
         </div>
@@ -360,7 +263,7 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
           <div className="flex items-center gap-2 pl-3 border-l border-[#262b30]">
             <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Administrator: Online</span>
+              <span>Execution: Not started</span>
             </div>
           </div>
         </div>
@@ -404,102 +307,13 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
                     role={msg.role}
                   />
 
-                  {/* Intermediate Task Orchestration & Execution Card */}
-                  {(msg.briefing || msg.analysis) && (
-                    <IntermediateTaskExecutionCard
-                      taskData={{
-                        id: msg.briefing?.id || `task-${msg.id}`,
-                        title: msg.briefing?.title || msg.analysis?.intent || "Autonomous Task Execution",
-                        summary: msg.briefing?.summary || `Orchestrated ${msg.analysis?.complexity || 'standard'} objective across ${msg.analysis?.targetDepartment || 'fleet'} operations.`,
-                        targetDepartment: msg.analysis?.targetDepartment,
-                        complexity: msg.analysis?.complexity,
-                        estimatedDuration: msg.analysis?.estimatedDuration,
-                        toolsRequired: msg.analysis?.toolsRequired,
-                        subtasks: (msg.briefing?.subtasks || []).map(s => ({
-                          id: s.id,
-                          title: s.title,
-                          description: s.description,
-                          assignedTo: s.assignedTo,
-                          priority: s.priority,
-                          status: s.status,
-                          progress: s.progress,
-                        })),
-                        dispatchedToAdmin: msg.briefing?.dispatchedToAdmin ?? true,
-                        dispatchedAt: msg.briefing?.dispatchedAt,
-                      }}
-                      onExecuteSubtask={(subtask) => {
-                        onAddTask({
-                          id: subtask.id,
-                          title: subtask.title,
-                          description: subtask.description,
-                          assignedTo: subtask.assignedTo,
-                          status: "running",
-                          progress: 15,
-                          priority: subtask.priority,
-                          createdAt: Date.now(),
-                        });
-                        onAddLog?.({
-                          id: `log-${Date.now()}`,
-                          agentId: subtask.assignedTo,
-                          agentName: subtask.assignedTo,
-                          message: `▶ [Intermediate Exec] Started subtask: "${subtask.title}"`,
-                          level: "info",
-                          type: "action",
-                          timestamp: new Date().toLocaleTimeString(),
-                        });
-                      }}
-                      onExecuteAll={(taskData) => {
-                        taskData.subtasks.forEach((st) => {
-                          onAddTask({
-                            id: st.id,
-                            title: st.title,
-                            description: st.description,
-                            assignedTo: st.assignedTo,
-                            status: "running",
-                            progress: 10,
-                            priority: st.priority,
-                            createdAt: Date.now(),
-                          });
-                        });
-                        onAddLog?.({
-                          id: `log-all-${Date.now()}`,
-                          agentId: "scott",
-                          agentName: "Administrator (Michael Scott)",
-                          message: `⚡ [Intermediate Exec] Dispatched all ${taskData.subtasks.length} subtasks for "${taskData.title}" into workforce execution pipeline.`,
-                          level: "success",
-                          type: "action",
-                          timestamp: new Date().toLocaleTimeString(),
-                        });
-                      }}
-                      onOpenQueue={() => setActiveTab("admin_queue")}
-                    />
-                  )}
-
                   {/* Assistant Actions Bar (ChatGPT / Gemini style) */}
                   {msg.role === "assistant" && (
                     <ChatMessageActions
                       content={msg.content}
-                      modelName={selectedModel}
+                      modelName="Configured model provider"
                       timestamp={msg.timestamp}
                       onRegenerate={() => handleSend(messages[messages.length - 2]?.content || "Regenerate last response")}
-                      onDispatchTask={
-                        msg.briefing
-                          ? () => {
-                              msg.briefing?.subtasks.forEach((st) => {
-                                onAddTask({
-                                  id: `${st.id}-manual-${Date.now()}`,
-                                  title: st.title,
-                                  description: st.description,
-                                  assignedTo: st.assignedTo,
-                                  status: "queued",
-                                  progress: 0,
-                                  priority: st.priority,
-                                  createdAt: Date.now(),
-                                });
-                              });
-                            }
-                          : undefined
-                      }
                     />
                   )}
                 </div>
@@ -550,6 +364,9 @@ export const RuffloIntelligence: React.FC<RuffloIntelligenceProps> = ({
           >
             <div className="flex-1 relative">
               <textarea
+                id="rufflo-objective-input"
+                name="objective"
+                aria-label="Objective to analyze and send"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {

@@ -65,8 +65,6 @@ export class DiscoveryEngine {
 
   private constructor() {
     this.browserService = new BrowserService();
-    this.seedInitialDiscoveries();
-    // Rotate through research areas once per minute to keep online discovery current.
     this.startContinuousScanning(60_000);
   }
 
@@ -75,108 +73,6 @@ export class DiscoveryEngine {
       DiscoveryEngine.instance = new DiscoveryEngine();
     }
     return DiscoveryEngine.instance;
-  }
-
-  /**
-   * Seeds baseline high-density discoveries across technologies, research papers, and market developments.
-   */
-  private seedInitialDiscoveries() {
-    const seeds: Omit<TechDiscovery, "id" | "timestamp">[] = [
-      {
-        source: "arXiv CS.MA (Multi-Agent)",
-        category: "research_paper",
-        title: "Mixture of Specialists: Adaptive Multi-Agent Workforces for Dynamic Problem Solving",
-        url: "https://arxiv.org/abs/2609.12345",
-        summary: "Proposes a design pattern where AI agent topologies are synthesized on-the-fly depending on task metadata and required capabilities.",
-        keyFindings: [
-          "Dynamic role synthesis outperforms static monolithic agent teams by 42% on complex benchmarks",
-          "Automated capability registries allow on-demand agent commissioning without human oversight",
-          "Continuous feedback loops dynamically calibrate empirical skill scores",
-        ],
-        technologies: ["multi-agent", "agentic-workforce", "dynamic-synthesis", "role-registry"],
-        departments: ["research", "engineering"],
-        severity: "critical",
-        relevanceScore: 0.98,
-        status: "ingested",
-      },
-      {
-        source: "GitHub Framework Releases",
-        category: "technology",
-        title: "Vite v7.0.0 released with native ESM bundling and zero-latency CSS pipelines",
-        url: "https://github.com/vitejs/vite/releases/tag/v7.0.0",
-        summary: "Vite 7 introduces ultra-fast CSS compiling and dynamic asset pipeline optimization, cutting dev startup in half.",
-        keyFindings: [
-          "50% reduction in cold server boot time",
-          "Direct CommonJS and ESM hybrid boundary tree-shaking",
-          "Improved HMR event bus handling with zero state loss",
-        ],
-        technologies: ["vite", "frontend", "esm", "build-tooling"],
-        departments: ["engineering"],
-        severity: "important",
-        relevanceScore: 0.92,
-        status: "ingested",
-      },
-      {
-        source: "Enterprise AI Radar",
-        category: "market_development",
-        title: "Autonomous Corporate Workforces: Enterprise Shift from Single Agents to Swarm Hierarchies",
-        url: "https://techradar.corp/market/autonomous-workforce-2026",
-        summary: "Fortune 500 enterprises are adopting multi-department virtual agent cascades with autonomous Heads of Department.",
-        keyFindings: [
-          "Organizations with decentralized AI departments report 3x faster task execution",
-          "Autonomous knowledge discovery engines provide competitive edge by removing permission bottlenecks",
-          "Corporate cascade architectures replace manual prompt chaining",
-        ],
-        technologies: ["corporate-cascade", "workforce-orchestration", "enterprise-ai"],
-        departments: ["operations", "marketing", "research"],
-        severity: "important",
-        relevanceScore: 0.95,
-        status: "ingested",
-      },
-      {
-        source: "arXiv CS.SE (Software Engineering)",
-        category: "research_paper",
-        title: "Self-Healing Code Synthesis: Integrating Real-Time Linters with AST-Guided Memory",
-        url: "https://arxiv.org/abs/2608.09876",
-        summary: "Formalizes closed-loop code generation where compilation diagnostic feedback triggers immediate automated surgical diff corrections.",
-        keyFindings: [
-          "Closed-loop linter feedback achieves 96% first-pass pass rate",
-          "Reduces multi-turn token consumption by 65%",
-          "Self-correcting AST mutations eliminate invalid import and syntax errors",
-        ],
-        technologies: ["self-healing-code", "ast-guided", "linter-feedback"],
-        departments: ["engineering", "research"],
-        severity: "critical",
-        relevanceScore: 0.96,
-        status: "ingested",
-      },
-      {
-        source: "Cloud Infrastructure Journal",
-        category: "market_development",
-        title: "Scale-to-Zero Relational Database Architectures Dominate Serverless Agent Ecosystems",
-        url: "https://cloudjournal.ai/market/serverless-relational-2026",
-        summary: "Near-instant provisioning and sub-second cold starts establish Cloud SQL and serverless Postgres as the gold standard for agent memory.",
-        keyFindings: [
-          "Scale-to-zero cuts idling costs by 80% for sporadic background agents",
-          "PostgreSQL pgvector extension enables zero-infrastructure semantic retrieval",
-          "Integrated OAuth token acquisition streamlines secure database connectivity",
-        ],
-        technologies: ["cloudsql", "postgresql", "serverless", "vector-store"],
-        departments: ["engineering", "operations"],
-        severity: "info",
-        relevanceScore: 0.88,
-        status: "ingested",
-      },
-    ];
-
-    for (const seed of seeds) {
-      const discovery: TechDiscovery = {
-        ...seed,
-        id: `disc-${randomUUID().slice(0, 8)}`,
-        timestamp: new Date().toISOString(),
-      };
-      this.discoveries.push(discovery);
-    }
   }
 
   /**
@@ -323,7 +219,7 @@ export class DiscoveryEngine {
       try {
         console.log("[DiscoveryEngine] Invoking Gemini with Google Search Grounding tool...");
         const response = await geminiClient.models.generateContent({
-          model: "gemini-3.8-flash",
+          model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
           contents: `Search the live internet for recent breakthroughs, announcements, papers, or market developments related to: "${query}".
 Category: ${category}
 
@@ -348,19 +244,27 @@ Output strictly the JSON array, no extra text.`,
           const parsed = JSON.parse(jsonMatch[0]);
           if (Array.isArray(parsed)) {
             for (const item of parsed) {
-              if (item.title && !this.discoveries.some((d) => d.title.toLowerCase() === item.title.toLowerCase())) {
+              if (
+                typeof item?.title === "string"
+                && typeof item?.url === "string"
+                && typeof item?.summary === "string"
+                && item.title.trim()
+                && item.url.trim()
+                && !this.discoveries.some((d) => d.title.toLowerCase() === item.title.toLowerCase())
+              ) {
                 const disc: TechDiscovery = {
                   id: `disc-${randomUUID().slice(0, 8)}`,
-                  source: item.source || "Google Search Grounding",
+                  source: typeof item.source === "string" ? item.source : "Google Search Grounding",
                   category,
                   title: item.title,
-                  url: item.url || `https://search.google.com/?q=${encodeURIComponent(item.title)}`,
-                  summary: item.summary || `Intelligence gathered on ${item.title}`,
-                  keyFindings: item.keyFindings || [item.summary],
+                  url: item.url,
+                  summary: item.summary,
+                  keyFindings: Array.isArray(item.keyFindings) && item.keyFindings.every((finding: unknown) => typeof finding === "string")
+                    ? item.keyFindings
+                    : [item.summary],
                   technologies: Array.isArray(item.technologies) ? item.technologies : [category],
                   departments: this.inferDepartments(category, item.technologies || []),
-                  severity: item.severity || "important",
-                  relevanceScore: 0.95,
+                  severity: ["critical", "important", "info"].includes(item.severity) ? item.severity : "info",
                   searchQuery: query,
                   timestamp: new Date().toISOString(),
                   status: "discovered",

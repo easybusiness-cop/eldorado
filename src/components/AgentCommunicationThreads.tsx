@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Agent, InterAgentThread, InterAgentMessage, SkillMatrixCategory } from '../types.ts';
+import { Agent, InterAgentThread, InterAgentMessage } from '../types.ts';
 import { soundFx } from '../utils/speech.ts';
+import { getAvatarInitials, isLocalAvatar } from '../utils/avatar.ts';
 import { Atom, MessageSquare, Sparkles, Filter, Search, ChevronDown, ChevronUp, Copy, Check, Send, Users, Shield, TrendingUp, Zap } from 'lucide-react';
+
+type ThreadCategory = InterAgentThread['category'];
 
 interface AgentCommunicationThreadsProps {
   agents: Agent[];
@@ -413,25 +416,25 @@ export const AgentCommunicationThreads: React.FC<AgentCommunicationThreadsProps>
     const topics = [
       {
         topic: 'Q3 Paper Supply Chain Telemetry Audit',
-        cat: 'operations' as SkillMatrixCategory,
+        cat: 'operations' as ThreadCategory,
         q1: `Pinging @${a2.name}, our paper warehouse buffer is running at 94% utilization. Should we spin up cold storage archival?`,
         q2: `Logged. The cold storage cluster is primed. Routing the top 20 enterprise accounts through high-throughput cache.`,
       },
       {
         topic: 'Zero-Trust Host API Hardening',
-        cat: 'security' as SkillMatrixCategory,
+        cat: 'security' as ThreadCategory,
         q1: `Running automated port scan across branch workstations. Detected an unencrypted port 8080 forward on the annex router.`,
         q2: `Patched with TLS 1.3 mTLS certificate. Verification hashes match across all fleet nodes.`,
       },
       {
         topic: 'Cross-Department Revenue Model Synchronization',
-        cat: 'finance' as SkillMatrixCategory,
+        cat: 'finance' as ThreadCategory,
         q1: `Checking unit margins on the 500-sheet ream bundles. Net profit margin is up 3.4% post-automation.`,
         q2: `Reconciled in corporate general ledger. Allocating the margin dividend to fleet training compute.`,
       },
       {
         topic: 'Viral Growth & Client Conversion Funnel',
-        cat: 'marketing' as SkillMatrixCategory,
+        cat: 'marketing' as ThreadCategory,
         q1: `A/B testing two subject lines for the Scranton northeast regional school district pitch.`,
         q2: `Variant B has an 82% open rate. Deploying Variant B across the remaining 340 educational accounts.`,
       },
@@ -698,10 +701,10 @@ ${thread.quantumSynergy.decisionConsensus}
                       style={{ backgroundColor: thread.agent1Color }}
                       title={`${thread.agent1Name} (${thread.agent1Role})`}
                     >
-                      {thread.agent1Avatar && thread.agent1Avatar.startsWith('http') ? (
+                      {isLocalAvatar(thread.agent1Avatar) ? (
                         <img src={thread.agent1Avatar} alt={thread.agent1Name} className="w-full h-full object-cover" />
                       ) : (
-                        thread.agent1Name[0]
+                        getAvatarInitials(thread.agent1Name)
                       )}
                     </div>
                     <div
@@ -709,10 +712,10 @@ ${thread.quantumSynergy.decisionConsensus}
                       style={{ backgroundColor: thread.agent2Color }}
                       title={`${thread.agent2Name} (${thread.agent2Role})`}
                     >
-                      {thread.agent2Avatar && thread.agent2Avatar.startsWith('http') ? (
+                      {isLocalAvatar(thread.agent2Avatar) ? (
                         <img src={thread.agent2Avatar} alt={thread.agent2Name} className="w-full h-full object-cover" />
                       ) : (
-                        thread.agent2Name[0]
+                        getAvatarInitials(thread.agent2Name)
                       )}
                     </div>
                   </div>

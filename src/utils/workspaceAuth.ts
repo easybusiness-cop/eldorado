@@ -86,8 +86,8 @@ export const initWorkspaceAuth = (
   const checkSupabase = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.provider_token) {
-        cachedAccessToken = session.provider_token;
+      if (session?.access_token) {
+        cachedAccessToken = session.access_token;
         cachedUser = {
           uid: session.user.id,
           email: session.user.email,
@@ -134,8 +134,8 @@ export const initWorkspaceAuth = (
   });
 
   const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session?.provider_token) {
-      cachedAccessToken = session.provider_token;
+    if (session?.access_token) {
+      cachedAccessToken = session.access_token;
       cachedUser = {
         uid: session.user.id,
         email: session.user.email,
@@ -144,6 +144,10 @@ export const initWorkspaceAuth = (
         provider: 'supabase',
       };
       onAuthSuccess?.(cachedUser, cachedAccessToken);
+    } else if (cachedUser?.provider === 'supabase') {
+      cachedAccessToken = null;
+      cachedUser = null;
+      onAuthFailure?.();
     }
   });
 
@@ -222,31 +226,21 @@ export async function signInWithFirebaseExplicit(email: string, password?: strin
 }
 
 export async function signInWithSupabaseExplicit(email: string, password?: string): Promise<{ user: WorkspaceUser; accessToken: string }> {
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password: password || 'password123',
-    });
-    if (data?.session) {
-      cachedAccessToken = data.session.access_token;
-      cachedUser = {
-        uid: data.user.id,
-        email: data.user.email,
-        displayName: data.user.user_metadata?.full_name || email.split('@')[0],
-        provider: 'supabase',
-      };
-      return { user: cachedUser, accessToken: cachedAccessToken };
-    }
-  } catch (err) {
-    console.warn('Supabase password login notice, activating local session:', err);
+  if (!password) {
+    throw new Error('Enter your Supabase password to sign in.');
   }
 
-  cachedAccessToken = 'supabase-jwt-' + Date.now();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  if (!data.session || !data.user) {
+    throw new Error('Supabase Auth did not return a signed-in session.');
+  }
+
+  cachedAccessToken = data.session.access_token;
   cachedUser = {
-    uid: 'supabase-user-' + Date.now(),
-    email: email,
-    displayName: email.split('@')[0],
-    photoURL: 'https://supabase.com/favicon/favicon-32x32.png',
+    uid: data.user.id,
+    email: data.user.email,
+    displayName: data.user.user_metadata?.full_name || email.split('@')[0],
     provider: 'supabase',
   };
   return { user: cachedUser, accessToken: cachedAccessToken };
@@ -280,7 +274,31 @@ export async function getGoogleAccessToken(): Promise<string | null> {
 }
 
 export async function getSupabaseAccessToken(): Promise<string | null> {
-  return cachedAccessToken;
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    const session = data.session;
+
+    if (error || !session?.access_token) {
+      if (cachedUser?.provider === 'supabase') {
+        cachedAccessToken = null;
+        cachedUser = null;
+      }
+      return null;
+    }
+
+    cachedAccessToken = session.access_token;
+    cachedUser = {
+      uid: session.user.id,
+      email: session.user.email,
+      displayName: session.user.user_metadata?.full_name || session.user.email,
+      photoURL: session.user.user_metadata?.avatar_url,
+      provider: 'supabase',
+    };
+
+    return session.access_token;
+  } catch {
+    return null;
+  }
 }
 
 export function getCurrentWorkspaceUser(): WorkspaceUser | null {

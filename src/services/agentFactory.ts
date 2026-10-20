@@ -20,7 +20,11 @@ import {
   ClothingStyle,
   AgentGender
 } from '../types';
-import { generateInitialTrainingRecord } from '../constants/cseCurriculum';
+import {
+  ENGINEERING_AGENT_COMPETENCIES,
+  ENGINEERING_AGENT_PLAYBOOK,
+  isEngineeringRelatedAgent,
+} from '../constants/engineeringCompetencies';
 
 /**
  * Master Department Defaults & Configurations
@@ -99,7 +103,7 @@ export const DEPARTMENT_CONFIGS: Record<string, {
     defaultMovementGait: 'casual',
     speed: 1.1,
     accentColor: '#ec4899',
-    defaultTools: ['Recruitment Matrix', 'Talent Evaluator', 'CSE Academy Gateway', 'Workforce Planner'],
+    defaultTools: ['Recruitment Matrix', 'Talent Evaluator', 'Workforce Capability Registry', 'Workforce Planner'],
     defaultEquipment: ['digital-hr-tablet', 'interview-screen', 'smart-badge'],
     defaultApplications: ['recruitment-crm', 'workforce-allocator', 'training-tracker']
   },
@@ -209,7 +213,7 @@ export function createAgent(input: CreateAgentInput): Agent {
   const identity: AgentIdentity = {
     displayName: input.name,
     shortName: input.name.split(' ')[0],
-    avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(input.id)}&skinColor=9e5622`,
+    avatarUrl: '',
     gender,
     personality: {
       traits: input.personality?.traits || ['analytical', 'disciplined', 'innovative'],
@@ -297,7 +301,7 @@ export function createAgent(input: CreateAgentInput): Agent {
   };
 
   // 6. Skills Matrix
-  const skills: AgentSkill[] = input.skills || [
+  const baseSkills: AgentSkill[] = input.skills || [
     {
       id: 'core-competency',
       name: agentRole.title,
@@ -315,6 +319,30 @@ export function createAgent(input: CreateAgentInput): Agent {
       certified: true
     }
   ];
+  const engineeringRelated = isEngineeringRelatedAgent({
+    departmentId: input.departmentId,
+    departmentName: deptConfig.name,
+    role: agentRole.title,
+  });
+  const knownSkillNames = new Set(baseSkills.map((skill) => skill.name.toLowerCase()));
+  const engineeringSkills: AgentSkill[] = engineeringRelated
+    ? ENGINEERING_AGENT_COMPETENCIES
+        .filter((name) => !knownSkillNames.has(name.toLowerCase()))
+        .map((name) => ({
+          id: `engineering-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+          name,
+          category: 'technical' as const,
+          proficiency: 88,
+          experiencePoints: 0,
+          certified: false,
+        }))
+    : [];
+  const skills = [...baseSkills, ...engineeringSkills];
+  const capabilities = Array.from(new Set([
+    ...deptConfig.defaultTools,
+    ...(engineeringRelated ? ENGINEERING_AGENT_COMPETENCIES : []),
+  ]));
+  agentRole.capabilities = capabilities;
 
   // 7. Initial Location & 3D Coordinates
   const agentLocation: AgentLocation = {
@@ -371,7 +399,7 @@ export function createAgent(input: CreateAgentInput): Agent {
       { id: 'c-101', name: 'Zero-Trust Protocol Certification', progress: 100, score: 98, status: 'completed' },
       { id: 'c-102', name: 'Autonomous Reasoning & Fast Verification', progress: 100, score: 95, status: 'completed' }
     ],
-    certifications: ['Enterprise Autonomous Operator', 'CSE Level 5 Architect']
+    certifications: ['Enterprise Autonomous Operator']
   };
 
   // 11. Interactive Workspace & Screens
@@ -445,7 +473,6 @@ export function createAgent(input: CreateAgentInput): Agent {
     authorityLevel: seniority === 'executive' ? 10 : seniority === 'director' ? 9 : seniority === 'manager' ? 8 : 7,
     assignedTools: deptConfig.defaultTools,
     permissions: agentRole.permissions,
-    trainingRecord: generateInitialTrainingRecord(agentRole.title, input.departmentId),
     deskPosition: {
       x: 100 + Math.floor(Math.random() * 400),
       y: 100 + Math.floor(Math.random() * 300),
@@ -458,8 +485,8 @@ export function createAgent(input: CreateAgentInput): Agent {
       text: `Operational on Floor ${deptConfig.floorCode} [${deptConfig.name}]`,
       expiresAt: Date.now() + 15000
     },
-    capabilities: deptConfig.defaultTools,
-    systemPrompt: `You are ${input.name}, an autonomous AI employee working in ${deptConfig.name}. Deliver precision results with professional corporate agility.`,
+    capabilities,
+    systemPrompt: `You are ${input.name}, an autonomous AI employee working in ${deptConfig.name}. Deliver precision results with professional corporate agility.${engineeringRelated ? `\n\n${ENGINEERING_AGENT_PLAYBOOK}` : ''}`,
     memory: brainPipeline.memory,
     voicePitch: 1.0,
     voiceRate: 1.0,

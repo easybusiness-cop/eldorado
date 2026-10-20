@@ -1,6 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { ModelProvider, ModelGenerateOptions, ModelGenerateResult, StreamCallback } from '../providers/model-provider.ts';
-import { LocalProvider } from '../providers/local.provider.ts';
+import { ModelProvider, ModelGenerateOptions, ModelGenerateResult, ModelProviderUnavailableError, StreamCallback } from '../providers/model-provider.ts';
 import { GeminiProvider } from '../providers/gemini.provider.ts';
 import { OllamaProvider } from '../providers/ollama.provider.ts';
 
@@ -16,9 +15,9 @@ export class ModelRouter {
   private providers: ModelProvider[] = [];
   private preferLocal = true;
 
-  private constructor() {
+  public constructor(providers?: ModelProvider[]) {
     this.initClient();
-    this.initProviders();
+    this.providers = providers ?? [new OllamaProvider(), new GeminiProvider()];
   }
 
   public static getInstance(): ModelRouter {
@@ -42,12 +41,6 @@ export class ModelRouter {
     }
   }
 
-  private initProviders(): void {
-    this.providers.push(new OllamaProvider());
-    this.providers.push(new GeminiProvider());
-    this.providers.push(new LocalProvider());
-  }
-
   public getClient(): GoogleGenAI | null {
     if (!this.client && process.env.GEMINI_API_KEY) {
       this.initClient();
@@ -56,70 +49,28 @@ export class ModelRouter {
   }
 
   public routeModel(taskType: 'coding' | 'reasoning' | 'creative' | 'general' | 'fast'): ModelRouteDecision {
-    switch (taskType) {
-      case 'coding':
-        return {
-          model: 'gemini-3.7-flash',
-          reason: 'Selected for precise code synthesis, AST awareness, and error diagnosis',
-          temperature: 0.1,
-        };
-      case 'reasoning':
-        return {
-          model: 'gemini-3.7-flash',
-          reason: 'Selected for complex cross-agent planning and policy validation',
-          temperature: 0.2,
-        };
-      case 'creative':
-        return {
-          model: 'gemini-3.7-flash',
-          reason: 'Selected for nuanced social content, pitch creation, and branding',
-          temperature: 0.7,
-        };
-      case 'fast':
-      default:
-        return {
-          model: 'gemini-3.5-flash-lite',
-          reason: 'High throughput, low-latency execution for heartbeat and log triage',
-          temperature: 0.3,
-        };
-    }
+    const temperatures = {
+      coding: 0.1,
+      reasoning: 0.2,
+      creative: 0.7,
+      general: 0.3,
+      fast: 0.3,
+    };
+    return {
+      model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+      reason: `Configured Gemini model for ${taskType} tasks; no benchmark-based ranking is available.`,
+      temperature: temperatures[taskType],
+    };
   }
 
   public async executeWithFallback(prompt: string, systemInstruction?: string, taskType: 'coding' | 'reasoning' | 'creative' | 'general' | 'fast' = 'general'): Promise<string> {
-    const client = this.getClient();
-    if (!client) {
-      try {
-        const res = await this.generate({ prompt, systemInstruction, temperature: 0.3 });
-        return res.text;
-      } catch {
-        return `[SIMULATED OFFLINE EXECUTION - GEMINI_API_KEY NOT CONFIGURED]\nProcessed prompt: ${prompt.slice(0, 100)}...`;
-      }
-    }
-
     const decision = this.routeModel(taskType);
-    const candidateModels = [decision.model, 'gemini-3.7-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
-
-    let lastError: any = null;
-    for (const model of candidateModels) {
-      try {
-        const response = await client.models.generateContent({
-          model,
-          contents: prompt,
-          config: {
-            systemInstruction: systemInstruction || 'You are an autonomous enterprise AI agent in the Rufflo Fleet.',
-            temperature: decision.temperature,
-          },
-        });
-        if (response && response.text) {
-          return response.text;
-        }
-      } catch (err: any) {
-        lastError = err;
-        console.warn(`[ModelRouter] Fallback from ${model} due to: ${err?.message || err}`);
-      }
-    }
-
-    throw new Error(`All candidate AI models failed: ${lastError?.message || 'Unknown execution failure'}`);
+    const result = await this.generate({
+      prompt,
+      systemInstruction: systemInstruction || 'You are an enterprise AI agent.',
+      temperature: decision.temperature,
+    });
+    return result.text;
   }
 
   // --- Provider flow methods ---
@@ -146,15 +97,10 @@ export class ModelRouter {
       }
     }
 
-    return {
-      text: JSON.stringify({
-        error: "All model providers failed",
-        fallback: true,
-        message: "Rufflo emergency local response",
-        detail: lastError?.message || "unknown",
-      }, null, 2),
-      provider: "emergency-local",
-    };
+    if (lastError) {
+      throw new Error("All available real model providers failed to generate a response.", { cause: lastError });
+    }
+    throw new ModelProviderUnavailableError();
   }
 
   public async generateStream(options: ModelGenerateOptions, onChunk: StreamCallback): Promise<ModelGenerateResult> {
@@ -182,19 +128,10 @@ export class ModelRouter {
       }
     }
 
-    const emergencyText = JSON.stringify({
-      error: "All streaming providers failed",
-      fallback: true,
-      detail: lastError?.message || "unknown",
-    });
-
-    onChunk({ text: emergencyText, done: false, provider: "emergency-local" });
-    onChunk({ text: "", done: true, provider: "emergency-local" });
-
-    return {
-      text: emergencyText,
-      provider: "emergency-local",
-    };
+    if (lastError) {
+      throw new Error("All available real model providers failed to generate a response.", { cause: lastError });
+    }
+    throw new ModelProviderUnavailableError();
   }
 
   public async getStatus(): Promise<{ name: string; available: boolean }[]> {
@@ -208,14 +145,24 @@ export class ModelRouter {
 
   // --- MultiModelRouter compatibility ---
   public async routeTask(task: any) {
-    const modelScores: Record<string, number> = {
-      'gemini-3.7-flash': 0.95,
-      'gemini-3.5-flash-lite': 0.88,
+    void task;
+    const availableProviders = (await this.getStatus()).filter((provider) => provider.available);
+    if (availableProviders.length === 0) {
+      throw new ModelProviderUnavailableError();
+    }
+    const selectedProvider = this.preferLocal
+      ? availableProviders[0]
+      : availableProviders[availableProviders.length - 1];
+    const selectedModel = selectedProvider.name === 'ollama'
+      ? process.env.OLLAMA_MODEL || 'llama3.2'
+      : selectedProvider.name === 'gemini'
+        ? process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+        : selectedProvider.name;
+    return {
+      model: selectedModel,
+      reason: `Selected configured provider "${selectedProvider.name}" for this request; no benchmark-based model ranking is available.`,
     };
-    const bestModel = Object.entries(modelScores).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-    return { model: bestModel, reason: 'Best routed model for this task category' };
   }
 }
 
 export const modelRouter = ModelRouter.getInstance();
-

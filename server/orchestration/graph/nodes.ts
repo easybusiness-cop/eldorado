@@ -18,9 +18,10 @@ export class WorkflowNodes {
     const currentStep = state.steps[state.currentStepIndex];
     if (currentStep) {
       currentStep.status = 'running';
-      // Simulate real step accomplishment
-      currentStep.status = 'completed';
-      currentStep.result = { message: `Step completed successfully by agent: ${currentStep.assignedAgent}` };
+      currentStep.status = 'blocked';
+      currentStep.error = `No execution adapter is configured for agent "${currentStep.assignedAgent}".`;
+      state.errors.push(currentStep.error);
+      state.status = 'BLOCKED';
     }
     return state;
   }
@@ -28,10 +29,14 @@ export class WorkflowNodes {
   public static async executeVerification(state: WorkflowState): Promise<WorkflowState> {
     state.status = 'VERIFYING';
     const hasFailures = state.steps.some(s => s.status === 'failed');
+    const allStepsCompleted = state.steps.length > 0 && state.steps.every(s => s.status === 'completed');
     if (hasFailures) {
       state.status = 'FAILED';
-    } else {
+    } else if (allStepsCompleted) {
       state.status = 'COMPLETED';
+    } else {
+      state.status = 'BLOCKED';
+      state.errors.push('Workflow verification cannot pass until every step has execution evidence.');
     }
     return state;
   }

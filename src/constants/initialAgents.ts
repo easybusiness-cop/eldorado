@@ -1,5 +1,5 @@
 import { Agent, DynamicFeature, TriggerRule, FleetTask } from '../types';
-import { generateInitialTrainingRecord } from './cseCurriculum';
+import { applyEngineeringCompetencies } from './engineeringCompetencies';
 
 export const INITIAL_AGENTS: Agent[] = [
   {
@@ -24,7 +24,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 10,
     assignedTools: ['Fleet Orchestrator', 'Admin Dispatcher', 'Standup Broadcaster', 'Priority Router'],
     permissions: ['ALL_PERMISSIONS', 'DELEGATE_WORK', 'HIRE_AGENT', 'PROMOTE_AGENT', 'EXECUTE_STANDUP'],
-    trainingRecord: generateInitialTrainingRecord('GOD / Floor Orchestrator', 'exec'),
     deskPosition: {
       x: 75,
       y: 95,
@@ -76,7 +75,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 9,
     assignedTools: ['Zero-Trust Permission Inspector', 'Security Scanner', 'Perimeter Firewall', 'Audit Log Gatekeeper'],
     permissions: ['SECURITY_AUDIT', 'ZERO_TRUST_ENFORCE', 'SECRET_VAULT_ACCESS', 'REVOKE_ACCESS'],
-    trainingRecord: generateInitialTrainingRecord('CISO', 'sec'),
     deskPosition: {
       x: 160,
       y: 235,
@@ -128,7 +126,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 7,
     assignedTools: ['Outreach Copy Engine', 'Funnel Analytics', 'Campaign Scheduler', 'CRM Pipeline'],
     permissions: ['MARKETING_PUBLISH', 'CLIENT_COMMUNICATION', 'CAMPAIGN_EXECUTE'],
-    trainingRecord: generateInitialTrainingRecord('Lead Client Strategist', 'mkt'),
     deskPosition: {
       x: 50,
       y: 235,
@@ -175,11 +172,10 @@ export const INITIAL_AGENTS: Agent[] = [
     primaryRole: 'HR & People Operations Agent',
     secondarySkills: ['Agent Recruiting', 'Onboarding Workflows', 'Dispute Resolution', 'Training Supervision'],
     departmentId: 'hr',
-    departmentName: 'HR, Recruitment & Training Academy (Floor 2)',
+    departmentName: 'HR, Recruitment & People Operations (Floor 2)',
     authorityLevel: 8,
-    assignedTools: ['Agent Onboarding Engine', 'Culture & Feedback Hub', 'Dispute Mediator', 'Academy Registrar'],
-    permissions: ['AGENT_ONBOARD', 'AGENT_ASSIGN_ROLE', 'DRAFT_POLICY', 'MANAGE_ACADEMY'],
-    trainingRecord: generateInitialTrainingRecord('People Ops Lead', 'hr'),
+    assignedTools: ['Agent Onboarding Engine', 'Culture & Feedback Hub', 'Dispute Mediator', 'Training Records'],
+    permissions: ['AGENT_ONBOARD', 'AGENT_ASSIGN_ROLE', 'DRAFT_POLICY', 'MANAGE_WORKFORCE_RECORDS'],
     deskPosition: {
       x: 600,
       y: 235,
@@ -230,7 +226,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 8,
     assignedTools: ['Enterprise Runway & ROI Calculator', 'P&L Ledger', 'Expense Auditor', 'Tax Modeler'],
     permissions: ['FINANCE_READ', 'BUDGET_APPROVE', 'PANDL_WRITE', 'AUDIT_LEDGER'],
-    trainingRecord: generateInitialTrainingRecord('Financial Analyst', 'fin'),
     deskPosition: {
       x: 270,
       y: 235,
@@ -281,7 +276,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 7,
     assignedTools: ['Viral Thread & Post Generator', 'Trend Predictor', 'Hashtag Optimizer', 'Growth Dashboard'],
     permissions: ['SOCIAL_PUBLISH', 'BRAND_POST', 'ANALYTICS_READ'],
-    trainingRecord: generateInitialTrainingRecord('VP of Viral Growth', 'mkt'),
     deskPosition: {
       x: 380,
       y: 235,
@@ -333,7 +327,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 8,
     assignedTools: ['Open Source Dependency Auditor', 'Repo Inspector', 'Web Scraper', 'Spec Aggregator'],
     permissions: ['RESEARCH_SCRAPE', 'REPO_AUDIT', 'DOCS_INDEX'],
-    trainingRecord: generateInitialTrainingRecord('Senior Intelligence Specialist', 'res'),
     deskPosition: {
       x: 490,
       y: 235,
@@ -383,7 +376,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 8,
     assignedTools: ['ArXiv Paper Ingestion Daemon', 'Vector Embedding Indexer', 'Citation Graph Miner'],
     permissions: ['RESEARCH_SCRAPE', 'VECTOR_WRITE', 'MODEL_BENCHMARK'],
-    trainingRecord: generateInitialTrainingRecord('Principal Research Scientist', 'res'),
     deskPosition: {
       x: 160,
       y: 235,
@@ -432,7 +424,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 7,
     assignedTools: ['Benchmarking Harness', 'Perplexity Analyzer', 'Evaluation Suite'],
     permissions: ['MODEL_BENCHMARK', 'DATASET_EVALUATE'],
-    trainingRecord: generateInitialTrainingRecord('Benchmark Specialist', 'res'),
     deskPosition: {
       x: 270,
       y: 235,
@@ -480,7 +471,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 8,
     assignedTools: ['Continuous Background Debugger', 'Telemetry Monitor', 'Patch Engine', 'Garbage Collector'],
     permissions: ['SRE_DEBUG', 'PATCH_SYSTEM', 'MONITOR_METRICS', 'RESTART_DAEMON'],
-    trainingRecord: generateInitialTrainingRecord('SRE Lead', 'sre'),
     deskPosition: {
       x: 50,
       y: 335,
@@ -530,7 +520,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 9,
     assignedTools: ['IDE Hot-Reloader', 'Sandbox Execution VM', 'Dynamic Feature Builder', 'API Route Generator'],
     permissions: ['WRITE_CODE', 'MOUNT_WIDGET', 'EXECUTE_SANDBOX', 'MODIFY_DOM'],
-    trainingRecord: generateInitialTrainingRecord('Full-Stack Engineer', 'eng'),
     deskPosition: {
       x: 160,
       y: 335,
@@ -581,7 +570,6 @@ export const INITIAL_AGENTS: Agent[] = [
     authorityLevel: 9,
     assignedTools: ['Cline Web Dev Engine', 'MCP Tool Executor', 'File Diff Engine', 'Browser Verifier'],
     permissions: ['WRITE_CODE', 'EXECUTE_MCP_TOOL', 'BROWSER_AUTOMATION', 'FULL_SYSTEM_BUILD'],
-    trainingRecord: generateInitialTrainingRecord('Senior System Architect', 'eng'),
     deskPosition: {
       x: 270,
       y: 335,
@@ -613,6 +601,10 @@ export const INITIAL_AGENTS: Agent[] = [
     tokensProcessed: 215400,
   },
 ];
+
+for (const agent of INITIAL_AGENTS) {
+  Object.assign(agent, applyEngineeringCompetencies(agent));
+}
 
 export const INITIAL_DYNAMIC_FEATURES: DynamicFeature[] = [
   {
@@ -770,13 +762,13 @@ export const INITIAL_FLEET_TASKS: FleetTask[] = [
   },
   {
     id: 'tsk-pam-01',
-    title: 'Agent Academy Curriculum & Inter-Office SOPs',
+    title: 'Agent Onboarding & Inter-Office SOPs',
     description: 'Maintain Scranton office SOPs, structure standardized onboarding workflows for newly provisioned agents, and conduct quarterly team pulse surveys.',
     assignedTo: 'pam',
     status: 'running',
     progress: 70,
     priority: 'medium',
-    output: 'CSE Agent Academy Level 8 syllabus updated with autonomous tooling certification.',
+    output: 'Agent onboarding checklist and inter-office compliance handbook updated.',
     createdAt: Date.now() - 2500000,
   },
   {
@@ -868,4 +860,3 @@ export const INITIAL_FLEET_TASKS: FleetTask[] = [
     createdAt: Date.now() - 300000,
   },
 ];
-

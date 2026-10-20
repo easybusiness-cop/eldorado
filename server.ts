@@ -1,7 +1,7 @@
+import "./server/load-env.ts";
 import express from "express";
 import http from "http";
 import path from "path";
-import dotenv from "dotenv";
 import { WebSocketServer, WebSocket } from "ws";
 import { createServer as createViteServer } from "vite";
 import helmet from "helmet";
@@ -46,8 +46,9 @@ import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engin
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
 import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
 
-dotenv.config();
-
+// Load Vite's local development file for server-side Supabase JWT verification too.
+// Keep server-only credentials (for example SUPABASE_SERVICE_ROLE_KEY) in this
+// ignored file or the deployment environment; never prefix them with VITE_.
 const app = express();
 const distPath = path.join(process.cwd(), "dist");
 const indexPath = path.join(distPath, "index.html");

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { corporationStore } from '../corporation/corporation.store.ts';
+import { applyCorporateEngineeringCompetencies, corporationStore } from '../corporation/corporation.store.ts';
 import { companyBrain } from '../corporation/company-brain.service.ts';
 import { workforceEngine } from '../corporation/workforce.engine.ts';
 import { collaborationFabric } from '../corporation/collaboration-fabric.service.ts';
@@ -238,7 +238,8 @@ router.post('/employees', (req: Request, res: Response) => {
       updatedAt: new Date().toISOString(),
     };
 
-    corporationStore.employees.set(empId, newEmployee);
+    const enrichedEmployee = applyCorporateEngineeringCompetencies(newEmployee);
+    corporationStore.employees.set(empId, enrichedEmployee);
     dept.headcount += 1;
     corporationStore.company.headcountTotal += 1;
 
@@ -255,7 +256,7 @@ router.post('/employees', (req: Request, res: Response) => {
     });
 
     corporationStore.saveToDisk();
-    res.json({ success: true, employee: newEmployee });
+    res.json({ success: true, employee: enrichedEmployee });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

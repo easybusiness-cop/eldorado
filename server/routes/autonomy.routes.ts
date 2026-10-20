@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AutonomousEngineer } from "../agents/autonomy/autonomous-engineer.ts";
-import { MasterTrainer } from "../training/master/master-trainer.ts";
+import { AgentTrainingUnavailableError, MasterTrainer } from "../training/master/master-trainer.ts";
 import { IngestionPipeline } from "../knowledge/ingestion/ingestion-pipeline.ts";
 import { capabilityEngine } from "../core/capabilities/capability.engine.ts";
 import { failureMemory } from "../core/learning/failure-memory.ts";
@@ -113,6 +113,14 @@ autonomyRouter.post("/autonomy/train", async (req, res) => {
     const result = await trainer.train(agentId);
     return res.json({ success: true, training: result });
   } catch (error) {
+    if (error instanceof AgentTrainingUnavailableError) {
+      return res.status(501).json({
+        success: false,
+        status: "blocked",
+        code: error.code,
+        error: error.message,
+      });
+    }
     return res.status(500).json({
       error: error instanceof Error ? error.message : String(error),
     });

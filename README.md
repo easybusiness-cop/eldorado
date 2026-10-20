@@ -1,7 +1,9 @@
 # Rufflo Autonomous Company Operating System (ACOS)
 ## Munderdiffl.in Enterprise Autonomous Fleet & Holographic Command Center
 
-**Rufflo** is an enterprise-grade, stateful **Autonomous Company Operating System (ACOS)** engineered to run entire multi-departmental corporate organizations without human-in-the-loop bottlenecks. Powered by a distributed workforce of autonomous AI agents organized into corporate hierarchies with an executive chain-of-command, granular clearance levels, zero-trust security boundaries, real-time software construction pipelines, and continuous intelligence loops.
+**Rufflo** is a React and Express application exploring AI-assisted company workflows, agent interfaces, orchestration, memory, and integrations. Actual model generation and tool execution depend on configured providers and implemented execution paths; the UI roster does not represent independently operating employees.
+
+> **Capability status:** This repository contains a mix of implemented features, configuration-dependent integrations, and UI/product concepts. A displayed agent, integration, metric, or task status is not proof of independent work. Chat and workflow responses are not task execution unless a separate tool result verifies the action. When no real model or execution backend is available, affected endpoints return a blocked/unavailable response rather than inventing a result. The repository does not currently contain a trained-from-scratch foundation model or a functioning ML training/evaluation pipeline. See [MODEL_DEVELOPMENT_PLAN.md](./MODEL_DEVELOPMENT_PLAN.md) for prerequisites and go/no-go criteria.
 
 ---
 
@@ -34,12 +36,12 @@
 
 ## 1. System Overview & Operating Philosophy
 
-Modern enterprise software often treats AI as isolated chatbots or simple single-shot completion engines. Rufflo rejects this model entirely. In the Rufflo Operating System:
+The product design explores a multi-agent company interface. In the current implementation:
 
-- **AI is the Workforce, not a Widget**: Every agent holds a defined corporate job title, departmental reporting hierarchy, clearance tier (Level 1–100), explicit system permissions, and empirical skill metrics.
-- **Closed-Loop Execution**: Tasks are broken down into plans, coded, compiled, verified in sandboxes, criticized, and distributed into company knowledge graphs autonomously.
-- **Zero-Trust Safety & Tenancy**: Even autonomous agents cannot bypass tenant isolation, destructive action approvals, or secret redaction gates.
-- **Unsupervised Proactive Intelligence**: Rather than waiting for human queries, background engines continuously sweep preprint papers, code repositories, market movements, and tech indices, automatically teaching discoveries to relevant department employees.
+- Gemini and Ollama are usable only when correctly configured and reachable; otherwise model-dependent operations are unavailable.
+- Chat and planning endpoints generate responses or proposals; those responses are not evidence of task execution.
+- Only implemented tool operations can perform work, and each result must be verified independently. UI status, simulation output, model claims, and roster entries are not execution evidence.
+- ML training, model evaluation, CSE certification, and the former static quantum evaluation are unavailable rather than simulated as successful.
 
 ---
 
@@ -173,7 +175,7 @@ Located in `apps/control-plane/integrations/` and `risk-engine/`:
   - `MEDIUM`: Reversible writes, outbound HTTP webhooks.
   - `HIGH`: Code execution in sandboxes, repository branch pushes.
   - `CRITICAL`: File deletion, root config modifications, production deployments.
-- **Human-In-The-Loop Approval Gates**: Any operation flagged as `CRITICAL` halts execution and enters the approval queue (`/api/admin/approvals`) awaiting explicit clearance.
+- **Human-In-The-Loop Approval Gates**: Any operation flagged as `CRITICAL` halts execution and enters the approval queue (`GET /api/approvals`) awaiting explicit clearance.
 - **Secret Redaction Gate**: Regex sanitizers inspect all outputs, replacing tokens matching GitHub PATs, Stripe Secret Keys, Gemini API Keys, and Supabase service keys with `[REDACTED_SECURITY_GATEWAY]`.
 - **Payload Scanner**: Express middleware (`server/security/payloadScanner.ts`) analyzes incoming bodies for SQL injection patterns, path traversal (`../`), and command injection tokens.
 
@@ -185,16 +187,12 @@ Located in `server/tools/browser/browser.service.ts`:
 
 ### 3.10. Multi-Model AI Routing & Resilient Providers
 Located in `server/ai/providers/`:
-- **Gemini Provider (`gemini.provider.ts`)**: Uses the modern `@google/genai` TypeScript SDK with model alias support (`gemini-2.5-flash`, `gemini-2.5-pro`) and Google Search Grounding.
-- **Local Ollama Provider (`ollama.provider.ts`)**: Connects to local instances of Llama 3, Mistral, or DeepSeek for air-gapped, zero-cost reasoning.
-- **Rule-Based Fallback Provider (`local.provider.ts`)**: Built-in AST and heuristic parser providing operational responses even when external networks or LLM APIs are offline.
-- **Model Router (`model-router.ts`)**: Intelligently scores task requirements (complexity, latency, token size, offline requirements) to route to the optimal model.
+- **Gemini Provider (`gemini.provider.ts`)**: Uses the `@google/genai` SDK when `GEMINI_API_KEY` is configured. The request uses `GEMINI_MODEL` or the configured default; transient errors receive one retry. Configure and verify the selected model with the provider before relying on it.
+- **Local Ollama Provider (`ollama.provider.ts`)**: Uses an Ollama service only when it is running and reachable.
+- **Model Router (`model-router.ts`)**: Tries configured real providers and reports an error if none can produce a response. It does not synthesize a response when providers are unavailable; provider order is not a measured model-quality ranking.
 
 ### 3.11. Quantum Superposition & Wavefunction Coherence
-Located in `src/utils/quantumEngine.ts`:
-- Simulates quantum wavefunction collapse for task optimization.
-- Agents maintain quantum states (`entangled`, `superposition`, `collapsed`).
-- Computes phase coherence scores across paired employees (e.g., Dwight & Jim) to calculate synergy and optimal task assignment probabilities.
+The former quantum-evaluation endpoint returned fixed, unmeasured candidate probabilities and performance claims. It now responds as unavailable (`501`) because the repository has no quantum evaluation implementation or benchmark. Do not use quantum terminology or the former static metrics as evidence of optimization.
 
 ### 3.12. SRE Telemetry, Chaos Simulation & Self-Healing Daemon
 Located in `server/routes/system-telemetry.routes.ts` and `server/routes/chaos-simulation.routes.ts`:
@@ -277,8 +275,8 @@ The user interface provides instant access to all autonomous operations:
 6. **DevOps SRE Telemetry & Continuous Debugger (`ContinuousDebuggerModal.tsx`)**:
    - V8 memory metrics, CPU load, and event loop latency charts.
    - Synthetic error injection triggers and Toby's Self-Healing one-click daemon.
-7. **CSE Agent Academy & Task Compiler (`CseAgentAcademyModal.tsx`)**:
-   - Visual workbench to design, compile, and dry-run new operational playbooks.
+7. **Engineering Agent Competency Profiles (`engineeringCompetencies.ts`)**:
+   - Programming-language, object-oriented design, data-structure, algorithmic problem-solving, testing, and security practices are attached to engineering and related agents and injected into their execution prompts.
 8. **Predictive Load Balancer (`PredictiveLoadBalancerModal.tsx`)**:
    - Visual task queue management, worker load metrics, and automated balancing.
 9. **Public API Integrator Hub (`PublicApiHubModal.tsx`)**:
@@ -359,20 +357,20 @@ The user interface provides instant access to all autonomous operations:
 - `POST /api/meta/improve`: Runs the autonomous weekly improvement cycle.
 
 ### Discovery & Intelligence
-- `GET /api/autonomy/discoveries`: Returns registered tech, research, and market discoveries.
-- `POST /api/autonomy/discoveries/scan`: Triggers an immediate multi-source discovery sweep.
+- `GET /api/autonomy/knowledge/discoveries`: Returns registered tech, research, and market discoveries.
+- `POST /api/corporation/discoveries/scan`: Triggers an immediate multi-source discovery sweep.
 - `POST /api/autonomy/intelligence/query`: Unlimited intelligence query with automatic web sweep on miss.
 
 ### Composio & Integrations
-- `GET /api/composio/actions`: Lists supported and connected Composio actions.
+- `GET /api/composio/tools`: Lists supported Composio tools.
 - `POST /api/composio/execute`: Executes a Composio tool action.
-  - *Payload*: `{ "action": string, "params": object }`
-- `GET /api/composio/connections`: Lists authenticated app connections.
+  - *Payload*: `{ "actionId": string, "parameters": object, "userId"?: string }`
+- `GET /api/composio/status`: Reports configuration and authenticated app connections.
 
 ### Administration & Control Plane
 - `POST /api/admin/orchestrate-task`: Executive task delegation to specialized employees.
-- `GET /api/admin/approvals`: Lists tasks awaiting human approval.
-- `POST /api/admin/approvals/:id/decide`: Approves or rejects a critical-risk operation.
+- `GET /api/approvals`: Lists tasks awaiting human approval.
+- `POST /api/approvals/:id/decision`: Approves or rejects a critical-risk operation.
 
 ### WebSockets
 - `ws://<host>:<port>/ws/spider`: Spider Web task-ring distribution channel.

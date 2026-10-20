@@ -131,3 +131,62 @@ The documented Composio, approvals, and autonomy-discovery routes listed above d
 4. Correct the nested Agent Fleet buttons and retest pointer/keyboard interaction.
 5. Improve contrast across dark gradient cards and provide local avatar fallbacks.
 6. Align README endpoints with the current Express route mounts, or implement the documented routes.
+
+## Follow-up implementation and verification — 20 October 2026
+
+The audit findings were followed by a focused fail-closed patch:
+
+- The graph workflow no longer marks planned steps complete without an execution adapter. It returns `BLOCKED`, and final verification only returns `COMPLETED` when every step is completed with execution evidence.
+- Approval of a workflow no longer silently advances and completes its pending step. Approval is recorded separately; it is not evidence that the step ran.
+- GitHub Actions status and dispatch now use GitHub's API through Octokit and require `GITHUB_TOKEN`; absent credentials produce an explicit unavailable error instead of synthetic successful jobs.
+- The Composio integration catalog now reports zero connected accounts until a real connection is verified. The placeholder connect route fails explicitly rather than minting a Rufflo email and claiming authorization.
+- GitHub identity status is validated with GitHub's authenticated-user endpoint. Pull requests use the real GitHub API when credentials exist; the random-number/success-shaped fallback was removed.
+- Intelligence chat no longer renders generated text as a dispatched task, creates fake running-task records, or labels the administrator online without evidence. Static dashboard badges now direct operators to check live integration status.
+
+### Follow-up validation
+
+| Check | Result | Evidence |
+|---|---|---|
+| `npm run typecheck` | PASS | `tsc --noEmit` completed. |
+| Focused honesty, provider, workflow, and integration tests | PASS | 17 tests passed, 0 failed. |
+| `npm test` | PASS | Security suite passed all 8 checks. Its expected blocked-payload audit event was appended. |
+| `npm run test:memory` | PASS | 1 test passed. |
+| `npm run test:chat-format` | PASS | 3 tests passed. |
+| `npm run build` | PASS | Vite and esbuild production builds completed. |
+| Browser smoke check | PASS with known warnings | Chromium rendered the dashboard. The health route returned `{"status":"ok"}`. The browser logged the expected missing-Supabase configuration warning and a missing `/favicon.ico` (404); no application-rendering error was observed after a fresh load. |
+| Composio status endpoint without credentials | PASS | `configured: false`, `hasApiKey: false`, `activeConnectionsCount: 0`; all seven catalog entries report `connected: false`. |
+| Composio connect endpoint without a provider authorization flow | PASS | Returned `success: false` with an explicit “no provider authorization flow is implemented” error. |
+| Model availability | UNAVAILABLE | Gemini and Ollama remain unconfigured; no external model operation was attempted. |
+
+The follow-up browser screenshot is [feature-audit-follow-up.png](./feature-audit-follow-up.png). It still displays a large administrator task-queue count; that pre-existing activity data was not independently verified as real execution. This remains a bounded smoke check, not a complete click-through of every modal or an authorization-backed test of third-party services. The workforce/activity-count mismatch, nested-button warning, contrast issues, avatar requests, stale README paths, and Supabase static local-fallback limitations are not resolved by this follow-up.
+
+## Browser warning cleanup — 20 October 2026
+
+The latest warning cleanup addressed the reproducible browser issues and stale route references:
+
+- Added a local SVG favicon and updated the page description to avoid claiming that model responses automatically dispatch work.
+- Kept missing Supabase configuration visible as an informational console message and in the existing diagnostics; no placeholder credentials or connected status were introduced.
+- Replaced the clickable Agent Fleet card's outer button with a labeled group and an explicit keyboard-accessible **View details** button.
+- Added safe local-avatar checks and initials fallbacks across the fleet, monitor, communications, skill matrix, SOP, and corporation employee views. New employees no longer get a Dicebear URL. Existing remote avatar values are not loaded.
+- Added an accessible `id`, `name`, and label to the Rufflo Intelligence objective textarea.
+- Updated the README's discovery, Composio, and approval endpoint paths to match the mounted routes.
+
+### Latest validation
+
+| Check | Result | Evidence |
+|---|---|---|
+| `npm run typecheck` | PASS | TypeScript completed without errors. |
+| `npm run build` | PASS | Vite and esbuild production builds completed. |
+| `npm test` | PASS | Security suite passed all 8 checks. Its expected blocked-payload event was appended to the audit ledger. |
+| `npm run test:memory` | PASS | 1 test passed. |
+| `npm run test:chat-format` | PASS | 3 tests passed. |
+| Chromium Agent Fleet smoke check | PASS | 97 rendered cards; 0 nested buttons; 0 remote image sources in the Agent Fleet view; 0 form fields missing both `id` and `name`. |
+| Browser favicon check | PASS | `GET /favicon.svg` returned HTTP 200. |
+| Browser console | PASS | No warnings, errors, or issues after navigation. The app retains an informational message that Supabase is not configured. |
+| Local server health | PASS | `GET /api/health` returned `{"status":"ok"}`. |
+
+A Chromium screenshot of the Agent Fleet was captured inline during this session. The earlier issues tied to the favicon, nested buttons, blocked agent-avatar requests, unlabelled objective textarea, and stale README routes are now resolved.
+
+### Remaining limitations
+
+This cleanup does not resolve the separately identified workforce/activity totals disagreement or the low-contrast text noted in the broader cross-panel screenshot audit. Those require a canonical workforce/activity source and a dedicated visual/accessibility pass across the affected panels. Supabase, Gemini, Ollama, and Composio remain unconfigured in this environment; their absence is surfaced rather than represented as a successful connection. The browser validation remains a targeted smoke check, not a click-through of every modal or an authorization-backed test of external services.

@@ -36,8 +36,8 @@ export class AgentFleetRegistry {
         metrics: {
           tasksCompleted: 0,
           tokensProcessed: 0,
-          successRate: 100,
-          avgLatencyMs: 250,
+          successRate: 0,
+          avgLatencyMs: 0,
         },
       };
       this.agentStates.set(def.id, def);

@@ -1,58 +1,25 @@
 import { Router } from 'express';
-import { MlPipelineService } from '../engineering/ml/ml-pipeline.service.ts';
-import { ModelEvaluator } from '../engineering/ml/model-evaluator.ts';
+import { MlPipelineService, MlTrainingUnavailableError } from '../engineering/ml/ml-pipeline.service.ts';
+import { ModelEvaluationUnavailableError, ModelEvaluator } from '../engineering/ml/model-evaluator.ts';
 import { VectorDatabaseService } from '../engineering/ml/vector-database.service.ts';
 import { DatasetManager } from '../engineering/ml/dataset-manager.ts';
-import { CseCurriculumRunner } from '../engineering/cse/cse-curriculum-runner.ts';
-import { AlgorithmBenchmarker } from '../engineering/cse/algorithm-benchmarker.ts';
-import { CseSpecializationService } from '../engineering/cse/cse-specialization.service.ts';
-import { CSE_TRAINING_LEVELS, CSE_SPECIALIZATION_SPECS, generateInitialTrainingRecord } from '../../src/constants/cseCurriculum.ts';
+import { AlgorithmBenchmarkUnavailableError, AlgorithmBenchmarker } from '../engineering/cse/algorithm-benchmarker.ts';
 
 export const cseMlRouter = Router();
 
-// ==========================================
-// COMPUTER SCIENCE ENGINEERING (CSE) ROUTES
-// ==========================================
-
-// GET /api/v2/cse/curriculum - Returns CSE curriculum levels and specialization tracks
-cseMlRouter.get('/cse/curriculum', (req, res) => {
-  res.json({
-    success: true,
-    levels: CSE_TRAINING_LEVELS,
-    specializations: CSE_SPECIALIZATION_SPECS,
-  });
-});
-
-// POST /api/v2/cse/assess - Run CSE competency challenge assessment for an agent
-cseMlRouter.post('/cse/assess', async (req, res) => {
-  try {
-    const { agentId = 'ruflo-coder', targetLevel = 1, currentRecord } = req.body;
-    const baseRecord = currentRecord || generateInitialTrainingRecord('Software Engineer', 'eng');
-    const result = await CseCurriculumRunner.assessAgent(agentId, Number(targetLevel), baseRecord);
-    res.json({ success: true, assessment: result });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/v2/cse/benchmark - Run algorithm time & space complexity benchmark
-cseMlRouter.post('/cse/benchmark', (req, res) => {
+// POST /api/v2/engineering/algorithm/benchmark - Run algorithm time & space complexity benchmark
+cseMlRouter.post('/engineering/algorithm/benchmark', (req, res) => {
   try {
     const { algorithm = 'quick_sort', inputSize = 10000 } = req.body;
     const report = AlgorithmBenchmarker.runBenchmark(algorithm as any, Number(inputSize));
     res.json({ success: true, report });
   } catch (err: any) {
+    if (err instanceof AlgorithmBenchmarkUnavailableError) {
+      return res.status(501).json({ success: false, status: 'blocked', code: err.code, error: err.message });
+    }
     res.status(500).json({ error: err.message });
   }
 });
-
-// GET /api/v2/cse/specializations/:specId - Inspect specialization details
-cseMlRouter.get('/cse/specializations/:specId', (req, res) => {
-  const spec = CseSpecializationService.getSpecialization(req.params.specId);
-  if (!spec) return res.status(404).json({ error: 'Specialization not found' });
-  res.json({ success: true, specialization: spec });
-});
-
 
 // ==========================================
 // MACHINE LEARNING ENGINEERING (ML) ROUTES
@@ -83,6 +50,9 @@ cseMlRouter.post('/ml/train', async (req, res) => {
 
     res.json({ success: true, training: result });
   } catch (err: any) {
+    if (err instanceof MlTrainingUnavailableError) {
+      return res.status(501).json({ success: false, status: 'blocked', code: err.code, error: err.message });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -94,6 +64,9 @@ cseMlRouter.post('/ml/evaluate', (req, res) => {
     const report = ModelEvaluator.evaluateModel(modelId, Number(testDatasetSize));
     res.json({ success: true, evaluation: report });
   } catch (err: any) {
+    if (err instanceof ModelEvaluationUnavailableError) {
+      return res.status(501).json({ success: false, status: 'blocked', code: err.code, error: err.message });
+    }
     res.status(500).json({ error: err.message });
   }
 });

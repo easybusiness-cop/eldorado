@@ -1,4 +1,3 @@
-import { composioAuth } from './auth.ts';
 import { composioClient } from './client.ts';
 
 export interface ComposioToolAction {
@@ -175,20 +174,13 @@ export class ComposioToolGateway {
           const res = await fetch('https://api.github.com/user', {
             headers: { Authorization: `token ${ghToken}`, 'User-Agent': 'Rufflo-Composio-Agent' },
           });
-          if (res.ok) {
-            return await res.json();
+          if (!res.ok) {
+            throw new Error(`GitHub authenticated-user request failed with HTTP ${res.status}.`);
           }
+          return await res.json();
         }
 
-        return {
-          success: true,
-          login: 'rufflo-quantum-operator',
-          name: 'Rufflo Quantum Engineer',
-          bio: 'Autonomous AI Enterprise Operator with Composio Tool Execution Mesh',
-          public_repos: 42,
-          followers: 128,
-          mode: 'SIMULATION_MODE',
-        };
+        throw new Error('GitHub profile lookup is unavailable: configure Composio or GITHUB_TOKEN.');
       },
     });
 
@@ -221,17 +213,7 @@ export class ComposioToolGateway {
           }
         }
 
-        const conn = composioAuth.getConnection('github');
-        if (!conn?.connected) {
-          throw new Error('GitHub integration is NOT CONNECTED. Please configure GITHUB_TOKEN or OAuth credentials.');
-        }
-        return {
-          success: true,
-          issueNumber: Math.floor(Math.random() * 800) + 100,
-          url: `https://github.com/${params.repo}/issues/${Math.floor(Math.random() * 800) + 100}`,
-          title: params.title,
-          mode: 'SIMULATION_MODE',
-        };
+        throw new Error('GitHub issue creation is unavailable: configure the Composio execution provider.');
       },
     });
 
@@ -262,11 +244,7 @@ export class ComposioToolGateway {
           }
         }
 
-        const conn = composioAuth.getConnection('gmail');
-        if (!conn?.connected) {
-          throw new Error('Gmail integration is NOT CONNECTED. Please initiate Google OAuth first.');
-        }
-        return { success: true, messageId: `msg-${Date.now()}`, mode: 'SIMULATION_MODE' };
+        throw new Error('Gmail sending is unavailable: configure the Composio execution provider.');
       },
     });
 
@@ -295,11 +273,7 @@ export class ComposioToolGateway {
           }
         }
 
-        const conn = composioAuth.getConnection('slack');
-        if (!conn?.connected) {
-          throw new Error('Slack integration is NOT CONNECTED. Please connect your Slack bot token.');
-        }
-        return { success: true, ts: Date.now().toString(), mode: 'SIMULATION_MODE' };
+        throw new Error('Slack messaging is unavailable: configure the Composio execution provider.');
       },
     });
   }
@@ -334,4 +308,3 @@ export class ComposioToolGateway {
 }
 
 export const composioToolGateway = ComposioToolGateway.getInstance();
-

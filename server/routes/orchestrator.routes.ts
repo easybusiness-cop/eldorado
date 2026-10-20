@@ -265,12 +265,11 @@ orchestratorRouter.post("/orchestrator/briefing", async (req, res) => {
       .map((m: any) => `[${(m.role || "user").toUpperCase()}]: ${m.content}`)
       .join("\n");
 
-    // Dynamic summarization & subtask generation
+    // Generate a proposal; this endpoint does not dispatch or execute subtasks.
     let summary: any = null;
     try {
-      const { callGeminiResilient } = await import("../ai/geminiService.ts");
       const systemPrompt = `You are the Executive Intelligence Summarizer for Rufflo OS.
-Analyze the following conversation between the user (${userName}) and Rufflo Quantum Intelligence:
+Analyze the supplied conversation for the user (${userName}).
 
 ${conversationText}
 
@@ -278,64 +277,58 @@ Produce a JSON briefing summary matching this exact schema:
 {
   "executiveSummary": "A concise 2-sentence summary of what the user wants built, investigated, or achieved.",
   "keyTopics": ["Topic 1", "Topic 2", "Topic 3"],
-  "adminSpeech": "Michael Scott Administrator speech confirming receipt of the briefing from Rufflo Quantum Intelligence and delegating work to employees.",
+  "adminSpeech": "A concise acknowledgment that makes clear no tasks were dispatched or executed.",
   "subtasks": [
     {
       "id": "subtask-1",
       "title": "Subtask title",
       "assignedTo": "cline | ruflo-coder | dwight | jim | kevin | pam | stanley",
       "priority": "critical | high | medium",
-      "shellCommands": ["cmd 1", "cmd 2"],
-      "executableCode": "// Code snippet",
-      "outputSummary": "Summary of expected output"
+      "suggestedWork": "Proposed task only; not dispatched or executed"
     }
   ]
 }`;
 
-      const rawAiResponse = await callGeminiResilient({
-        contents: `Summarize chat and generate administrator briefing for user directives: "${userText.slice(0, 1000)}"`,
+      const rawAiResponse = await modelRouter.generate({
+        prompt: `Summarize the supplied conversation and propose, but do not claim to dispatch or execute, work for: "${userText.slice(0, 1000)}"`,
         systemInstruction: systemPrompt,
         responseMimeType: "application/json",
         temperature: 0.6,
       });
 
-      summary = JSON.parse(rawAiResponse || "{}");
-    } catch (aiErr) {
-      console.warn("[Intelligence Briefing AI Fallback] Utilizing resilient local summarizer engine.");
-      summary = {
-        executiveSummary: `User (${userName}) requested: "${userText.slice(0, 140)}...". Quantum Intelligence processed and derived actionable fleet work items.`,
-        keyTopics: ["Fleet Tasking", "AI Workflow", "Rufflo Automation"],
-        adminSpeech: `Attention team! Rufflo Quantum Intelligence just delivered a direct briefing from ${userName}: "${userText.slice(0, 80)}...". I am dispatching Cline, Ruflo Coder, and Dwight immediately!`,
-        subtasks: [
-          {
-            id: `subtask-${Date.now()}-1`,
-            title: `Execute User Objective: ${userText.slice(0, 30)}...`,
-            assignedTo: "cline",
-            priority: "high",
-            shellCommands: ["npm run build:check", "git status"],
-            executableCode: `console.log("Executing intelligence directive for: ${userText.slice(0, 30).replace(/"/g, '\\"')}");`,
-            outputSummary: `Cline initiated software execution for user briefing directive.`,
-          },
-          {
-            id: `subtask-${Date.now()}-2`,
-            title: `Security & AST Audit for Intelligence Briefing`,
-            assignedTo: "dwight",
-            priority: "critical",
-            shellCommands: ["npx eslint . --quiet"],
-            executableCode: `console.log("Dwight verified zero-trust security perimeter for briefing.");`,
-            outputSummary: `Dwight completed security audit on briefing payload.`,
-          },
-        ],
-      };
+      summary = JSON.parse(rawAiResponse.text);
+    } catch (modelError) {
+      console.error("[Intelligence Briefing] Real model provider failed:", modelError);
+      return res.status(503).json({
+        success: false,
+        status: "blocked",
+        code: "MODEL_PROVIDER_UNAVAILABLE",
+        error: "No briefing or task proposal was generated because no configured real model provider completed the request.",
+      });
+    }
+
+    if (
+      !summary ||
+      typeof summary.executiveSummary !== "string" ||
+      !Array.isArray(summary.keyTopics) ||
+      typeof summary.adminSpeech !== "string" ||
+      !Array.isArray(summary.subtasks)
+    ) {
+      return res.status(502).json({
+        success: false,
+        status: "failed",
+        code: "MODEL_RESPONSE_INVALID",
+        error: "The configured model did not return a valid briefing; no briefing was stored.",
+      });
     }
 
     const memoryEntry = {
       id: `briefing-${Date.now()}`,
       timestamp: new Date().toISOString(),
-      executiveSummary: summary.executiveSummary || `Briefing processed for ${messages.length} messages.`,
-      keyTopics: summary.keyTopics || ["Automation", "Rufflo OS"],
-      adminSpeech: summary.adminSpeech || `Administrator Scott dispatched briefing tasks to the fleet.`,
-      subtasks: summary.subtasks || [],
+      executiveSummary: summary.executiveSummary,
+      keyTopics: summary.keyTopics,
+      adminSpeech: summary.adminSpeech,
+      subtasks: summary.subtasks,
       messagesCount: messages.length,
     };
 
@@ -362,6 +355,3 @@ orchestratorRouter.get("/orchestrator/memory", (_req, res) => {
     memories: intelligenceMemoryStore,
   });
 });
-
-
-

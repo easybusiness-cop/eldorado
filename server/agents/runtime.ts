@@ -31,6 +31,8 @@ export class AgentRuntime {
     success: boolean;
     result: string;
     durationMs: number;
+    status: 'model_response';
+    completionVerified: false;
   }> {
     const startTime = Date.now();
 
@@ -135,15 +137,9 @@ export class AgentRuntime {
 
       const durationMs =
         Date.now() - startTime;
-
-      agentFleetRegistry.recordTaskCompletion(
-        agentId,
-        durationMs,
-      );
-
       agentFleetRegistry.updateStatus(
         agentId,
-        "completed",
+        "idle",
       );
 
       workingMemory.clearContext(
@@ -154,6 +150,8 @@ export class AgentRuntime {
         success: true,
         result: execution.result,
         durationMs,
+        status: 'model_response',
+        completionVerified: false,
       };
     } catch (error) {
       agentFleetRegistry.updateStatus(

@@ -15,7 +15,7 @@ const supabasePublishableKey = (
 
 if (!rawSupabaseUrl || !supabasePublishableKey || supabasePublishableKey === "placeholder-key") {
   if (typeof window !== "undefined") {
-    console.warn(
+    console.info(
       "Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY."
     );
   }
