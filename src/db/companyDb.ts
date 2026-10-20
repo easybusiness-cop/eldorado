@@ -1893,10 +1893,29 @@ export function onboardAgent(agentProfile) {
   }
 
   private save() {
+    const tempPath = `${DB_FILE_PATH}.tmp`;
     try {
-      const tempPath = `${DB_FILE_PATH}.tmp`;
       fs.writeFileSync(tempPath, JSON.stringify(this.cache, null, 2), 'utf8');
-      fs.renameSync(tempPath, DB_FILE_PATH);
+      try {
+        fs.renameSync(tempPath, DB_FILE_PATH);
+      } catch (renameError: any) {
+        const retryableWindowsLock = process.platform === 'win32'
+          && ['EPERM', 'EACCES', 'EBUSY'].includes(renameError?.code);
+        if (!retryableWindowsLock) throw renameError;
+
+        // Windows may refuse to replace a destination held briefly by a sync
+        // or scanner process. The complete temp file is already durable, so
+        // copy it into place as a fallback and keep the temp if that also fails.
+        try {
+          fs.copyFileSync(tempPath, DB_FILE_PATH);
+          fs.unlinkSync(tempPath);
+        } catch (copyError: any) {
+          throw new Error(
+            `Database rename failed (${renameError.code}); fallback copy failed (${copyError?.code || copyError?.message}). Recovery data remains at ${tempPath}.`,
+            { cause: copyError },
+          );
+        }
+      }
     } catch (err: any) {
       console.error(`[CompanyDB Error] Transaction write failed: ${err.message}`);
     }

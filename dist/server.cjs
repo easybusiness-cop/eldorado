@@ -9787,10 +9787,24 @@ export function onboardAgent(agentProfile) {
     }
   }
   save() {
+    const tempPath = `${DB_FILE_PATH}.tmp`;
     try {
-      const tempPath = `${DB_FILE_PATH}.tmp`;
       import_fs2.default.writeFileSync(tempPath, JSON.stringify(this.cache, null, 2), "utf8");
-      import_fs2.default.renameSync(tempPath, DB_FILE_PATH);
+      try {
+        import_fs2.default.renameSync(tempPath, DB_FILE_PATH);
+      } catch (renameError) {
+        const retryableWindowsLock = process.platform === "win32" && ["EPERM", "EACCES", "EBUSY"].includes(renameError?.code);
+        if (!retryableWindowsLock) throw renameError;
+        try {
+          import_fs2.default.copyFileSync(tempPath, DB_FILE_PATH);
+          import_fs2.default.unlinkSync(tempPath);
+        } catch (copyError) {
+          throw new Error(
+            `Database rename failed (${renameError.code}); fallback copy failed (${copyError?.code || copyError?.message}). Recovery data remains at ${tempPath}.`,
+            { cause: copyError }
+          );
+        }
+      }
     } catch (err) {
       console.error(`[CompanyDB Error] Transaction write failed: ${err.message}`);
     }
