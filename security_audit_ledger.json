@@ -1,5 +1,77 @@
 [
   {
+    "eventId": "evt-1792571573609-0q7nj9",
+    "timestamp": "2026-10-21T08:32:53.610Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
+    "eventId": "evt-1792571150381-48uv5l",
+    "timestamp": "2026-10-21T08:25:50.381Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
+    "eventId": "evt-1792570722702-rac9bm",
+    "timestamp": "2026-10-21T08:18:42.702Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
+    "eventId": "evt-1792570713858-w14e5g",
+    "timestamp": "2026-10-21T08:18:33.858Z",
+    "actor": "anonymous-intruder",
+    "tenant": "org-unknown",
+    "action": "API_PAYLOAD_OWASP_BLOCKED",
+    "resource": "/api/tasks",
+    "policyDecision": "deny",
+    "riskScore": 95,
+    "riskLevel": "CRITICAL",
+    "findings": [
+      "Blocked request from IP unknown due to OWASP payload detection.",
+      "SQL Injection (SQLi) (Severity: CRITICAL)"
+    ],
+    "isolationLevel": "WAF_PAYLOAD_SCANNER",
+    "networkIsolated": true,
+    "credentialsStripped": true
+  },
+  {
     "eventId": "evt-1792273635206-ss5d1n",
     "timestamp": "2026-10-17T21:47:15.206Z",
     "actor": "anonymous-intruder",

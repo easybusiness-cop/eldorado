@@ -67,12 +67,37 @@ export function AgentDetailDrawer({
   const [delegateStatus, setDelegateStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isDelegating, setIsDelegating] = useState<boolean>(false);
 
+  // Dedicated Chromium Browser Context state
+  const [browserUrl, setBrowserUrl] = useState<string>('https://news.ycombinator.com');
+  const [isBrowsing, setIsBrowsing] = useState<boolean>(false);
+  const [browserSession, setBrowserSession] = useState<any>(null);
+  const [browseResult, setBrowseResult] = useState<any>(null);
+  const [researchTopic, setResearchTopic] = useState<string>('');
+  const [isResearching, setIsResearching] = useState<boolean>(false);
+  const [researchResult, setResearchResult] = useState<any>(null);
+
+  const fetchAgentBrowserStatus = async () => {
+    if (!agent) return;
+    try {
+      const res = await fetch(`/api/browser/agent/${agent.id}/status`);
+      const data = await res.json();
+      if (data.success && data.session) {
+        setBrowserSession(data.session);
+      } else {
+        setBrowserSession(null);
+      }
+    } catch {}
+  };
+
   useEffect(() => {
     if (agent) {
       setSyncEnabled(agent.telegramSyncEnabled ?? false);
       setTargetChannelId(agent.telegramChannelId || '-1001928374650');
       setShowDelegateModal(false);
       setDelegateStatus(null);
+      setBrowseResult(null);
+      setResearchResult(null);
+      fetchAgentBrowserStatus();
     }
   }, [agent]);
 
@@ -103,6 +128,58 @@ export function AgentDetailDrawer({
     });
 
   const bestIdleCandidate = candidateAgents.find(a => a.isIdle) || candidateAgents[0];
+
+  const handleAgentBrowse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!browserUrl.trim() || !agent) return;
+    soundFx.playClick();
+    setIsBrowsing(true);
+    setBrowseResult(null);
+
+    try {
+      const res = await fetch(`/api/browser/agent/${agent.id}/browse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: browserUrl.trim() }),
+      });
+      const data = await res.json();
+      setBrowseResult(data);
+      soundFx.playNotification();
+      fetchAgentBrowserStatus();
+    } catch (err: any) {
+      setBrowseResult({ success: false, error: err.message });
+    } finally {
+      setIsBrowsing(false);
+    }
+  };
+
+  const handleAgentResearchMission = async () => {
+    if (!agent || !browserUrl.trim()) return;
+    soundFx.playClick();
+    setIsResearching(true);
+    setResearchResult(null);
+
+    try {
+      const res = await fetch(`/api/browser/agent/${agent.id}/research-mission`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetUrl: browserUrl.trim(),
+          topic: researchTopic.trim() || `Autonomous OSINT & Technical Ingestion for ${agent.name}`,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.result) {
+        setResearchResult(data.result);
+        soundFx.playSuccessChime();
+        fetchAgentBrowserStatus();
+      }
+    } catch (err: any) {
+      setResearchResult({ error: err.message });
+    } finally {
+      setIsResearching(false);
+    }
+  };
 
   const handleOpenAutoDelegate = () => {
     soundFx.playClick();
@@ -543,6 +620,105 @@ export function AgentDetailDrawer({
             ) : (
               <div className="text-[11px] text-[#7c6f64] italic">
                 Toggle ON to connect {agent.name} to Telegram for real-time channel broadcasting.
+              </div>
+            )}
+          </section>
+
+          {/* Dedicated Chromium Browser Workspace */}
+          <section className="bg-[#181615] border border-[#fabd2f]/30 rounded-xl p-4 shadow-lg space-y-3 font-mono">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#fabd2f]/10 border border-[#fabd2f]/30 flex items-center justify-center text-[#fabd2f]">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    Individual Chromium Browser
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-bold">
+                      ISOLATED CONTEXT
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-[#a89984]">
+                    User-Agent: Rufflo-Agent/{agent.id}
+                  </div>
+                </div>
+              </div>
+
+              {browserSession && (
+                <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                  ACTIVE ({browserSession.cookiesCount} Cookies)
+                </span>
+              )}
+            </div>
+
+            {/* Quick Browse Bar */}
+            <form onSubmit={handleAgentBrowse} className="flex gap-2 pt-1">
+              <input
+                type="text"
+                value={browserUrl}
+                onChange={(e) => setBrowserUrl(e.target.value)}
+                placeholder="https://..."
+                className="flex-1 bg-[#121110] border border-[#3c3836] rounded px-2.5 py-1.5 text-xs text-[#ebdbb2] focus:outline-none focus:border-[#fabd2f]"
+              />
+              <button
+                type="submit"
+                disabled={isBrowsing}
+                className="px-3 py-1.5 bg-[#fabd2f] hover:bg-[#d79921] disabled:opacity-50 text-[#1d2021] font-bold rounded text-xs flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                {isBrowsing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                <span>Browse</span>
+              </button>
+            </form>
+
+            {/* Autonomous Research Mission Trigger */}
+            <div className="p-2.5 bg-[#121110] rounded border border-[#3c3836] space-y-2">
+              <div className="text-[10px] text-[#a89984] uppercase font-bold flex items-center justify-between">
+                <span>Autonomous OSINT & Vector Knowledge Sync</span>
+                <span className="text-purple-400">Knowledge Graph Linked</span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={researchTopic}
+                  onChange={(e) => setResearchTopic(e.target.value)}
+                  placeholder={`Topic (e.g. "Security Audit", "API Docs")...`}
+                  className="flex-1 bg-[#181615] border border-[#3c3836] rounded px-2 py-1 text-[11px] text-[#ebdbb2] focus:outline-none focus:border-purple-400"
+                />
+                <button
+                  type="button"
+                  onClick={handleAgentResearchMission}
+                  disabled={isResearching}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold rounded text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  {isResearching ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                  <span>Research</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Results Preview */}
+            {(browseResult || researchResult) && (
+              <div className="p-2.5 bg-[#121110] rounded border border-emerald-500/30 text-xs space-y-1 animate-in fade-in">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-bold text-emerald-400 truncate max-w-[280px]">
+                    {browseResult?.info?.title || researchResult?.pageTitle || 'Extracted'}
+                  </span>
+                  <span className="text-[10px] text-[#7c6f64]">
+                    {browseResult?.durationMs || researchResult?.durationMs}ms
+                  </span>
+                </div>
+                {researchResult?.knowledgeNodeId && (
+                  <div className="text-[10px] text-purple-300 font-bold">
+                    ✓ Committed to Knowledge Graph (ID: {researchResult.knowledgeNodeId})
+                  </div>
+                )}
+                {browseResult?.screenshot && (
+                  <img
+                    src={browseResult.screenshot}
+                    alt="Agent Viewport"
+                    className="max-h-36 rounded border border-[#3c3836] mt-1"
+                  />
+                )}
               </div>
             )}
           </section>

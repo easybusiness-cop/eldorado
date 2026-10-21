@@ -14,6 +14,236 @@
       "createdAt": "2026-10-17T21:53:21.583Z",
       "updatedAt": "2026-10-17T21:53:21.583Z",
       "importance": 0.9
+    },
+    {
+      "id": "node-ecc08291-a",
+      "type": "concept",
+      "label": "Python Runtime & Scientific Ecosystem",
+      "content": "Python 3.11 execution runtime. Excels in rapid scripting, automation, API integration, data manipulation, math, string parsing, json handling, and asynchronous tasks with asyncio.",
+      "tags": [
+        "python",
+        "python3",
+        "automation",
+        "data-science",
+        "runtime"
+      ],
+      "metadata": {
+        "runtime": "python3",
+        "standardLibraries": [
+          "json",
+          "csv",
+          "sys",
+          "os",
+          "subprocess",
+          "math",
+          "re",
+          "asyncio",
+          "datetime",
+          "urllib"
+        ]
+      },
+      "createdAt": "2026-10-21T08:28:48.945Z",
+      "updatedAt": "2026-10-21T08:28:48.945Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-d740436d-3",
+      "type": "concept",
+      "label": "C++ High-Performance Systems & Algorithmic Runtime",
+      "content": "Modern C++ (C++17/C++20) compiled via GNU Compiler Collection (g++). Excels in maximum computational speed, low-latency execution, memory efficiency, complex data structures, algorithms, and system utilities.",
+      "tags": [
+        "cpp",
+        "c++",
+        "g++",
+        "systems",
+        "algorithms",
+        "performance"
+      ],
+      "metadata": {
+        "compiler": "g++",
+        "flags": [
+          "-O3",
+          "-std=c++20",
+          "-Wall"
+        ],
+        "headers": [
+          "<iostream>",
+          "<vector>",
+          "<string>",
+          "<algorithm>",
+          "<memory>",
+          "<map>",
+          "<chrono>",
+          "<thread>"
+        ]
+      },
+      "createdAt": "2026-10-21T08:28:48.946Z",
+      "updatedAt": "2026-10-21T08:28:48.946Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-3501d6d8-a",
+      "type": "concept",
+      "label": "Java OpenJDK Enterprise Execution Runtime",
+      "content": "Java 17/21 OpenJDK runtime (javac and java). Excels in robust object-oriented architecture, enterprise logic, multi-threading, stream processing, deterministic typing, and portable modular software.",
+      "tags": [
+        "java",
+        "openjdk",
+        "javac",
+        "enterprise",
+        "oop",
+        "concurrency"
+      ],
+      "metadata": {
+        "compiler": "javac",
+        "runner": "java",
+        "packages": [
+          "java.util.*",
+          "java.io.*",
+          "java.nio.file.*",
+          "java.util.concurrent.*",
+          "java.util.stream.*"
+        ]
+      },
+      "createdAt": "2026-10-21T08:28:48.946Z",
+      "updatedAt": "2026-10-21T08:28:48.946Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-5751fe30-c",
+      "type": "concept",
+      "label": "Python Runtime & Scientific Ecosystem",
+      "content": "Python 3.11 execution runtime. Excels in rapid scripting, automation, API integration, data manipulation, math, string parsing, json handling, and asynchronous tasks with asyncio.",
+      "tags": [
+        "python",
+        "python3",
+        "automation",
+        "data-science",
+        "runtime"
+      ],
+      "metadata": {
+        "runtime": "python3",
+        "standardLibraries": [
+          "json",
+          "csv",
+          "sys",
+          "os",
+          "subprocess",
+          "math",
+          "re",
+          "asyncio",
+          "datetime",
+          "urllib"
+        ]
+      },
+      "createdAt": "2026-10-21T08:32:35.861Z",
+      "updatedAt": "2026-10-21T08:32:35.861Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-caa5c872-a",
+      "type": "concept",
+      "label": "C++ High-Performance Systems & Algorithmic Runtime",
+      "content": "Modern C++ (C++17/C++20) compiled via GNU Compiler Collection (g++). Excels in maximum computational speed, low-latency execution, memory efficiency, complex data structures, algorithms, and system utilities.",
+      "tags": [
+        "cpp",
+        "c++",
+        "g++",
+        "systems",
+        "algorithms",
+        "performance"
+      ],
+      "metadata": {
+        "compiler": "g++",
+        "flags": [
+          "-O3",
+          "-std=c++20",
+          "-Wall"
+        ],
+        "headers": [
+          "<iostream>",
+          "<vector>",
+          "<string>",
+          "<algorithm>",
+          "<memory>",
+          "<map>",
+          "<chrono>",
+          "<thread>"
+        ]
+      },
+      "createdAt": "2026-10-21T08:32:35.862Z",
+      "updatedAt": "2026-10-21T08:32:35.862Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-5e6e66cf-9",
+      "type": "concept",
+      "label": "Java OpenJDK Enterprise Execution Runtime",
+      "content": "Java 17/21 OpenJDK runtime (javac and java). Excels in robust object-oriented architecture, enterprise logic, multi-threading, stream processing, deterministic typing, and portable modular software.",
+      "tags": [
+        "java",
+        "openjdk",
+        "javac",
+        "enterprise",
+        "oop",
+        "concurrency"
+      ],
+      "metadata": {
+        "compiler": "javac",
+        "runner": "java",
+        "packages": [
+          "java.util.*",
+          "java.io.*",
+          "java.nio.file.*",
+          "java.util.concurrent.*",
+          "java.util.stream.*"
+        ]
+      },
+      "createdAt": "2026-10-21T08:32:35.862Z",
+      "updatedAt": "2026-10-21T08:32:35.862Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-877011e9-9",
+      "type": "concept",
+      "label": "Research: Example Domain",
+      "content": "Target: https://example.com\nAgent: dwight\nTopic: Security Perimeter & Architecture Inspection\n\nKey Insights:\nThis domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\n\nTop Headings:\n",
+      "tags": [
+        "web-research",
+        "osint",
+        "dwight",
+        "chromium"
+      ],
+      "metadata": {
+        "url": "https://example.com",
+        "agentId": "dwight",
+        "wordCount": 25,
+        "capturedAt": "2026-10-21T08:32:39.339Z"
+      },
+      "createdAt": "2026-10-21T08:32:39.339Z",
+      "updatedAt": "2026-10-21T08:32:39.339Z",
+      "importance": 0.85
+    },
+    {
+      "id": "node-39e4e941-e",
+      "type": "concept",
+      "label": "Research: Example Domain",
+      "content": "Target: https://example.org\nAgent: pete-miller\nTopic: Enterprise Cloud Infrastructure Audit\n\nKey Insights:\nThis domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\n\nTop Headings:\n",
+      "tags": [
+        "web-research",
+        "osint",
+        "pete-miller",
+        "chromium"
+      ],
+      "metadata": {
+        "url": "https://example.org",
+        "agentId": "pete-miller",
+        "wordCount": 25,
+        "capturedAt": "2026-10-21T08:32:47.416Z"
+      },
+      "createdAt": "2026-10-21T08:32:47.416Z",
+      "updatedAt": "2026-10-21T08:32:47.416Z",
+      "importance": 0.85
     }
   ],
   "edges": [],

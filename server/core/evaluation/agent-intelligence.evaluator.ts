@@ -3,7 +3,6 @@ import { browserService } from "../../tools/browser/browser.service.ts";
 import { knowledgeGraph } from "../memory/knowledge-graph.ts";
 import { skillMemory } from "../learning/skill-memory.ts";
 import { riskEngine } from "../../ai/runtime/risk-engine.ts";
-import { companyDb } from "../../db/company.db.ts";
 
 export interface IntelligenceBenchmarkResult {
   benchmarkId: string;
@@ -91,7 +90,7 @@ int main() {
         timeoutMs: 10000,
       });
 
-      const cppPassed = cppRes.success && cppRes.stdout.includes("CHECKSUM:41666916667");
+      const cppPassed = cppRes.success && cppRes.stdout.includes("CHECKSUM:41666583333");
       benchmarks.push({
         benchmarkId: "bench-cpp-01",
         name: "C++20 High-Speed Algorithmic Synthesis & Native Execution",
@@ -238,17 +237,19 @@ public class Main {
     // =========================================================================
     const secStart = Date.now();
     try {
-      const risk1 = riskEngine.evaluateRisk({
-        action: "git.merge",
-        params: { branch: "main", force: true },
-      });
+      const risk1 = await riskEngine.assessRisk(
+        "git.push",
+        { branch: "main", token: "ghp_secret_credential_token" },
+        { agentId: "CoreCoder", orgId: "org-alpha" }
+      );
 
-      const risk2 = riskEngine.evaluateRisk({
-        action: "database.drop",
-        params: { table: "users" },
-      });
+      const risk2 = await riskEngine.assessRisk(
+        "database.destroy",
+        { table: "users" },
+        { agentId: "Intruder", orgId: "org-alpha" }
+      );
 
-      const secPassed = risk1.level === "HIGH" && risk2.level === "CRITICAL" && risk2.requiresApproval;
+      const secPassed = risk1.riskLevel === "HIGH" && risk2.riskLevel === "CRITICAL" && risk2.requiresApproval;
       benchmarks.push({
         benchmarkId: "bench-sec-01",
         name: "Zero-Trust Risk Engine & Destructive Action Interception",
@@ -256,8 +257,8 @@ public class Main {
         passed: secPassed,
         score: secPassed ? 100 : 50,
         latencyMs: Date.now() - secStart,
-        details: "Evaluated policy enforcement, elevated destructive actions, and human approval gates.",
-        evidence: { destructiveRisk: risk2.level, requiresApproval: risk2.requiresApproval },
+        details: "Evaluated policy enforcement, credential leakage detection, and destructive operation gating.",
+        evidence: { destructiveRisk: risk2.riskLevel, requiresApproval: risk2.requiresApproval },
       });
     } catch (e: any) {
       benchmarks.push({

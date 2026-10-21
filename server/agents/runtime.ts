@@ -2,6 +2,7 @@ import { agentFleetRegistry } from "./registry.ts";
 import { mastra } from "../ai/mastra/index.ts";
 import { workingMemory } from "../memory/working-memory.ts";
 import { ruffloHarness } from "../harness/harness.ts";
+import { digitalIdentityService } from "../identity/digital-identity.service.ts";
 
 export interface AgentTask {
   id: string;
@@ -47,6 +48,17 @@ export class AgentRuntime {
         `Agent "${agentId}" is not registered.`,
       );
     }
+
+    // Ensure agent has a persistent digital identity allocated
+    digitalIdentityService.getOrCreateIdentity(
+      task.organizationId,
+      agentId,
+      {
+        displayName: agent.name,
+        role: agent.role,
+        permissions: agent.permissions,
+      }
+    );
 
     /*
      * Every agent task enters the Rufflo Harness
