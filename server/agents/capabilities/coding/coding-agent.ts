@@ -74,4 +74,37 @@ export class CodingAgent {
       details: commitRes,
     };
   }
+
+  public static async executePolyglotTask(params: {
+    task: string;
+    language: 'python' | 'cpp' | 'java' | 'typescript';
+    code: string;
+    stdin?: string;
+  }): Promise<{
+    success: boolean;
+    language: string;
+    stdout: string;
+    stderr: string;
+    durationMs: number;
+    exitCode: number | null;
+  }> {
+    const { polyglotService } = await import('../../../core/execution/polyglot.service.ts');
+    const result = await polyglotService.executeCode({
+      language: params.language,
+      code: params.code,
+      stdin: params.stdin,
+      taskDescription: params.task,
+      agentId: 'CodingAgent',
+    });
+
+    return {
+      success: result.success,
+      language: result.language,
+      stdout: result.stdout,
+      stderr: result.stderr,
+      durationMs: result.durationMs,
+      exitCode: result.exitCode,
+    };
+  }
 }
+

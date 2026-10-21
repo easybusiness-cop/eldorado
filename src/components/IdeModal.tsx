@@ -30,6 +30,7 @@ import {
   Monitor
 } from 'lucide-react';
 import { DeveloperComputerSuite } from './DeveloperComputerSuite';
+import { PolyglotLanguageHub } from './PolyglotLanguageHub';
 
 interface IdeModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export const IdeModal: React.FC<IdeModalProps> = ({
   onSaveFeature,
   onExecuteCode,
 }) => {
-  const [activeTab, setActiveTab] = useState<'developer_suite' | 'ide' | 'website_builder' | 'software_builder' | 'self_healing' | 'cloudrun'>('developer_suite');
+  const [activeTab, setActiveTab] = useState<'developer_suite' | 'ide' | 'polyglot' | 'website_builder' | 'software_builder' | 'self_healing' | 'cloudrun'>('developer_suite');
   const [featureName, setFeatureName] = useState(featureToEdit?.name || 'Autonomous Fleet Pipeline');
 
   // Autonomous Software Builder UI State
@@ -365,6 +366,18 @@ return generateCloudRunRoute();`
             >
               <Terminal className="w-3.5 h-3.5" />
               <span>Live IDE</span>
+            </button>
+
+            <button
+              onClick={() => { soundFx.playClick(); setActiveTab('polyglot'); }}
+              className={`px-2.5 py-1 rounded text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+                activeTab === 'polyglot'
+                  ? 'bg-[#fabd2f] text-[#1d2021]'
+                  : 'text-[#a89984] hover:text-[#ebdbb2]'
+              }`}
+            >
+              <Cpu className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Python • C++ • Java</span>
             </button>
 
             <button
@@ -974,6 +987,13 @@ return generateCloudRunRoute();`
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* TAB POLYGLOT: PYTHON, C++, JAVA RUNTIMES */}
+        {activeTab === 'polyglot' && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <PolyglotLanguageHub />
           </div>
         )}
 

@@ -64,6 +64,7 @@ interface TopNavigationProps {
   onOpenComposioHub?: () => void;
   onOpenOpenWebUI?: () => void;
   onOpenCrisisSimulation?: () => void;
+  onOpenIntelligence?: () => void;
   onSelectCorporationTab?: () => void;
   dynamicFeatureCount: number;
   systemModulesCount: number;
@@ -121,6 +122,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     onOpenComposioHub,
     onOpenOpenWebUI,
     onOpenCrisisSimulation,
+    onOpenIntelligence,
     onSelectCorporationTab,
     dynamicFeatureCount,
     systemModulesCount,
@@ -175,6 +177,12 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
       icon: <Flame className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white" />,
       onClick: onOpenCrisisSimulation,
     },
+    {
+      id: 'intelligence',
+      label: 'Fleet Intelligence & Chromium',
+      icon: <Brain className="w-3.5 h-3.5 text-purple-400 group-hover:text-white" />,
+      onClick: onOpenIntelligence,
+    },
   ];
 
   // Comprehensive Catalog of All Features categorized for the Mega Menu
@@ -190,6 +198,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
           icon: <Layers className="w-4 h-4 text-emerald-400" />,
           onClick: onSelectCorporationTab,
           badge: 'CORE',
+        },
+        {
+          id: 'intelligence-eval',
+          label: 'Fleet Intelligence & Chromium Hub',
+          description: 'Benchmark IQ (152+), polyglot compilers & connected Chromium CDP gateway',
+          icon: <Brain className="w-4 h-4 text-purple-400" />,
+          onClick: onOpenIntelligence,
+          badge: 'IQ 152',
         },
         {
           id: 'radar',
@@ -232,6 +248,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
           icon: <Code className="w-4 h-4 text-amber-400" />,
           onClick: onOpenIde,
           badge: 'IDE',
+        },
+        {
+          id: 'polyglot',
+          label: 'Python • C++ • Java Polyglot Hub',
+          description: 'Native compilers: g++ -O3, OpenJDK 17, Python 3.10 runtime & LLM memory',
+          icon: <Cpu className="w-4 h-4 text-emerald-400" />,
+          onClick: onOpenIde,
+          badge: 'POLYGLOT',
         },
         {
           id: 'repos',

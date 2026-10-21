@@ -98,6 +98,18 @@ export class KnowledgeGraph {
       .slice(0, limit);
   }
 
+  allNodes(): MemoryNode[] {
+    return Array.from(this.nodes.values());
+  }
+
+  allEdges(): MemoryEdge[] {
+    return Array.from(this.edges.values());
+  }
+
+  getEpisodes(limit = 20): EpisodicMemory[] {
+    return this.getRecentEpisodes(undefined, limit);
+  }
+
   // ------------------------------------------------------------------
   // Edges (Knowledge Graph relations)
   // ------------------------------------------------------------------

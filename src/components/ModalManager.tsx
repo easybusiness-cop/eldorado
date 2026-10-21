@@ -41,6 +41,7 @@ const OpenWebUIModal = lazy(() => import('./OpenWebUIModal').then(({ OpenWebUIMo
 const ComposioHubModal = lazy(() => import('./ComposioHubModal').then(({ ComposioHubModal }) => ({ default: ComposioHubModal })));
 const ApiGatewayMicroservicesModal = lazy(() => import('./ApiGatewayMicroservicesModal').then(({ ApiGatewayMicroservicesModal }) => ({ default: ApiGatewayMicroservicesModal })));
 const CrisisSimulationModal = lazy(() => import('./CrisisSimulationModal').then(({ CrisisSimulationModal }) => ({ default: CrisisSimulationModal })));
+const AgentIntelligenceModal = lazy(() => import('./AgentIntelligenceModal').then(({ AgentIntelligenceModal }) => ({ default: AgentIntelligenceModal })));
 import { Zap } from 'lucide-react';
 
 function lazy<P extends object>(
@@ -58,6 +59,7 @@ function lazy<P extends object>(
 
 export interface ModalManagerState {
   isComposioHubOpen?: boolean;
+  isIntelligenceOpen?: boolean;
   isCrisisSimulationOpen?: boolean;
 
   isApiGatewayMicroservicesOpen?: boolean;
@@ -360,6 +362,15 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       <MasterSelfEvolutionModal
         isOpen={state.isMasterEvolutionOpen}
         onClose={() => onClose('isMasterEvolutionOpen')}
+      />
+
+      <AgentIntelligenceModal
+        isOpen={Boolean(state.isIntelligenceOpen)}
+        onClose={() => onClose('isIntelligenceOpen')}
+        onOpenBrowser={() => {
+          onClose('isIntelligenceOpen');
+          onOpen('isWebOpen');
+        }}
       />
 
       <AdministratorOrchestratorModal

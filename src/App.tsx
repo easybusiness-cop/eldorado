@@ -148,6 +148,7 @@ export default function App() {
     isAdminOrchestratorOpen: false,
     isDynamicFeaturesOpen: false,
     isIdeOpen: false,
+    isIntelligenceOpen: false,
     isCallOpen: false,
     isWorkstationOpen: false,
     isAgentDetailOpen: false,
@@ -196,6 +197,7 @@ export default function App() {
       isAdminOrchestratorOpen: false,
       isDynamicFeaturesOpen: false,
       isIdeOpen: false,
+      isIntelligenceOpen: false,
       isCallOpen: false,
       isWorkstationOpen: false,
       isAgentDetailOpen: false,
@@ -1198,6 +1200,7 @@ export default function App() {
         onOpenOpenWebUI={() => { closeAllModals(); openModal('isOpenWebUiOpen'); }}
 
         onOpenCrisisSimulation={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+        onOpenIntelligence={() => { closeAllModals(); openModal('isIntelligenceOpen'); }}
         onOpenPublicApiHub={() => { closeAllModals(); openModal('isPublicApiOpen'); }}
         onOpenMunderdifflinDashboard={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); openModal('isMunderdifflinDashboardOpen'); }}
         onOpenAgentCommunication={() => { closeAllModals(); setDashboardInitialTab('communication'); openModal('isMunderdifflinDashboardOpen'); }}
