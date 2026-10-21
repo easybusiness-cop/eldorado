@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { ModelProvider, ModelGenerateOptions, ModelGenerateResult, ModelProviderUnavailableError, StreamCallback } from '../providers/model-provider.ts';
 import { GeminiProvider } from '../providers/gemini.provider.ts';
 import { OllamaProvider } from '../providers/ollama.provider.ts';
+import { withLangfuseModelGeneration } from '../observability/langfuse-tracing.ts';
 
 export interface ModelRouteDecision {
   model: string;
@@ -87,7 +88,7 @@ export class ModelRouter {
         const available = await provider.isAvailable();
         if (!available) continue;
 
-        const result = await provider.generate(options);
+        const result = await withLangfuseModelGeneration(provider.name, options, () => provider.generate(options));
         if (result?.text && result.text.trim().length > 0) {
           return result;
         }
@@ -113,10 +114,10 @@ export class ModelRouter {
         if (!available) continue;
 
         if (typeof provider.generateStream === "function") {
-          return await provider.generateStream(options, onChunk);
+          return await withLangfuseModelGeneration(provider.name, options, () => provider.generateStream!(options, onChunk));
         }
 
-        const result = await provider.generate(options);
+        const result = await withLangfuseModelGeneration(provider.name, options, () => provider.generate(options));
         if (result?.text) {
           onChunk({ text: result.text, done: false, provider: result.provider, model: result.model });
           onChunk({ text: "", done: true, provider: result.provider, model: result.model });
