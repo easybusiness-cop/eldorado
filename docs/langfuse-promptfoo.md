@@ -1,4 +1,4 @@
-# Langfuse tracing and Promptfoo evaluations
+# AI quality, observability, and knowledge integrations
 
 Rufflo can optionally send model-provider generation observations to Langfuse and run a small grounding-focused Promptfoo evaluation against a local Ollama model. These integrations are separate: Promptfoo validation is local and does not require Langfuse credentials.
 
@@ -8,10 +8,11 @@ The application dependency set needs:
 
 - `@langfuse/tracing`
 - `@langfuse/otel`
-- `@opentelemetry/sdk-node`
+- `@opentelemetry/api`, `@opentelemetry/core`, `@opentelemetry/exporter-trace-otlp-http`, `@opentelemetry/otlp-exporter-base`, `@opentelemetry/sdk-node`, and `@opentelemetry/sdk-trace-base` pinned to compatible releases
+- `inngest` for durable background document indexing
 - `promptfoo` as a development dependency for the evaluation CLI
 
-Use matching Langfuse SDK package majors. The current Langfuse JS/TS SDK v6 supports Node.js 22+, which matches the repository's Docker runtime. No Langfuse client package is needed for this tracing-only integration.
+Use matching Langfuse SDK package majors and keep the OpenTelemetry packages on the compatible versions recorded in `package-lock.json`. The Langfuse JS/TS SDK v6 supports Node.js 22+, which matches the repository's Docker runtime. No Langfuse client package is needed for this tracing-only integration.
 
 ## Langfuse setup
 
@@ -33,7 +34,7 @@ LANGFUSE_CAPTURE_CONTENT=true
 
 Only enable content capture when the data sent through the model is permitted to leave the application. The capture flag records the complete input and output for each provider attempt, including calls that are later followed by a fallback provider.
 
-The server host should call `shutdownLangfuseTracing()` during graceful shutdown to flush buffered observations. The helper exposes this function, but the current model-router integration does not bind it to a process signal handler.
+The server calls `shutdownLangfuseTracing()` during graceful shutdown after `SIGINT` or `SIGTERM` so buffered observations can flush.
 
 ## Promptfoo setup and usage
 
@@ -50,9 +51,53 @@ Configuration validation checks the YAML and referenced test data without callin
 
 These cases are a small regression starter set, not a broad quality benchmark. Add reviewed examples from real Rufflo workflows and expected evidence before treating aggregate scores as a release gate.
 
+## Supabase semantic knowledge
+
+The server uses `gemini-embedding-001` with 768 dimensions for both indexing and query embeddings. It persists chunks in `public.knowledge_chunks`, filters every query by the authenticated organization, and uses the `match_knowledge_chunks` RPC. Embeddings fail closed when `GEMINI_API_KEY` is unavailable; there is no synthetic hash-vector fallback.
+
+Configure these server-only values:
+
+```text
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<server-only service role key>
+GEMINI_API_KEY=<Gemini API key>
+```
+
+Review and apply the migration with the Supabase CLI:
+
+```sh
+npx supabase db push
+```
+
+The migration creates the pgvector table, organization index, metadata-filtered similarity RPC, and queued indexing-job table. It enables RLS and grants direct table/RPC access only to `service_role`; the app must authenticate the user and set the organization filter before querying.
+
+Authenticated application endpoints:
+
+- `POST /api/knowledge/index-jobs` with `{ "documentId", "content", "metadata?" }` queues indexing and returns a job ID.
+- `GET /api/knowledge/index-jobs/:jobId` returns only the caller's organization-scoped job status.
+- `POST /api/knowledge/semantic/search` with `{ "query", "topK?", "metadataFilter?" }` returns ranked chunks.
+
+## Inngest background indexing
+
+The Express handler is mounted at `/api/inngest`. In development, start the Inngest dev server and point it to `http://localhost:3000/api/inngest`; in production, configure `INNGEST_EVENT_KEY` for event delivery and `INNGEST_SIGNING_KEY` for signed function requests. The production handler refuses unsigned setup. The document body remains in Supabase; Inngest receives the job ID, organization ID, and a SHA-256 hash of the document ID for per-document concurrency. The vector upsert is idempotent by organization, document, and chunk index.
+
+The local Inngest CLI command is:
+
+```sh
+npx inngest-cli@latest dev -u http://localhost:3000/api/inngest
+```
+
+## Service setup status
+
+Installing the SDKs wires the application code, but does not create vendor accounts, API keys, or a Supabase database schema. Langfuse traces remain disabled until its keys are configured; semantic indexing/search needs Gemini and server-side Supabase credentials; queued indexing also needs the Inngest dev server or a connected Inngest environment. Apply the migration only after selecting the intended Supabase project.
+
 ## References
 
 - [Langfuse TypeScript instrumentation](https://langfuse.com/docs/observability/sdk/instrumentation)
 - [Langfuse JS/TS SDK overview](https://langfuse.com/docs/observability/sdk/overview)
 - [Promptfoo configuration guide](https://www.promptfoo.dev/docs/configuration/guide/)
 - [Promptfoo Ollama provider](https://www.promptfoo.dev/docs/providers/ollama/)
+- [Supabase vector columns](https://supabase.com/docs/guides/ai/vector-columns)
+- [Gemini embeddings](https://ai.google.dev/gemini-api/docs/embeddings)
+- [Inngest Express quick start](https://www.inngest.com/docs/getting-started/express-quick-start)
+- [Inngest event idempotency](https://www.inngest.com/docs/durable-execution/guides-and-advanced/idempotency)

@@ -76,13 +76,15 @@ cseMlRouter.post('/ml/vector/ingest', async (req, res) => {
   try {
     const { documentId = `doc-${Date.now()}`, content, metadata = {} } = req.body;
     if (!content) return res.status(400).json({ error: 'content is required' });
+    const organizationId = (req as any).identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ error: 'Authenticated organization context is required.' });
 
-    const chunks = await VectorDatabaseService.ingestDocument(documentId, content, metadata);
+    const chunks = await VectorDatabaseService.ingestDocument(organizationId, documentId, content, metadata);
     res.json({
       success: true,
       documentId,
       chunksIngested: chunks.length,
-      totalVectorStoreCount: VectorDatabaseService.getStoreCount(),
+      storage: 'supabase-pgvector',
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -94,8 +96,10 @@ cseMlRouter.post('/ml/vector/search', async (req, res) => {
   try {
     const { query, topK = 3 } = req.body;
     if (!query) return res.status(400).json({ error: 'query is required' });
+    const organizationId = (req as any).identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ error: 'Authenticated organization context is required.' });
 
-    const results = await VectorDatabaseService.searchSimilar(query, Number(topK));
+    const results = await VectorDatabaseService.searchSimilar(organizationId, query, Number(topK));
     res.json({ success: true, query, results });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
