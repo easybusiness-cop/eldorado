@@ -25,22 +25,39 @@ export function installApiAuthentication(): void {
 
       const isRuffloApi =
         requestUrl.origin === window.location.origin &&
-        requestUrl.pathname.startsWith("/api/");
+        requestUrl.pathname.startsWith("/api/") &&
+        requestUrl.pathname !== "/api/health";
 
       if (!isRuffloApi) {
         return originalFetch(input, init);
       }
 
+      const headers = new Headers(
+        input instanceof Request ? input.headers : undefined
+      );
+      new Headers(init?.headers).forEach((value, name) => {
+        headers.set(name, value);
+      });
+
+      // Rufflo's API verifies Supabase JWTs, so never forward a Firebase or
+      // demo token supplied by a caller.
       const token = await getSupabaseAccessToken();
 
       if (!token) {
-        return originalFetch(input, init);
+        // Keep anonymous polling from generating repeated browser network
+        // errors. Returning the same auth contract locally lets existing
+        // callers handle the unauthenticated state without contacting APIs.
+        return new Response(
+          JSON.stringify({
+            error: "Authentication required.",
+            code: "AUTH_TOKEN_MISSING",
+          }),
+          {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
-
-      const headers = new Headers(
-        init?.headers ??
-          (input instanceof Request ? input.headers : undefined)
-      );
 
       headers.set("Authorization", `Bearer ${token}`);
 

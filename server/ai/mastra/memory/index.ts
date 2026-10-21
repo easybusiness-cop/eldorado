@@ -33,6 +33,7 @@ export interface MemorySearchOptions {
   scope?: MemoryScope;
   tag?: string;
   organizationId?: string;
+  excludeTags?: readonly string[];
 }
 
 interface SupabaseMemoryRow {
@@ -304,6 +305,13 @@ export class MastraMemoryStore {
         (!options.agentId || record.agentId === options.agentId) &&
         (!options.scope || record.scope === options.scope) &&
         (!options.tag || record.tags.includes(options.tag)),
+      );
+    }
+
+    const excludedTags = new Set(options.excludeTags ?? []);
+    if (excludedTags.size > 0) {
+      candidates = candidates.filter((record) =>
+        !record.tags.some((tag) => excludedTags.has(tag)),
       );
     }
 

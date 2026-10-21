@@ -19,7 +19,6 @@ const WebAccessModal = lazy(() => import('./WebAccessModal').then(({ WebAccessMo
 const RepoExplorerModal = lazy(() => import('./RepoExplorerModal').then(({ RepoExplorerModal }) => ({ default: RepoExplorerModal })));
 const ContinuousDebuggerModal = lazy(() => import('./ContinuousDebuggerModal').then(({ ContinuousDebuggerModal }) => ({ default: ContinuousDebuggerModal })));
 const SystemModulesModal = lazy(() => import('./SystemModulesModal').then(({ SystemModulesModal }) => ({ default: SystemModulesModal })));
-const CseAgentAcademyModal = lazy(() => import('./CseAgentAcademyModal').then(({ CseAgentAcademyModal }) => ({ default: CseAgentAcademyModal })));
 const CompanyDatabaseModal = lazy(() => import('./CompanyDatabaseModal').then(({ CompanyDatabaseModal }) => ({ default: CompanyDatabaseModal })));
 const ExecutiveAnalyticsModal = lazy(() => import('./ExecutiveAnalyticsModal').then(({ ExecutiveAnalyticsModal }) => ({ default: ExecutiveAnalyticsModal })));
 const GoogleWorkspaceHub = lazy(() => import('./GoogleWorkspaceHub').then(({ GoogleWorkspaceHub }) => ({ default: GoogleWorkspaceHub })));
@@ -77,7 +76,6 @@ export interface ModalManagerState {
   isReposOpen: boolean;
   isDebuggerOpen: boolean;
   isSystemModulesOpen: boolean;
-  isAcademyOpen: boolean;
   isMasterEvolutionOpen: boolean;
   isCompanyDbOpen: boolean;
   isAnalyticsOpen: boolean;
@@ -189,7 +187,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onOpenDebugger={() => onOpen('isDebuggerOpen')}
         onOpenAdminOrchestrator={() => onOpen('isAdminOrchestratorOpen')}
         onOpenRepos={() => onOpen('isReposOpen')}
-        onOpenAcademy={() => onOpen('isAcademyOpen')}
         onOpenSystemModules={() => onOpen('isSystemModulesOpen')}
         onOpenPreferences={() => onOpen('isPreferencesOpen')}
         onOpenCall={(id) => {
@@ -306,15 +303,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
           onOpen('isIdeOpen');
         }}
       />
-
-      {state.isAcademyOpen && (
-        <CseAgentAcademyModal
-          agents={agents}
-          onUpdateAgent={onUpdateAgent}
-          onAddTask={onAddTask}
-          onClose={() => onClose('isAcademyOpen')}
-        />
-      )}
 
       <CompanyDatabaseModal
         isOpen={state.isCompanyDbOpen}

@@ -50,6 +50,7 @@ import {
   InefficiencyCategory,
   RemediationResult,
 } from '../../../server/corporation/types.ts';
+import { getAvatarInitials, isLocalAvatar } from '../../utils/avatar.ts';
 
 type ActiveTab =
   | 'optimizer'
@@ -1486,11 +1487,20 @@ export const VirtualCorporationView: React.FC = () => {
                           : 'bg-[#121520] border-white/5 hover:border-white/20'
                       }`}
                     >
-                      <img
-                        src={emp.avatarUrl}
-                        alt={emp.displayName}
-                        className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
-                      />
+                      {isLocalAvatar(emp.avatarUrl) ? (
+                        <img
+                          src={emp.avatarUrl}
+                          alt={emp.displayName}
+                          className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
+                        />
+                      ) : (
+                        <div
+                          aria-label={`${emp.displayName} avatar`}
+                          className="w-10 h-10 rounded-lg border border-white/10 shrink-0 flex items-center justify-center bg-cyan-950 text-cyan-200 font-bold"
+                        >
+                          {getAvatarInitials(emp.displayName)}
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <h4 className="text-xs font-bold text-white truncate">{emp.displayName}</h4>
@@ -1520,11 +1530,20 @@ export const VirtualCorporationView: React.FC = () => {
                   {/* Top Dossier Header */}
                   <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={selectedEmployee.avatarUrl}
-                        alt={selectedEmployee.displayName}
-                        className="w-16 h-16 rounded-xl object-cover border border-cyan-500/40 shadow-lg shadow-cyan-950/50"
-                      />
+                      {isLocalAvatar(selectedEmployee.avatarUrl) ? (
+                        <img
+                          src={selectedEmployee.avatarUrl}
+                          alt={selectedEmployee.displayName}
+                          className="w-16 h-16 rounded-xl object-cover border border-cyan-500/40 shadow-lg shadow-cyan-950/50"
+                        />
+                      ) : (
+                        <div
+                          aria-label={`${selectedEmployee.displayName} avatar`}
+                          className="w-16 h-16 rounded-xl border border-cyan-500/40 shadow-lg shadow-cyan-950/50 flex items-center justify-center bg-cyan-950 text-cyan-200 text-xl font-bold"
+                        >
+                          {getAvatarInitials(selectedEmployee.displayName)}
+                        </div>
+                      )}
                       <div>
                         <div className="flex items-center gap-2">
                           <h2 className="text-lg font-bold text-white">{selectedEmployee.displayName}</h2>

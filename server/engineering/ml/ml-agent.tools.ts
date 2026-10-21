@@ -5,6 +5,20 @@ import { ModelEvaluator } from './model-evaluator.ts';
 import { VectorDatabaseService } from './vector-database.service.ts';
 import { DatasetManager } from './dataset-manager.ts';
 
+function requireOrganizationId(context: unknown): string {
+  const value = context as any;
+  const requestContext = value?.requestContext ?? value?.context?.requestContext;
+  const organizationId =
+    requestContext?.getRaw?.('orgId') ??
+    requestContext?.get?.('orgId') ??
+    value?.orgId;
+
+  if (typeof organizationId !== 'string' || !organizationId.trim()) {
+    throw new Error('Authenticated organization context is required for vector operations.');
+  }
+  return organizationId;
+}
+
 export const trainMlModelTool = createTool({
   id: 'train_ml_model',
   description: 'Train a machine learning model or fine-tune LLM parameters on target features',
@@ -44,30 +58,33 @@ export const evaluateModelTool = createTool({
 
 export const ingestVectorDocumentTool = createTool({
   id: 'ingest_vector_document',
-  description: 'Ingest text document into semantic RAG vector embeddings database',
+  description: 'Persist a text document as Gemini semantic embeddings in the organization-scoped Supabase knowledge store',
   inputSchema: z.object({
     documentId: z.string().describe('Unique ID for the document'),
     content: z.string().describe('Text content to chunk and embed'),
   }),
-  execute: async ({ documentId, content }) => {
-    const chunks = await VectorDatabaseService.ingestDocument(documentId, content);
+  execute: async ({ documentId, content }, context) => {
+    const organizationId = requireOrganizationId(context);
+    const chunks = await VectorDatabaseService.ingestDocument(organizationId, documentId, content);
     return {
       success: true,
       chunksIngested: chunks.length,
-      totalVectorStoreSize: VectorDatabaseService.getStoreCount(),
+      documentId,
+      storage: 'supabase-pgvector',
     };
   },
 });
 
 export const queryVectorStoreTool = createTool({
   id: 'query_vector_store',
-  description: 'Perform semantic cosine similarity search over vector store',
+  description: 'Search only the authenticated organization’s persistent Supabase knowledge using Gemini semantic embeddings',
   inputSchema: z.object({
     query: z.string().describe('Natural language search query'),
     topK: z.number().default(3),
   }),
-  execute: async ({ query, topK }) => {
-    const results = await VectorDatabaseService.searchSimilar(query, topK);
+  execute: async ({ query, topK }, context) => {
+    const organizationId = requireOrganizationId(context);
+    const results = await VectorDatabaseService.searchSimilar(organizationId, query, topK);
     return {
       query,
       topK,

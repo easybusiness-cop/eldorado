@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Agent, FleetTask, UserProfile, AppliedSystemModule, SystemTelemetry } from '../types.ts';
 import { AdminEngineDashboard } from './AdminEngineDashboard.tsx';
-import { soundFx, speakText } from '../utils/speech.ts';
+import { soundFx } from '../utils/speech.ts';
 import confetti from 'canvas-confetti';
 import {
   Sparkles,
@@ -48,7 +48,7 @@ interface SubtaskPlan {
   shellCommands: string[];
   codeSnippet: string;
   outputSummary: string;
-  status?: 'queued' | 'running' | 'completed';
+  status: 'proposed';
 }
 
 interface AdministratorOrchestratorModalProps {
@@ -81,9 +81,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
     adminQuote: string;
     subtasks: SubtaskPlan[];
   } | null>(null);
-  const [executingSubtaskId, setExecutingSubtaskId] = useState<string | null>(null);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
-  const [completedCount, setCompletedCount] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [taskAnalysis, setTaskAnalysis] = useState<any>(null);
   const [activePrompt, setActivePrompt] = useState('');
@@ -167,11 +165,11 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
   const [simulationDiagnostics, setSimulationDiagnostics] = useState<{ text: string; author: string; avatar: string; recommendations: string[] } | null>(null);
   const [isHealAnimationPlaying, setIsHealAnimationPlaying] = useState(false);
   const [visualAstNodes, setVisualAstNodes] = useState<Array<{ id: string; name: string; type: string; status: 'verified' | 'violation' | 'unchecked'; description: string }>>([
-    { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
-    { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'verified', description: 'Declares autonomous components structure.' },
-    { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: 'verified', description: 'Instantiates state hooks correctly.' },
-    { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: 'verified', description: 'Connects standard system event listeners.' },
-    { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: 'verified', description: 'Compiles clean Tailwind HTML template.' },
+    { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'unchecked', description: 'Demo placeholder; no AST scan performed.' },
+    { id: 'n2', name: 'VariableDeclaration', type: 'Declaration', status: 'unchecked', description: 'Demo placeholder; no AST scan performed.' },
+    { id: 'n3', name: 'UseStateCall', type: 'ReactHook', status: 'unchecked', description: 'Demo placeholder; no AST scan performed.' },
+    { id: 'n4', name: 'UseEffectCall', type: 'ReactHook', status: 'unchecked', description: 'Demo placeholder; no AST scan performed.' },
+    { id: 'n5', name: 'ReturnStatement', type: 'JSXExpression', status: 'unchecked', description: 'Demo placeholder; no AST scan performed.' },
   ]);
 
   const getAgentColor = (dept: string) => {
@@ -196,10 +194,8 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
     
     setAutoLoopPhase('brainstorming');
     setAutoLoopLogs([
-      `[OS_INIT] Bootstrapping autonomous full-stack compiler suite...`,
-      `[BRAINSTORM] Ruflo Coder: Analyzing current codebase schema. Target: Peak-level optimization of software modules.`,
-      `[BRAINSTORM] Dwight Schrute: Listening for zero-trust boundary events.`,
-      `[BRAINSTORM] Toby Flenderson: Running continuous heap diagnostics daemon.`,
+      `[SIMULATION] Local demo started; no compiler, agent, or telemetry service was invoked.`,
+      `[SIMULATION] Rendering a scripted workflow sequence for UI demonstration only.`,
     ]);
 
     const runLoop = async () => {
@@ -208,10 +204,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
         setAutoLoopPhase('writing');
         setAutoLoopLogs((prev) => [
           ...prev,
-          `[COMPILING] Ruflo Coder: Designing dynamic AST modifications for self-updating components...`,
-          `[WRITE] Injected: "export default function AutonomousModule() { ... }"`,
-          `[WRITE] Appended: "const [telemetryState, setTelemetryState] = useState({ health: 100 });"`,
-          `[WRITE] Verified: Standard React hooks bindings declared cleanly.`,
+          `[SIMULATION] Showing sample code-generation log; no source files were read or changed.`,
         ]);
         setVisualAstNodes([
           { id: 'n1', name: 'ImportDeclaration', type: 'SyntaxNode', status: 'verified', description: 'Imports React, motion & lucide icons.' },
@@ -224,8 +217,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
         setAutoLoopPhase('security_audit');
         setAutoLoopLogs((prev) => [
           ...prev,
-          `[AUDIT] Dwight Schrute: Initiating mandatory 100% Zero-Trust structural audit on newly generated AST...`,
-          `[AUDIT] Dwight Schrute: Validating import boundaries, network sockets, and filesystem permissions.`,
+          `[SIMULATION] Showing a sample security-audit stage; no AST or filesystem audit was run.`,
         ]);
 
         if (currentErrorSimulation !== 'none') {
@@ -266,23 +258,20 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
         } else {
           setAutoLoopLogs((prev) => [
             ...prev,
-            `✓ [AUDIT PASSED] Dwight Schrute: 100% Zero-Trust verification achieved. AST conforms to secure corporate policy boundaries.`,
+            `[SIMULATION] Sample audit stage completed; no security verification was performed.`,
           ]);
         }
       } else if (currentStep === 3) {
         setAutoLoopPhase('lint_compile');
         setAutoLoopLogs((prev) => [
           ...prev,
-          `[COMPILER] Toby Flenderson: Running static type checking and production code compiler...`,
-          `[COMPILER] Running 'tsc --noEmit' and verifying build integrity.`,
-          `✓ [BUILD SUCCESS] Compiled dynamic binary bundle dist/server.cjs. Total build time: 114ms.`,
+          `[SIMULATION] Compiler stage displayed; no type-check or build command was run.`,
         ]);
       } else if (currentStep === 4) {
         setAutoLoopPhase('completed');
         setAutoLoopLogs((prev) => [
           ...prev,
-          `✓ [PEAK STATUS] Project successfully assembled, audited, and deployed live to Cloud Run!`,
-          `[PEAK STATUS] Current uptime: 100% | CPU utilization: optimal | Performance index: 100/100.`,
+          `[SIMULATION COMPLETE] Demo sequence ended. No project was built, audited, or deployed.`,
         ]);
         soundFx.playSuccessChime();
         confetti({ particleCount: 50, spread: 60 });
@@ -304,22 +293,19 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
     setAutoLoopPhase('self_healing');
     
     setHealingLogs([
-      `[HEAL_INIT] Initiating autonomous self-repair protocols...`,
-      `[HEAL] Toby Flenderson: Analyzing diagnostic report regarding '${currentErrorSimulation}'...`,
+      `[SIMULATION] Resetting demo indicators for '${currentErrorSimulation}'. No repair operation will run.`,
     ]);
 
     await new Promise((r) => setTimeout(r, 850));
     setHealingLogs((prev) => [
       ...prev,
-      `[HEAL] Dwight Schrute: Commencing AST verification checks and isolation overrides...`,
-      `[HEAL] Ruflo Coder: Applying targeted hot-fix parameters to correct AST nodes...`,
+      `[SIMULATION] No agent, AST checker, or code patch was invoked.`,
     ]);
 
     await new Promise((r) => setTimeout(r, 850));
     setHealingLogs((prev) => [
       ...prev,
-      `[HEAL] Toby Flenderson: Hot-patch completed successfully. Clearing warnings...`,
-      `✓ [HEALED] AST successfully stabilized and re-verified. Semicolons normalized, hook dependencies pruned, memory sanitized!`,
+      `[SIMULATION COMPLETE] Demo indicators reset. No files or runtime state were changed.`,
     ]);
 
     setCurrentErrorSimulation('none');
@@ -365,14 +351,10 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
     soundFx.playClick();
     setIsOrchestrating(true);
     setTerminalLogs([
-      `[ADMIN ORCHESTRATOR] Administrator Michael Scott received directive: "${promptToUse}"`,
-      `[DECOMPOSITION] Analyzing functional requirements, agent roles, and runtime dependencies...`,
-      `[FLEET BUS] Routing subtasks to specialized autonomous agents...`,
+      `[PLANNER] Request received: "${promptToUse}"`,
+      '[PLANNER] Requesting a model-generated proposal. No agent will be dispatched by this endpoint.',
     ]);
     setActivePlan(null);
-    setTaskAnalysis(null);
-    setActivePrompt(promptToUse);
-    setCompletedCount(0);
 
     try {
       const res = await fetch('/api/admin/orchestrate-task', {
@@ -381,176 +363,43 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
         body: JSON.stringify({
           prompt: promptToUse,
           userProfile,
-  telemetry,
           userPreferences: userProfile.preferences,
           activeAgents: agents.map((a) => ({ id: a.id, name: a.name, role: a.role })),
         }),
       });
 
-      const data = await res.json();
-      if (data.success) {
-        soundFx.playNotification();
-        const plan = {
-          adminSpeech: data.orchestratorPlan,
-          adminQuote: data.adminQuote || "World's Best Boss: Real leaders delegate to real bots.",
-          subtasks: data.subtasks.map((st: any) => ({ ...st, status: 'queued' })),
-        };
-        setActivePlan(plan);
-
-        // Speak Michael's executive speech
-        speakText(plan.adminSpeech, agents.find((a) => a.id === 'michael'));
-
-        // Automatically sequence task execution across autonomous agents
-        executeSubtasksSequentially(plan.subtasks, promptToUse);
+      const response = await res.json();
+      if (!res.ok || !response.success) {
+        throw new Error(response.error || `Proposal request failed with HTTP ${res.status}.`);
       }
+      if (response.status !== 'proposal_only' || !Array.isArray(response.data?.subtasks)) {
+        throw new Error('The server returned an unexpected proposal response; no tasks were dispatched.');
+      }
+
+      const plan = {
+        adminSpeech: response.data.adminSpeech,
+        adminQuote: response.data.adminQuote,
+        subtasks: response.data.subtasks.map((subtask: any, index: number) => ({
+          id: typeof subtask.id === 'string' ? subtask.id : `proposal-${index + 1}`,
+          title: subtask.title,
+          assignedTo: subtask.assignedTo,
+          priority: subtask.priority,
+          shellCommands: subtask.shellCommands,
+          codeSnippet: subtask.executableCode,
+          outputSummary: subtask.outputSummary,
+          status: 'proposed' as const,
+        })),
+      };
+      setActivePlan(plan);
+      setTerminalLogs((prev) => [
+        ...prev,
+        '[PROPOSAL READY] No agents were dispatched. No commands were run and no code was applied.',
+      ]);
+      soundFx.playNotification();
     } catch (e: any) {
-      setTerminalLogs((prev) => [...prev, `[ERROR] Failed to orchestrate: ${e.message}`]);
+      setTerminalLogs((prev) => [...prev, `[ERROR] Failed to create proposal: ${e.message}`]);
     } finally {
       setIsOrchestrating(false);
-    }
-  };
-
-  const executeSubtasksSequentially = async (subtasks: SubtaskPlan[], originalPrompt: string) => {
-    let completed = 0;
-
-    for (let i = 0; i < subtasks.length; i++) {
-      const st = subtasks[i];
-      setExecutingSubtaskId(st.id);
-
-      // Trigger bot animation on the floorplan!
-      if (onTriggerBotMovement) {
-        onTriggerBotMovement(st.assignedTo, 'coding_at_server');
-      }
-
-      setTerminalLogs((prev) => [
-        ...prev,
-        `>>> DISPATCHING SUBTASK #${i + 1} to [${st.assignedTo.toUpperCase()}]: "${st.title}"`,
-      ]);
-
-      // Run each shell command
-      for (const cmd of st.shellCommands) {
-        setTerminalLogs((prev) => [...prev, `$ ${st.assignedTo}@dunder-fleet: ${cmd}`]);
-        try {
-          const cmdRes = await fetch('/api/terminal/run-command', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ command: cmd }),
-          });
-          const cmdData = await cmdRes.json();
-          if (cmdData.stdout) {
-            setTerminalLogs((prev) => [...prev, ...cmdData.stdout.split('\n').map((l: string) => `  ${l}`)]);
-          }
-        } catch (e) {}
-        await new Promise((r) => setTimeout(r, 450));
-      }
-
-      // Apply code to website runtime
-      if (st.codeSnippet) {
-        try {
-          const applyRes = await fetch('/api/system/apply-code', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              code: st.codeSnippet,
-              name: `${st.assignedTo.toUpperCase()} - ${st.title.slice(0, 30)}`,
-              source: st.assignedTo,
-              target: 'system_runtime',
-              context: { directive: originalPrompt },
-            }),
-          });
-          const applyData = await applyRes.json();
-          if (applyData.success && applyData.module) {
-            onCodeApplied(applyData.module);
-            setTerminalLogs((prev) => [
-              ...prev,
-              `✓ [WEBSITE SELF-DEVELOPED] Module "${applyData.module.name}" compiled and hot-patched into live system runtime!`,
-            ]);
-          }
-        } catch (e) {}
-      }
-
-      // Create fleet task entry
-      const assignedAgent = agents.find((a) => a.id === st.assignedTo);
-      const newTask: FleetTask = {
-        id: `tsk-${Date.now()}-${i}`,
-        title: st.title,
-        description: st.outputSummary,
-        assignedTo: st.assignedTo,
-        status: 'completed',
-        progress: 100,
-        priority: st.priority,
-        codeSnippet: st.codeSnippet,
-        createdAt: Date.now(),
-        completedAt: Date.now(),
-      };
-      onTaskCreated(newTask);
-
-      onLogCreated({
-        id: `log-admin-delegation-${Date.now()}-${i}`,
-        timestamp: new Date().toLocaleTimeString(),
-        level: 'success',
-        agentId: st.assignedTo,
-        message: `[Task Completed] ${st.outputSummary}`,
-        codeSnippet: st.codeSnippet,
-        appliedToSystem: true,
-      });
-
-      completed++;
-      setCompletedCount(completed);
-
-      // Update plan state
-      setActivePlan((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          subtasks: prev.subtasks.map((item) =>
-            item.id === st.id ? { ...item, status: 'completed' } : item
-          ),
-        };
-      });
-
-      soundFx.playClick();
-      await new Promise((r) => setTimeout(r, 600));
-    }
-
-    setExecutingSubtaskId(null);
-    soundFx.playSuccessChime();
-    confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-    setTerminalLogs((prev) => [
-      ...prev,
-      `══════════════════════════════════════════════════════════════════`,
-      `🎉 MISSION COMPLETE: All subtasks executed. Website self-developed & hot-patched!`,
-      `[POST-MORTEM] Initiating Chief Strategist post-execution report generation...`,
-      `══════════════════════════════════════════════════════════════════`,
-    ]);
-
-    setIsAnalyzing(true);
-    try {
-      const analysisRes = await fetch('/api/admin/analyze-task-outcome', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: originalPrompt,
-          subtasks,
-          userProfile,
-          userPreferences: userProfile?.preferences || {}
-        }),
-      });
-      const analysisData = await analysisRes.json();
-      if (analysisData.success && analysisData.analysis) {
-        setTaskAnalysis(analysisData.analysis);
-        setTerminalLogs((prev) => [
-          ...prev,
-          `✓ [REPORT COMPLETE] Strategic Corporate Executive Report generated successfully!`,
-        ]);
-      }
-    } catch (err: any) {
-      setTerminalLogs((prev) => [
-        ...prev,
-        `[WARN] Strategy analysis warning: ${err.message}`,
-      ]);
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
@@ -658,16 +507,18 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
             </div>
           </div>
 
-          {/* Active Plan & Delegation Visualizer */}
+          {/* Proposal preview; this interface does not dispatch work. */}
           {activePlan && (
             <div className="p-3.5 rounded-lg bg-[#ebdbb2]/30 dark:bg-[#282828]/40 border border-[#fabd2f]/50 space-y-3">
-              {/* Michael's Executive Quote & Speech */}
+              <div className="rounded border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] font-semibold text-amber-800 dark:text-amber-200">
+                Model-generated proposal only. No agents were dispatched, commands were run, or code was applied.
+              </div>
               <div className="p-3 rounded bg-[#fabd2f]/10 border border-[#fabd2f]/30 flex items-start gap-2.5">
                 <span className="text-2xl">👔</span>
                 <div className="text-xs space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-[#b57614] dark:text-[#fabd2f]">
-                      Michael Scott (Administrator):
+                      Plan summary:
                     </span>
                     <span className="text-[10px] text-[#7c6f64] dark:text-[#a89984] italic">
                       "{activePlan.adminQuote}"
@@ -682,25 +533,17 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
               {/* Visual Multi-Agent Handoff Flow Chart */}
               <div className="p-3 bg-[#fbf1c7] dark:bg-[#151722] border border-[#fabd2f]/30 rounded-lg space-y-2">
                 <span className="text-[10px] font-bold text-[#b57614] dark:text-[#fabd2f] uppercase block tracking-wider">
-                  ✦ BUDBASE-STYLE HANDOFF PIPELINE WORKFLOW (VISUALIZED)
+                  PROPOSED WORKFLOW (NOT DISPATCHED)
                 </span>
                 <div className="flex flex-col md:flex-row items-center justify-around gap-3 pt-2">
                   {activePlan.subtasks.map((st, idx) => {
                     const agent = agents.find((a) => a.id === st.assignedTo);
-                    const isRunning = executingSubtaskId === st.id;
-                    const isDone = st.status === 'completed';
                     const isLast = idx === activePlan.subtasks.length - 1;
 
                     return (
                       <React.Fragment key={st.id}>
                         {/* Node */}
-                        <div className={`flex items-center gap-2 p-2 rounded-lg border-2 text-xs transition-all w-full md:w-auto ${
-                          isRunning 
-                            ? 'bg-[#fabd2f]/10 border-[#fabd2f] shadow-lg shadow-[#fabd2f]/20 animate-pulse scale-105' 
-                            : isDone 
-                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-800 dark:text-emerald-300' 
-                            : 'bg-[#ebdbb2]/30 dark:bg-[#1d2021]/80 border-[#d5c4a1] dark:border-[#3c3836]'
-                        }`}>
+                        <div className="flex items-center gap-2 p-2 rounded-lg border-2 text-xs w-full md:w-auto bg-[#ebdbb2]/30 dark:bg-[#1d2021]/80 border-[#d5c4a1] dark:border-[#3c3836]">
                           <span className="text-sm">{agent?.avatar || '🤖'}</span>
                           <div>
                             <div className="font-extrabold text-[10px] uppercase text-slate-500 dark:text-slate-400">Step {idx + 1}: {agent?.name || st.assignedTo}</div>
@@ -712,9 +555,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                         {!isLast && (
                           <div className="flex flex-col items-center justify-center text-center">
                             <span className="text-[#fabd2f] text-sm animate-bounce font-extrabold">&rarr;</span>
-                            <span className="text-[8px] font-mono text-[#7c6f64] dark:text-[#a89984] max-w-[80px] truncate">
-                              {`{{ steps.${idx + 1}.output }}`}
-                            </span>
+                            <span className="text-[8px] font-mono text-[#7c6f64] dark:text-[#a89984]">proposed</span>
                           </div>
                         )}
                       </React.Fragment>
@@ -728,29 +569,19 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-[#fabd2f]" />
-                    <span>DELEGATED AGENT WORKSTATIONS</span>
+                    <span>PROPOSED ASSIGNMENTS (NOT DISPATCHED)</span>
                   </span>
-                  <span className="text-[#8ec07c]">
-                    {completedCount}/{activePlan.subtasks.length} Completed
-                  </span>
+                  <span className="text-amber-700 dark:text-amber-300">0 dispatched</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                   {activePlan.subtasks.map((st) => {
                     const agent = agents.find((a) => a.id === st.assignedTo);
-                    const isRunning = executingSubtaskId === st.id;
-                    const isDone = st.status === 'completed';
 
                     return (
                       <div
                         key={st.id}
-                        className={`p-2.5 rounded border transition-all ${
-                          isRunning
-                            ? 'bg-[#fabd2f]/15 border-[#fabd2f] ring-1 ring-[#fabd2f] scale-[1.02]'
-                            : isDone
-                            ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-800 dark:text-emerald-300'
-                            : 'bg-[#fbf1c7] dark:bg-[#1d2021] border-[#d5c4a1] dark:border-[#3c3836]'
-                        }`}
+                        className="p-2.5 rounded border bg-[#fbf1c7] dark:bg-[#1d2021] border-[#d5c4a1] dark:border-[#3c3836]"
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-1.5">
@@ -762,16 +593,8 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                               </div>
                             </div>
                           </div>
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                              isRunning
-                                ? 'bg-[#fabd2f] text-[#1d2021] animate-pulse'
-                                : isDone
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-[#d5c4a1] dark:bg-[#3c3836] text-[#7c6f64] dark:text-[#a89984]'
-                            }`}
-                          >
-                            {isRunning ? 'RUNNING' : isDone ? 'COMPLETED' : 'QUEUED'}
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-200">
+                            PROPOSED
                           </span>
                         </div>
 
@@ -784,11 +607,11 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                         </div>
 
                         <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-[#d5c4a1]/50 dark:border-[#3c3836]/50">
-                          <span className="text-[#8ec07c] font-mono">
-                            {st.shellCommands.length} commands
+                          <span className="text-[#7c6f64] dark:text-[#a89984] font-mono">
+                            {st.shellCommands.length} proposed commands (not run)
                           </span>
-                          <span className="font-mono text-[#fabd2f]">
-                            {st.codeSnippet ? 'Live Code Hot-Patched' : 'Verified'}
+                          <span className="font-mono text-amber-700 dark:text-amber-300">
+                            {st.codeSnippet ? 'Code proposed; not applied' : 'No code proposal'}
                           </span>
                         </div>
                       </div>
@@ -809,10 +632,10 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                 </span>
                 <div>
                   <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#b57614] dark:text-[#fabd2f] block leading-none">
-                    COLLABORATIVE AGENT ENGINE
+                    LOCAL WORKFLOW DEMO
                   </span>
                   <h2 className="text-sm font-extrabold flex items-center gap-1.5 mt-0.5">
-                    Peak-Level Autonomous Execution & Self-Healing Console
+                    Scripted preview; no agents or tools are connected
                   </h2>
                 </div>
               </div>
@@ -822,7 +645,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  HEALTHY // PEAK_ACTIVE
+                  SIMULATION // NOT CONNECTED
                 </span>
               </div>
             </div>
@@ -836,7 +659,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                       <Terminal className="w-3.5 h-3.5 text-[#fabd2f]" />
-                      <span>AUTONOMOUS WORKSPACE TRIGGER</span>
+                      <span>LOCAL WORKFLOW SIMULATION</span>
                     </span>
                     <span className="text-[10px] font-bold text-[#b57614] dark:text-[#fabd2f] uppercase">
                       Phase: {autoLoopPhase.replace('_', ' ')}
@@ -856,7 +679,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                       }`}
                     >
                       <Play className="w-4 h-4" />
-                      {isAutonomousLoopActive ? 'HALT RUN LOOP' : 'START AUTONOMOUS COMPILER LOOP'}
+                      {isAutonomousLoopActive ? 'STOP SIMULATION' : 'START LOCAL SIMULATION'}
                     </button>
 
                     <button
@@ -908,12 +731,12 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                 {/* Real-time Compiler Log Stream */}
                 <div className="p-3 rounded-lg bg-[#0f111a] border border-slate-800 font-mono text-[10px] text-emerald-400 min-h-[160px] max-h-[220px] overflow-y-auto space-y-1 shadow-inner">
                   <div className="text-slate-500 font-extrabold uppercase text-[9px] mb-1 tracking-widest border-b border-slate-800 pb-1 flex items-center justify-between">
-                    <span>V8 MICRO-FRONTEND COMPILER STREAM</span>
-                    <span className="text-[#fabd2f] animate-pulse">● LIVE CONNECTION</span>
+                    <span>SIMULATION LOG (NO COMPILER CONNECTED)</span>
+                    <span className="text-amber-400">● LOCAL ONLY</span>
                   </div>
                   {autoLoopLogs.length === 0 ? (
                     <div className="text-slate-500 italic py-4 text-center">
-                      Autonomous loop idle. Click "Start Autonomous Compiler Loop" above to watch agents build and compile code.
+                      Local demo idle. Starting it does not call agents, a compiler, or deployment services.
                     </div>
                   ) : (
                     autoLoopLogs.map((log, idx) => (
@@ -1000,7 +823,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                         }`}
                       >
                         <RefreshCw className={`w-3.5 h-3.5 ${isHealAnimationPlaying ? 'animate-spin' : ''}`} />
-                        {isHealAnimationPlaying ? 'APPLYING HOT-PATCHES...' : 'EXECUTE AUTONOMOUS SELF-HEAL DAEMON'}
+                        {isHealAnimationPlaying ? 'RESETTING DEMO STATE...' : 'RESET SIMULATED DEMO STATE'}
                       </button>
                     </div>
                   </div>
@@ -1008,10 +831,10 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <div className="p-3.5 rounded-lg bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center justify-center text-center py-6">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-1.5" />
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
-                      System Codebase Stable
+                      No Live Codebase Check
                     </span>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 max-w-xs mt-1">
-                      No AST compiler exceptions detected. Live web sandbox operates in optimal peak performance.
+                      This screen has not run an AST scan, compiler, or live sandbox check.
                     </p>
                   </div>
                 )}
@@ -1053,7 +876,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   </div>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20">
-                  ONLINE CERTIFIED
+                  MODEL-GENERATED; NOT VERIFIED
                 </span>
               </div>
 
@@ -1064,7 +887,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <div>
                     <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">MANUAL HOURS SAVED</span>
                     <strong className="text-base font-extrabold text-slate-800 dark:text-slate-100 block">
-                      {taskAnalysis.businessImpact?.hoursSaved || 24} hrs
+                      {taskAnalysis.businessImpact?.hoursSaved ?? 'Not measured'}
                     </strong>
                   </div>
                 </div>
@@ -1073,7 +896,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <div>
                     <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">SPEED MULTIPLIER</span>
                     <strong className="text-base font-extrabold text-slate-800 dark:text-slate-100 block">
-                      {taskAnalysis.businessImpact?.speedup || '15x'}
+                      {taskAnalysis.businessImpact?.speedup ?? 'Not measured'}
                     </strong>
                   </div>
                 </div>
@@ -1082,7 +905,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <div>
                     <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">KPI BOOST</span>
                     <strong className="text-base font-extrabold text-slate-800 dark:text-slate-100 block">
-                      {taskAnalysis.businessImpact?.kpiImprovement || '97.2%'}
+                      {taskAnalysis.businessImpact?.kpiImprovement ?? 'Not measured'}
                     </strong>
                   </div>
                 </div>
@@ -1091,7 +914,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   <div>
                     <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">SECURITY GATEWAY</span>
                     <strong className="text-base font-extrabold text-slate-800 dark:text-slate-100 block">
-                      {taskAnalysis.businessImpact?.securityCheck || '100% Passed'}
+                      {taskAnalysis.businessImpact?.securityCheck ?? 'Not assessed'}
                     </strong>
                   </div>
                 </div>
@@ -1199,7 +1022,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   </span>
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-extrabold text-indigo-600 dark:text-indigo-400 block">
-                      LIVE SANDBOX ENVIRONMENT
+                      STATIC PREVIEW; NOT DEPLOYED
                     </span>
                     <h2 className="text-sm font-bold flex items-center gap-1.5">
                       Interactive Website Build & Verification Sandbox
@@ -1209,7 +1032,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-                    PORT 3080 // ACTIVE
+                    LOCAL MOCKUP // NO SERVER
                   </span>
                 </div>
               </div>
@@ -1268,7 +1091,7 @@ export const AdministratorOrchestratorModal: React.FC<AdministratorOrchestratorM
                   {/* Address bar input */}
                   <div className="flex-1 max-w-xl bg-white dark:bg-[#14151e] border border-slate-300 dark:border-slate-800 px-3 py-1 rounded text-[11px] text-slate-500 font-mono text-center select-all flex items-center justify-center gap-1">
                     <Globe className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>http://localhost:3080/sandbox/active-deployment</span>
+                    <span>Not a live deployment</span>
                   </div>
 
                   <button

@@ -55,13 +55,8 @@ const DEV_IDENTITY: RuffloIdentity = {
 };
 
 function isDevelopmentAuthEnabled(): boolean {
-  if (process.env.NODE_ENV === "production") {
-    return false;
-  }
-  return (
-    process.env.RUFFLO_DEV_AUTH === "true" ||
-    process.env.RUFFLO_PUBLIC_FLEET !== "false"
-  );
+  return process.env.NODE_ENV !== "production" &&
+    process.env.RUFFLO_DEV_AUTH === "true";
 }
 
 function getSupabaseAuthClient() {

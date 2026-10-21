@@ -1,10 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { GoogleGenAI } from "@google/genai";
 import { companyDb, AgentContract, DBTask, ProjectPortfolio, AuditEvent } from "../db/companyDb.ts";
-import { toolGateway, isSoftwareEngineerAgent } from "../../apps/control-plane/integrations/gateway/tool.gateway.ts";
+import { isSoftwareEngineerAgent } from "../../apps/control-plane/integrations/gateway/tool.gateway.ts";
 import { repositoryEngineer } from "../../server/agents/repository/repository-engineer.ts";
 import { modelRouter } from "../../server/ai/providers/index.ts";
+import {
+  ENGINEERING_AGENT_PLAYBOOK,
+  isEngineeringRelatedAgent,
+} from "../constants/engineeringCompetencies.ts";
 
 export function isEngineeringTask(task: { title: string; description: string }): boolean {
   const text = `${task.title} ${task.description}`.toLowerCase();
@@ -68,19 +71,6 @@ export interface PermissionCheckResult {
 // Agent Execution Loop Service Class
 // ----------------------------------------------------------------------
 export class AgentExecutionLoopService {
-  private static getGeminiClient(): GoogleGenAI | null {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return null;
-    return new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build-execution-loop",
-        },
-      },
-    });
-  }
-
   /**
    * 1. Perform strict multi-parameter permissions & authority checks
    */
@@ -248,13 +238,17 @@ export class AgentExecutionLoopService {
       executionId,
     };
 
-    if (!permResult.allowed) {
+    if (!permResult.allowed || permResult.approvalRequired) {
       taskObj.status = permResult.approvalRequired ? "waiting_approval" : "blocked";
       taskObj.progress = 0;
-      taskObj.output = `PERMISSIONS CHECK FAILED: ${permResult.reason}`;
+      taskObj.output = permResult.approvalRequired
+        ? `APPROVAL REQUIRED: ${permResult.reason || "This action requires explicit approval before execution."}`
+        : `PERMISSIONS CHECK FAILED: ${permResult.reason}`;
       companyDb.addTask(taskObj);
 
-      auditObj.result = `BLOCKED: Security and permission rules violated. Reason: ${permResult.reason}`;
+      auditObj.result = permResult.approvalRequired
+        ? `WAITING_APPROVAL: Execution was not started. Reason: ${permResult.reason || "Explicit approval is required."}`
+        : `BLOCKED: Security and permission rules violated. Reason: ${permResult.reason}`;
       companyDb.logAudit(auditObj);
 
       return {
@@ -275,7 +269,7 @@ export class AgentExecutionLoopService {
     companyDb.logAudit(auditObj);
 
     // Trigger asynchronous execution loop (non-blocking)
-    this.runAsyncAgentProcess(taskObj, agent, project, executionId).catch((err) => {
+    this.runAsyncAgentProcess(taskObj, agent, project, executionId, params.organizationId).catch((err) => {
       console.error(`[Agent Execution Loop async crash] Task: ${taskId}`, err);
     });
 
@@ -294,7 +288,8 @@ export class AgentExecutionLoopService {
     task: DBTask,
     agent: AgentContract,
     project: ProjectPortfolio,
-    executionId: string
+    executionId: string,
+    organizationId?: string,
   ): Promise<void> {
     try {
       // Step A: Progress Update
@@ -308,6 +303,9 @@ export class AgentExecutionLoopService {
       const recentContextText = previousTasks.map((t, idx) => {
         return `[Context ${idx + 1}] Task "${t.title}": Output: ${t.output?.slice(0, 400)}`;
       }).join("\n\n");
+      const engineeringGuidance = isEngineeringRelatedAgent(agent)
+        ? `\n\n${ENGINEERING_AGENT_PLAYBOOK}`
+        : "";
 
       // Check if project workspace has files we can list
       let workspaceFilesList = "None";
@@ -338,6 +336,7 @@ Job Description: ${agent.jobDescription}
 Skills: ${agent.skills.join(", ")}
 Tools Available: ${agent.tools.join(", ")}
 Authority Level: ${agent.authorityLevel} (out of 7)
+${engineeringGuidance ? `[ENGINEERING CAPABILITIES]\n${engineeringGuidance.trim()}\n` : ""}
 
 [WORKFORCE MANDATE]
 There are no human employees in the workforce simulation. Every worker, manager, specialist, trainer, recruiter, accountant, marketer, engineer, researcher and executive worker is an AI agent. Organizational titles such as Manager, Director, Engineer or HR Specialist describe an agent's role and authority—not a human identity.
@@ -359,122 +358,101 @@ export const NewComponent = () => {
       `.trim();
 
       let finalOutput = "";
-      let codeSnippet = "";
-      let tokensUsed = 0;
-      let costUsed = 0;
+      let repositoryResult: Awaited<ReturnType<typeof repositoryEngineer.develop>> | undefined;
+      let repositoryFailure: string | undefined;
 
       companyDb.updateTaskStatus(task.id, "running", 60);
 
-      let ranViaRepoEngineer = false;
-
       if (isSoftwareEngineerAgent(agent)) {
         try {
-          const devResult = await repositoryEngineer.develop({
+          repositoryResult = await repositoryEngineer.develop({
             id: task.id,
             agentId: agent.id,
-            organizationId: "org-munderdifflin",
+            organizationId: organizationId ?? "org-munderdifflin",
             workspace: workspaceRoot,
-            objective: `${task.title}\n\n${task.description}`,
+            objective: `${task.title}\n\n${task.description}${engineeringGuidance}`,
           });
           
-          if (devResult.success) {
-            finalOutput = devResult.summary;
-            tokensUsed = 15000;
-            costUsed = 0.05;
-            codeSnippet = "// Code modified automatically by RepositoryEngineer";
-            ranViaRepoEngineer = true;
+          if (repositoryResult.success) {
+            finalOutput = repositoryResult.summary;
           }
         } catch (repoErr: any) {
+          repositoryFailure = repoErr instanceof Error ? repoErr.message : String(repoErr);
           console.warn(`[RepositoryEngineer Note] Soft failover to modelRouter: ${repoErr?.message || repoErr}`);
         }
       }
 
-      if (!ranViaRepoEngineer) {
+      if (!repositoryResult?.success) {
         const systemInstruction = `You are ${agent.name}, executing your specialized role as ${agent.role} under corporate guidelines. Be highly specific, technical, and aligned with your department's goals.`;
         try {
           const genResult = await modelRouter.generate({
             prompt,
             systemInstruction,
-            temperature: 0.6,
+            temperature: isEngineeringRelatedAgent(agent) ? 0.2 : 0.6,
           });
-          finalOutput = genResult?.text || `${agent.name} (${agent.role}) completed task "${task.title}" successfully. Verified and aligned with department requirements.`;
-          const chars = prompt.length + finalOutput.length;
-          tokensUsed = genResult?.usage?.completionTokens ? (genResult.usage.promptTokens || 0) + genResult.usage.completionTokens : Math.ceil(chars / 3.8);
-          costUsed = (tokensUsed / 1000000) * 0.075;
-
-          const match = finalOutput.match(/```[a-z]*\n([\s\S]*?)```/i);
-          if (match) {
-            codeSnippet = match[1].trim();
-            const lines = codeSnippet.split('\n');
-            let filename = '';
-            if (lines[0].startsWith('//')) {
-               filename = lines[0].replace('//', '').trim();
-            } else if (lines[0].startsWith('/*')) {
-               filename = lines[0].replace('/*', '').replace('*/', '').trim();
-            } else if (lines[0].startsWith('#')) {
-               filename = lines[0].replace('#', '').trim();
-            }
-            
-            if (!filename || filename.includes(' ') || !filename.includes('.')) {
-               filename = `generated_code_${Date.now()}.ts`;
-            }
-
-            try {
-              const fullPath = path.join(workspaceRoot, filename);
-              fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-              fs.writeFileSync(fullPath, codeSnippet);
-            } catch (e) {
-              console.error("Failed to write to VS Code workspace file", e);
-            }
-          }
+          finalOutput = genResult?.text?.trim() || "The configured model returned no proposal.";
         } catch (genErr: any) {
-          console.warn(`[Agent Execution Loop Fallback] Primary model generation note: ${genErr?.message || genErr}`);
-          finalOutput = `[Execution Report - ${agent.name}]\nTask "${task.title}" was evaluated and executed by ${agent.name} (${agent.role}).\n\nObjective: ${task.description}\nExecution Status: Processed with corporate governance and audit logs committed.`;
-          tokensUsed = Math.ceil(prompt.length / 3.8);
-          costUsed = 0.001;
+          throw new Error(`No execution-capable workflow completed this task, and model proposal generation failed: ${genErr instanceof Error ? genErr.message : String(genErr)}`);
         }
       }
 
-      // Step F: Update task as completed
-      const finalTask = companyDb.updateTaskStatus(task.id, "completed", 100, finalOutput, codeSnippet || undefined);
-      if (finalTask) {
-        finalTask.subtasks[1].completed = true;
-        finalTask.subtasks[2].completed = true;
-        companyDb.addTask(finalTask);
+      if (repositoryResult?.success) {
+        const finalTask = companyDb.updateTaskStatus(
+          task.id,
+          "completed",
+          100,
+          finalOutput,
+          undefined,
+          {
+            status: "VERIFIED",
+            source: "repository-engineer:typecheck+tests+security-audit",
+            timestamp: new Date().toISOString(),
+            verificationId: executionId,
+          },
+        );
+        if (finalTask) {
+          finalTask.subtasks[1].completed = true;
+          finalTask.subtasks[2].completed = true;
+          companyDb.addTask(finalTask);
+
+        }
+
+        companyDb.logAudit({
+          id: `aud-comp-${Date.now()}`,
+          agentId: agent.id,
+          projectId: project.id,
+          taskId: task.id,
+          tool: "agent.execution_loop",
+          action: `Task Completed: "${task.title.slice(0, 50)}"`,
+          inputHash: Buffer.from(finalOutput).toString("base64").slice(0, 20),
+          result: `VERIFIED: Repository development passed typecheck, tests, and security audit. Changed files: ${repositoryResult.diff.files.length}.`,
+          timestamp: new Date().toISOString(),
+          riskLevel: task.priority === "critical" ? "critical" : task.priority === "high" ? "high" : "medium",
+          approvalRequired: task.priority === "critical",
+          executionId,
+        });
+      } else {
+        const reason = repositoryResult?.summary
+          ? `Execution was not verified: ${repositoryResult.summary}`
+          : repositoryFailure
+            ? `Repository execution failed before verification: ${repositoryFailure}`
+            : "A model-generated proposal is available, but no task-execution workflow ran. Review and execute it through an authorized workflow.";
+        companyDb.updateTaskStatus(task.id, "blocked", 60, `${reason}\n\n${finalOutput}`);
+        companyDb.logAudit({
+          id: `aud-blocked-${Date.now()}`,
+          agentId: agent.id,
+          projectId: project.id,
+          taskId: task.id,
+          tool: "agent.execution_loop",
+          action: `Task Blocked: "${task.title.slice(0, 50)}"`,
+          inputHash: Buffer.from(task.description).toString("base64").slice(0, 20),
+          result: `BLOCKED: ${reason}`,
+          timestamp: new Date().toISOString(),
+          riskLevel: task.priority === "critical" ? "critical" : task.priority === "high" ? "high" : "medium",
+          approvalRequired: true,
+          executionId,
+        });
       }
-
-      // Step G: Deduct financial assets and update KPIs for workers
-      companyDb.updateAgentKPIs(agent.id, tokensUsed, costUsed, 1);
-      companyDb.evaluateAgentPromotion(agent.id, project.id, task.id);
-      companyDb.deductBudget(costUsed);
-
-      // Step H: Add operational event to persistent memory
-      companyDb.addMemory({
-        id: `mem-${Date.now()}`,
-        agentId: agent.id,
-        type: "episodic",
-        content: `Successfully completed mission task "${task.title}" in workspace of project "${project.name}". Generated code snippet: ${Boolean(codeSnippet)}.`,
-        projectId: project.id,
-        importance: 7,
-        confidence: 95,
-        createdAt: Date.now(),
-      });
-
-      // Step I: Log audit completion event
-      companyDb.logAudit({
-        id: `aud-comp-${Date.now()}`,
-        agentId: agent.id,
-        projectId: project.id,
-        taskId: task.id,
-        tool: "agent.execution_loop",
-        action: `Task Completed: "${task.title.slice(0, 50)}"`,
-        inputHash: Buffer.from(finalOutput).toString("base64").slice(0, 20),
-        result: `SUCCESS: Dynamic execution successfully processed. Code snippet saved to workspace. Cost: $${costUsed.toFixed(6)}`,
-        timestamp: new Date().toISOString(),
-        riskLevel: task.priority === "critical" ? "critical" : task.priority === "high" ? "high" : "medium",
-        approvalRequired: task.priority === "critical",
-        executionId,
-      });
 
     } catch (processError: any) {
       console.error(`[Execution Loop Error] Failed to process async loop for task ${task.id}:`, processError);

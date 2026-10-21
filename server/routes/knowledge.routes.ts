@@ -1,7 +1,149 @@
 import { Router } from "express";
+import { createHash } from "node:crypto";
 import { knowledgeGraph } from "../core/memory/knowledge-graph.ts";
+import { requireCapability } from "../security/auth.middleware.ts";
+import { VectorDatabaseService } from "../engineering/ml/vector-database.service.ts";
+import { getSupabaseAdmin } from "../../src/utils/supabaseAdmin.ts";
+import { inngest } from "../inngest/client.ts";
 
 export const knowledgeRouter = Router();
+
+// Semantic retrieval uses real Gemini embeddings and organization-scoped
+// Supabase pgvector storage. It fails closed if either service is unconfigured.
+knowledgeRouter.post("/semantic/search", async (req, res) => {
+  const organizationId = (req as any).identity?.organizationId;
+  const { query, topK = 3, metadataFilter = {} } = req.body ?? {};
+  if (typeof query !== "string" || !query.trim()) {
+    return res.status(400).json({ success: false, error: "A non-empty query is required." });
+  }
+  if (metadataFilter === null || typeof metadataFilter !== "object" || Array.isArray(metadataFilter)) {
+    return res.status(400).json({ success: false, error: "metadataFilter must be a JSON object." });
+  }
+
+  try {
+    const results = await VectorDatabaseService.searchSimilar(
+      organizationId,
+      query,
+      Number(topK),
+      metadataFilter,
+    );
+    return res.json({ success: true, count: results.length, results });
+  } catch (error: any) {
+    console.error("[Knowledge Semantic Search] Failed:", error?.message || String(error));
+    return res.status(503).json({
+      success: false,
+      code: "SEMANTIC_SEARCH_UNAVAILABLE",
+      error: "Semantic search is unavailable. Check Gemini and Supabase server configuration.",
+    });
+  }
+});
+
+// Long document indexing is queued through Inngest; the event contains only
+// the job and organization IDs, while the document remains in Supabase.
+knowledgeRouter.post("/index-jobs", requireCapability("task:run"), async (req, res) => {
+  const organizationId = (req as any).identity?.organizationId;
+  const { documentId, content, metadata = {} } = req.body ?? {};
+
+  if (typeof organizationId !== "string" || !organizationId.trim()) {
+    return res.status(401).json({ success: false, error: "Authenticated organization context is required." });
+  }
+  if (typeof documentId !== "string" || !documentId.trim() || documentId.trim().length > 500) {
+    return res.status(400).json({ success: false, error: "documentId must be between 1 and 500 characters." });
+  }
+  if (typeof content !== "string" || !content.trim() || content.length > 2_000_000) {
+    return res.status(400).json({ success: false, error: "content must be non-empty and no larger than 2 MB." });
+  }
+  if (metadata === null || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return res.status(400).json({ success: false, error: "metadata must be a JSON object." });
+  }
+
+  try {
+    const admin = getSupabaseAdmin();
+    const { data: job, error } = await admin
+      .from("knowledge_ingestion_jobs")
+      .insert({
+        organization_id: organizationId,
+        document_id: documentId.trim(),
+        document_content: content,
+        metadata,
+      })
+      .select("id")
+      .single();
+
+    if (error || !job) {
+      throw new Error(`Could not persist indexing job: ${error?.message || "no job ID returned"}`);
+    }
+
+    try {
+      const documentKey = createHash("sha256")
+        .update(`${organizationId}\u0000${documentId.trim()}`)
+        .digest("hex");
+      const { ids } = await inngest.send({
+        id: `rufflo-knowledge-index-${job.id}`,
+        name: "rufflo/knowledge.index.requested",
+        data: { jobId: job.id, organizationId, documentKey },
+      });
+      return res.status(202).json({
+        success: true,
+        jobId: job.id,
+        eventId: ids?.[0],
+        status: "queued",
+      });
+    } catch (dispatchError: any) {
+      const message = String(dispatchError?.message || dispatchError).slice(0, 1000);
+      await admin
+        .from("knowledge_ingestion_jobs")
+        .update({
+          status: "failed",
+          document_content: null,
+          error: `Inngest dispatch failed: ${message}`,
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", job.id)
+        .eq("organization_id", organizationId);
+      return res.status(503).json({
+        success: false,
+        code: "WORKFLOW_DISPATCH_FAILED",
+        error: "The document was stored as a failed indexing job because Inngest did not accept the event.",
+        jobId: job.id,
+      });
+    }
+  } catch (error: any) {
+    console.error("[Knowledge Index Job] Failed:", error?.message || String(error));
+    return res.status(503).json({
+      success: false,
+      code: "KNOWLEDGE_INDEXING_UNAVAILABLE",
+      error: "Could not create a knowledge indexing job. Check Supabase server configuration.",
+    });
+  }
+});
+
+knowledgeRouter.get("/index-jobs/:jobId", async (req, res) => {
+  const organizationId = (req as any).identity?.organizationId;
+  if (typeof organizationId !== "string" || !organizationId.trim()) {
+    return res.status(401).json({ success: false, error: "Authenticated organization context is required." });
+  }
+
+  try {
+    const { data: job, error } = await getSupabaseAdmin()
+      .from("knowledge_ingestion_jobs")
+      .select("id, document_id, status, chunks_ingested, error, created_at, started_at, completed_at")
+      .eq("id", req.params.jobId)
+      .eq("organization_id", organizationId)
+      .maybeSingle();
+
+    if (error) throw new Error(`Could not load indexing job: ${error.message}`);
+    if (!job) return res.status(404).json({ success: false, error: "Indexing job not found." });
+    return res.json({ success: true, job });
+  } catch (error: any) {
+    console.error("[Knowledge Index Job Status] Failed:", error?.message || String(error));
+    return res.status(503).json({
+      success: false,
+      code: "KNOWLEDGE_JOB_STATUS_UNAVAILABLE",
+      error: "Could not read the indexing job status.",
+    });
+  }
+});
 
 // In-memory server-side knowledge cache synced with standard domains
 interface ServerKnowledgeItem {
@@ -196,4 +338,3 @@ knowledgeRouter.get("/graph/search", (req, res) => {
     res.status(500).json({ success: false, error: err.message || "Search failed" });
   }
 });
-

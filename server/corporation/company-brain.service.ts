@@ -158,7 +158,7 @@ World Discoveries: ${recentDiscoveries.map((d) => d.title).join('; ')}`;
         relevantDepartments: ['All 10 Core Departments'],
         assignedWorkforce: [
           { employeeId: 'emp-michael', name: 'Michael G. Scott', role: 'CEO', contribution: 'Final authorization for cross-department resource reassignment.' },
-          { employeeId: 'emp-toby', name: 'Toby Flenderson', role: 'CHRO', contribution: 'Verifying CSE Agent Academy certifications and capability proficiency.' },
+          { employeeId: 'emp-toby', name: 'Toby Flenderson', role: 'CHRO', contribution: 'Verifying documented role capabilities and performance evidence.' },
         ],
         requiredResources: ['Workforce Manager Suitability Scoring Matrix'],
         identifiedRisks: ['Overloading key department heads (Hank Tate: 88% load; Dwight Schrute: 94% load)'],

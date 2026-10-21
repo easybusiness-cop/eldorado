@@ -148,12 +148,9 @@ export class MasterOrchestrator {
           role: step.role,
           error: step.error,
         });
-
-        if (step.role === "planner" || step.role === "coder") {
-          plan.status = "failed";
-          plan.finalAnswer = `Orchestration failed at ${step.role} step: ${step.error}`;
-          break;
-        }
+        plan.status = "failed";
+        plan.finalAnswer = `Orchestration blocked at ${step.role} step; no fallback work was reported as complete: ${step.error}`;
+        break;
       } finally {
         step.finishedAt = new Date().toISOString();
       }
@@ -410,13 +407,7 @@ export class MasterOrchestrator {
             allowConsole: true,
           };
         } else {
-          step.parameters = {
-            code: `
-              const message = "Executor step reached.";
-              __result = { ok: true, message };
-              console.log(message);
-            `,
-          };
+          throw new Error("Code execution is blocked because the coder produced no verified code.");
         }
       }
 
@@ -436,14 +427,14 @@ export class MasterOrchestrator {
       return gatewayResult.data;
     }
 
-    // Pure reasoning steps (now real LLM with streaming support)
-    return await this.simulateReasoning(step, plan, onProgress);
+    // Pure reasoning steps use a configured model provider.
+    return await this.runModelReasoning(step, plan, onProgress);
   }
 
   /**
-   * Real LLM reasoning using ModelRouter (with safe fallback & progress streaming)
+   * Model-backed reasoning with progress streaming.
    */
-  private static async simulateReasoning(
+  private static async runModelReasoning(
     step: OrchestratorStep,
     plan: OrchestratorPlan,
     onProgress?: ProgressCallback
@@ -592,80 +583,9 @@ Provide a useful, structured response.`;
         content: raw,
         source: result.provider,
       };
-    } catch (err: any) {
-      console.warn(`[MasterOrchestrator] Model reasoning failed for ${step.role}:`, err.message);
-      return this.fallbackReasoning(step, plan);
-    }
-  }
-
-  /**
-   * Deterministic fallback when LLM is unavailable
-   */
-  private static fallbackReasoning(step: OrchestratorStep, plan: OrchestratorPlan): any {
-    const obj = plan.originalObjective;
-
-    switch (step.role) {
-      case "planner":
-        return {
-          planSummary: `High-level plan created for: "${obj}"`,
-          recommendedPhases: ["Research", "Design", "Implement", "Validate", "Synthesize"],
-          notes: "Fallback plan (LLM unavailable)",
-          source: "fallback",
-        };
-
-      case "coder":
-        return {
-          language: "javascript",
-          code: `
-            function solve() {
-              const objective = ${JSON.stringify(obj)};
-              const result = {
-                success: true,
-                objective,
-                message: "Fallback code executed successfully",
-                timestamp: new Date().toISOString()
-              };
-              __result = result;
-              console.log("Fallback coder output:", JSON.stringify(result));
-              return result;
-            }
-            solve();
-          `,
-          explanation: `Fallback code generated for: ${obj}`,
-          source: "fallback",
-        };
-
-      case "critic":
-        const failed = plan.steps.filter((s) => s.status === "failed").length;
-        const completed = plan.steps.filter((s) => s.status === "completed").length;
-        return {
-          critique:
-            failed > 0
-              ? `Found ${failed} failed step(s). Review required.`
-              : `All executed steps completed successfully (${completed} steps).`,
-          riskLevel: failed > 0 ? "MEDIUM" : "LOW",
-          recommendations:
-            failed > 0
-              ? ["Re-run failed steps", "Increase research depth"]
-              : ["Proceed to final synthesis"],
-          source: "fallback",
-        };
-
-      case "synthesizer":
-        return {
-          finalSummary: `Orchestration completed for objective: "${obj}"`,
-          keyOutcomes: plan.steps
-            .filter((s) => s.status === "completed")
-            .map((s) => `${s.role}: success`),
-          source: "fallback",
-        };
-
-      default:
-        return {
-          message: `Step ${step.role} completed (fallback)`,
-          objective: step.objective,
-          source: "fallback",
-        };
+    } catch (err) {
+      console.error(`[MasterOrchestrator] Model reasoning failed for ${step.role}:`, err);
+      throw err;
     }
   }
 

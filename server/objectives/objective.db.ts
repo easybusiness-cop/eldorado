@@ -28,12 +28,7 @@ export class ObjectiveDB {
   private initializeSupabase() {
     const rawUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").trim();
     const url = normalizeSupabaseUrl(rawUrl);
-    const key = (
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.VITE_SUPABASE_ANON_KEY ||
-      ""
-    ).trim();
+    const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
 
     const isConfigured = Boolean(url && key && !url.includes("placeholder") && url.startsWith("http"));
 
@@ -52,9 +47,11 @@ export class ObjectiveDB {
         console.warn(`[ObjectiveDB WARNING] ${this.warningMessage}`);
       }
     } else {
-      this.useLocalFallback = true;
-      this.persistenceStatus = "fallback_local";
-      this.warningMessage = "Supabase variables missing or unconfigured. Fallen back to local JSON file persistence at .rufflo-store.json";
+      this.switchToLocalFallback(
+        url && !key
+          ? "SUPABASE_SERVICE_ROLE_KEY is not configured. Objective data is using local JSON persistence."
+          : "Supabase URL or server credentials are missing or unconfigured. Objective data is using local JSON persistence.",
+      );
       console.warn(`[ObjectiveDB WARNING] ${this.warningMessage}`);
     }
   }
@@ -67,8 +64,15 @@ export class ObjectiveDB {
     };
   }
 
+  private switchToLocalFallback(reason: string): void {
+    this.isSupabaseActive = false;
+    this.useLocalFallback = true;
+    this.persistenceStatus = "fallback_local";
+    this.warningMessage = reason;
+  }
+
   public async saveObjective(objective: Objective): Promise<void> {
-    if (this.isSupabaseActive && this.supabaseClient) {
+    if (this.isSupabaseActive && this.supabaseClient && !this.useLocalFallback) {
       try {
         // Upsert serialized objective JSON into 'rufflo_objectives' table
         const { error } = await this.supabaseClient
@@ -82,14 +86,11 @@ export class ObjectiveDB {
         if (error) {
           // If table does not exist (42P01) or other SQL errors, trigger local fallback
           if (error.code === "42P01") {
-            this.useLocalFallback = true;
-            this.warningMessage = "Supabase table 'rufflo_objectives' does not exist. Automatically fallback to local JSON file persistence.";
+            this.switchToLocalFallback("Supabase table 'rufflo_objectives' does not exist. Falling back to local JSON file persistence.");
             console.warn(`[ObjectiveDB Table Missing] ${this.warningMessage}`);
             await this.saveToLocalFile(objective);
           } else {
-            this.isSupabaseActive = false;
-            this.useLocalFallback = true;
-            this.warningMessage = `Supabase request failed: ${error.message}. Local JSON file fallback permanently enabled.`;
+            this.switchToLocalFallback(`Supabase request failed: ${error.message}. Local JSON file fallback enabled.`);
             console.warn(`[ObjectiveDB Disabled] ${this.warningMessage}`);
             await this.saveToLocalFile(objective);
           }
@@ -98,9 +99,7 @@ export class ObjectiveDB {
         }
       } catch (err: any) {
         console.error("[ObjectiveDB] Supabase query failed, falling back to JSON:", err.message);
-        this.isSupabaseActive = false;
-        this.useLocalFallback = true;
-        this.warningMessage = `Supabase query error: ${err.message}. Local JSON file database permanently engaged.`;
+        this.switchToLocalFallback(`Supabase query error: ${err.message}. Local JSON file fallback enabled.`);
         await this.saveToLocalFile(objective);
       }
     } else {
@@ -119,13 +118,10 @@ export class ObjectiveDB {
 
         if (error) {
           if (error.code === "42P01") {
-            this.useLocalFallback = true;
-            this.warningMessage = "Supabase table 'rufflo_objectives' missing. Reading from local JSON.";
+            this.switchToLocalFallback("Supabase table 'rufflo_objectives' is missing. Reading from local JSON.");
             return await this.loadFromLocalFile();
           }
-          this.isSupabaseActive = false;
-          this.useLocalFallback = true;
-          this.warningMessage = `Supabase request failed: ${error.message}. Reading from local JSON.`;
+          this.switchToLocalFallback(`Supabase request failed: ${error.message}. Reading from local JSON.`);
           return await this.loadFromLocalFile();
         }
 
@@ -139,9 +135,7 @@ export class ObjectiveDB {
         }
       } catch (err: any) {
         console.error("[ObjectiveDB] Load from Supabase failed, fallback to JSON:", err.message);
-        this.isSupabaseActive = false;
-        this.useLocalFallback = true;
-        this.warningMessage = `Supabase read exception: ${err.message}. Loading from local JSON fallback.`;
+        this.switchToLocalFallback(`Supabase read exception: ${err.message}. Loading from local JSON fallback.`);
         return await this.loadFromLocalFile();
       }
     }

@@ -3,6 +3,7 @@ import { Agent, FleetTask } from '../types';
 import { KnowledgeCategory, KnowledgeEntry } from '../types/knowledgeBase';
 import { knowledgeBaseService } from '../services/knowledgeBaseService';
 import { soundFx } from '../utils/speech';
+import { getAvatarInitials, isLocalAvatar } from '../utils/avatar';
 import { AgentCommunicationThreads } from './AgentCommunicationThreads';
 import { AgentSkillMatrix } from './AgentSkillMatrix';
 import { AgentSops } from './AgentSops';
@@ -1409,10 +1410,10 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
                             className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-xs text-white"
                             style={{ backgroundColor: agent.color || '#d65d0e' }}
                           >
-                            {agent.avatar ? (
+                            {isLocalAvatar(agent.avatar) ? (
                               <img src={agent.avatar} alt={agent.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
-                              agent.name[0]
+                              getAvatarInitials(agent.name)
                             )}
                           </div>
                           <div>
@@ -2408,25 +2409,11 @@ ${t.codeSnippet ? `\n\`\`\`\n${t.codeSnippet}\n\`\`\`\n` : ''}
           />
         )}
 
-        {/* VIEW TAB: AGENT SKILL MATRIX & PERSONALIZED LEARNING MODULES */}
+        {/* VIEW TAB: DIRECT AGENT CAPABILITY PROFILES */}
         {activeTab === 'skills' && (
           <AgentSkillMatrix
             agents={agents}
             onOpenAgentProfile={onSelectAgent}
-            onRecordKnowledge={(entry) => {
-              knowledgeBaseService.addEntry({
-                title: entry.title,
-                category: 'coding',
-                summary: entry.content,
-                content: entry.content,
-                actionableInsight: 'Agent training certified and verified in curriculum ledger.',
-                tags: ['training', 'skill-matrix', 'certification'],
-                authorAgentId: 'system',
-                authorAgentName: 'Curriculum Sentinel',
-                confidenceScore: 0.96,
-              });
-              setKnowledgeEntries(knowledgeBaseService.getAll());
-            }}
           />
         )}
 

@@ -82,7 +82,8 @@ export class ProductionMastraRuntime {
     success: boolean;
     result: string;
     traceId: string;
-    mode: 'REAL_RUNTIME' | 'SIMULATION_MODE';
+    mode: 'REAL_RUNTIME';
+    completionVerified: false;
   }> {
     await this.initialization;
     const agent = this.agents.getAgent(agentId);
@@ -112,27 +113,12 @@ export class ProductionMastraRuntime {
       : taskDescription;
 
     if (this.isSimulationMode || !this.realMastra) {
-      // Compliance: Explicitly mark as SIMULATION_MODE
-      try {
-        const response = await this.router.executeWithFallback(
-          taskWithMemory,
-          agent.getInstructions(),
-          agent.getDepartment() === 'engineering' ? 'coding' : 'general'
-        );
-
-        await this.memory.saveMemory(agentId, `[SIMULATION] Task: ${taskDescription.slice(0, 100)} => ${response.slice(0, 100)}`, 'agent', [], organizationId);
-        this.observability.finishTrace(trace.traceId, 'completed', { outputLength: response.length, mode: 'SIMULATION_MODE' });
-
-        return {
-          success: true,
-          result: response,
-          traceId: trace.traceId,
-          mode: 'SIMULATION_MODE',
-        };
-      } catch (err: any) {
-        this.observability.finishTrace(trace.traceId, 'failed', { error: err?.message || String(err), mode: 'SIMULATION_MODE' });
-        throw err;
-      }
+      const error = new Error('Real Mastra execution is unavailable; this task was not executed.');
+      this.observability.finishTrace(trace.traceId, 'failed', {
+        error: error.message,
+        mode: 'UNAVAILABLE',
+      });
+      throw error;
     }
 
     // REAL RUNTIME EXECUTION PATH using @mastra/core
@@ -151,15 +137,26 @@ export class ProductionMastraRuntime {
       });
       const textResult = response.text || '';
 
-      // Persist to short term memory
-      await this.memory.saveMemory(agentId, `[REAL] Task: ${taskDescription.slice(0, 100)} => ${textResult.slice(0, 100)}`, 'agent', [], organizationId);
-      this.observability.finishTrace(trace.traceId, 'completed', { outputLength: textResult.length, mode: 'REAL_RUNTIME' });
+      // Keep model output out of reusable agent knowledge until execution is verified.
+      await this.memory.saveMemory(
+        agentId,
+        `[MODEL RESPONSE; TASK EXECUTION UNVERIFIED] Request: ${taskDescription.slice(0, 100)} => ${textResult.slice(0, 100)}`,
+        'short_term',
+        ['model-response', 'execution-unverified'],
+        organizationId,
+      );
+      this.observability.finishTrace(trace.traceId, 'completed', {
+        outputLength: textResult.length,
+        mode: 'REAL_RUNTIME',
+        completionVerified: false,
+      });
 
       return {
         success: true,
         result: textResult,
         traceId: trace.traceId,
         mode: 'REAL_RUNTIME',
+        completionVerified: false,
       };
     } catch (err: any) {
       this.observability.finishTrace(trace.traceId, 'failed', { error: err?.message || String(err), mode: 'REAL_RUNTIME' });

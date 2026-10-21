@@ -8,7 +8,6 @@ import {
   Minimize,
   User,
   Code,
-  Sparkles,
   Phone,
   Globe,
   FolderGit2,
@@ -47,7 +46,6 @@ interface TopNavigationProps {
   onOpenSystemModules: () => void;
   onOpenDb?: () => void;
   onOpenAnalytics?: () => void;
-  onOpenAcademy?: () => void;
   onOpenMasterEvolution?: () => void;
   onOpenWorkspace?: () => void;
   onOpenPublicApiHub?: () => void;
@@ -105,7 +103,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
     onOpenSystemModules,
     onOpenDb,
     onOpenAnalytics,
-    onOpenAcademy,
     onOpenMasterEvolution,
     onOpenWorkspace,
     onOpenPublicApiHub,
@@ -348,13 +345,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = (props) => {
           description: 'Crash reporting, stack trace diagnosis, telemetry',
           icon: <Activity className="w-4 h-4 text-red-400" />,
           onClick: onOpenCrashalyst,
-        },
-        {
-          id: 'academy',
-          label: 'Agent Academy',
-          description: 'Curriculum learning, benchmark evaluations, certifications',
-          icon: <Sparkles className="w-4 h-4 text-violet-400" />,
-          onClick: onOpenAcademy,
         },
         {
           id: 'evolution',

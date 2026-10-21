@@ -3,6 +3,7 @@ import { Agent, FleetTask, AgentLog, QuantumSuperpositionCandidate } from '../ty
 import { Activity, Zap, Cpu, Sparkles, Layers, Atom, CheckCircle2, ChevronRight, X, Play, ShieldAlert, ArrowUpRight } from 'lucide-react';
 import { getAgentQuantumState, generateSuperpositionCandidates, runQuantumModelForTask } from '../utils/quantumEngine';
 import { soundFx } from '../utils/speech';
+import { getAvatarInitials, isLocalAvatar } from '../utils/avatar';
 
 interface FleetHealthMonitorProps {
   agents: Agent[];
@@ -303,7 +304,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                   {/* Top Bar: Identity & Superposition Status */}
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      {agent.avatar && agent.avatar.startsWith('http') ? (
+                      {isLocalAvatar(agent.avatar) ? (
                         <img 
                           src={agent.avatar} 
                           alt={agent.name} 
@@ -311,7 +312,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                           className="w-6 h-6 rounded-full object-cover shrink-0 border border-white/20" 
                         />
                       ) : (
-                        <span className="text-base shrink-0">{agent.avatar || '🤖'}</span>
+                        <span className="text-base shrink-0">{getAvatarInitials(agent.name)}</span>
                       )}
                       <div className="truncate">
                         <div className="font-semibold text-xs text-white truncate">{agent.name}</div>
@@ -465,7 +466,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                           ['--ring-scale' as any]: isWorking ? '0.1' : '0.05',
                         }}
                       >
-                        {agent.avatar && agent.avatar.startsWith('http') ? (
+                        {isLocalAvatar(agent.avatar) ? (
                           <img 
                             src={agent.avatar} 
                             alt={agent.name} 
@@ -473,7 +474,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                             className="w-4 h-4 rounded-full object-cover shrink-0 border border-white/20" 
                           />
                         ) : (
-                          <span className="text-xs shrink-0">{agent.avatar || '🤖'}</span>
+                          <span className="text-xs shrink-0">{getAvatarInitials(agent.name)}</span>
                         )}
                       </div>
                       <span className="font-semibold text-xs text-white truncate max-w-[70px]">{agent.name}</span>
@@ -530,7 +531,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-white/10 relative z-10">
               <div className="flex items-center gap-3">
-                {inspectedAgent.avatar && inspectedAgent.avatar.startsWith('http') ? (
+                {isLocalAvatar(inspectedAgent.avatar) ? (
                   <img 
                     src={inspectedAgent.avatar} 
                     alt={inspectedAgent.name} 
@@ -539,7 +540,7 @@ export const FleetHealthMonitor: React.FC<FleetHealthMonitorProps> = ({
                   />
                 ) : (
                   <span className="text-3xl p-2 rounded-xl bg-black/40 border border-white/10">
-                    {inspectedAgent.avatar || '🤖'}
+                    {getAvatarInitials(inspectedAgent.name)}
                   </span>
                 )}
                 <div>

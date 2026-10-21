@@ -1,5 +1,6 @@
 import { composioAuth } from '../auth.ts';
 import { composioClient } from '../client.ts';
+import { Octokit } from '@octokit/rest';
 
 export class ComposioGitHubProvider {
   public static async checkConnection(): Promise<{ connected: boolean; username?: string }> {
@@ -13,17 +14,23 @@ export class ComposioGitHubProvider {
           return { connected: true, username: githubAccount.alias || 'connected' };
         }
       } catch (err) {
-        console.error('Error checking real Composio GitHub connection:', err);
+        throw new Error(`GitHub Composio connection check failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     }
 
-    const conn = composioAuth.getConnection('github');
     const token = process.env.GITHUB_TOKEN;
     if (token) {
-      composioAuth.setConnectionStatus('github', { connected: true, accountEmailOrHandle: 'bot@rufflo.dev' });
-      return { connected: true, username: 'rufflo-bot' };
+      try {
+        const { data } = await new Octokit({ auth: token }).rest.users.getAuthenticated();
+        composioAuth.setConnectionStatus('github', { connected: true, accountEmailOrHandle: data.login });
+        return { connected: true, username: data.login };
+      } catch (err) {
+        composioAuth.setConnectionStatus('github', { connected: false, accountEmailOrHandle: undefined });
+        throw new Error(`GitHub token validation failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
     }
-    return { connected: Boolean(conn?.connected), username: conn?.accountEmailOrHandle };
+    composioAuth.setConnectionStatus('github', { connected: false, accountEmailOrHandle: undefined });
+    return { connected: false };
   }
 
   public static async createPullRequest(params: {
@@ -56,17 +63,31 @@ export class ComposioGitHubProvider {
       }
     }
 
-    const { connected } = await this.checkConnection();
-    if (!connected) {
-      throw new Error('GitHub connection is NOT CONNECTED. Please configure GITHUB_TOKEN in your environment.');
+    const token = process.env.GITHUB_TOKEN;
+    if (!token) {
+      throw new Error('GitHub pull request creation is unavailable: configure Composio or GITHUB_TOKEN.');
     }
+
+    const [owner, repo, ...extra] = params.repo.split('/');
+    if (!owner || !repo || extra.length > 0) {
+      throw new Error('GitHub repository must use the "owner/repo" format.');
+    }
+
+    const { data } = await new Octokit({ auth: token }).rest.pulls.create({
+      owner,
+      repo,
+      title: params.title,
+      head: params.head,
+      base: params.base,
+      body: params.body,
+    });
+
     return {
       success: true,
-      prNumber: Math.floor(Math.random() * 500) + 1,
-      url: `https://github.com/${params.repo}/pull/${Math.floor(Math.random() * 500) + 1}`,
-      title: params.title,
-      state: 'open',
+      prNumber: data.number,
+      url: data.html_url,
+      title: data.title,
+      state: data.state,
     };
   }
 }
-

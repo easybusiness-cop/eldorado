@@ -6,7 +6,7 @@ export class ComposioAuthService {
   private connections: Map<string, IntegrationConnectionStatus> = new Map();
 
   private constructor() {
-    this.initRealDataIntegrations();
+    this.initIntegrationCatalog();
   }
 
   public static getInstance(): ComposioAuthService {
@@ -16,63 +16,52 @@ export class ComposioAuthService {
     return ComposioAuthService.instance;
   }
 
-  private initRealDataIntegrations() {
-    // 1. Real Telegram Gateway (Live Channel Web Ingestion & Bot API)
+  private initIntegrationCatalog() {
     this.connections.set('telegram', {
       id: 'conn-telegram',
-      name: 'Telegram Live Intelligence & Bot Gateway',
+      name: 'Telegram',
       provider: 'telegram',
-      connected: true,
+      connected: false,
       authType: 'token',
       scopes: ['public_channels:read', 'bot_api:send', 'search:live'],
-      accountEmailOrHandle: '@telegram / @durov / @techcrunch',
     });
 
-    // 2. Real GitHub Enterprise & Open Source VCS
     this.connections.set('github', {
       id: 'conn-github',
-      name: 'GitHub API & Repositories Gateway',
+      name: 'GitHub',
       provider: 'github',
-      connected: true,
+      connected: false,
       authType: 'token',
       scopes: ['repo:read', 'search:repositories', 'issues:read'],
-      accountEmailOrHandle: 'https://api.github.com',
     });
 
-    // 3. Real Hacker News Live Feed API
     this.connections.set('hackernews', {
       id: 'conn-hackernews',
-      name: 'Hacker News Live Tech Stream',
+      name: 'Hacker News',
       provider: 'hackernews',
-      connected: true,
+      connected: false,
       authType: 'api_key',
       scopes: ['topstories:read', 'newstories:read', 'items:read'],
-      accountEmailOrHandle: 'https://hacker-news.firebaseio.com/v0',
     });
 
-    // 4. Real ArXiv Open Scientific Research API
     this.connections.set('arxiv', {
       id: 'conn-arxiv',
-      name: 'ArXiv Open Scientific Papers API',
+      name: 'arXiv',
       provider: 'arxiv',
-      connected: true,
+      connected: false,
       authType: 'api_key',
       scopes: ['cs.AI:read', 'cs.SE:read', 'papers:search'],
-      accountEmailOrHandle: 'https://export.arxiv.org/api/query',
     });
 
-    // 5. Real Open-Source Chromium Browser Gateway
     this.connections.set('browser', {
       id: 'conn-browser',
-      name: 'Playwright Chromium Open-Source Browser Gateway',
+      name: 'Browser',
       provider: 'browser',
-      connected: true,
+      connected: false,
       authType: 'token',
       scopes: ['headless_rendering', 'screenshots:capture', 'dom:extract'],
-      accountEmailOrHandle: 'Chromium 156.0.8078.4 (Local Linux Engine)',
     });
 
-    // 6. Google Workspace Integration
     this.connections.set('google_workspace', {
       id: 'conn-google',
       name: 'Google Workspace (Drive & Calendar)',
@@ -82,15 +71,13 @@ export class ComposioAuthService {
       scopes: ['https://www.googleapis.com/auth/drive.readonly'],
     });
 
-    // 7. Webhook & Event Dispatcher
     this.connections.set('webhook', {
       id: 'conn-webhook',
-      name: 'Fleet Ingress Webhook Dispatcher',
+      name: 'Webhook',
       provider: 'webhook',
-      connected: true,
+      connected: false,
       authType: 'token',
       scopes: ['events:receive', 'telemetry:stream'],
-      accountEmailOrHandle: '/api/integrations/webhook',
     });
   }
 
@@ -126,16 +113,8 @@ export class ComposioAuthService {
   }
 
   public async initiateConnection(provider: string, userId = 'default_user'): Promise<any> {
-    const conn = this.setConnectionStatus(provider, {
-      connected: true,
-      accountEmailOrHandle: `${userId}@rufflo.internal`,
-      lastSync: new Date().toISOString(),
-    });
-    return {
-      connected: true,
-      connection: conn,
-      message: `Active connection established for ${provider}`,
-    };
+    void userId;
+    throw new Error(`Connection setup is unavailable for ${provider}: no provider authorization flow is implemented.`);
   }
 
   public async deleteConnection(provider: string): Promise<boolean> {

@@ -32,6 +32,9 @@ export class GraphRunner {
       if (nextNode === 'execute_step') {
         state = await WorkflowNodes.executeStep(state);
         WorkflowCheckpointer.checkpoint(state);
+        if (state.status === 'BLOCKED') {
+          break;
+        }
       } else if (nextNode === 'verify') {
         state = await WorkflowNodes.executeVerification(state);
         WorkflowCheckpointer.checkpoint(state);

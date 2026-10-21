@@ -1,4 +1,4 @@
-export type WorkflowStatus = 'PENDING' | 'PLANNING' | 'RUNNING' | 'WAITING_APPROVAL' | 'VERIFYING' | 'COMPLETED' | 'FAILED';
+export type WorkflowStatus = 'PENDING' | 'PLANNING' | 'RUNNING' | 'WAITING_APPROVAL' | 'VERIFYING' | 'COMPLETED' | 'FAILED' | 'BLOCKED';
 
 export interface WorkflowState {
   workflowId: string;
@@ -8,7 +8,7 @@ export interface WorkflowState {
     name: string;
     description: string;
     assignedAgent: string;
-    status: 'pending' | 'running' | 'completed' | 'failed';
+    status: 'pending' | 'running' | 'completed' | 'failed' | 'blocked';
     result?: any;
     error?: string;
   }[];

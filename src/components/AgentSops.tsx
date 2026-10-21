@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Agent } from '../types';
 import { KnowledgeCategory } from '../types/knowledgeBase';
 import { soundFx } from '../utils/speech';
+import { getAvatarInitials, isLocalAvatar } from '../utils/avatar';
 import {
   Terminal,
   Shield,
@@ -189,24 +190,24 @@ ORDER BY conversion_rate DESC;`,
   },
   pam: {
     id: 'SOP-BEES-004',
-    title: 'HR Operations, Agent Recruiting & Academy Management Protocol',
+    title: 'HR Operations, Agent Recruiting & Skill Records Protocol',
     objectives: [
       'Manage agent recruitment pipelines, onboarding paths, and role configs.',
       'Moderate internal disputes and draft comprehensive corporate guidelines.',
-      'Manage training curriculums and coordinate academy registration ledger.',
+      'Maintain workforce skill records and coordinate role-based capability reviews.',
       'Maintain office morale logs and organize team culture programs.',
     ],
     clearanceLevel: 8,
     clearanceName: 'HR Administration & Training Registry Access',
     authorizedSources: [
       { name: 'hr_recruitment', type: 'database', clearance: 'WRITE' },
-      { name: 'academy_registrar', type: 'file', clearance: 'WRITE' },
+      { name: 'hr_skill_records', type: 'file', clearance: 'WRITE' },
       { name: 'employee_culture_hub', type: 'database', clearance: 'WRITE' },
     ],
     skillsAndCap: [
       { name: 'Agent Onboarding Operations', level: 98, description: 'Constructs optimized initial system prompts and tools mapping' },
       { name: 'Dispute Mediation & Compliance', level: 95, description: 'Ensures workspace standards are strictly respected' },
-      { name: 'Curriculum Administration', level: 92, description: 'Directs Personalized Learning Modules and schedules certifications' },
+      { name: 'Workforce Skill Records', level: 92, description: 'Maintains role-based capability reviews and evidence-backed records' },
     ],
     querySample: {
       title: 'Registering Candidates & Tracking Onboarding Achievements',
@@ -215,13 +216,13 @@ ORDER BY conversion_rate DESC;`,
 INSERT INTO hr_recruitment (candidate_name, assigned_role, onboarding_status, clearance_level) 
 VALUES ('Ryan Howard', 'Social Media Strategist', 'onboarding_active', 7);
 
-SELECT name, training_progress, certified_skills 
-FROM academy_registrar 
-WHERE training_progress < 100;`,
+SELECT name, review_status, verified_skills 
+FROM hr_skill_records 
+WHERE review_status <> 'complete';`,
     },
     simulationSteps: [
       'Starting Onboarding Pipeline Engine and tracking candidate queues...',
-      'Loading HR & Training Academy Registries under Pam Beesly clearance...',
+      'Loading workforce skill review records under Pam Beesly clearance...',
       'Checking active agent training records and scheduling curriculum cycles...',
       'Updating employee culture hub. Score: 94.8% (Positive alignment)...',
       'Drafting workplace dispute settlement files for internal compliance...',
@@ -229,7 +230,7 @@ WHERE training_progress < 100;`,
       'Registering onboarding audit summaries into company knowledge base.',
     ],
     simulatedInsight: {
-      title: 'Talent Acquisition & Employee Academy Training Onboarding Standard',
+      title: 'Talent Acquisition & Employee Onboarding Standard',
       category: 'coding',
       content: 'New recruits receive automatically isolated runtime sandboxes, explicit tool clearances, and clear performance thresholds. Onboarding is complete when the recruit passes the zero-trust system diagnostics with a proficiency score >= 80%.',
     },
@@ -688,10 +689,10 @@ export const AgentSops: React.FC<AgentSopsProps> = ({ agents, onRecordKnowledge 
                       className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-xs"
                       style={{ backgroundColor: agent.color || '#d65d0e' }}
                     >
-                      {agent.avatar ? (
+                      {isLocalAvatar(agent.avatar) ? (
                         <img src={agent.avatar} alt={agent.name} className="w-full h-full rounded-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
-                        agent.name[0]
+                        getAvatarInitials(agent.name)
                       )}
                     </div>
                     <div>

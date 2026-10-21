@@ -24,29 +24,41 @@ export class ResearchAgent {
     // 3. Read sources and extract evidence
     const findings: string[] = [];
     const citations: string[] = [];
+    const evidence: Array<{ sourceIndex: number; sourceUrl: string; sourceTitle: string; quote: string }> = [];
 
     for (let i = 0; i < sources.length; i++) {
       const src = sources[i];
       const text = await this.reader.readSource(src.url);
-      const evidence = await EvidenceExtractor.extractEvidence(text, topic);
-      findings.push(...evidence);
+      const sourceEvidence = await EvidenceExtractor.extractEvidence(text, topic);
+      findings.push(...sourceEvidence);
+      evidence.push(...sourceEvidence.map((quote) => ({
+        sourceIndex: i + 1,
+        sourceUrl: src.url,
+        sourceTitle: src.title,
+        quote,
+      })));
       citations.push(CitationBuilder.buildCitation(i + 1, src.url, src.title));
     }
     trace.push('EXTRACT: Collected evidence and findings from documents.');
 
     // 4. Cross-check
-    const contradictions = ContradictionChecker.detectContradictions(findings);
-    if (contradictions.hasContradictions) {
-      trace.push('WARN: Detected logical contradictions across sources.');
+    const contradictions = await ContradictionChecker.detectContradictions(findings);
+    if (contradictions.status === 'checked' && contradictions.hasContradictions) {
+      trace.push('WARN: Candidate contradictions were found; review the cited excerpts before relying on a conclusion.');
+    } else if (contradictions.status === 'checked') {
+      trace.push('VERIFY: Available evidence was checked; no direct contradiction was identified.');
     } else {
-      trace.push('VERIFY: Logical cross-checking completed with no violations.');
+      trace.push(`UNVERIFIED: Cross-source contradiction check ${contradictions.status}; no clean verification result is available.`);
     }
 
     // 5. Save session
     const session = {
       topic,
       findings,
+      evidence,
       citations,
+      contradictions,
+      verificationStatus: contradictions.status,
       timestamp: new Date().toISOString(),
     };
     ResearchMemory.saveSession(session);
@@ -57,7 +69,10 @@ export class ResearchAgent {
       topic,
       trace,
       findings,
+      evidence,
       citations,
+      contradictions,
+      verificationStatus: contradictions.status,
     };
   }
 }

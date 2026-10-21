@@ -386,7 +386,6 @@ export interface Agent {
   authorityLevel?: number; // 1 to 10
   assignedTools?: string[];
   permissions?: string[];
-  trainingRecord?: CseTrainingRecord;
   deskPosition: {
     x: number; // grid or canvas coordinates
     y: number;
@@ -440,34 +439,12 @@ export interface AgentLog {
   systemModuleName?: string;
 }
 
-export interface CseCertification {
-  id: string;
-  name: string;
-  level: string;
-  track: string;
-  issuedAt: string;
-  sourceRepository: string;
-}
-
-export interface CseTrainingRecord {
-  completedLevels: number[];
-  currentLevel: number;
-  competencyScore: number;
-  competencyGrade: string;
-  specializationTrack: string;
-  certifications: CseCertification[];
-  practicalProjectsCompleted: string[];
-  hoursTrained: number;
-  lastTrainedAt: string;
-  skillsMatrix: Record<string, number>;
-}
-
 export interface FleetTask {
   id: string;
   title: string;
   description: string;
   assignedTo: string;
-  status: 'queued' | 'running' | 'completed' | 'failed';
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'blocked';
   progress: number;
   priority: 'low' | 'medium' | 'high' | 'critical';
   output?: string;
@@ -905,38 +882,4 @@ export interface InterAgentThread {
   quantumSynergy: InterAgentQuantumSynergy;
 }
 
-// Visual Agent Skill Matrix & Learning Modules Types
-export type SkillMatrixCategory = 'marketing' | 'finance' | 'coding' | 'security' | 'operations' | 'quantum';
-
-export interface AgentSkillProfile {
-  agentId: string;
-  agentName: string;
-  agentRole: string;
-  agentAvatar?: string;
-  agentColor: string;
-  department: string;
-  scores: Record<SkillMatrixCategory, number>; // 0 - 100
-  overallCompetency: number;
-  identifiedGapCategory: SkillMatrixCategory;
-  identifiedGapScore: number;
-  gapSeverity: 'low' | 'medium' | 'critical';
-}
-
-export interface PersonalizedLearningModule {
-  id: string;
-  title: string;
-  category: SkillMatrixCategory;
-  targetAgentId: string;
-  targetAgentName: string;
-  gapIdentified: string;
-  curriculumOverview: string;
-  xpReward: number;
-  durationMinutes: number;
-  projectedProficiencyBoost: number;
-  projectedSynergyBoost: number;
-  isCompleted?: boolean;
-}
-
-
-
-
+// Agent skills are stored directly on each Agent profile.

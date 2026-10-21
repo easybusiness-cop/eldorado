@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Agent } from '../types';
 import { soundFx } from '../utils/speech';
+import { getAvatarInitials } from '../utils/avatar';
 import { MessageSquare, Zap } from 'lucide-react';
 import { SmartSuggestionTooltip } from './SmartSuggestionTooltip';
 import { SmartTaskSuggestion } from '../utils/smartTaskSuggestions';
@@ -75,7 +76,7 @@ export const AgentRoster: React.FC<AgentRosterProps> = ({
                   borderColor: agent.color,
                 }}
               >
-                <span>{agent.avatar}</span>
+                <span>{/^https?:\/\//i.test(agent.avatar ?? '') ? getAvatarInitials(agent.name) : agent.avatar || getAvatarInitials(agent.name)}</span>
                 {agent.status === 'working' && (
                   <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-[#1d2021] animate-ping" />
                 )}

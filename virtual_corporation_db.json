@@ -27,7 +27,7 @@
       "cto": "Hank Tate (Technology & Systems)",
       "ciso": "Dwight K. Schrute (Security & Risk)",
       "cfo": "Angela Martin (Finance & Treasury)",
-      "chro": "Toby Flenderson (Workforce & Academy)"
+      "chro": "Toby Flenderson (Workforce & People Operations)"
     }
   },
   "divisions": [
@@ -93,7 +93,7 @@
       "id": "div-admin",
       "name": "Finance, HR & People Operations",
       "code": "ADMIN",
-      "description": "Treasury, budget allocation, talent recruitment, agent academy training, and workforce operations.",
+      "description": "Treasury, budget allocation, talent recruitment, capability reviews, and workforce operations.",
       "leaderId": "emp-angela",
       "leaderName": "Angela Martin",
       "departmentIds": [
@@ -291,9 +291,9 @@
     {
       "id": "dept-hr",
       "divisionId": "div-admin",
-      "name": "Human Resources & CSE Agent Academy",
+      "name": "Human Resources & People Operations",
       "code": "HR",
-      "description": "Workforce capability certification, agent syllabus management, and conflict resolution.",
+      "description": "Agent onboarding, evidence-backed capability reviews, and conflict resolution.",
       "headOfDepartmentId": "emp-toby",
       "headName": "Toby Flenderson",
       "headRole": "Chief Human Resources Officer (CHRO)",
@@ -303,12 +303,12 @@
       "activeProjectsCount": 3,
       "workloadPercent": 65,
       "teamIds": [
-        "team-hr-academy"
+        "team-hr-people-ops"
       ],
       "clearanceRequired": 70,
       "keyCapabilities": [
         "workforce_planning",
-        "curriculum_design",
+        "capability_reviews",
         "performance_evaluation",
         "compliance"
       ]
@@ -593,6 +593,62 @@
           "certifiedTools": [
             "risk-engine"
           ]
+        },
+        {
+          "id": "cap-eng-cross-language-engineering-adapt-to-the-requested-language-ecosystem-by-inspecting-repository-conventions-and-authoritative-documentation",
+          "name": "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-programming-languages-typescript-javascript-python-java-c-c-c-go-rust-ruby-php-swift-kotlin-dart-scala-r-julia-matlab-sql-bash-powershell-html-css-lua-perl-haskell-elixir-erlang-clojure-f-objective-c-visual-basic-net-cobol",
+          "name": "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-object-oriented-programming-classes-objects-constructors-encapsulation-abstraction-inheritance-polymorphism-and-composition",
+          "name": "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-data-structures-and-algorithms-arrays-linked-lists-stacks-queues-hash-maps-trees-graphs-recursion-searching-and-sorting",
+          "name": "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-problem-solving-requirements-decomposition-algorithm-design-big-o-time-and-space-analysis-edge-case-analysis-and-trade-off-evaluation",
+          "name": "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-design-solid-principles-useful-design-patterns-modular-architecture-api-contracts-and-maintainable-abstractions",
+          "name": "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-quality-debugging-root-cause-analysis-automated-tests-code-review-secure-coding-performance-and-reliability",
+          "name": "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
         }
       ],
       "responsibilities": [
@@ -707,6 +763,62 @@
             "tsc",
             "vite"
           ]
+        },
+        {
+          "id": "cap-eng-cross-language-engineering-adapt-to-the-requested-language-ecosystem-by-inspecting-repository-conventions-and-authoritative-documentation",
+          "name": "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-programming-languages-typescript-javascript-python-java-c-c-c-go-rust-ruby-php-swift-kotlin-dart-scala-r-julia-matlab-sql-bash-powershell-html-css-lua-perl-haskell-elixir-erlang-clojure-f-objective-c-visual-basic-net-cobol",
+          "name": "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-object-oriented-programming-classes-objects-constructors-encapsulation-abstraction-inheritance-polymorphism-and-composition",
+          "name": "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-data-structures-and-algorithms-arrays-linked-lists-stacks-queues-hash-maps-trees-graphs-recursion-searching-and-sorting",
+          "name": "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-problem-solving-requirements-decomposition-algorithm-design-big-o-time-and-space-analysis-edge-case-analysis-and-trade-off-evaluation",
+          "name": "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-design-solid-principles-useful-design-patterns-modular-architecture-api-contracts-and-maintainable-abstractions",
+          "name": "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-quality-debugging-root-cause-analysis-automated-tests-code-review-secure-coding-performance-and-reliability",
+          "name": "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
         }
       ],
       "responsibilities": [
@@ -1066,6 +1178,62 @@
             "software-builder",
             "terminal"
           ]
+        },
+        {
+          "id": "cap-eng-cross-language-engineering-adapt-to-the-requested-language-ecosystem-by-inspecting-repository-conventions-and-authoritative-documentation",
+          "name": "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-programming-languages-typescript-javascript-python-java-c-c-c-go-rust-ruby-php-swift-kotlin-dart-scala-r-julia-matlab-sql-bash-powershell-html-css-lua-perl-haskell-elixir-erlang-clojure-f-objective-c-visual-basic-net-cobol",
+          "name": "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-object-oriented-programming-classes-objects-constructors-encapsulation-abstraction-inheritance-polymorphism-and-composition",
+          "name": "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-data-structures-and-algorithms-arrays-linked-lists-stacks-queues-hash-maps-trees-graphs-recursion-searching-and-sorting",
+          "name": "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-problem-solving-requirements-decomposition-algorithm-design-big-o-time-and-space-analysis-edge-case-analysis-and-trade-off-evaluation",
+          "name": "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-design-solid-principles-useful-design-patterns-modular-architecture-api-contracts-and-maintainable-abstractions",
+          "name": "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-quality-debugging-root-cause-analysis-automated-tests-code-review-secure-coding-performance-and-reliability",
+          "name": "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
         }
       ],
       "responsibilities": [
@@ -1142,6 +1310,62 @@
             "software-builder",
             "terminal"
           ]
+        },
+        {
+          "id": "cap-eng-cross-language-engineering-adapt-to-the-requested-language-ecosystem-by-inspecting-repository-conventions-and-authoritative-documentation",
+          "name": "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-programming-languages-typescript-javascript-python-java-c-c-c-go-rust-ruby-php-swift-kotlin-dart-scala-r-julia-matlab-sql-bash-powershell-html-css-lua-perl-haskell-elixir-erlang-clojure-f-objective-c-visual-basic-net-cobol",
+          "name": "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-object-oriented-programming-classes-objects-constructors-encapsulation-abstraction-inheritance-polymorphism-and-composition",
+          "name": "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-data-structures-and-algorithms-arrays-linked-lists-stacks-queues-hash-maps-trees-graphs-recursion-searching-and-sorting",
+          "name": "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-problem-solving-requirements-decomposition-algorithm-design-big-o-time-and-space-analysis-edge-case-analysis-and-trade-off-evaluation",
+          "name": "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-design-solid-principles-useful-design-patterns-modular-architecture-api-contracts-and-maintainable-abstractions",
+          "name": "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
+        },
+        {
+          "id": "cap-eng-software-quality-debugging-root-cause-analysis-automated-tests-code-review-secure-coding-performance-and-reliability",
+          "name": "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability",
+          "category": "engineering",
+          "proficiencyScore": 88,
+          "verifiedEvidence": "Assigned as an engineering capability; execution evidence is tracked through completed work.",
+          "certifiedTools": []
         }
       ],
       "responsibilities": [

@@ -7,6 +7,7 @@ import {
   HQMemoryEntry,
   CrossDeptWorkflow
 } from '../types.ts';
+import { applyEngineeringCompetencies } from '../constants/engineeringCompetencies.ts';
 
 export const INITIAL_FLOORS: HQFloorInfo[] = [
   {
@@ -73,10 +74,10 @@ export const INITIAL_FLOORS: HQFloorInfo[] = [
     id: '10',
     level: 10,
     code: '10',
-    name: 'Human Resources & Agent Academy',
+    name: 'Human Resources & People Operations',
     logo: '📋',
     departmentId: 'hr',
-    departmentName: 'Human Resources & Academy',
+    departmentName: 'Human Resources & People Operations',
     headId: 'toby_hr',
     headName: 'Toby Flenderson',
     headRole: 'Chief Human Resources Officer (CHRO)',
@@ -85,8 +86,8 @@ export const INITIAL_FLOORS: HQFloorInfo[] = [
     activeProjectsCount: 3,
     pendingApprovalsCount: 0,
     workloadPercent: 54,
-    alerts: ['Agent Academy Level 8 Curriculum Active'],
-    description: 'Talent recruitment, CSE Agent Academy certifications, performance evaluations, agent onboarding, and persona alignment.',
+    alerts: ['Agent onboarding and performance reviews active'],
+    description: 'Talent recruitment, performance evaluations, agent onboarding, and persona alignment.',
     securityClassification: 'CONFIDENTIAL'
   },
   {
@@ -810,7 +811,6 @@ export interface AgentContract {
   status: 'active' | 'suspended' | 'vacation' | 'training';
   memorySummary: string;
   
-  trainingRecord?: any;
   trainingState: 'UNTRAINED' | 'TRAINING' | 'EVALUATION' | 'SUPERVISED' | 'PRODUCTION';
   kpis: {
     tasksCompleted: number;
@@ -1366,16 +1366,16 @@ const INITIAL_TASKS: DBTask[] = [
     id: 'tsk-pam-01',
     projectId: 'prj-alpha',
     missionId: 'mis-01',
-    title: 'Agent Academy Curriculum & Inter-Office SOPs',
+    title: 'Agent Onboarding & Inter-Office SOPs',
     description: 'Maintain Scranton office SOPs, structure standardized onboarding workflows for newly provisioned agents, and conduct quarterly team pulse surveys.',
     assignedTo: 'pam',
     status: 'running',
     progress: 70,
     priority: 'medium',
-    output: 'CSE Agent Academy Level 8 syllabus updated with autonomous tooling certification.',
-    codeSnippet: `// Pam Beesly People Ops & Academy Standard\nexport function onboardAgent(agentProfile) {\n  return { certified: true, level: 8, sopChecklistCompleted: true };\n}`,
+    output: 'Agent onboarding checklist and inter-office compliance handbook updated.',
+    codeSnippet: `// Pam Beesly People Operations Standard\nexport function onboardAgent(agentProfile) {\n  return { onboardingChecklistCompleted: true, sopChecklistCompleted: true };\n}`,
     subtasks: [
-      { id: 'st-p-1', title: 'Update CSE Agent Academy Level 8 training syllabus', completed: true, assignedTo: 'pam' },
+      { id: 'st-p-1', title: 'Update standardized new-agent onboarding checklist', completed: true, assignedTo: 'pam' },
       { id: 'st-p-2', title: 'Standardize inter-office remote compliance handbook', completed: true, assignedTo: 'pam' },
       { id: 'st-p-3', title: 'Review quarterly department psychological safety index', completed: false, assignedTo: 'pam' },
     ],
@@ -1641,7 +1641,36 @@ export class CompanyDB {
       changed = true;
     }
 
+    const hrFloor = this.cache.floors.find((floor) => floor.departmentId === 'hr');
+    if (hrFloor && (hrFloor.name !== 'Human Resources & People Operations' || hrFloor.departmentName !== 'Human Resources & People Operations')) {
+      hrFloor.name = 'Human Resources & People Operations';
+      hrFloor.departmentName = 'Human Resources & People Operations';
+      hrFloor.alerts = ['Agent onboarding and performance reviews active'];
+      hrFloor.description = 'Talent recruitment, performance evaluations, agent onboarding, and persona alignment.';
+      changed = true;
+    }
+
+    const legacyOnboardingTask = this.cache.tasks?.find((task) => task.id === 'tsk-pam-01');
+    if (legacyOnboardingTask && legacyOnboardingTask.title !== 'Agent Onboarding & Inter-Office SOPs') {
+      legacyOnboardingTask.title = 'Agent Onboarding & Inter-Office SOPs';
+      legacyOnboardingTask.output = 'Agent onboarding checklist and inter-office compliance handbook updated.';
+      legacyOnboardingTask.codeSnippet = `// Pam Beesly People Operations Standard
+export function onboardAgent(agentProfile) {
+  return { onboardingChecklistCompleted: true, sopChecklistCompleted: true };
+}`;
+      legacyOnboardingTask.subtasks = legacyOnboardingTask.subtasks.map((subtask, index) => index === 0
+        ? { ...subtask, title: 'Update standardized new-agent onboarding checklist' }
+        : subtask);
+      changed = true;
+    }
+
     this.seedMissingEmployees();
+    const currentAgents = this.cache.agents;
+    const enrichedAgents = currentAgents.map(applyEngineeringCompetencies);
+    if (enrichedAgents.some((agent, index) => agent !== currentAgents[index])) {
+      this.cache.agents = enrichedAgents;
+      changed = true;
+    }
     if (this.seedFleetTasks()) {
       changed = true;
     }
@@ -1864,10 +1893,29 @@ export class CompanyDB {
   }
 
   private save() {
+    const tempPath = `${DB_FILE_PATH}.tmp`;
     try {
-      const tempPath = `${DB_FILE_PATH}.tmp`;
       fs.writeFileSync(tempPath, JSON.stringify(this.cache, null, 2), 'utf8');
-      fs.renameSync(tempPath, DB_FILE_PATH);
+      try {
+        fs.renameSync(tempPath, DB_FILE_PATH);
+      } catch (renameError: any) {
+        const retryableWindowsLock = process.platform === 'win32'
+          && ['EPERM', 'EACCES', 'EBUSY'].includes(renameError?.code);
+        if (!retryableWindowsLock) throw renameError;
+
+        // Windows may refuse to replace a destination held briefly by a sync
+        // or scanner process. The complete temp file is already durable, so
+        // copy it into place as a fallback and keep the temp if that also fails.
+        try {
+          fs.copyFileSync(tempPath, DB_FILE_PATH);
+          fs.unlinkSync(tempPath);
+        } catch (copyError: any) {
+          throw new Error(
+            `Database rename failed (${renameError.code}); fallback copy failed (${copyError?.code || copyError?.message}). Recovery data remains at ${tempPath}.`,
+            { cause: copyError },
+          );
+        }
+      }
     } catch (err: any) {
       console.error(`[CompanyDB Error] Transaction write failed: ${err.message}`);
     }
@@ -2053,86 +2101,6 @@ export class CompanyDB {
   }
 
 
-  public evaluateAgentPromotion(agentId: string, projectId: string, taskId: string) {
-    const agent = this.getAgentById(agentId);
-    if (!agent) return;
-    
-    if (!agent.trainingRecord) {
-        agent.trainingRecord = {
-            completedLevels: [],
-            currentLevel: 1,
-            competencyScore: 50,
-            competencyGrade: 'L2',
-            certifications: [],
-            practicalProjectsCompleted: [],
-            hoursTrained: 0,
-            skillsMatrix: {}
-        };
-    }
-    
-    agent.trainingRecord.practicalProjectsCompleted.push(taskId);
-    agent.trainingRecord.competencyScore += 5; // 5 points per task
-    agent.trainingRecord.hoursTrained += 2; // Simulate hours
-    
-    let promoted = false;
-    let oldGrade = agent.trainingRecord.competencyGrade;
-    let newLevel = agent.trainingRecord.currentLevel;
-    
-    // Grade Logic
-    if (agent.trainingRecord.competencyScore >= 95) agent.trainingRecord.competencyGrade = 'L5';
-    else if (agent.trainingRecord.competencyScore >= 85) agent.trainingRecord.competencyGrade = 'L4';
-    else if (agent.trainingRecord.competencyScore >= 75) agent.trainingRecord.competencyGrade = 'L3';
-    
-    // Level up Logic
-    if (agent.trainingRecord.competencyScore >= agent.trainingRecord.currentLevel * 20) {
-        newLevel = Math.min(9, agent.trainingRecord.currentLevel + 1);
-        if (newLevel > agent.trainingRecord.currentLevel) {
-            agent.trainingRecord.currentLevel = newLevel;
-            if (!agent.trainingRecord.completedLevels.includes(newLevel - 1)) {
-                 agent.trainingRecord.completedLevels.push(newLevel - 1);
-            }
-            promoted = true;
-        }
-    }
-    
-    if (promoted || oldGrade !== agent.trainingRecord.competencyGrade) {
-        // Log celebratory event
-        this.logAudit({
-            id: `aud-prom-${Date.now()}`,
-            agentId: agent.id,
-            projectId: projectId,
-            taskId: taskId,
-            tool: 'cse_academy',
-            action: `Agent Promotion: ${agent.name}`,
-            inputHash: 'CERT-GEN-AUTO',
-            result: `🎉 PROMOTION UNLOCKED! Agent ${agent.name} has advanced to CSE Level ${agent.trainingRecord.currentLevel} (Grade ${agent.trainingRecord.competencyGrade}) after completing project task.`,
-            timestamp: new Date().toISOString(),
-            riskLevel: 'low',
-            approvalRequired: false,
-            executionId: `prom-${Date.now()}`
-        });
-        
-        // Add to persistent memory
-        this.addMemory({
-            id: `mem-prom-${Date.now()}`,
-            agentId: agent.id, // using agentId for memory model backwards compatibility
-            type: 'episodic',
-            content: `Earned promotion to CSE Academy Level ${agent.trainingRecord.currentLevel} and Grade ${agent.trainingRecord.competencyGrade} by completing practical project task.`,
-            projectId: projectId,
-            importance: 9,
-            confidence: 100,
-            createdAt: Date.now()
-        });
-        
-        // Slightly bump authority based on level if they are low
-        if (agent.trainingRecord.currentLevel > 3 && agent.authorityLevel < 5) {
-            agent.authorityLevel = 5;
-        }
-    }
-    
-    this.save();
-  }
-
   public addProject(proj: ProjectPortfolio) {
     this.cache.projects = this.cache.projects.filter((p) => p.id !== proj.id);
     this.cache.projects.push(proj);
@@ -2163,8 +2131,26 @@ export class CompanyDB {
     return task;
   }
 
-  public updateTaskStatus(taskId: string, status: DBTask['status'], progress: number = (status === 'completed' ? 100 : 50), output?: string, snippet?: string) {
+  public updateTaskStatus(
+    taskId: string,
+    status: DBTask['status'],
+    progress: number = (status === 'completed' ? 100 : 50),
+    output?: string,
+    snippet?: string,
+    verificationEvidence?: NonNullable<DBTask['evidence']>[number],
+  ) {
     const task = this.cache.tasks.find((t) => t.id === taskId);
+    if (
+      task &&
+      status === 'completed' &&
+      (!verificationEvidence ||
+        verificationEvidence.status !== 'VERIFIED' ||
+        !verificationEvidence.source ||
+        !verificationEvidence.verificationId)
+    ) {
+      throw new Error('Task completion requires explicit verification evidence.');
+    }
+
     if (task) {
       task.status = status;
       task.progress = progress;
@@ -2173,12 +2159,7 @@ export class CompanyDB {
       if (status === 'completed') {
         task.completedAt = Date.now();
         task.evidence = task.evidence || [];
-        task.evidence.push({
-          status: 'VERIFIED',
-          source: task.assignedTo,
-          timestamp: new Date().toISOString(),
-          verificationId: `v-${Math.floor(Math.random() * 900 + 100)}`
-        });
+        task.evidence.push(verificationEvidence);
       }
       this.save();
     }

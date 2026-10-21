@@ -10,7 +10,6 @@ import {
   Activity,
   Code2,
   Shield,
-  BookOpen,
   Sliders,
   ArrowRight,
   Zap,
@@ -46,7 +45,6 @@ interface SearchModalProps {
   onOpenDebugger: () => void;
   onOpenAdminOrchestrator: () => void;
   onOpenRepos: () => void;
-  onOpenAcademy: () => void;
   onOpenSystemModules: () => void;
   onOpenPreferences: () => void;
   onOpenCall: (agentId: string) => void;
@@ -70,7 +68,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onOpenDebugger,
   onOpenAdminOrchestrator,
   onOpenRepos,
-  onOpenAcademy,
   onOpenSystemModules,
   onOpenPreferences,
   onOpenCall,
@@ -148,18 +145,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         action: () => {
           onClose();
           onOpenRepos();
-        },
-      },
-      {
-        id: 'tool-academy',
-        category: 'tools',
-        title: 'CSE Agent Training Academy',
-        subtitle: 'Certify workforce skills & compliance records',
-        badge: 'HR / Learn',
-        icon: <BookOpen className="w-4 h-4 text-amber-400" />,
-        action: () => {
-          onClose();
-          onOpenAcademy();
         },
       },
       {
@@ -344,7 +329,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     onOpenDebugger,
     onOpenIde,
     onOpenRepos,
-    onOpenAcademy,
     onOpenSystemModules,
     onOpenPreferences,
     onSelectAgent,
