@@ -112,8 +112,10 @@ class CorporateCascadeEngine {
    */
   public async executeCommand(
     userCommand: string,
-    onProgress?: CascadeProgressCallback
+    onProgress?: CascadeProgressCallback,
+    organizationId?: string,
   ): Promise<CorporateCascadeRun> {
+    if (!organizationId?.trim()) throw new Error('organizationId is required to run an organization-scoped agent cascade.');
     const startTime = Date.now();
     const runId = `cascade-${randomUUID().slice(0, 8)}`;
 
@@ -328,10 +330,11 @@ Output JSON with keys:
         // Check if we should spawn an extra specialized employee for this department to demonstrate unlimited workforce
         if (deptKey === "engineering" || deptKey === "research") {
           const specializedRole = deptKey === "engineering" ? "software_engineer" : "technology_researcher";
-          const spawnedEmployee = employeeFactory.createEmployee(
+          const spawnedEmployee = await employeeFactory.createEmployee(
             specializedRole,
+            organizationId,
             `Specialized ${deptKey.toUpperCase()} Operator`,
-            [`${deptKey}_optimization`, "autonomous_execution"]
+            [`${deptKey}_optimization`, "autonomous_execution"],
           );
 
           tasks.push({

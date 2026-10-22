@@ -3,6 +3,9 @@ import path from 'path';
 import { BrowserNavigation } from './browser.navigation.ts';
 import { BrowserExtract, ExtractedPageInfo } from './browser.extract.ts';
 import { BrowserPolicy } from './browser.policy.ts';
+import { kmsEnvelopeEncryptionService, type KmsEncryptedEnvelope } from '../../security/kms-envelope-encryption.service.ts';
+import { getSupabaseAdmin } from '../../../src/utils/supabaseAdmin.ts';
+import { digitalIdentityService } from '../../identity/digital-identity.service.ts';
 
 export interface BrowserStatus {
   status: 'online' | 'degraded' | 'offline';
@@ -37,14 +40,10 @@ export interface AgentBrowserSessionSummary {
   status: 'active' | 'idle' | 'closed';
   historyCount: number;
   cookiesCount: number;
-  cookieDomains: string[];
   localStorageKeysCount: number;
-  storagePath: string;
   isPersistent: boolean;
   createdAt: number;
   lastActiveAt: number;
-  lastScreenshot?: string;
-  userAgent: string;
 }
 
 interface InternalAgentSession {
@@ -84,6 +83,13 @@ export class BrowserService {
     const org = (orgId || 'org-alpha').toLowerCase().trim();
     const agent = (agentId || 'system').toLowerCase().trim();
     return `${org}:${agent}`;
+  }
+
+  private countActiveAgentContexts(orgId?: string): number {
+    const targetOrg = orgId?.toLowerCase().trim();
+    return Array.from(this.agentSessions.values()).filter((session) =>
+      Boolean(session.context && (!targetOrg || session.organizationId === targetOrg)),
+    ).length;
   }
 
   /**
@@ -144,11 +150,12 @@ export class BrowserService {
     }
 
     // Set up dedicated persistent directory for this agent
-    const agentWorkspaceDir = path.join(this.baseWorkspaceDir, normalizedOrgId, normalizedAgentId);
+    const agentWorkspaceDir = path.join(this.baseWorkspaceDir, encodeURIComponent(normalizedOrgId), encodeURIComponent(normalizedAgentId));
     if (!fs.existsSync(agentWorkspaceDir)) {
       fs.mkdirSync(agentWorkspaceDir, { recursive: true });
     }
-    const storageStatePath = path.join(agentWorkspaceDir, 'storage_state.json');
+    const storageStatePath = path.join(agentWorkspaceDir, 'storage_state.enc.json');
+    const legacyStorageStatePath = path.join(agentWorkspaceDir, 'storage_state.json');
 
     try {
       const userAgent = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Rufflo-Agent/${normalizedAgentId}`;
@@ -162,19 +169,18 @@ export class BrowserService {
       // Restore persistent cookies and local storage if previous state exists
       let previouslyStoredCookiesCount = 0;
       let previouslyStoredDomains: string[] = [];
-      if (fs.existsSync(storageStatePath)) {
-        try {
-          const rawState = fs.readFileSync(storageStatePath, 'utf8');
-          const parsedState = JSON.parse(rawState);
-          contextOptions.storageState = storageStatePath;
-          if (Array.isArray(parsedState.cookies)) {
-            previouslyStoredCookiesCount = parsedState.cookies.length;
-            previouslyStoredDomains = Array.from(new Set(parsedState.cookies.map((c: any) => c.domain)));
-          }
-        } catch (e: any) {
-          console.warn(`[BrowserService] Note reading existing storage state: ${e.message}`);
-        }
+      await digitalIdentityService.getOrCreateIdentity(normalizedOrgId, normalizedAgentId);
+      const parsedState = await this.loadPersistentStorageState(normalizedOrgId, normalizedAgentId, legacyStorageStatePath, storageStatePath);
+      const persistedState = parsedState || undefined;
+      if (parsedState && Array.isArray(parsedState.cookies)) {
+        previouslyStoredCookiesCount = parsedState.cookies.length;
+        previouslyStoredDomains = Array.from(new Set(parsedState.cookies.map((c: any) => c.domain)));
       }
+
+      if (!kmsEnvelopeEncryptionService.isConfigured()) {
+        throw new Error('Cloud KMS is required for persistent browser sessions.');
+      }
+      if (persistedState) contextOptions.storageState = persistedState;
 
       const context = await browser.newContext(contextOptions);
       const page = await context.newPage();
@@ -208,7 +214,8 @@ export class BrowserService {
   /**
    * Check status of the browser engine and all active agent sessions
    */
-  public async getBrowserStatus(): Promise<BrowserStatus> {
+  public async getBrowserStatus(orgId?: string): Promise<BrowserStatus> {
+    const activeCount = this.countActiveAgentContexts(orgId);
     try {
       const browser = await this.getChromiumBrowser();
       if (browser) {
@@ -227,8 +234,8 @@ export class BrowserService {
             'anti_bot_headers',
             'real_time_web_radar',
           ],
-          activeSessions: Math.max(1, this.agentSessions.size),
-          individualAgentSessionsCount: this.agentSessions.size,
+          activeSessions: activeCount,
+          individualAgentSessionsCount: activeCount,
         };
       }
     } catch {}
@@ -245,8 +252,8 @@ export class BrowserService {
         'news_crawler',
         'link_crawler',
       ],
-      activeSessions: Math.max(1, this.agentSessions.size),
-      individualAgentSessionsCount: this.agentSessions.size,
+      activeSessions: activeCount,
+      individualAgentSessionsCount: activeCount,
     };
   }
 
@@ -272,7 +279,7 @@ export class BrowserService {
     if (!check.allowed) {
       return {
         success: false,
-        url: normalizedUrl,
+        url: redactUrlForOutput(normalizedUrl),
         engine: 'resilient-http-scraper',
         error: check.reason,
         agentId: normalizedAgentId,
@@ -297,9 +304,9 @@ export class BrowserService {
         const title = await page.title();
         const content = await page.content();
 
-        const info = BrowserExtract.extractInformation(
+        const info = sanitizePageInfo(BrowserExtract.extractInformation(
           content || `<html><head><title>${title}</title></head></html>`
-        );
+        ), normalizedUrl);
 
         let screenshotBase64 = '';
         try {
@@ -312,7 +319,7 @@ export class BrowserService {
         // Count cookies and domain list in agent's context (strictly avoiding raw values)
         let cookiesCount = 0;
         let cookieDomains: string[] = [];
-        const session = this.agentSessions.get(key);
+        let session = this.agentSessions.get(key);
         if (session && session.context) {
           try {
             const cookies = await session.context.cookies();
@@ -321,9 +328,10 @@ export class BrowserService {
             session.cookiesCount = cookiesCount;
             session.cookieDomains = cookieDomains;
 
-            // Automatically commit storageState to persistent disk
-            await session.context.storageState({ path: session.storageStatePath });
-          } catch {}
+            await this.persistStorageState(session);
+          } catch {
+            session.isPersistent = false;
+          }
 
           session.currentUrl = normalizedUrl;
           session.screenshot = screenshotBase64;
@@ -333,12 +341,12 @@ export class BrowserService {
 
         return {
           success: true,
-          url: normalizedUrl,
+          url: redactUrlForOutput(normalizedUrl),
           engine: 'chromium-playwright',
           agentId: normalizedAgentId,
           organizationId: normalizedOrgId,
           cookiesCount,
-          isPersistent: true,
+          isPersistent: session?.isPersistent ?? false,
           info: {
             ...info,
             title: title || info.title,
@@ -347,7 +355,7 @@ export class BrowserService {
           durationMs: Date.now() - startTime,
         };
       } catch (playwrightError: any) {
-        console.warn(`[BrowserService] Playwright notice for agent ${normalizedAgentId} on ${normalizedUrl}: ${playwrightError.message}`);
+        console.warn(`[BrowserService] Playwright navigation failed for agent ${normalizedAgentId}.`);
       }
     }
 
@@ -367,25 +375,25 @@ export class BrowserService {
       clearTimeout(timeoutId);
 
       const html = await response.text();
-      const info = BrowserExtract.extractInformation(html);
+      const info = sanitizePageInfo(BrowserExtract.extractInformation(html), normalizedUrl);
 
       // Record in session store
       let session = this.agentSessions.get(key);
       if (!session) {
-        const agentWorkspaceDir = path.join(this.baseWorkspaceDir, normalizedOrgId, normalizedAgentId);
+        const agentWorkspaceDir = path.join(this.baseWorkspaceDir, encodeURIComponent(normalizedOrgId), encodeURIComponent(normalizedAgentId));
         session = {
           agentId: normalizedAgentId,
           organizationId: normalizedOrgId,
           context: null,
           page: null,
-          currentUrl: normalizedUrl,
+          currentUrl: redactUrlForOutput(normalizedUrl),
           history: [],
           cookiesCount: 0,
           cookieDomains: [],
           localStorageKeysCount: 0,
           workspaceDir: agentWorkspaceDir,
-          storageStatePath: path.join(agentWorkspaceDir, 'storage_state.json'),
-          isPersistent: true,
+          storageStatePath: path.join(agentWorkspaceDir, 'storage_state.enc.json'),
+          isPersistent: false,
           createdAt: Date.now(),
           lastActiveAt: Date.now(),
           userAgent: `Rufflo-Agent/${normalizedAgentId}`,
@@ -398,26 +406,28 @@ export class BrowserService {
 
       return {
         success: true,
-        url: normalizedUrl,
+          url: redactUrlForOutput(normalizedUrl),
         engine: 'resilient-http-scraper',
         agentId: normalizedAgentId,
         organizationId: normalizedOrgId,
         info,
+        isPersistent: false,
         status: response.status,
-        headers: Object.fromEntries(response.headers.entries()),
+        // Never forward Set-Cookie or authentication-related response headers to callers.
+        headers: safeResponseHeaders(response.headers),
         durationMs: Date.now() - startTime,
       };
     } catch (httpError: any) {
       return {
         success: false,
-        url: normalizedUrl,
+        url: redactUrlForOutput(normalizedUrl),
         engine: 'resilient-http-scraper',
         agentId: normalizedAgentId,
         organizationId: normalizedOrgId,
-        error: httpError?.message || 'Failed to fetch web resource',
+        error: 'Failed to fetch web resource.',
         info: {
-          title: `Resource Unavailable: ${normalizedUrl}`,
-          description: httpError?.message || 'Connection timed out',
+          title: `Resource Unavailable: ${safeHost(normalizedUrl)}`,
+          description: 'The request failed or timed out.',
           headings: [],
           paragraphs: [],
           links: [],
@@ -433,7 +443,7 @@ export class BrowserService {
    * Default browse method (backward compatibility)
    */
   public async browseTo(url: string): Promise<BrowseResult> {
-    return this.browseAsAgent('system', url, 'org-alpha');
+    return this.browseAsAgent('system', url, process.env.RUFFLO_SYSTEM_ORGANIZATION_ID?.trim() || 'org-default');
   }
 
   /**
@@ -444,24 +454,26 @@ export class BrowserService {
     if (page) {
       try {
         await page.click(selector, { timeout: 5000 });
+        const session = this.agentSessions.get(this.getSessionKey(orgId, agentId));
+        if (session) await this.persistStorageState(session);
         return {
           success: true,
           agentId,
-          result: `Agent ${agentId} clicked element: ${selector} in isolated Chromium context.`,
+          result: 'The requested action completed in the isolated browser context.',
         };
-      } catch (err: any) {
-        return { success: false, agentId, error: err.message };
+      } catch {
+        return { success: false, agentId, error: 'The isolated browser action could not be completed or saved.' };
       }
     }
     return {
-      success: true,
+      success: false,
       agentId,
-      result: `Processed click on element: ${selector} for agent ${agentId}.`,
+      error: 'The isolated persistent browser workspace is unavailable.',
     };
   }
 
   public async click(selector: string): Promise<any> {
-    return this.clickAsAgent('system', selector, 'org-alpha');
+    return this.clickAsAgent('system', selector, process.env.RUFFLO_SYSTEM_ORGANIZATION_ID?.trim() || 'org-default');
   }
 
   /**
@@ -472,24 +484,26 @@ export class BrowserService {
     if (page) {
       try {
         await page.fill(selector, value, { timeout: 5000 });
+        const session = this.agentSessions.get(this.getSessionKey(orgId, agentId));
+        if (session) await this.persistStorageState(session);
         return {
           success: true,
           agentId,
-          result: `Agent ${agentId} filled "${value}" into element: ${selector}.`,
+          result: 'The requested input was submitted to the isolated browser context.',
         };
-      } catch (err: any) {
-        return { success: false, agentId, error: err.message };
+      } catch {
+        return { success: false, agentId, error: 'The isolated browser input could not be completed or saved.' };
       }
     }
     return {
-      success: true,
+      success: false,
       agentId,
-      result: `Processed input for selector: ${selector} for agent ${agentId}.`,
+      error: 'The isolated persistent browser workspace is unavailable.',
     };
   }
 
   public async type(selector: string, value: string): Promise<any> {
-    return this.typeAsAgent('system', selector, value, 'org-alpha');
+    return this.typeAsAgent('system', selector, value, process.env.RUFFLO_SYSTEM_ORGANIZATION_ID?.trim() || 'org-default');
   }
 
   /**
@@ -497,55 +511,20 @@ export class BrowserService {
    */
   public getAgentSession(agentId: string, orgId: string = 'org-alpha'): AgentBrowserSessionSummary | null {
     const key = this.getSessionKey(orgId, agentId);
-    let session = this.agentSessions.get(key);
-    
-    // Fallback: check if storage state exists on disk even if in-memory session is idle/closed
-    if (!session) {
-      const normalizedAgentId = (agentId || 'system').toLowerCase().trim();
-      const normalizedOrgId = (orgId || 'org-alpha').toLowerCase().trim();
-      const workspaceDir = path.join(this.baseWorkspaceDir, normalizedOrgId, normalizedAgentId);
-      const storageStatePath = path.join(workspaceDir, 'storage_state.json');
-
-      if (fs.existsSync(storageStatePath)) {
-        try {
-          const raw = fs.readFileSync(storageStatePath, 'utf8');
-          const parsed = JSON.parse(raw);
-          const cookies = Array.isArray(parsed.cookies) ? parsed.cookies : [];
-          return {
-            agentId: normalizedAgentId,
-            organizationId: normalizedOrgId,
-            currentUrl: 'about:blank',
-            status: 'idle',
-            historyCount: 0,
-            cookiesCount: cookies.length,
-            cookieDomains: Array.from(new Set(cookies.map((c: any) => c.domain))),
-            localStorageKeysCount: Array.isArray(parsed.origins) ? parsed.origins.length : 0,
-            storagePath: workspaceDir,
-            isPersistent: true,
-            createdAt: fs.statSync(storageStatePath).birthtimeMs,
-            lastActiveAt: fs.statSync(storageStatePath).mtimeMs,
-            userAgent: `Rufflo-Agent/${normalizedAgentId}`,
-          };
-        } catch {}
-      }
-      return null;
-    }
+    const session = this.agentSessions.get(key);
+    if (!session) return null;
 
     return {
       agentId: session.agentId,
       organizationId: session.organizationId,
-      currentUrl: session.currentUrl,
-      status: 'active',
+      currentUrl: redactUrlForOutput(session.currentUrl),
+      status: session.context ? 'active' : 'idle',
       historyCount: session.history.length,
       cookiesCount: session.cookiesCount,
-      cookieDomains: session.cookieDomains,
       localStorageKeysCount: session.localStorageKeysCount,
-      storagePath: session.workspaceDir,
-      isPersistent: true,
+      isPersistent: session.isPersistent,
       createdAt: session.createdAt,
       lastActiveAt: session.lastActiveAt,
-      lastScreenshot: session.screenshot,
-      userAgent: session.userAgent,
     };
   }
 
@@ -561,18 +540,14 @@ export class BrowserService {
         list.push({
           agentId: session.agentId,
           organizationId: session.organizationId,
-          currentUrl: session.currentUrl,
-          status: 'active',
+          currentUrl: redactUrlForOutput(session.currentUrl),
+          status: session.context ? 'active' : 'idle',
           historyCount: session.history.length,
           cookiesCount: session.cookiesCount,
-          cookieDomains: session.cookieDomains,
           localStorageKeysCount: session.localStorageKeysCount,
-          storagePath: session.workspaceDir,
-          isPersistent: true,
+          isPersistent: session.isPersistent,
           createdAt: session.createdAt,
           lastActiveAt: session.lastActiveAt,
-          lastScreenshot: session.screenshot,
-          userAgent: session.userAgent,
         });
       }
     }
@@ -590,12 +565,16 @@ export class BrowserService {
     try {
       if (session.context) {
         // Save persistent state before closing
-        await session.context.storageState({ path: session.storageStatePath }).catch(() => {});
-        await session.context.close().catch(() => {});
+        await this.persistStorageState(session);
+        await session.context.close();
       }
-    } catch {}
+    } catch {
+      session.isPersistent = false;
+      return false;
+    }
 
     this.agentSessions.delete(key);
+    await this.updateWorkspaceStatus(orgId, agentId, 'closed', 'encrypted').catch(() => {});
     return true;
   }
 
@@ -606,13 +585,17 @@ export class BrowserService {
     await this.closeAgentSession(agentId, orgId);
     const normalizedAgentId = (agentId || 'system').toLowerCase().trim();
     const normalizedOrgId = (orgId || 'org-alpha').toLowerCase().trim();
-    const workspaceDir = path.join(this.baseWorkspaceDir, normalizedOrgId, normalizedAgentId);
-    const storageStatePath = path.join(workspaceDir, 'storage_state.json');
-
+    const workspaceDir = path.join(this.baseWorkspaceDir, encodeURIComponent(normalizedOrgId), encodeURIComponent(normalizedAgentId));
     try {
-      if (fs.existsSync(storageStatePath)) {
-        fs.unlinkSync(storageStatePath);
-      }
+      const { error: deleteError } = await getSupabaseAdmin().from('agent_secret_envelopes').delete()
+        .eq('organization_id', normalizedOrgId).eq('agent_id', normalizedAgentId)
+        .eq('purpose', 'playwright-storage-state');
+      if (deleteError) throw deleteError;
+      await this.updateWorkspaceStatus(normalizedOrgId, normalizedAgentId, 'idle', 'pending');
+      const legacyStorageStatePath = path.join(workspaceDir, 'storage_state.json');
+      const encryptedStorageStatePath = path.join(workspaceDir, 'storage_state.enc.json');
+      if (fs.existsSync(legacyStorageStatePath)) fs.unlinkSync(legacyStorageStatePath);
+      if (fs.existsSync(encryptedStorageStatePath)) fs.unlinkSync(encryptedStorageStatePath);
       return true;
     } catch {
       return false;
@@ -635,6 +618,201 @@ export class BrowserService {
       this.browser = null;
     }
   }
+
+  private async persistStorageState(session: InternalAgentSession): Promise<void> {
+    if (!kmsEnvelopeEncryptionService.isConfigured()) {
+      throw new Error('Cloud KMS is required for persistent browser sessions.');
+    }
+    const state = await session.context.storageState();
+    const envelope = await kmsEnvelopeEncryptionService.encrypt(JSON.stringify(state), {
+      organizationId: session.organizationId,
+      agentId: session.agentId,
+      purpose: 'playwright-storage-state',
+    });
+    const scope = {
+      organizationId: session.organizationId,
+      agentId: session.agentId,
+      purpose: 'playwright-storage-state',
+    };
+    const { error } = await getSupabaseAdmin().from('agent_secret_envelopes').upsert({
+      organization_id: scope.organizationId,
+      agent_id: scope.agentId,
+      purpose: scope.purpose,
+      kms_key_name: envelope.keyName,
+      wrapped_dek: bytea(envelope.wrappedDek),
+      ciphertext: bytea(envelope.ciphertext),
+      nonce: bytea(envelope.iv),
+      auth_tag: bytea(envelope.authTag),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'organization_id,agent_id,purpose' });
+    if (error) throw new Error('Encrypted browser state could not be persisted.');
+    await this.updateWorkspaceStatus(scope.organizationId, scope.agentId, 'active', 'encrypted');
+    session.isPersistent = true;
+  }
+
+  private async loadPersistentStorageState(
+    organizationId: string,
+    agentId: string,
+    legacyPath: string,
+    encryptedPath: string,
+  ): Promise<any | null> {
+    if (!kmsEnvelopeEncryptionService.isConfigured()) throw new Error('Cloud KMS is required for persistent browser sessions.');
+    const scope = { organizationId, agentId, purpose: 'playwright-storage-state' };
+    const { data: row, error } = await getSupabaseAdmin().from('agent_secret_envelopes').select('*')
+      .eq('organization_id', organizationId).eq('agent_id', agentId).eq('purpose', scope.purpose).maybeSingle();
+    if (error) throw new Error('Encrypted browser state lookup failed.');
+    if (row) {
+      const envelope = envelopeFromRow(row);
+      const state = JSON.parse((await kmsEnvelopeEncryptionService.decrypt(envelope, scope)).toString('utf8'));
+      if (fs.existsSync(legacyPath)) fs.unlinkSync(legacyPath);
+      if (fs.existsSync(encryptedPath)) fs.unlinkSync(encryptedPath);
+      return state;
+    }
+    if (fs.existsSync(encryptedPath)) {
+      const localEnvelope = JSON.parse(fs.readFileSync(encryptedPath, 'utf8')) as KmsEncryptedEnvelope;
+      const cleartext = await kmsEnvelopeEncryptionService.decrypt(localEnvelope, scope);
+      const state = JSON.parse(cleartext.toString('utf8'));
+      await this.storeEncryptedState(state, scope);
+      fs.unlinkSync(encryptedPath);
+      if (fs.existsSync(legacyPath)) fs.unlinkSync(legacyPath);
+      return state;
+    }
+    if (fs.existsSync(legacyPath)) {
+      const legacyState = JSON.parse(fs.readFileSync(legacyPath, 'utf8'));
+      if (!legacyState || !Array.isArray(legacyState.cookies) || !Array.isArray(legacyState.origins)) {
+        throw new Error('Legacy browser profile is malformed.');
+      }
+      await this.storeEncryptedState(legacyState, scope);
+      fs.unlinkSync(legacyPath);
+      return legacyState;
+    }
+    return null;
+  }
+
+  private async storeEncryptedState(state: unknown, scope: { organizationId: string; agentId: string; purpose: string }): Promise<void> {
+    const envelope = await kmsEnvelopeEncryptionService.encrypt(JSON.stringify(state), scope);
+    const { error } = await getSupabaseAdmin().from('agent_secret_envelopes').upsert({
+      organization_id: scope.organizationId,
+      agent_id: scope.agentId,
+      purpose: scope.purpose,
+      kms_key_name: envelope.keyName,
+      wrapped_dek: bytea(envelope.wrappedDek),
+      ciphertext: bytea(envelope.ciphertext),
+      nonce: bytea(envelope.iv),
+      auth_tag: bytea(envelope.authTag),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'organization_id,agent_id,purpose' });
+    if (error) throw new Error('Encrypted browser state could not be persisted.');
+    await this.updateWorkspaceStatus(scope.organizationId, scope.agentId, 'active', 'encrypted');
+  }
+
+  private async updateWorkspaceStatus(
+    organizationId: string,
+    agentId: string,
+    status: 'active' | 'idle' | 'closed',
+    persistenceStatus: 'pending' | 'encrypted' | 'unavailable',
+  ): Promise<void> {
+    const { error } = await getSupabaseAdmin().from('agent_workspaces').update({
+      status,
+      persistence_status: persistenceStatus,
+      last_started_at: status === 'active' ? new Date().toISOString() : undefined,
+    }).eq('organization_id', organizationId).eq('agent_id', agentId.trim().toLowerCase());
+    if (error) throw new Error('Workspace status could not be updated.');
+  }
 }
 
 export const browserService = new BrowserService();
+
+function redactUrlForOutput(value: string): string {
+  try {
+    const url = new URL(value);
+    url.username = '';
+    url.password = '';
+    url.hash = '';
+    for (const key of Array.from(url.searchParams.keys())) {
+      if (/(?:token|secret|password|auth|session|signature|credential|api[_-]?key|code|state|nonce|ticket|jwt|cookie)/i.test(key)) {
+        url.searchParams.set(key, '[REDACTED]');
+      }
+    }
+    return url.toString();
+  } catch {
+    return '[invalid-url]';
+  }
+}
+
+function safeHost(value: string): string {
+  try {
+    return new URL(value).host;
+  } catch {
+    return 'unknown host';
+  }
+}
+
+function sanitizePageInfo(info: ExtractedPageInfo, baseUrl: string): ExtractedPageInfo {
+  const cleanText = (value: string) => value
+    .replace(/\bBearer\s+[A-Za-z0-9._~+\/-]{12,}/gi, 'Bearer [REDACTED]')
+    .replace(/\bya29\.[A-Za-z0-9._-]+/g, '[REDACTED_TOKEN]')
+    .replace(/\b1\/\/[A-Za-z0-9._-]{12,}/g, '[REDACTED_TOKEN]')
+    .replace(/\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g, '[REDACTED_JWT]')
+    .replace(/\b(access|refresh|id)[_-]?token\s*[:=]\s*[^\s,;]+/gi, '$1_token=[REDACTED]')
+    .replace(/\b(authorization|csrf|x-csrf-token|session|cookie|api[_-]?key|secret|password)\s*[:=]\s*[^\s,;]+/gi, '$1=[REDACTED]')
+    .replace(/\b\d{6,8}\b/g, '[REDACTED_CODE]');
+
+  const meta: Record<string, string> = {};
+  for (const [key, value] of Object.entries(info.meta || {})) {
+    if (!/(?:token|secret|password|auth|session|cookie|csrf|nonce|credential|api[_-]?key|code)/i.test(key)) {
+      meta[key] = cleanText(value);
+    }
+  }
+
+  const links = (info.links || []).map((link) => {
+    let href = '[invalid-url]';
+    try {
+      const resolved = new URL(link.href, baseUrl);
+      const sanitized = redactUrlForOutput(resolved.toString());
+      href = link.href.startsWith('/') ? sanitized.replace(resolved.origin, '') : sanitized;
+    } catch {}
+    return { text: cleanText(link.text), href };
+  });
+
+  return {
+    title: cleanText(info.title),
+    description: cleanText(info.description),
+    headings: (info.headings || []).map(cleanText),
+    paragraphs: (info.paragraphs || []).map(cleanText),
+    links,
+    codeSnippets: info.codeSnippets?.map(cleanText),
+    meta,
+    wordCount: info.wordCount,
+  };
+}
+
+function safeResponseHeaders(headers: Headers): Record<string, string> {
+  const safe: Record<string, string> = {};
+  const blocked = /^(?:set-cookie2?|authorization|proxy-authorization|www-authenticate|proxy-authenticate)$/i;
+  for (const [name, value] of headers.entries()) {
+    if (!blocked.test(name)) safe[name] = value.slice(0, 2000);
+  }
+  return safe;
+}
+
+function bytea(base64: string): string {
+  return `\\x${Buffer.from(base64, 'base64').toString('hex')}`;
+}
+
+function fromBytea(value: string): string {
+  if (typeof value !== 'string' || !value.startsWith('\\x')) throw new Error('Encrypted browser state is malformed.');
+  return Buffer.from(value.slice(2), 'hex').toString('base64');
+}
+
+function envelopeFromRow(row: Record<string, any>): KmsEncryptedEnvelope {
+  return {
+    version: 1,
+    algorithm: 'AES-256-GCM',
+    keyName: row.kms_key_name,
+    wrappedDek: fromBytea(row.wrapped_dek),
+    ciphertext: fromBytea(row.ciphertext),
+    iv: fromBytea(row.nonce),
+    authTag: fromBytea(row.auth_tag),
+  };
+}

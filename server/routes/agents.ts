@@ -33,10 +33,12 @@ agentRouter.post('/intelligence/evaluate', async (_req: Request, res: Response) 
 });
 
 // GET /api/agents/intelligence/chromium - Verify and connect Chromium directly
-agentRouter.get('/intelligence/chromium', async (_req: Request, res: Response) => {
+agentRouter.get('/intelligence/chromium', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const status = await browserService.getBrowserStatus();
-    const testBrowse = await browserService.browseTo('https://example.com');
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: 'Organization authentication is required.' });
+    const status = await browserService.getBrowserStatus(organizationId);
+    const testBrowse = await browserService.browseAsAgent('system', 'https://example.com', organizationId);
     res.json({
       success: true,
       chromium: {

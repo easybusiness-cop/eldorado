@@ -1,7 +1,7 @@
 import { workforceManager } from "../workforce/workforce.manager.ts";
 import { learningEngine } from "./learning.engine.ts";
 import { TechDiscovery } from "./discovery.engine.ts";
-import { BrowserService } from "../../../tools/browser/browser.service.ts";
+import { browserService } from "../../../tools/browser/browser.service.ts";
 
 export interface ResearchBrief {
   discoveryId: string;
@@ -32,12 +32,14 @@ export class ResearchManager {
    */
   public async queueResearch(discovery: TechDiscovery): Promise<ResearchBrief> {
     console.log(`[ResearchManager] Queueing proactive research for topic: "${discovery.title}"`);
+    const organizationId = process.env.RUFFLO_SYSTEM_ORGANIZATION_ID?.trim() || "org-default";
 
     // 1. Select or spawn a specialized research employee
     const recommendation = await workforceManager.selectEmployeeForTask(
       `Research, analyze and extract key takeaways from this technology breakthrough: "${discovery.title}". Summary: "${discovery.summary}"`,
       ["internet_research", "technology_research"],
-      "research"
+      organizationId,
+      "research",
     );
 
     const agent = recommendation.agent;
@@ -57,26 +59,25 @@ export class ResearchManager {
 
     // Run active model synthesis/analysis of the discovery
     // We execute the model flow asynchronously, mimicking real research
-    this.executeResearchBrief(brief, discovery, agent.getId()).catch((err) => {
+    this.executeResearchBrief(brief, discovery, agent.getId(), organizationId).catch((err) => {
       console.error(`[ResearchManager] Failed to complete research brief:`, err);
     });
 
     return brief;
   }
 
-  private async executeResearchBrief(brief: ResearchBrief, discovery: TechDiscovery, agentId: string) {
+  private async executeResearchBrief(brief: ResearchBrief, discovery: TechDiscovery, agentId: string, organizationId: string) {
     try {
-      console.log(`[ResearchManager] Employee "${agentId}" is actively researching: "${discovery.title}" [URL: ${discovery.url}]`);
+      console.log(`[ResearchManager] Employee "${agentId}" is actively researching: "${discovery.title}" [URL: ${redactUrlForOutput(discovery.url)}]`);
 
-      // Instantiate BrowserService to fetch actual web contents from discovery url
-      const browser = new BrowserService();
-      const browseResult = await browser.browseTo(discovery.url);
+      // Use the assigned agent's organization-scoped persistent browser context.
+      const browseResult = await browserService.browseAsAgent(agentId, discovery.url, organizationId);
 
       const title = browseResult.info?.title || discovery.title;
       const paragraphs = browseResult.info?.paragraphs || [];
       const webpageContentSummary = paragraphs.length > 0 
         ? paragraphs.join("\n\n") 
-        : `Simulated documentation sweep of ${discovery.url}`;
+        : `Documentation sweep of ${redactUrlForOutput(discovery.url)}`;
 
       const takeaways = [
         `Extracted major paradigm change: ${discovery.summary}`,
@@ -88,7 +89,7 @@ export class ResearchManager {
       const simulatedContent = `
 ### Advanced Technological Research Summary
 **Target Breakthrough:** ${title}
-**Reference URL:** ${discovery.url}
+**Reference URL:** ${redactUrlForOutput(discovery.url)}
 **Assigned Analyst:** ${agentId}
 
 #### Technical Analysis & Scraped Web Intelligence
@@ -127,3 +128,20 @@ Utilize standard modular encapsulation, and update active service configurations
 }
 
 export const researchManager = ResearchManager.getInstance();
+
+function redactUrlForOutput(value: string): string {
+  try {
+    const url = new URL(value);
+    url.username = '';
+    url.password = '';
+    url.hash = '';
+    for (const key of Array.from(url.searchParams.keys())) {
+      if (/(?:token|secret|password|auth|session|signature|credential|api[_-]?key|code|state|nonce|ticket|jwt|cookie)/i.test(key)) {
+        url.searchParams.set(key, '[REDACTED]');
+      }
+    }
+    return url.toString();
+  } catch {
+    return '[invalid-url]';
+  }
+}

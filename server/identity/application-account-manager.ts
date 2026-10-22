@@ -1,8 +1,8 @@
-import { credentialVault } from '../security/credential-vault.ts';
-import { emailInfrastructureService } from './email-infrastructure.service.ts';
-import { eventBus } from '../events/eventBus.ts';
+import { randomUUID } from 'node:crypto';
+import { getSupabaseAdmin } from '../../src/utils/supabaseAdmin.ts';
 
-export type PlatformType = 'linkedin' | 'instagram' | 'youtube' | 'canva' | 'github' | 'x_twitter' | 'custom';
+export type PlatformType = 'linkedin' | 'instagram' | 'youtube' | 'canva' | 'github' | 'x_twitter' | 'custom' | 'google_workspace';
+const PLATFORMS = new Set<PlatformType>(['linkedin', 'instagram', 'youtube', 'canva', 'github', 'x_twitter', 'custom', 'google_workspace']);
 
 export interface ConnectedAccountRecord {
   id: string;
@@ -10,18 +10,13 @@ export interface ConnectedAccountRecord {
   organizationId: string;
   platform: PlatformType;
   accountHandle: string;
-  emailUsed: string;
-  status: 'provisioned' | 'pending_verification' | 'pending_human_assistance' | 'active' | 'suspended';
+  emailUsed: string | null;
+  status: 'requested' | 'denied' | 'provisioned' | 'pending_verification' | 'pending_human_assistance' | 'active' | 'suspended' | 'revoked';
+  authorizationStatus: 'requested' | 'approved' | 'denied' | 'revoked';
   requiresHumanAssistance: boolean;
   assistanceReason?: string;
-  browserSessionId?: string;
   createdAt: string;
   lastActiveAt: string;
-  activityHistory: {
-    action: string;
-    timestamp: string;
-    details?: string;
-  }[];
 }
 
 export interface AccountProvisioningRequest {
@@ -29,180 +24,174 @@ export interface AccountProvisioningRequest {
   organizationId: string;
   platform: PlatformType;
   accountHandle: string;
-  desiredPassword?: string;
-  requiresBrowserSession?: boolean;
+  requestedBy?: string;
 }
 
 export class ApplicationAccountManager {
   private static instance: ApplicationAccountManager;
-  private accounts: Map<string, ConnectedAccountRecord> = new Map();
-
   private constructor() {}
 
   public static getInstance(): ApplicationAccountManager {
-    if (!ApplicationAccountManager.instance) {
-      ApplicationAccountManager.instance = new ApplicationAccountManager();
-    }
+    if (!ApplicationAccountManager.instance) ApplicationAccountManager.instance = new ApplicationAccountManager();
     return ApplicationAccountManager.instance;
   }
 
-  private getKey(orgId: string, agentId: string, platform: PlatformType): string {
-    return `${orgId.toLowerCase().trim()}:${agentId.toLowerCase().trim()}:${platform.toLowerCase().trim()}`;
+  public async getAccount(orgId: string, agentId: string, platform: PlatformType): Promise<ConnectedAccountRecord | null> {
+    const { data, error } = await getSupabaseAdmin().from('agent_connected_accounts').select('*')
+      .eq('organization_id', orgId).eq('agent_id', agentId.trim().toLowerCase()).eq('platform', platform)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (error) throw new Error(`Account lookup failed: ${error.message}`);
+    return data ? this.mapRow(data) : null;
   }
 
-  /**
-   * 1. Check whether the required account already exists
-   */
-  public getAccount(orgId: string, agentId: string, platform: PlatformType): ConnectedAccountRecord | null {
-    return this.accounts.get(this.getKey(orgId, agentId, platform)) || null;
+  public async getAccountById(orgId: string, accountId: string): Promise<ConnectedAccountRecord | null> {
+    const { data, error } = await getSupabaseAdmin().from('agent_connected_accounts').select('*')
+      .eq('organization_id', orgId).eq('account_id', accountId).maybeSingle();
+    if (error) throw new Error('Connected account lookup failed.');
+    return data ? this.mapRow(data) : null;
   }
 
-  public listAccountsForAgent(orgId: string, agentId: string): ConnectedAccountRecord[] {
-    const prefix = `${orgId.toLowerCase().trim()}:${agentId.toLowerCase().trim()}:`;
-    const result: ConnectedAccountRecord[] = [];
-    for (const [key, acc] of this.accounts.entries()) {
-      if (key.startsWith(prefix)) {
-        result.push(acc);
-      }
-    }
-    return result;
+  public async listAccountsForAgent(orgId: string, agentId: string): Promise<ConnectedAccountRecord[]> {
+    const { data, error } = await getSupabaseAdmin().from('agent_connected_accounts').select('*')
+      .eq('organization_id', orgId).eq('agent_id', agentId.trim().toLowerCase()).order('created_at', { ascending: false });
+    if (error) throw new Error(`Connected account list failed: ${error.message}`);
+    return (data ?? []).map((row) => this.mapRow(row));
   }
 
-  /**
-   * Provisions an authorized external application account following the 9-step directive
-   */
+  public async decideAccessRequest(input: {
+    organizationId: string;
+    accountId: string;
+    approved: boolean;
+    decidedBy: string;
+  }): Promise<ConnectedAccountRecord | null> {
+    const db = getSupabaseAdmin();
+    const { data: pending, error: lookupError } = await db.from('agent_connected_accounts').select('*')
+      .eq('organization_id', input.organizationId).eq('account_id', input.accountId).eq('status', 'requested').maybeSingle();
+    if (lookupError) throw new Error('Account request lookup failed.');
+    if (!pending) return null;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.decidedBy);
+    const { data, error } = await db.from('agent_connected_accounts').update({
+      authorization_status: input.approved ? 'approved' : 'denied',
+      status: input.approved ? 'pending_human_assistance' : 'denied',
+      requires_human_assistance: input.approved,
+      assistance_reason: input.approved
+        ? 'An organization manager approved access. Complete the provider’s official authorization flow; no account was created.'
+        : null,
+      approved_by: input.approved && isUuid ? input.decidedBy : null,
+    }).eq('organization_id', input.organizationId).eq('account_id', input.accountId).eq('status', 'requested')
+      .select('*').maybeSingle();
+    if (error) throw new Error('Account request decision could not be saved.');
+    return data ? this.mapRow(data) : null;
+  }
+
+  public async confirmProviderAuthorization(input: {
+    organizationId: string;
+    accountId: string;
+    confirmedBy: string;
+    browserSessionId: string;
+  }): Promise<ConnectedAccountRecord | null> {
+    const db = getSupabaseAdmin();
+    const { data: pending, error: lookupError } = await db.from('agent_connected_accounts').select('agent_id,status,authorization_status')
+      .eq('organization_id', input.organizationId).eq('account_id', input.accountId)
+      .eq('status', 'pending_human_assistance').eq('authorization_status', 'approved').maybeSingle();
+    if (lookupError) throw new Error('Account authorization lookup failed.');
+    if (!pending) return null;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.confirmedBy);
+    const { data, error } = await db.from('agent_connected_accounts').update({
+      status: 'active',
+      requires_human_assistance: false,
+      assistance_reason: null,
+      browser_session_id: input.browserSessionId.slice(0, 150),
+      connected_confirmed_by: isUuid ? input.confirmedBy : null,
+      connected_confirmed_at: new Date().toISOString(),
+      last_active_at: new Date().toISOString(),
+    }).eq('organization_id', input.organizationId).eq('account_id', input.accountId)
+      .eq('status', 'pending_human_assistance').eq('authorization_status', 'approved')
+      .select('*').maybeSingle();
+    if (error) throw new Error('Provider authorization confirmation could not be saved.');
+    return data ? this.mapRow(data) : null;
+  }
+
+  /** Creates a pending registry request only; it never creates accounts on a third-party service. */
   public async provisionAccount(
     req: AccountProvisioningRequest,
-    agentPermissions: string[] = ['accounts:manage']
-  ): Promise<{
-    success: boolean;
-    account?: ConnectedAccountRecord;
-    error?: string;
-    requiresHumanAssistance?: boolean;
-    assistanceReason?: string;
-  }> {
-    const org = req.organizationId.toLowerCase().trim() || 'org-alpha';
-    const agent = req.agentId.toLowerCase().trim();
-    const platform = req.platform;
-
-    // Step 1: Check whether account already exists
-    const existing = this.getAccount(org, agent, platform);
-    if (existing && existing.status === 'active') {
-      return { success: true, account: existing };
+    agentPermissions: string[] = [],
+  ): Promise<{ success: boolean; account?: ConnectedAccountRecord; error?: string }> {
+    if (!PLATFORMS.has(req.platform)) return { success: false, error: 'Unsupported account provider.' };
+    if (!req.accountHandle?.trim() || req.accountHandle.trim().length > 150) {
+      return { success: false, error: 'An account identifier between 1 and 150 characters is required.' };
+    }
+    if (!agentPermissions.includes(`accounts:${req.platform}`) && !agentPermissions.includes('accounts:manage')) {
+      return { success: false, error: 'The agent has not been granted permission to request this account provider.' };
     }
 
-    // Step 2: Check whether agent has permission
-    const hasPermission =
-      agentPermissions.includes('accounts:manage') ||
-      agentPermissions.includes(`accounts:${platform}`) ||
-      agentPermissions.includes('*');
-
-    if (!hasPermission) {
-      return {
-        success: false,
-        error: `Agent [${agent}] lacks required permission [accounts:manage] or [accounts:${platform}]. Provisioning denied.`,
-      };
+    const agent = req.agentId.trim().toLowerCase();
+    const { data: existing, error: lookupError } = await getSupabaseAdmin().from('agent_connected_accounts').select('*')
+      .eq('organization_id', req.organizationId).eq('agent_id', agent).eq('platform', req.platform)
+      .eq('account_handle', req.accountHandle.trim())
+      .maybeSingle();
+    if (lookupError) throw new Error(`Account request lookup failed: ${lookupError.message}`);
+    if (existing) {
+      if (existing.authorization_status === 'denied') {
+        const { data: resubmitted, error } = await getSupabaseAdmin().from('agent_connected_accounts').update({
+          status: 'requested',
+          authorization_status: 'requested',
+          requires_human_assistance: false,
+          assistance_reason: null,
+          requested_by: isUuid(req.requestedBy) ? req.requestedBy : null,
+        }).eq('organization_id', req.organizationId).eq('account_id', existing.account_id).select('*').single();
+        if (error) throw new Error('Account request could not be resubmitted.');
+        return { success: true, account: this.mapRow(resubmitted) };
+      }
+      return { success: true, account: this.mapRow(existing) };
     }
 
-    // Step 3 & 4: Use agent's assigned email identity
-    const emailIdent = emailInfrastructureService.allocateEmailIdentity(org, agent);
-    const emailUsed = emailIdent.emailAddress;
-
-    // Step 5: Check if human assistance is required for strict platforms (e.g. phone/SMS verification, CAPTCHA)
-    const strictPlatforms: PlatformType[] = ['linkedin', 'instagram', 'youtube'];
-    const requiresAssistance = strictPlatforms.includes(platform);
-    const assistanceReason = requiresAssistance
-      ? `Platform [${platform}] requires mandatory SMS phone verification or CAPTCHA resolution.`
-      : undefined;
-
-    const accountId = `acc-${org}-${agent}-${platform}`;
-    const account: ConnectedAccountRecord = {
-      id: accountId,
-      agentId: agent,
-      organizationId: org,
-      platform,
-      accountHandle: req.accountHandle || `${agent}_${platform}`,
-      emailUsed,
-      status: requiresAssistance ? 'pending_human_assistance' : 'active',
-      requiresHumanAssistance: requiresAssistance,
-      assistanceReason,
-      browserSessionId: `ws-${org}-${agent}`,
-      createdAt: new Date().toISOString(),
-      lastActiveAt: new Date().toISOString(),
-      activityHistory: [
-        {
-          action: 'ACCOUNT_PROVISION_REQUESTED',
-          timestamp: new Date().toISOString(),
-          details: `Account requested for platform ${platform} with email ${emailUsed}.`,
-        },
-      ],
+    const row = {
+      account_id: `acc-${randomUUID()}`,
+      organization_id: req.organizationId,
+      agent_id: agent,
+      platform: req.platform,
+      account_handle: req.accountHandle.trim().slice(0, 150),
+      email_used: null,
+      status: 'requested',
+      authorization_status: 'requested',
+      requires_human_assistance: false,
+      assistance_reason: null,
+      browser_session_id: null,
+      requested_by: isUuid(req.requestedBy) ? req.requestedBy : null,
     };
-
-    // Step 7: Store credentials securely in CredentialVault if password provided
-    if (req.desiredPassword) {
-      await credentialVault.storeSecret(
-        { orgId: org, agentId: agent, secretId: `acc_${platform}_credentials` },
-        JSON.stringify({ handle: account.accountHandle, email: emailUsed, password: req.desiredPassword }),
-        { platform, updatedAt: new Date().toISOString() }
-      );
+    const { data, error } = await getSupabaseAdmin().from('agent_connected_accounts')
+      .upsert(row, { onConflict: 'organization_id,agent_id,platform,account_handle', ignoreDuplicates: true }).select('*').single();
+    if (error || !data) {
+      const { data: raced, error: racedError } = await getSupabaseAdmin().from('agent_connected_accounts').select('*')
+        .eq('organization_id', req.organizationId).eq('agent_id', agent).eq('platform', req.platform)
+        .eq('account_handle', req.accountHandle.trim()).maybeSingle();
+      if (racedError || !raced) throw new Error('Account request could not be recorded.');
+      return { success: true, account: this.mapRow(raced) };
     }
+    return { success: true, account: this.mapRow(data) };
+  }
 
-    this.accounts.set(this.getKey(org, agent, platform), account);
-
-    eventBus.emitEvent('ACCOUNT_PROVISIONED', {
-      orgId: org,
-      agentId: agent,
-      platform,
-      status: account.status,
-      requiresHumanAssistance: account.requiresHumanAssistance,
-    });
-
+  private mapRow(row: Record<string, any>): ConnectedAccountRecord {
     return {
-      success: true,
-      account,
-      requiresHumanAssistance: account.requiresHumanAssistance,
-      assistanceReason: account.assistanceReason,
+      id: row.account_id,
+      agentId: row.agent_id,
+      organizationId: row.organization_id,
+      platform: row.platform,
+      accountHandle: row.account_handle,
+      emailUsed: row.email_used ?? null,
+      status: row.status,
+      authorizationStatus: row.authorization_status ?? 'requested',
+      requiresHumanAssistance: row.requires_human_assistance,
+      assistanceReason: row.assistance_reason ?? undefined,
+      createdAt: row.created_at,
+      lastActiveAt: row.last_active_at,
     };
   }
+}
 
-  /**
-   * Complete supported email verification via OTP
-   */
-  public verifyAccountEmailOtp(orgId: string, agentId: string, platform: PlatformType, otpCode: string): boolean {
-    const account = this.getAccount(orgId, agentId, platform);
-    if (!account) return false;
-
-    account.activityHistory.push({
-      action: 'EMAIL_OTP_VERIFIED',
-      timestamp: new Date().toISOString(),
-      details: `Successfully completed OTP verification.`,
-    });
-
-    if (!account.requiresHumanAssistance) {
-      account.status = 'active';
-    }
-    account.lastActiveAt = new Date().toISOString();
-    return true;
-  }
-
-  /**
-   * Human supervisor resolves CAPTCHA / 2FA check
-   */
-  public resolveHumanAssistance(orgId: string, agentId: string, platform: PlatformType): boolean {
-    const account = this.getAccount(orgId, agentId, platform);
-    if (!account) return false;
-
-    account.requiresHumanAssistance = false;
-    account.assistanceReason = undefined;
-    account.status = 'active';
-    account.lastActiveAt = new Date().toISOString();
-    account.activityHistory.push({
-      action: 'HUMAN_ASSISTANCE_RESOLVED',
-      timestamp: new Date().toISOString(),
-      details: `Supervisor completed manual authentication / phone gate.`,
-    });
-    return true;
-  }
+function isUuid(value?: string): value is string {
+  return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
 }
 
 export const applicationAccountManager = ApplicationAccountManager.getInstance();

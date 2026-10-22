@@ -1,4 +1,5 @@
 import { executiveTools } from './executive.tools.ts';
+import { digitalIdentityTools } from '../../../identity/digital-identity.tools.ts';
 
 export interface MastraToolDefinition {
   name: string;
@@ -17,6 +18,10 @@ export class MastraToolRegistry {
     this.registerBuiltins();
 
     for (const tool of executiveTools) {
+      this.register(tool);
+    }
+
+    for (const tool of digitalIdentityTools) {
       this.register(tool);
     }
   }

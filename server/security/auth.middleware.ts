@@ -14,6 +14,8 @@ export type RuffloCapability =
   | "approval:decide"
   | "deployment:promote"
   | "system:patch:request"
+  | "identity:read"
+  | "identity:manage"
   | "system:admin";
 
 export interface RuffloIdentity {
@@ -35,7 +37,7 @@ interface OrganizationMembership {
 }
 
 const DEV_IDENTITY: RuffloIdentity = {
-  userId: "dev-admin-user",
+  userId: "00000000-0000-4000-8000-000000000001",
   email: null,
   organizationId: "org-default",
   role: "admin",

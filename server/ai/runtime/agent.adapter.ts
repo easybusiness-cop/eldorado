@@ -10,8 +10,18 @@ export class AgentAdapter {
    */
   public static adaptAgent(baseAgent: BaseMastraAgent): RealMastraAgent {
     // 1. Get system tools registered for this agent
+    const identityTools = new Set([
+      'identity.get_profile',
+      'identity.request_capability',
+      'accounts.request_access',
+      'gmail.list_inbox',
+      'gmail.send',
+      'browser.navigate',
+      'browser.click',
+      'browser.type',
+    ]);
     const systemTools = mastraToolRegistry.getAllTools()
-      .filter(t => baseAgent.canUseTool(t.name));
+      .filter(t => baseAgent.canUseTool(t.name) || identityTools.has(t.name));
 
     // 2. Translate them using the ToolAdapter
     const adaptedTools = ToolAdapter.adaptTools(systemTools);

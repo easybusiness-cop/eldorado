@@ -6,9 +6,11 @@ import { roleRegistry, RoleCategory, RoleDefinition } from "./role.registry.ts";
 import { capabilityRegistry, CapabilityCategory } from "./capability.registry.ts";
 import { capabilityEngine } from "../../../core/capabilities/capability.engine.ts";
 import { predictiveLoadBalancer } from "./predictive-load-balancer.ts";
+import { digitalIdentityService } from "../../../identity/digital-identity.service.ts";
 
 export interface WorkforceTask {
   id: string;
+  organizationId: string;
   title: string;
   description: string;
   requiredCapabilities: string[];
@@ -329,12 +331,14 @@ export class WorkforceManager {
    * Commissions a new specialized agent with the exact requested capabilities,
    * automatically instantiating the role, updating registries, and logging the commission.
    */
-  public commissionSpecializedAgent(
+  public async commissionSpecializedAgent(
     taskDescription: string,
     requiredCapabilities: string[],
+    organizationId: string,
     preferredDepartment?: string,
-    customName?: string
-  ): DynamicVirtualEmployee {
+    customName?: string,
+  ): Promise<DynamicVirtualEmployee> {
+    if (!organizationId?.trim()) throw new Error('organizationId is required to create an agent identity.');
     console.log(
       `[WorkforceManager] Commissioning specialized agent for task: "${taskDescription}". Capabilities: ${requiredCapabilities.join(
         ", "
@@ -369,10 +373,11 @@ export class WorkforceManager {
     const agentName = customName || roleMatch.synthesizedName;
 
     // 3. Instantiate dynamic employee via EmployeeFactory
-    const dynamicEmployee = employeeFactory.createEmployee(
+    const dynamicEmployee = await employeeFactory.createEmployee(
       roleMatch.roleId,
+      organizationId,
       agentName,
-      requiredCapabilities
+      requiredCapabilities,
     );
 
     // 4. Record audit ledger entry of commissioned agent
@@ -410,8 +415,10 @@ export class WorkforceManager {
   public async selectEmployeeForTask(
     taskDescription: string,
     requiredCapabilities: string[],
-    preferredDepartment?: string
+    organizationId: string,
+    preferredDepartment?: string,
   ): Promise<WorkforceRecommendation> {
+    if (!organizationId?.trim()) throw new Error('organizationId is required to allocate an agent identity.');
     console.log(
       `[WorkforceManager] Evaluating workforce for task: "${taskDescription}". Capabilities: [${requiredCapabilities.join(
         ", "
@@ -422,6 +429,10 @@ export class WorkforceManager {
     const candidate = this.findSuitableEmployee(requiredCapabilities, preferredDepartment);
 
     if (candidate) {
+      await digitalIdentityService.getOrCreateIdentity(organizationId, candidate.agent.getId(), {
+        displayName: candidate.agent.getName(),
+        role: candidate.agent.config.role,
+      });
       console.log(
         `[WorkforceManager] Existing employee selected: ${candidate.agent.getName()} (Score: ${(
           candidate.suitability.compositeScore * 100
@@ -442,10 +453,12 @@ export class WorkforceManager {
       "[WorkforceManager] No suitable existing employee met the threshold. Commissioning specialized agent..."
     );
 
-    const commissionedAgent = this.commissionSpecializedAgent(
+    const commissionedAgent = await this.commissionSpecializedAgent(
       taskDescription,
       requiredCapabilities,
-      preferredDepartment
+      organizationId,
+      preferredDepartment,
+      undefined,
     );
 
     const commissionRecord = this.commissionHistory[0];
@@ -474,7 +487,9 @@ export class WorkforceManager {
     preferredDepartment?: string;
     priority?: "low" | "medium" | "high" | "critical";
     payload?: any;
+    organizationId: string;
   }): Promise<TaskDistributionResult> {
+    if (!taskInput.organizationId?.trim()) throw new Error('organizationId is required to allocate an agent identity.');
     const taskId = taskInput.id || `task-${randomUUID().slice(0, 8)}`;
     const taskDescription = taskInput.description || taskInput.title;
     const requiredCaps = taskInput.requiredCapabilities || [];
@@ -483,7 +498,8 @@ export class WorkforceManager {
     const recommendation = await this.selectEmployeeForTask(
       taskDescription,
       requiredCaps,
-      taskInput.preferredDepartment
+      taskInput.organizationId,
+      taskInput.preferredDepartment,
     );
 
     const agent = recommendation.agent;
@@ -496,6 +512,7 @@ export class WorkforceManager {
     // 3. Create and register task record
     const task: WorkforceTask = {
       id: taskId,
+      organizationId: taskInput.organizationId,
       title: taskInput.title,
       description: taskDescription,
       requiredCapabilities: requiredCaps,
@@ -543,6 +560,7 @@ export class WorkforceManager {
       preferredDepartment?: string;
       priority?: "low" | "medium" | "high" | "critical";
       payload?: any;
+      organizationId: string;
     }>
   ): Promise<TaskDistributionResult[]> {
     const results: TaskDistributionResult[] = [];

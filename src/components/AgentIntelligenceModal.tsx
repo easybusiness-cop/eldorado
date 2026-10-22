@@ -50,16 +50,19 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
 
   // RDIWI Digital Identity State
   const [identities, setIdentities] = useState<any[]>([]);
-  const [selectedIdentityAgent, setSelectedIdentityAgent] = useState('michael');
+  const [selectedIdentityAgent, setSelectedIdentityAgent] = useState('');
   const [identityLoading, setIdentityLoading] = useState(false);
+  const [workspaceMessage, setWorkspaceMessage] = useState<string | null>(null);
   const [accountPlatform, setAccountPlatform] = useState('linkedin');
   const [accountHandle, setAccountHandle] = useState('');
   const [provisionMessage, setProvisionMessage] = useState<string | null>(null);
   const [inboxMessages, setInboxMessages] = useState<any[]>([]);
-  const [latestOtp, setLatestOtp] = useState<string | null>(null);
-  const [simEmailSender, setSimEmailSender] = useState('security@linkedin.com');
-  const [simEmailSubject, setSimEmailSubject] = useState('Your LinkedIn verification code is 849201');
-  const [simEmailBody, setSimEmailBody] = useState('Please enter verification code 849201 to confirm your email.');
+  const [googleWorkspaceStatus, setGoogleWorkspaceStatus] = useState<any>(null);
+  const [capabilityRequests, setCapabilityRequests] = useState<any[]>([]);
+  const [canManageIdentity, setCanManageIdentity] = useState(false);
+  const [requestedCapability, setRequestedCapability] = useState('gmail:read');
+  const [capabilityReason, setCapabilityReason] = useState('');
+  const [capabilityMessage, setCapabilityMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -77,6 +80,19 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
       const data = await res.json();
       if (data.success && data.identities) {
         setIdentities(data.identities);
+        if (!data.identities.some((identity: any) => identity.agentId === selectedIdentityAgent)) {
+          setSelectedIdentityAgent(data.identities[0]?.agentId || '');
+        }
+      }
+      const [googleStatusRes, requestsRes] = await Promise.all([
+        fetch('/api/identity/google/status'),
+        fetch('/api/identity/capability-requests'),
+      ]);
+      const [googleStatus, requests] = await Promise.all([googleStatusRes.json(), requestsRes.json()]);
+      if (googleStatus.success) setGoogleWorkspaceStatus(googleStatus);
+      if (requests.success) {
+        setCapabilityRequests(requests.requests || []);
+        setCanManageIdentity(Boolean(requests.canManage));
       }
     } catch (e) {
       console.error(e);
@@ -91,41 +107,95 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
       const data = await res.json();
       if (data.success) {
         setInboxMessages(data.messages || []);
-        setLatestOtp(data.latestOtp || null);
+      } else {
+        setInboxMessages([]);
       }
     } catch (e) {
       console.error(e);
     }
   };
 
+  const handleConnectGoogleWorkspace = async () => {
+    try {
+      const res = await fetch(`/api/identity/agent/${selectedIdentityAgent}/google/authorize`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.authorizationUrl) throw new Error(data.error || 'Google Workspace is not configured.');
+      window.open(data.authorizationUrl, 'rufflo-google-workspace', 'popup,width=640,height=760');
+    } catch (error: any) {
+      setProvisionMessage(error.message);
+    }
+  };
+
+  const handleRequestCapability = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`/api/identity/agent/${selectedIdentityAgent}/capability-requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ capability: requestedCapability, reason: capabilityReason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Capability request failed.');
+      setCapabilityMessage(`Requested ${requestedCapability}; approval is pending.`);
+      setCapabilityReason('');
+      fetchIdentities();
+    } catch (error: any) {
+      setCapabilityMessage(error.message);
+    }
+  };
+
+  const handleCapabilityDecision = async (requestId: string, approved: boolean) => {
+    try {
+      const res = await fetch(`/api/identity/capability-requests/${requestId}/decision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Capability decision failed.');
+      fetchIdentities();
+    } catch (error: any) {
+      setCapabilityMessage(error.message);
+    }
+  };
+
   const handleStartWorkspace = async (agentId: string) => {
     soundFx.playClick();
     try {
-      await fetch(`/api/identity/agent/${agentId}/workspace/start`, { method: 'POST' });
+      const res = await fetch(`/api/identity/agent/${agentId}/workspace/start`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Workspace could not be restored.');
+      setWorkspaceMessage(data.message || 'Workspace restored.');
       soundFx.playSuccessChime();
       fetchIdentities();
       fetchAgentSessions();
-    } catch {}
+    } catch (error: any) { setWorkspaceMessage(error.message); }
   };
 
   const handleStopWorkspace = async (agentId: string) => {
     soundFx.playClick();
     try {
-      await fetch(`/api/identity/agent/${agentId}/workspace/stop`, { method: 'POST' });
+      const res = await fetch(`/api/identity/agent/${agentId}/workspace/stop`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Workspace could not be stopped safely.');
+      setWorkspaceMessage(data.message || 'Workspace stopped with its state saved.');
       soundFx.playNotification();
       fetchIdentities();
       fetchAgentSessions();
-    } catch {}
+    } catch (error: any) { setWorkspaceMessage(error.message); }
   };
 
   const handleResetWorkspace = async (agentId: string) => {
     soundFx.playClick();
     try {
-      await fetch(`/api/identity/agent/${agentId}/workspace/reset`, { method: 'POST' });
+      const res = await fetch(`/api/identity/agent/${agentId}/workspace/reset`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Workspace profile could not be reset.');
+      setWorkspaceMessage(data.message || 'Workspace profile reset.');
       soundFx.playNotification();
       fetchIdentities();
       fetchAgentSessions();
-    } catch {}
+    } catch (error: any) { setWorkspaceMessage(error.message); }
   };
 
   const handleProvisionAccount = async (e: React.FormEvent) => {
@@ -138,12 +208,12 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform: accountPlatform,
-          accountHandle: accountHandle.trim() || `${selectedIdentityAgent}_${accountPlatform}`,
+          accountHandle: accountHandle.trim(),
         }),
       });
       const data = await res.json();
       if (data.success) {
-        setProvisionMessage(`Account for ${accountPlatform} provisioned!`);
+        setProvisionMessage(`Access request for ${accountPlatform} recorded; it is not connected yet.`);
         soundFx.playSuccessChime();
         fetchIdentities();
       } else {
@@ -154,35 +224,36 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
     }
   };
 
-  const handleResolveAssistance = async (platform: string) => {
-    soundFx.playClick();
+  const handleAccountDecision = async (accountId: string, approved: boolean) => {
     try {
-      await fetch(`/api/identity/agent/${selectedIdentityAgent}/resolve-assistance`, {
+      const res = await fetch(`/api/identity/accounts/${accountId}/decision`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platform }),
+        body: JSON.stringify({ approved }),
       });
-      soundFx.playSuccessChime();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Account decision failed.');
+      setProvisionMessage(data.message || 'Account request updated.');
       fetchIdentities();
-    } catch {}
+    } catch (error: any) {
+      setProvisionMessage(error.message);
+    }
   };
 
-  const handleSimulateEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    soundFx.playClick();
+  const handleConfirmAccountConnection = async (accountId: string) => {
     try {
-      await fetch(`/api/identity/agent/${selectedIdentityAgent}/inbox/receive`, {
+      const res = await fetch(`/api/identity/accounts/${accountId}/connection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender: simEmailSender,
-          subject: simEmailSubject,
-          body: simEmailBody,
-        }),
+        body: JSON.stringify({ authorized: true }),
       });
-      soundFx.playNotification();
-      fetchAgentInbox(selectedIdentityAgent);
-    } catch {}
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Provider authorization could not be confirmed.');
+      setProvisionMessage(data.message || 'External account connected.');
+      fetchIdentities();
+    } catch (error: any) {
+      setProvisionMessage(error.message);
+    }
   };
 
   const fetchAgentSessions = async () => {
@@ -724,7 +795,7 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                       </span>
                     </div>
                     <div className="text-[10px] text-[#a89984]">
-                      Scoped Email Mailbox • Persistent Chromium Profile • Encrypted Vault Storage
+                      Organization-scoped identity • isolated Playwright context • Cloud KMS encrypted state
                     </div>
                   </div>
                 </div>
@@ -741,33 +812,19 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                     }}
                     className="px-2.5 py-1.5 bg-[#181615] border border-[#3c3836] rounded text-xs font-bold text-[#fabd2f] focus:outline-none"
                   >
-                    <option value="michael">Michael Scott (CEO & Regional Manager)</option>
-                    <option value="dwight">Dwight Schrute (CISO & Security Lead)</option>
-                    <option value="jim">Jim Halpert (Sales Specialist)</option>
-                    <option value="pam">Pam Beesly (Office Administrator)</option>
-                    <option value="pete-miller">Pete Miller (Chief Enterprise Architect)</option>
-                    <option value="roy">Roy Anderson (DevOps & SRE)</option>
-                    <option value="toby">Toby Flenderson (Compliance SRE)</option>
-                    <option value="CoreCoder">CoreCoder (Polyglot Engineer)</option>
-                    <option value="ChromiumNavigator">ChromiumNavigator (Web OSINT)</option>
+                    {identities.map((identity: any) => (
+                      <option key={identity.identityId} value={identity.agentId}>
+                        {identity.displayName} ({identity.role})
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               {/* Identity Cards Grid */}
               {(() => {
-                const currentIdent = identities.find((i) => i.agentId === selectedIdentityAgent) || {
-                  identityId: `ident-org-alpha-${selectedIdentityAgent}`,
-                  displayName: selectedIdentityAgent,
-                  emailAddress: `${selectedIdentityAgent}@dundermifflin.internal`,
-                  emailProvider: 'google_workspace',
-                  status: 'active',
-                  workspaceId: `ws-org-alpha-${selectedIdentityAgent}`,
-                  workspacePath: `.rufflo-workspaces/org-alpha/${selectedIdentityAgent}`,
-                  permissions: ['browser:persist', 'accounts:manage', 'tools:execute'],
-                  connectedAccounts: [],
-                  browserSession: { status: 'idle', cookiesCount: 0, currentUrl: 'about:blank' },
-                };
+                const currentIdent = identities.find((i) => i.agentId === selectedIdentityAgent);
+                if (!currentIdent) return <div className="p-5 rounded-xl bg-[#201d1c] border border-[#3c3836] text-xs text-[#a89984]">{identityLoading ? 'Loading identities…' : 'No registered agents are available in this organization.'}</div>;
 
                 return (
                   <div className="space-y-4 pt-1">
@@ -775,13 +832,13 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                       {/* Email Identity */}
                       <div className="p-3 bg-[#181615] rounded-lg border border-[#3c3836] space-y-1">
                         <div className="text-[10px] text-[#7c6f64] uppercase font-bold flex items-center gap-1.5">
-                          <Mail className="w-3.5 h-3.5 text-blue-400" /> Assigned Mailbox
+                          <Mail className="w-3.5 h-3.5 text-blue-400" /> Google Workspace Mailbox
                         </div>
                         <div className="font-bold text-white text-[11px] truncate">
-                          {currentIdent.emailAddress}
+                          {currentIdent.emailAddress || 'No mailbox connected'}
                         </div>
                         <div className="text-[10px] text-emerald-400 font-mono">
-                          Provider: {currentIdent.emailProvider || 'Google Workspace'}
+                          {currentIdent.emailProvider ? `Provider: ${currentIdent.emailProvider}` : 'Connect an existing Workspace account'}
                         </div>
                       </div>
 
@@ -792,10 +849,10 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                         </div>
                         <div className="font-bold text-white text-[11px] flex items-center gap-1.5">
                           <span className={`w-2 h-2 rounded-full ${currentIdent.browserSession?.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-                          {currentIdent.browserSession?.status === 'active' ? 'ACTIVE SESSION' : 'IDLE / RECOVERABLE'}
+                          {currentIdent.browserSession?.status === 'active' ? 'ACTIVE SESSION' : currentIdent.browserSession?.persistenceProtected ? 'IDLE / ENCRYPTED' : 'KMS SETUP REQUIRED'}
                         </div>
                         <div className="text-[10px] text-[#a89984] font-mono truncate">
-                          Cookies: {currentIdent.browserSession?.cookiesCount || 0} • Path: {currentIdent.workspacePath}
+                          {currentIdent.browserSession?.persistenceProtected ? 'Encrypted state persistence ready' : 'Browser state remains locked until KMS is configured'}
                         </div>
                       </div>
 
@@ -805,10 +862,10 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                           <Lock className="w-3.5 h-3.5 text-[#fabd2f]" /> Vault & Permissions
                         </div>
                         <div className="font-bold text-[#fabd2f] text-[11px]">
-                          AES-256-GCM Vault Scoped
+                          {googleWorkspaceStatus?.workspaceEncryptionConfigured ? 'Cloud KMS key is configured' : 'Cloud KMS is not configured'}
                         </div>
                         <div className="text-[10px] text-purple-300 font-mono">
-                          Tenant: {currentIdent.organizationId || 'org-alpha'}
+                          Tenant: {currentIdent.organizationId}
                         </div>
                       </div>
                     </div>
@@ -844,12 +901,8 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                           </button>
                         </div>
                       </div>
+                      {workspaceMessage && <div className="text-[10px] text-amber-300" role="status">{workspaceMessage}</div>}
 
-                      {currentIdent.browserSession?.cookieDomains?.length > 0 && (
-                        <div className="text-[10px] text-[#a89984] pt-1">
-                          Stored Session Domains: {currentIdent.browserSession.cookieDomains.join(', ')}
-                        </div>
-                      )}
                     </div>
 
                     {/* Connected Application Accounts Manager */}
@@ -875,16 +928,19 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                               </div>
                               <div className="text-white text-[11px] font-mono truncate">@{acc.accountHandle}</div>
                               <div className="text-[10px] text-[#a89984] truncate">{acc.emailUsed}</div>
-                              {acc.requiresHumanAssistance && (
-                                <div className="pt-1 flex items-center justify-between">
-                                  <span className="text-[9px] text-amber-300 italic">2FA / Phone check pending</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleResolveAssistance(acc.platform)}
-                                    className="px-2 py-0.5 rounded bg-amber-600 hover:bg-amber-500 text-black font-bold text-[9px] cursor-pointer"
-                                  >
-                                    Approve Check
-                                  </button>
+                              {acc.authorizationStatus && acc.authorizationStatus !== 'approved' && (
+                                <div className="text-[9px] text-amber-300">Authorization: {acc.authorizationStatus}</div>
+                              )}
+                              {acc.authorizationStatus === 'approved' && acc.status !== 'active' && (
+                                <div className="text-[9px] text-amber-300">Approved. Complete the provider’s official authorization to connect this existing account.</div>
+                              )}
+                              {canManageIdentity && acc.status === 'pending_human_assistance' && (
+                                <button type="button" onClick={() => handleConfirmAccountConnection(acc.id)} className="px-2 py-1 bg-blue-950 text-blue-200 rounded text-[9px]">Confirm provider authorization</button>
+                              )}
+                              {canManageIdentity && acc.authorizationStatus === 'requested' && (
+                                <div className="flex gap-1 pt-1">
+                                  <button type="button" onClick={() => handleAccountDecision(acc.id, true)} className="px-2 py-1 bg-emerald-900 text-emerald-200 rounded text-[9px]">Approve access</button>
+                                  <button type="button" onClick={() => handleAccountDecision(acc.id, false)} className="px-2 py-1 bg-red-950 text-red-200 rounded text-[9px]">Deny</button>
                                 </div>
                               )}
                             </div>
@@ -892,7 +948,7 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                         </div>
                       ) : (
                         <div className="text-[11px] text-[#7c6f64] italic">
-                          No external application accounts provisioned yet for {selectedIdentityAgent}.
+                          No external application accounts or access requests for {currentIdent.displayName}.
                         </div>
                       )}
 
@@ -908,19 +964,23 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                           <option value="youtube">YouTube</option>
                           <option value="instagram">Instagram</option>
                           <option value="github">GitHub</option>
+                          <option value="x_twitter">X</option>
+                          <option value="custom">Other provider</option>
                         </select>
                         <input
                           type="text"
+                          required
+                          maxLength={150}
                           value={accountHandle}
                           onChange={(e) => setAccountHandle(e.target.value)}
-                          placeholder="Handle/Username (optional)..."
+                          placeholder="Existing account handle or email..."
                           className="flex-1 min-w-[160px] px-2.5 py-1 bg-[#121110] border border-[#3c3836] rounded text-xs text-[#ebdbb2] focus:outline-none"
                         />
                         <button
                           type="submit"
                           className="px-3 py-1 bg-[#fabd2f] hover:bg-[#d79921] text-black font-bold rounded text-xs transition-colors cursor-pointer"
                         >
-                          Provision Account
+                          Request Account Access
                         </button>
                       </form>
                       {provisionMessage && (
@@ -928,80 +988,68 @@ export const AgentIntelligenceModal: React.FC<AgentIntelligenceModalProps> = ({
                       )}
                     </div>
 
-                    {/* Verification Email & OTP Extraction Hub */}
+                    {/* Authorized Workspace Mailbox */}
                     <div className="p-3 bg-[#181615] rounded-lg border border-[#3c3836] space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                          <Mail className="w-3.5 h-3.5 text-blue-400" />
-                          Verification Email & OTP Extraction Hub
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => fetchAgentInbox(selectedIdentityAgent)}
-                          className="text-[10px] text-[#fabd2f] hover:underline cursor-pointer"
-                        >
-                          Check Mailbox ({inboxMessages.length})
-                        </button>
-                      </div>
-
-                      {latestOtp && (
-                        <div className="p-2.5 rounded bg-purple-950/60 border border-purple-500/40 flex items-center justify-between text-xs">
-                          <div className="text-purple-300">
-                            <strong>Latest Extracted Verification OTP:</strong>
-                          </div>
-                          <div className="text-base font-black text-[#fabd2f] tracking-widest font-mono">
-                            {latestOtp}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Quick Email Simulation Form */}
-                      <form onSubmit={handleSimulateEmail} className="p-2.5 bg-[#201d1c] rounded border border-[#3c3836] space-y-2 text-xs">
-                        <span className="font-bold text-[#ebdbb2] text-[11px]">Simulate Incoming Verification Email:</span>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          <input
-                            type="text"
-                            value={simEmailSender}
-                            onChange={(e) => setSimEmailSender(e.target.value)}
-                            placeholder="Sender email..."
-                            className="px-2 py-1 bg-[#121110] border border-[#3c3836] rounded text-xs text-[#ebdbb2]"
-                          />
-                          <input
-                            type="text"
-                            value={simEmailSubject}
-                            onChange={(e) => setSimEmailSubject(e.target.value)}
-                            placeholder="Subject..."
-                            className="px-2 py-1 bg-[#121110] border border-[#3c3836] rounded text-xs text-[#ebdbb2]"
-                          />
+                          <Mail className="w-3.5 h-3.5 text-blue-400" /> Authorized Google Workspace Mailbox
                         </div>
                         <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={simEmailBody}
-                            onChange={(e) => setSimEmailBody(e.target.value)}
-                            placeholder="Email body containing verification code or URL..."
-                            className="flex-1 px-2 py-1 bg-[#121110] border border-[#3c3836] rounded text-xs text-[#ebdbb2]"
-                          />
-                          <button
-                            type="submit"
-                            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded text-xs cursor-pointer"
-                          >
-                            Receive & Extract OTP
+                          <button type="button" onClick={handleConnectGoogleWorkspace} disabled={!googleWorkspaceStatus?.configured || !currentIdent.permissions?.some((permission: string) => permission === 'gmail:read' || permission === 'gmail:send')} className="px-2.5 py-1 bg-blue-950 border border-blue-700 disabled:opacity-50 text-blue-300 rounded text-[10px] font-bold">
+                            Connect existing Workspace account
+                          </button>
+                          <button type="button" onClick={() => fetchAgentInbox(selectedIdentityAgent)} className="text-[10px] text-[#fabd2f] hover:underline cursor-pointer">
+                            Refresh mailbox
                           </button>
                         </div>
-                      </form>
+                      </div>
+                      {!googleWorkspaceStatus?.configured && <p className="text-[10px] text-amber-300">Configure Google OAuth, Workspace domain, Cloud KMS, and Google consent before connecting.</p>}
+                      {inboxMessages.length ? (
+                        <div className="space-y-1.5">
+                          {inboxMessages.map((message: any) => (
+                            <div key={message.id} className="p-2 bg-[#201d1c] rounded border border-[#3c3836]">
+                              <div className="text-[10px] text-[#a89984] truncate">{message.sender}</div>
+                              <div className="text-[11px] text-white truncate">{message.subject || '(no subject)'}</div>
+                              <div className="text-[9px] text-[#7c6f64]">{message.receivedAt}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-[10px] text-[#7c6f64]">Mailbox previews show message headers only. Message bodies and verification codes are not returned to the dashboard.</div>
+                      )}
                     </div>
-
-                    {/* Permissions & Scopes */}
-                    <div className="p-3 bg-[#181615] rounded-lg border border-[#3c3836] space-y-1.5 text-xs">
-                      <span className="font-bold text-[#ebdbb2] text-[11px]">Allocated Identity Permissions:</span>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                    {/* Dynamic capability request and approval */}
+                    <div className="p-3 bg-[#181615] rounded-lg border border-[#3c3836] space-y-3 text-xs">
+                      <span className="font-bold text-[#ebdbb2] text-[11px]">Authorized capabilities for {currentIdent.displayName}:</span>
+                      <div className="flex flex-wrap gap-1.5">
                         {currentIdent.permissions?.map((p: string, idx: number) => (
-                          <span key={idx} className="px-2 py-0.5 rounded bg-[#201d1c] text-emerald-300 font-mono text-[10px] border border-emerald-800/50">
-                            ✓ {p}
-                          </span>
+                          <span key={idx} className="px-2 py-0.5 rounded bg-[#201d1c] text-emerald-300 font-mono text-[10px] border border-emerald-800/50">{p}</span>
                         ))}
                       </div>
+                      <form onSubmit={handleRequestCapability} className="flex flex-wrap gap-2 border-t border-[#3c3836] pt-3">
+                        <select value={requestedCapability} onChange={(e) => setRequestedCapability(e.target.value)} className="px-2 py-1 bg-[#121110] border border-[#3c3836] rounded text-xs text-[#ebdbb2]">
+                          <option value="gmail:read">Read Workspace mail</option>
+                          <option value="gmail:send">Send Workspace mail</option>
+                          <option value="accounts:github">Request GitHub account access</option>
+                          <option value="accounts:canva">Request Canva account access</option>
+                          <option value="accounts:linkedin">Request LinkedIn account access</option>
+                          <option value="browser:persist">Persist browser sessions</option>
+                        </select>
+                        <input required minLength={8} maxLength={2000} value={capabilityReason} onChange={(e) => setCapabilityReason(e.target.value)} placeholder="Why does this agent need it?" className="flex-1 min-w-[180px] px-2 py-1 bg-[#121110] border border-[#3c3836] rounded text-xs text-[#ebdbb2]" />
+                        <button type="submit" className="px-3 py-1 bg-purple-800 hover:bg-purple-700 text-white font-bold rounded text-xs">Request capability</button>
+                      </form>
+                      {capabilityMessage && <div className="text-[10px] text-amber-300">{capabilityMessage}</div>}
+                      {capabilityRequests.filter((request) => request.status === 'pending').length > 0 && (
+                        <div className="space-y-2 border-t border-[#3c3836] pt-3">
+                          <div className="text-[10px] uppercase font-bold text-[#a89984]">Pending organization approvals</div>
+                          {capabilityRequests.filter((request) => request.status === 'pending').map((request: any) => (
+                            <div key={request.id} className="flex flex-wrap items-center justify-between gap-2 p-2 bg-[#201d1c] rounded border border-[#3c3836]">
+                              <div><span className="font-bold text-white">{request.agent_id}</span> <span className="text-purple-300">{request.capability}</span><div className="text-[10px] text-[#a89984]">{request.reason}</div></div>
+                              {canManageIdentity && <div className="flex gap-1"><button type="button" onClick={() => handleCapabilityDecision(request.id, true)} className="px-2 py-1 bg-emerald-900 text-emerald-200 rounded text-[10px]">Approve</button><button type="button" onClick={() => handleCapabilityDecision(request.id, false)} className="px-2 py-1 bg-red-950 text-red-200 rounded text-[10px]">Deny</button></div>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

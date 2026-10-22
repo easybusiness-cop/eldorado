@@ -4,8 +4,21 @@ import { callGeminiResilient } from "../ai/geminiService.ts";
 import { browserService } from "../tools/browser/browser.service.ts";
 import { autonomousNewsRadar } from "../agents/research/autonomous-news-radar.ts";
 import { autonomousAgentResearcher } from "../agents/capabilities/research/autonomous-agent-researcher.ts";
+import type { AuthenticatedRequest, RuffloCapability } from "../security/auth.middleware.ts";
+import { digitalIdentityService } from "../identity/digital-identity.service.ts";
 
 export const webExplorerRouter = Router();
+
+function requireBrowserCapability(capability: RuffloCapability) {
+  return (req: AuthenticatedRequest, res: any, next: any) => {
+    const identity = req.identity;
+    if (!identity) return res.status(401).json({ success: false, error: "Authentication required." });
+    const granted = identity.capabilities.includes("system:admin") || identity.capabilities.includes(capability) ||
+      (capability === "identity:read" && identity.capabilities.includes("identity:manage"));
+    if (!granted) return res.status(403).json({ success: false, error: `Requires ${capability}.` });
+    next();
+  };
+}
 
 // User Authentication & Sync
 webExplorerRouter.post("/auth/sync-profile", (req, res) => {
@@ -25,9 +38,11 @@ webExplorerRouter.post("/auth/sync-profile", (req, res) => {
 });
 
 // Real Open-Source Browser Gateway Status
-webExplorerRouter.get(["/browser/status", "/web/browser-status"], async (_req, res) => {
+webExplorerRouter.get(["/browser/status", "/web/browser-status"], async (req: AuthenticatedRequest, res) => {
   try {
-    const status = await browserService.getBrowserStatus();
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    const status = await browserService.getBrowserStatus(organizationId);
     res.json({
       success: true,
       ...status,
@@ -39,14 +54,16 @@ webExplorerRouter.get(["/browser/status", "/web/browser-status"], async (_req, r
 });
 
 // Real Open-Source Browser Gateway Navigation & DOM Capture
-webExplorerRouter.post(["/browser/browse", "/web/browse-live"], async (req, res) => {
+webExplorerRouter.post(["/browser/browse", "/web/browse-live"], requireBrowserCapability("task:run"), async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { url } = req.body;
     if (!url || typeof url !== "string") {
       return res.status(400).json({ success: false, error: "URL is required" });
     }
 
-    const result = await browserService.browseTo(url);
+    const result = await browserService.browseAsAgent('system', url, organizationId);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -54,12 +71,14 @@ webExplorerRouter.post(["/browser/browse", "/web/browse-live"], async (req, res)
 });
 
 // Per-Agent Individual Browser Routes
-webExplorerRouter.get("/browser/agents", async (_req, res) => {
+webExplorerRouter.get("/browser/agents", requireBrowserCapability("identity:read"), async (req: AuthenticatedRequest, res) => {
   try {
-    const sessions = browserService.listAllAgentSessions();
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    const sessions = browserService.listAllAgentSessions(organizationId);
     res.json({
       success: true,
-      activeAgentSessions: sessions.length,
+      activeAgentSessions: sessions.filter((session) => session.status === 'active').length,
       sessions,
     });
   } catch (err: any) {
@@ -67,9 +86,11 @@ webExplorerRouter.get("/browser/agents", async (_req, res) => {
   }
 });
 
-webExplorerRouter.get("/browser/agent/:agentId/status", async (req, res) => {
+webExplorerRouter.get("/browser/agent/:agentId/status", requireBrowserCapability("identity:read"), async (req: AuthenticatedRequest, res) => {
   try {
-    const session = browserService.getAgentSession(req.params.agentId);
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    const session = browserService.getAgentSession(req.params.agentId, organizationId);
     if (!session) {
       return res.json({
         success: true,
@@ -78,34 +99,44 @@ webExplorerRouter.get("/browser/agent/:agentId/status", async (req, res) => {
         message: "No active browser context for this agent.",
       });
     }
-    res.json({ success: true, active: true, session });
+    res.json({ success: true, active: session.status === 'active', session });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-webExplorerRouter.post("/browser/agent/:agentId/browse", async (req, res) => {
+webExplorerRouter.post("/browser/agent/:agentId/browse", requireBrowserCapability("task:run"), async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    if (!(await digitalIdentityService.getIdentity(organizationId, req.params.agentId))) {
+      return res.status(404).json({ success: false, error: "Agent identity is not registered in this organization." });
+    }
     const { url } = req.body;
     if (!url || typeof url !== "string") {
       return res.status(400).json({ success: false, error: "URL is required" });
     }
-    const result = await browserService.browseAsAgent(req.params.agentId, url);
+    const result = await browserService.browseAsAgent(req.params.agentId, url, organizationId);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-webExplorerRouter.post("/browser/agent/:agentId/action", async (req, res) => {
+webExplorerRouter.post("/browser/agent/:agentId/action", requireBrowserCapability("task:run"), async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    if (!(await digitalIdentityService.getIdentity(organizationId, req.params.agentId))) {
+      return res.status(404).json({ success: false, error: "Agent identity is not registered in this organization." });
+    }
     const { action, selector, value } = req.body;
     if (action === "click" && selector) {
-      const result = await browserService.clickAsAgent(req.params.agentId, selector);
+      const result = await browserService.clickAsAgent(req.params.agentId, selector, organizationId);
       return res.json(result);
     }
     if (action === "type" && selector && value !== undefined) {
-      const result = await browserService.typeAsAgent(req.params.agentId, selector, value);
+      const result = await browserService.typeAsAgent(req.params.agentId, selector, value, organizationId);
       return res.json(result);
     }
     res.status(400).json({ success: false, error: "Invalid action or parameters" });
@@ -114,9 +145,11 @@ webExplorerRouter.post("/browser/agent/:agentId/action", async (req, res) => {
   }
 });
 
-webExplorerRouter.post("/browser/agent/:agentId/close", async (req, res) => {
+webExplorerRouter.post("/browser/agent/:agentId/close", requireBrowserCapability("identity:manage"), async (req: AuthenticatedRequest, res) => {
   try {
-    const closed = await browserService.closeAgentSession(req.params.agentId);
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    const closed = await browserService.closeAgentSession(req.params.agentId, organizationId);
     res.json({ success: true, closed, agentId: req.params.agentId });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -124,13 +157,19 @@ webExplorerRouter.post("/browser/agent/:agentId/close", async (req, res) => {
 });
 
 // Autonomous Multi-Step Agent Research Mission
-webExplorerRouter.post("/browser/agent/:agentId/research-mission", async (req, res) => {
+webExplorerRouter.post("/browser/agent/:agentId/research-mission", requireBrowserCapability("task:run"), async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    if (!(await digitalIdentityService.getIdentity(organizationId, req.params.agentId))) {
+      return res.status(404).json({ success: false, error: "Agent identity is not registered in this organization." });
+    }
     const { targetUrl, topic, extractCodeSnippets } = req.body;
     if (!targetUrl || typeof targetUrl !== "string") {
       return res.status(400).json({ success: false, error: "targetUrl is required" });
     }
     const result = await autonomousAgentResearcher.executeMission({
+      organizationId,
       agentId: req.params.agentId,
       targetUrl,
       topic: topic || "Autonomous Web Research",
@@ -142,9 +181,11 @@ webExplorerRouter.post("/browser/agent/:agentId/research-mission", async (req, r
   }
 });
 
-webExplorerRouter.get("/browser/agent/:agentId/missions", async (req, res) => {
+webExplorerRouter.get("/browser/agent/:agentId/missions", requireBrowserCapability("identity:read"), async (req: AuthenticatedRequest, res) => {
   try {
-    const missions = autonomousAgentResearcher.getAgentMissions(req.params.agentId);
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
+    const missions = autonomousAgentResearcher.getAgentMissions(req.params.agentId, organizationId);
     res.json({ success: true, count: missions.length, missions });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -152,15 +193,17 @@ webExplorerRouter.get("/browser/agent/:agentId/missions", async (req, res) => {
 });
 
 // Interactive Browser Actions (Click / Fill)
-webExplorerRouter.post("/browser/action", async (req, res) => {
+webExplorerRouter.post("/browser/action", requireBrowserCapability("task:run"), async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { action, selector, value } = req.body;
     if (action === "click" && selector) {
-      const result = await browserService.click(selector);
+      const result = await browserService.clickAsAgent('system', selector, organizationId);
       return res.json(result);
     }
     if (action === "type" && selector && value !== undefined) {
-      const result = await browserService.type(selector, value);
+      const result = await browserService.typeAsAgent('system', selector, value, organizationId);
       return res.json(result);
     }
     res.status(400).json({ success: false, error: "Invalid action or parameters" });

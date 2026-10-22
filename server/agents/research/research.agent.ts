@@ -9,7 +9,7 @@ import { ResearchMemory } from './research-memory.ts';
 export class ResearchAgent {
   private reader = new SourceReader();
 
-  public async conductResearch(topic: string): Promise<any> {
+  public async conductResearch(topic: string, agentId: string, organizationId: string): Promise<any> {
     const trace: string[] = [];
     trace.push(`START: Research initiated for topic: ${topic}`);
 
@@ -28,7 +28,7 @@ export class ResearchAgent {
 
     for (let i = 0; i < sources.length; i++) {
       const src = sources[i];
-      const text = await this.reader.readSource(src.url);
+      const text = await this.reader.readSource(src.url, agentId, organizationId);
       const sourceEvidence = await EvidenceExtractor.extractEvidence(text, topic);
       findings.push(...sourceEvidence);
       evidence.push(...sourceEvidence.map((quote) => ({
