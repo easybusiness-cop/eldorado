@@ -7963,6 +7963,45 @@
   ],
   "audits": [
     {
+      "id": "aud-evt-1792705297517-8",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T21:41:37.517Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792705297517"
+    },
+    {
+      "id": "aud-evt-1792705297430-767",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T21:41:37.430Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792705297430"
+    },
+    {
+      "id": "aud-evt-1792705297322-72",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T21:41:37.323Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792705297323"
+    },
+    {
       "id": "aud-gw-1792657167232",
       "agentId": "pete",
       "projectId": "prj-alpha",
@@ -14593,48 +14632,6 @@
       "riskLevel": "high",
       "approvalRequired": false,
       "executionId": "exec-1788355545110-2077"
-    },
-    {
-      "id": "aud-chat-1788355446396",
-      "agentId": "cline",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788355446387",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 4355 characters response. Token cost: $0.00009",
-      "timestamp": "2026-09-02T13:24:06.396Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788355446396"
-    },
-    {
-      "id": "aud-chat-1788355446086",
-      "agentId": "cline",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788355446074",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 4368 characters response. Token cost: $0.00009",
-      "timestamp": "2026-09-02T13:24:06.086Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788355446086"
-    },
-    {
-      "id": "aud-chat-1788355445879",
-      "agentId": "cline",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788355445869",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 6203 characters response. Token cost: $0.00012",
-      "timestamp": "2026-09-02T13:24:05.879Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788355445879"
     }
   ],
   "accounts": [
