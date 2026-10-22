@@ -7985,9 +7985,121 @@
         }
       ],
       "createdAt": 1792099117988
+    },
+    {
+      "id": "tsk-jim-01",
+      "projectId": "prj-alpha",
+      "missionId": "mis-01",
+      "title": "B2B Client Acquisition & Outreach Funnels",
+      "description": "Design high-converting 3-touchpoint outbound proposals for regional corporate accounts, track funnel metrics, and optimize customer acquisition costs.",
+      "assignedTo": "jim",
+      "status": "running",
+      "progress": 65,
+      "priority": "high",
+      "output": "Outreach campaign drafted: 3-step high-converting sequence prepared for procurement leads.",
+      "codeSnippet": "// Jim Halpert Outbound Lead Engine\nexport function sendClientTouchpoint(account) {\n  return { delivered: true, openRateEstimate: \"48.2%\", account };\n}",
+      "subtasks": [
+        {
+          "id": "st-j-1",
+          "title": "Draft personalized outbound outreach sequence",
+          "completed": true,
+          "assignedTo": "jim"
+        },
+        {
+          "id": "st-j-2",
+          "title": "Customer acquisition cost (CAC) benchmarking",
+          "completed": true,
+          "assignedTo": "jim"
+        },
+        {
+          "id": "st-j-3",
+          "title": "Pipeline lead conversion review with sales leads",
+          "completed": false,
+          "assignedTo": "jim"
+        }
+      ],
+      "createdAt": 1792700422802
     }
   ],
   "audits": [
+    {
+      "id": "aud-evt-1792700885830-572",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T20:28:05.830Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792700885830"
+    },
+    {
+      "id": "aud-evt-1792700885768-404",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T20:28:05.768Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792700885768"
+    },
+    {
+      "id": "aud-evt-1792700885671-85",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T20:28:05.671Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792700885671"
+    },
+    {
+      "id": "aud-evt-1792700656371-898",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T20:24:16.371Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792700656371"
+    },
+    {
+      "id": "aud-evt-1792700656234-723",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T20:24:16.234Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792700656234"
+    },
+    {
+      "id": "aud-evt-1792700656051-941",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T20:24:16.051Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792700656051"
+    },
     {
       "id": "aud-task-remediation-test-exec-1788683879367",
       "agentId": "ruflo",
@@ -14589,90 +14701,6 @@
       "riskLevel": "low",
       "approvalRequired": false,
       "executionId": "ex-chat-1788352706422"
-    },
-    {
-      "id": "aud-chat-1788335240529",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788335240520",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"hloo...\"",
-      "inputHash": "aGxvbw==",
-      "result": "SUCCESS: Generated 1971 characters response. Token cost: $0.00004",
-      "timestamp": "2026-09-02T07:47:20.529Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788335240529"
-    },
-    {
-      "id": "aud-gw-1788255301983",
-      "agentId": "pete",
-      "projectId": "prj-alpha",
-      "taskId": "gw-failure",
-      "tool": "github",
-      "action": "list_repositories",
-      "inputHash": "e30=",
-      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
-      "timestamp": "2026-09-01T09:35:01.991Z",
-      "riskLevel": "high",
-      "approvalRequired": false,
-      "executionId": "exec-1788255301983-3309"
-    },
-    {
-      "id": "aud-gw-1788255288886",
-      "agentId": "pete",
-      "projectId": "prj-alpha",
-      "taskId": "gw-failure",
-      "tool": "github",
-      "action": "list_repositories",
-      "inputHash": "e30=",
-      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
-      "timestamp": "2026-09-01T09:34:48.890Z",
-      "riskLevel": "high",
-      "approvalRequired": false,
-      "executionId": "exec-1788255288886-1287"
-    },
-    {
-      "id": "aud-gw-1788255273118",
-      "agentId": "pete",
-      "projectId": "prj-alpha",
-      "taskId": "gw-failure",
-      "tool": "github",
-      "action": "list_repositories",
-      "inputHash": "e30=",
-      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
-      "timestamp": "2026-09-01T09:34:33.122Z",
-      "riskLevel": "high",
-      "approvalRequired": false,
-      "executionId": "exec-1788255273118-3375"
-    },
-    {
-      "id": "aud-chat-1788254735123",
-      "agentId": "emp-engineering-devops-engineer",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254735115",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"run the projects that are still pending...\"",
-      "inputHash": "cnVuIHRoZSBwcm9qZWN0",
-      "result": "SUCCESS: Generated 3883 characters response. Token cost: $0.00008",
-      "timestamp": "2026-09-01T09:25:35.123Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254735123"
-    },
-    {
-      "id": "aud-chat-1788254606706",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254606697",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"why you all are not doing you given tasks...\"",
-      "inputHash": "d2h5IHlvdSBhbGwgYXJl",
-      "result": "SUCCESS: Generated 3419 characters response. Token cost: $0.00007",
-      "timestamp": "2026-09-01T09:23:26.706Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254606706"
     }
   ],
   "accounts": [

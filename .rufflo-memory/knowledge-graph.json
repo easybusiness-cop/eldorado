@@ -338,6 +338,288 @@
       "createdAt": "2026-10-22T19:33:59.639Z",
       "updatedAt": "2026-10-22T19:33:59.639Z",
       "importance": 0.95
+    },
+    {
+      "id": "node-85db22ef-7",
+      "type": "concept",
+      "label": "Python Runtime & Scientific Ecosystem",
+      "content": "Python 3.11 execution runtime. Excels in rapid scripting, automation, API integration, data manipulation, math, string parsing, json handling, and asynchronous tasks with asyncio.",
+      "tags": [
+        "python",
+        "python3",
+        "automation",
+        "data-science",
+        "runtime"
+      ],
+      "metadata": {
+        "runtime": "python3",
+        "standardLibraries": [
+          "json",
+          "csv",
+          "sys",
+          "os",
+          "subprocess",
+          "math",
+          "re",
+          "asyncio",
+          "datetime",
+          "urllib"
+        ]
+      },
+      "createdAt": "2026-10-22T20:20:24.622Z",
+      "updatedAt": "2026-10-22T20:20:24.622Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-08e8b50a-4",
+      "type": "concept",
+      "label": "C++ High-Performance Systems & Algorithmic Runtime",
+      "content": "Modern C++ (C++17/C++20) compiled via GNU Compiler Collection (g++). Excels in maximum computational speed, low-latency execution, memory efficiency, complex data structures, algorithms, and system utilities.",
+      "tags": [
+        "cpp",
+        "c++",
+        "g++",
+        "systems",
+        "algorithms",
+        "performance"
+      ],
+      "metadata": {
+        "compiler": "g++",
+        "flags": [
+          "-O3",
+          "-std=c++20",
+          "-Wall"
+        ],
+        "headers": [
+          "<iostream>",
+          "<vector>",
+          "<string>",
+          "<algorithm>",
+          "<memory>",
+          "<map>",
+          "<chrono>",
+          "<thread>"
+        ]
+      },
+      "createdAt": "2026-10-22T20:20:24.627Z",
+      "updatedAt": "2026-10-22T20:20:24.627Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-117c6af8-a",
+      "type": "concept",
+      "label": "Java OpenJDK Enterprise Execution Runtime",
+      "content": "Java 17/21 OpenJDK runtime (javac and java). Excels in robust object-oriented architecture, enterprise logic, multi-threading, stream processing, deterministic typing, and portable modular software.",
+      "tags": [
+        "java",
+        "openjdk",
+        "javac",
+        "enterprise",
+        "oop",
+        "concurrency"
+      ],
+      "metadata": {
+        "compiler": "javac",
+        "runner": "java",
+        "packages": [
+          "java.util.*",
+          "java.io.*",
+          "java.nio.file.*",
+          "java.util.concurrent.*",
+          "java.util.stream.*"
+        ]
+      },
+      "createdAt": "2026-10-22T20:20:24.629Z",
+      "updatedAt": "2026-10-22T20:20:24.629Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-4c374964-0",
+      "type": "concept",
+      "label": "Python Runtime & Scientific Ecosystem",
+      "content": "Python 3.11 execution runtime. Excels in rapid scripting, automation, API integration, data manipulation, math, string parsing, json handling, and asynchronous tasks with asyncio.",
+      "tags": [
+        "python",
+        "python3",
+        "automation",
+        "data-science",
+        "runtime"
+      ],
+      "metadata": {
+        "runtime": "python3",
+        "standardLibraries": [
+          "json",
+          "csv",
+          "sys",
+          "os",
+          "subprocess",
+          "math",
+          "re",
+          "asyncio",
+          "datetime",
+          "urllib"
+        ]
+      },
+      "createdAt": "2026-10-22T20:22:15.209Z",
+      "updatedAt": "2026-10-22T20:22:15.209Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-b7a3de5e-1",
+      "type": "concept",
+      "label": "C++ High-Performance Systems & Algorithmic Runtime",
+      "content": "Modern C++ (C++17/C++20) compiled via GNU Compiler Collection (g++). Excels in maximum computational speed, low-latency execution, memory efficiency, complex data structures, algorithms, and system utilities.",
+      "tags": [
+        "cpp",
+        "c++",
+        "g++",
+        "systems",
+        "algorithms",
+        "performance"
+      ],
+      "metadata": {
+        "compiler": "g++",
+        "flags": [
+          "-O3",
+          "-std=c++20",
+          "-Wall"
+        ],
+        "headers": [
+          "<iostream>",
+          "<vector>",
+          "<string>",
+          "<algorithm>",
+          "<memory>",
+          "<map>",
+          "<chrono>",
+          "<thread>"
+        ]
+      },
+      "createdAt": "2026-10-22T20:22:15.212Z",
+      "updatedAt": "2026-10-22T20:22:15.212Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-ce32dabd-0",
+      "type": "concept",
+      "label": "Java OpenJDK Enterprise Execution Runtime",
+      "content": "Java 17/21 OpenJDK runtime (javac and java). Excels in robust object-oriented architecture, enterprise logic, multi-threading, stream processing, deterministic typing, and portable modular software.",
+      "tags": [
+        "java",
+        "openjdk",
+        "javac",
+        "enterprise",
+        "oop",
+        "concurrency"
+      ],
+      "metadata": {
+        "compiler": "javac",
+        "runner": "java",
+        "packages": [
+          "java.util.*",
+          "java.io.*",
+          "java.nio.file.*",
+          "java.util.concurrent.*",
+          "java.util.stream.*"
+        ]
+      },
+      "createdAt": "2026-10-22T20:22:15.214Z",
+      "updatedAt": "2026-10-22T20:22:15.214Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-a4a59000-6",
+      "type": "concept",
+      "label": "Python Runtime & Scientific Ecosystem",
+      "content": "Python 3.11 execution runtime. Excels in rapid scripting, automation, API integration, data manipulation, math, string parsing, json handling, and asynchronous tasks with asyncio.",
+      "tags": [
+        "python",
+        "python3",
+        "automation",
+        "data-science",
+        "runtime"
+      ],
+      "metadata": {
+        "runtime": "python3",
+        "standardLibraries": [
+          "json",
+          "csv",
+          "sys",
+          "os",
+          "subprocess",
+          "math",
+          "re",
+          "asyncio",
+          "datetime",
+          "urllib"
+        ]
+      },
+      "createdAt": "2026-10-22T20:25:45.564Z",
+      "updatedAt": "2026-10-22T20:25:45.564Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-3d2eeac2-8",
+      "type": "concept",
+      "label": "C++ High-Performance Systems & Algorithmic Runtime",
+      "content": "Modern C++ (C++17/C++20) compiled via GNU Compiler Collection (g++). Excels in maximum computational speed, low-latency execution, memory efficiency, complex data structures, algorithms, and system utilities.",
+      "tags": [
+        "cpp",
+        "c++",
+        "g++",
+        "systems",
+        "algorithms",
+        "performance"
+      ],
+      "metadata": {
+        "compiler": "g++",
+        "flags": [
+          "-O3",
+          "-std=c++20",
+          "-Wall"
+        ],
+        "headers": [
+          "<iostream>",
+          "<vector>",
+          "<string>",
+          "<algorithm>",
+          "<memory>",
+          "<map>",
+          "<chrono>",
+          "<thread>"
+        ]
+      },
+      "createdAt": "2026-10-22T20:25:45.568Z",
+      "updatedAt": "2026-10-22T20:25:45.568Z",
+      "importance": 0.95
+    },
+    {
+      "id": "node-e27944eb-b",
+      "type": "concept",
+      "label": "Java OpenJDK Enterprise Execution Runtime",
+      "content": "Java 17/21 OpenJDK runtime (javac and java). Excels in robust object-oriented architecture, enterprise logic, multi-threading, stream processing, deterministic typing, and portable modular software.",
+      "tags": [
+        "java",
+        "openjdk",
+        "javac",
+        "enterprise",
+        "oop",
+        "concurrency"
+      ],
+      "metadata": {
+        "compiler": "javac",
+        "runner": "java",
+        "packages": [
+          "java.util.*",
+          "java.io.*",
+          "java.nio.file.*",
+          "java.util.concurrent.*",
+          "java.util.stream.*"
+        ]
+      },
+      "createdAt": "2026-10-22T20:25:45.569Z",
+      "updatedAt": "2026-10-22T20:25:45.569Z",
+      "importance": 0.95
     }
   ],
   "edges": [],
