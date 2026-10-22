@@ -7963,6 +7963,45 @@
   ],
   "audits": [
     {
+      "id": "aud-evt-1792697773301-51",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T19:36:13.301Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792697773301"
+    },
+    {
+      "id": "aud-evt-1792697772687-941",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T19:36:12.687Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792697772687"
+    },
+    {
+      "id": "aud-evt-1792697772617-808",
+      "agentId": "system",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"INTELLIGENCE_DISCOVERED\" triggered: System Dispatch",
+      "inputHash": "eyJkaXNjb3ZlcnlJZCI6",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T19:36:12.618Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792697772618"
+    },
+    {
       "id": "aud-gw-1792571573589",
       "agentId": "pete",
       "projectId": "prj-alpha",
@@ -14608,46 +14647,6 @@
       "riskLevel": "low",
       "approvalRequired": false,
       "executionId": "ex-chat-1788171022962"
-    },
-    {
-      "id": "aud-gw-1788169706997",
-      "agentId": "kevin",
-      "projectId": "prj-alpha",
-      "taskId": "gw-halt",
-      "tool": "postgresql",
-      "action": "execute_query",
-      "inputHash": "eyJzcWwiOiJTRUxFQ1Qg",
-      "result": "BLOCKED: High-risk action (HIGH) halted. Approval requested. ID: app-1788169706997-660",
-      "timestamp": "2026-08-31T09:48:26.997Z",
-      "riskLevel": "high",
-      "approvalRequired": true,
-      "executionId": "exec-1788169706997-1672"
-    },
-    {
-      "id": "aud-acc-1788169689784",
-      "agentId": "michael",
-      "tool": "accounts.update",
-      "action": "Synchronized third-party oauth integration: GitHub Enterprise -> NOT_CONNECTED",
-      "inputHash": "R2l0SHViIEVudGVycHJp",
-      "result": "SUCCESS: Connection mapped. Active scopes parsed.",
-      "timestamp": "2026-08-31T09:48:09.784Z",
-      "riskLevel": "high",
-      "approvalRequired": true,
-      "approvedBy": "michael",
-      "executionId": "ex-acc-1788169689784"
-    },
-    {
-      "id": "aud-acc-1788169685292",
-      "agentId": "michael",
-      "tool": "accounts.update",
-      "action": "Synchronized third-party oauth integration: Google Workspace -> CONNECTED",
-      "inputHash": "R29vZ2xlIFdvcmtzcGFj",
-      "result": "SUCCESS: Connection mapped. Active scopes parsed.",
-      "timestamp": "2026-08-31T09:48:05.293Z",
-      "riskLevel": "high",
-      "approvalRequired": true,
-      "approvedBy": "michael",
-      "executionId": "ex-acc-1788169685293"
     }
   ],
   "accounts": [

@@ -2,6 +2,20 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Rufflo: Install dependencies",
+      "type": "process",
+      "command": "npm.cmd",
+      "args": ["ci"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "inAgents": true,
+      "runOptions": {
+        "runOn": "worktreeCreated"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Rufflo: Start app on folder open",
       "type": "process",
       "command": "powershell.exe",
@@ -17,6 +31,7 @@
         "cwd": "${workspaceFolder}"
       },
       "isBackground": true,
+      "inAgents": true,
       "runOptions": {
         "runOn": "folderOpen",
         "instanceLimit": 1

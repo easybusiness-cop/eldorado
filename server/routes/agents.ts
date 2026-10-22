@@ -2,7 +2,7 @@ import { Router, Response, Request } from 'express';
 import { agentFleetRegistry } from '../agents/registry.ts';
 import { agentRuntime } from '../agents/runtime.ts';
 import { mastra } from '../ai/mastra/index.ts';
-import { requireAuth, AuthenticatedRequest } from '../security/auth.middleware.ts';
+import { requireAuth, requireCapability, AuthenticatedRequest } from '../security/auth.middleware.ts';
 import { agentIntelligenceEvaluator } from '../core/evaluation/agent-intelligence.evaluator.ts';
 import { browserService } from '../tools/browser/browser.service.ts';
 
@@ -76,7 +76,7 @@ agentRouter.get('/:id', (req, res) => {
   res.json({ success: true, agent });
 });
 
-agentRouter.post('/:id/execute', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+agentRouter.post('/:id/execute', requireAuth, requireCapability('task:run'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const identity = req.identity;
 

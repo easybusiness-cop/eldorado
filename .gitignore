@@ -1,4 +1,5 @@
 node_modules/
+workers/openhands/.venv/
 coverage/
 .DS_Store
 *.log

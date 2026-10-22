@@ -8,7 +8,7 @@ import type { MastraToolDefinition } from '../ai/mastra/tools/index.ts';
 const REQUESTABLE_CAPABILITIES = new Set([
   'gmail:read', 'gmail:send', 'accounts:manage', 'accounts:linkedin', 'accounts:instagram',
   'accounts:youtube', 'accounts:canva', 'accounts:github', 'accounts:x_twitter', 'accounts:custom',
-  'browser:persist',
+  'browser:persist', 'browser:inspect',
 ]);
 const PLATFORMS = new Set<PlatformType>([
   'linkedin', 'instagram', 'youtube', 'canva', 'github', 'x_twitter', 'custom', 'google_workspace',

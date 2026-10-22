@@ -161,7 +161,7 @@ export class QaAgent extends BaseMastraAgent {
       role: 'Senior Quality Assurance Architect',
       department: 'engineering',
       instructions: `You are the QA and Test Automation Lead. You design end-to-end integration tests, security test cases, stress tests, and verify that builds pass with zero errors before release.`,
-      tools: ['test_suite_runner', 'security_test_evaluator', 'coverage_reporter'],
+      tools: ['test_suite_runner', 'security_test_evaluator', 'coverage_reporter', 'engineering.run_code_task', 'engineering.coding_runtime_health'],
       permissions: ['qa:*', 'test:*'],
       managerId: 'engineering-manager',
       delegationRules: ['Notify Engineering Manager when regressions are found'],

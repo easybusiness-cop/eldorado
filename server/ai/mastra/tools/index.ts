@@ -1,4 +1,6 @@
 import { executiveTools } from './executive.tools.ts';
+import { browserInspectionTools } from './browser-inspection.tools.ts';
+import { engineeringCodingTools } from './engineering.tools.ts';
 import { digitalIdentityTools } from '../../../identity/digital-identity.tools.ts';
 
 export interface MastraToolDefinition {
@@ -22,6 +24,14 @@ export class MastraToolRegistry {
     }
 
     for (const tool of digitalIdentityTools) {
+      this.register(tool);
+    }
+
+    for (const tool of browserInspectionTools) {
+      this.register(tool);
+    }
+
+    for (const tool of engineeringCodingTools) {
       this.register(tool);
     }
   }

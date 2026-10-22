@@ -4,8 +4,18 @@ import { RepoLearningEngine } from '../knowledge/repositories/repo-learning-engi
 import { FailureSchoolService } from '../training/failures/failure-school.service.ts';
 import { LabRunner } from '../training/labs/lab-runner.ts';
 import { SoftwareBuilder } from '../core/builder/software-builder.ts';
+import { codingExecutionService } from '../ai/mastra/tools/engineering.tools.ts';
 
 export const engineeringAdvancedRouter = Router();
+
+// GET /api/v2/engineering/runtimes - Health of the configured coding engines
+engineeringAdvancedRouter.get('/engineering/runtimes', async (_req, res) => {
+  try {
+    res.json({ success: true, runtimes: await codingExecutionService.health() });
+  } catch {
+    res.status(503).json({ success: false, error: 'Coding runtime health could not be retrieved.' });
+  }
+});
 
 // ==========================================
 // MASTER ENGINEER SELF-DEVELOPMENT ROUTES
@@ -163,4 +173,3 @@ engineeringAdvancedRouter.post('/builder/build', async (req, res) => {
     res.status(500).json({ error: err.message || String(err) });
   }
 });
-
