@@ -1,0 +1,296 @@
+[
+  {
+    "identityId": "ident-org-alpha-michael",
+    "organizationId": "org-alpha",
+    "agentId": "michael",
+    "displayName": "Michael Scott",
+    "role": "Regional Manager & CEO",
+    "emailAddress": "michael@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-michael",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/michael",
+    "connectedAccounts": [],
+    "permissions": [
+      "*"
+    ],
+    "createdAt": "2026-10-22T08:03:04.146Z",
+    "lastActiveAt": "2026-10-22T08:03:04.146Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184146",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.146Z",
+        "details": "Provisioned individual digital identity with email michael@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-dwight",
+    "organizationId": "org-alpha",
+    "agentId": "dwight",
+    "displayName": "Dwight Schrute",
+    "role": "Assistant Regional Manager & CISO",
+    "emailAddress": "dwight@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-dwight",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/dwight",
+    "connectedAccounts": [],
+    "permissions": [
+      "security:audit",
+      "browser:persist",
+      "accounts:manage"
+    ],
+    "createdAt": "2026-10-22T08:03:04.155Z",
+    "lastActiveAt": "2026-10-22T08:03:04.155Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184155",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.155Z",
+        "details": "Provisioned individual digital identity with email dwight@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-jim",
+    "organizationId": "org-alpha",
+    "agentId": "jim",
+    "displayName": "Jim Halpert",
+    "role": "Client Relations & Sales Specialist",
+    "emailAddress": "jim@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-jim",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/jim",
+    "connectedAccounts": [],
+    "permissions": [
+      "browser:persist",
+      "accounts:manage"
+    ],
+    "createdAt": "2026-10-22T08:03:04.163Z",
+    "lastActiveAt": "2026-10-22T08:03:04.163Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184163",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.163Z",
+        "details": "Provisioned individual digital identity with email jim@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-pam",
+    "organizationId": "org-alpha",
+    "agentId": "pam",
+    "displayName": "Pam Beesly",
+    "role": "Office Administrator & UX Director",
+    "emailAddress": "pam@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-pam",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/pam",
+    "connectedAccounts": [],
+    "permissions": [
+      "browser:persist",
+      "accounts:manage"
+    ],
+    "createdAt": "2026-10-22T08:03:04.170Z",
+    "lastActiveAt": "2026-10-22T08:03:04.170Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184170",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.170Z",
+        "details": "Provisioned individual digital identity with email pam@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-pete-miller",
+    "organizationId": "org-alpha",
+    "agentId": "pete-miller",
+    "displayName": "Pete Miller",
+    "role": "Chief Enterprise Architect",
+    "emailAddress": "petemiller@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-pete-miller",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/pete-miller",
+    "connectedAccounts": [],
+    "permissions": [
+      "*"
+    ],
+    "createdAt": "2026-10-22T08:03:04.178Z",
+    "lastActiveAt": "2026-10-22T08:03:04.178Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184178",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.178Z",
+        "details": "Provisioned individual digital identity with email petemiller@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-roy",
+    "organizationId": "org-alpha",
+    "agentId": "roy",
+    "displayName": "Roy Anderson",
+    "role": "DevOps & Deployment SRE",
+    "emailAddress": "roy@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-roy",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/roy",
+    "connectedAccounts": [],
+    "permissions": [
+      "deployment:write",
+      "browser:persist"
+    ],
+    "createdAt": "2026-10-22T08:03:04.186Z",
+    "lastActiveAt": "2026-10-22T08:03:04.186Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184186",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.186Z",
+        "details": "Provisioned individual digital identity with email roy@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-toby",
+    "organizationId": "org-alpha",
+    "agentId": "toby",
+    "displayName": "Toby Flenderson",
+    "role": "Compliance & Self-Healing SRE",
+    "emailAddress": "toby@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-toby",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/toby",
+    "connectedAccounts": [],
+    "permissions": [
+      "compliance:audit",
+      "browser:persist"
+    ],
+    "createdAt": "2026-10-22T08:03:04.217Z",
+    "lastActiveAt": "2026-10-22T08:03:04.217Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184217",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.217Z",
+        "details": "Provisioned individual digital identity with email toby@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-corecoder",
+    "organizationId": "org-alpha",
+    "agentId": "corecoder",
+    "displayName": "CoreCoder",
+    "role": "Polyglot Systems Engineer",
+    "emailAddress": "corecoder@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-corecoder",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/corecoder",
+    "connectedAccounts": [],
+    "permissions": [
+      "task:run",
+      "browser:persist"
+    ],
+    "createdAt": "2026-10-22T08:03:04.225Z",
+    "lastActiveAt": "2026-10-22T08:03:04.225Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184225",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.225Z",
+        "details": "Provisioned individual digital identity with email corecoder@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-chromiumnavigator",
+    "organizationId": "org-alpha",
+    "agentId": "chromiumnavigator",
+    "displayName": "ChromiumNavigator",
+    "role": "Autonomous Web OSINT Radar",
+    "emailAddress": "chromiumnavigator@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-chromiumnavigator",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/chromiumnavigator",
+    "connectedAccounts": [],
+    "permissions": [
+      "browser:persist",
+      "accounts:manage"
+    ],
+    "createdAt": "2026-10-22T08:03:04.233Z",
+    "lastActiveAt": "2026-10-22T08:03:04.233Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656184233",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:04.233Z",
+        "details": "Provisioned individual digital identity with email chromiumnavigator@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-alpha-unauthorized-intern",
+    "organizationId": "org-alpha",
+    "agentId": "unauthorized-intern",
+    "displayName": "unauthorized-intern",
+    "role": "Autonomous Operational Agent",
+    "emailAddress": "unauthorizedintern@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-alpha-unauthorized-intern",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-alpha/unauthorized-intern",
+    "connectedAccounts": [],
+    "permissions": [],
+    "createdAt": "2026-10-22T08:03:32.812Z",
+    "lastActiveAt": "2026-10-22T08:03:32.812Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656212812",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:32.812Z",
+        "details": "Provisioned individual digital identity with email unauthorizedintern@dundermifflin.internal."
+      }
+    ]
+  },
+  {
+    "identityId": "ident-org-tenant-beta-michael",
+    "organizationId": "org-tenant-beta",
+    "agentId": "michael",
+    "displayName": "michael",
+    "role": "Autonomous Operational Agent",
+    "emailAddress": "michael@dundermifflin.internal",
+    "emailProvider": "google_workspace",
+    "status": "active",
+    "workspaceId": "ws-org-tenant-beta-michael",
+    "workspacePath": "/app/applet/.rufflo-workspaces/org-tenant-beta/michael",
+    "connectedAccounts": [],
+    "permissions": [
+      "browser:persist",
+      "accounts:manage",
+      "tools:execute"
+    ],
+    "createdAt": "2026-10-22T08:03:32.824Z",
+    "lastActiveAt": "2026-10-22T08:03:32.824Z",
+    "history": [
+      {
+        "eventId": "evt-init-1792656212824",
+        "action": "IDENTITY_PROVISIONED",
+        "timestamp": "2026-10-22T08:03:32.824Z",
+        "details": "Provisioned individual digital identity with email michael@dundermifflin.internal."
+      }
+    ]
+  }
+]

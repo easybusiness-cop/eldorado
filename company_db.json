@@ -95,10 +95,10 @@
       "id": "10",
       "level": 10,
       "code": "10",
-      "name": "Human Resources & Agent Academy",
+      "name": "Human Resources & People Operations",
       "logo": "📋",
       "departmentId": "hr",
-      "departmentName": "Human Resources & Academy",
+      "departmentName": "Human Resources & People Operations",
       "headId": "toby_hr",
       "headName": "Toby Flenderson",
       "headRole": "Chief Human Resources Officer (CHRO)",
@@ -108,9 +108,9 @@
       "pendingApprovalsCount": 0,
       "workloadPercent": 54,
       "alerts": [
-        "Agent Academy Level 8 Curriculum Active"
+        "Agent onboarding and performance reviews active"
       ],
-      "description": "Talent recruitment, CSE Agent Academy certifications, performance evaluations, agent onboarding, and persona alignment.",
+      "description": "Talent recruitment, performance evaluations, agent onboarding, and persona alignment.",
       "securityClassification": "CONFIDENTIAL"
     },
     {
@@ -1421,13 +1421,20 @@
       "role": "Chief Technology Officer (CTO)",
       "department": "engineering",
       "reportsTo": "michael",
-      "jobDescription": "Spearheads technology roadmap, designs enterprise software architectures, manages developers, and executes high-performance releases.",
+      "jobDescription": "Spearheads technology roadmap, designs enterprise software architectures, manages developers, and executes high-performance releases.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "System Architecture",
         "Node.js",
         "TypeScript",
         "Drizzle ORM",
-        "Database scaling"
+        "Database scaling",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -1476,13 +1483,20 @@
       "role": "Chief Security Officer (CSO)",
       "department": "security",
       "reportsTo": "michael",
-      "jobDescription": "Maintains zero-trust cyber perimeter, audits tool permissions, blocks SSRF attack vectors, and executes forensic incident scans.",
+      "jobDescription": "Maintains zero-trust cyber perimeter, audits tool permissions, blocks SSRF attack vectors, and executes forensic incident scans.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Defensive Security",
         "SSRF Guarding",
         "Access Control Lists",
         "Vulnerability Scanning",
-        "V8 Isolation"
+        "V8 Isolation",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -1716,12 +1730,19 @@
       "role": "Chief Research & Intelligence Officer",
       "department": "research",
       "reportsTo": "michael",
-      "jobDescription": "Extracts public repository schemas, analyses open-source specifications, and searches public APIs for system requirements.",
+      "jobDescription": "Extracts public repository schemas, analyses open-source specifications, and searches public APIs for system requirements.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "OSINT Research",
         "Competitor Analysis",
         "API Compliance",
-        "Code exploration"
+        "Code exploration",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "web-search",
@@ -1753,12 +1774,19 @@
       "role": "SRE & Infrastructure Head",
       "department": "reliability",
       "reportsTo": "michael",
-      "jobDescription": "Maintains system reliability, coordinates database backups, parses telemetry events, and coordinates continuous self-healing.",
+      "jobDescription": "Maintains system reliability, coordinates database backups, parses telemetry events, and coordinates continuous self-healing.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Site Reliability Engineering",
         "Uptime monitoring",
         "Garbage Collection tracking",
-        "Self-Healing algorithms"
+        "Self-Healing algorithms",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "telemetry-monitor",
@@ -1804,13 +1832,20 @@
       "role": "Autonomous Software Development Lead",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Executes autonomous full-stack development, builds stateful React widgets, edits server files, and designs high-performance micro-modules.",
+      "jobDescription": "Executes autonomous full-stack development, builds stateful React widgets, edits server files, and designs high-performance micro-modules.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Full-Stack Web Dev",
         "React 19",
         "TypeScript",
         "MCP Protocols",
-        "Test automation"
+        "Test automation",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -1863,12 +1898,19 @@
       "role": "Software Architect",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Designs multi-agent API contracts, details modular database structures, and enforces system modularity.",
+      "jobDescription": "Designs multi-agent API contracts, details modular database structures, and enforces system modularity.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "System Design",
         "Schema Specification",
         "UML",
-        "API Contracts"
+        "API Contracts",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -1899,12 +1941,19 @@
       "role": "Backend Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Builds transaction-safe REST APIs, configures secure file streams, and implements policy filters.",
+      "jobDescription": "Builds transaction-safe REST APIs, configures secure file streams, and implements policy filters.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Node.js",
         "Express",
         "Security verification",
-        "Data persistence"
+        "Data persistence",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -1936,11 +1985,18 @@
       "role": "Vulnerability Analyst",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Scans system dependencies for CVE records and audits sandbox execution logs.",
+      "jobDescription": "Scans system dependencies for CVE records and audits sandbox execution logs.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Vulnerability assessment",
         "Dependency Auditing",
-        "Log Inspection"
+        "Log Inspection",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -1971,11 +2027,18 @@
       "role": "Web Researcher",
       "department": "research",
       "reportsTo": "stanley",
-      "jobDescription": "Crawls public developer repositories and technical documentation, validating licenses and evidence.",
+      "jobDescription": "Crawls public developer repositories and technical documentation, validating licenses and evidence.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Web Research",
         "Data compilation",
-        "Document Analysis"
+        "Document Analysis",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "web-search",
@@ -2006,11 +2069,18 @@
       "role": "SRE",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Maintains system logs, tracks memory footprints, and monitors real-time thread health.",
+      "jobDescription": "Maintains system logs, tracks memory footprints, and monitors real-time thread health.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Log Parsing",
         "Uptime Metrics",
-        "Telemetry streams"
+        "Telemetry streams",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "telemetry-monitor",
@@ -2176,11 +2246,18 @@
       "role": "Architect",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Architect strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Architect strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "System Design",
         "API Specifications",
-        "Database Schema Design"
+        "Database Schema Design",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2210,12 +2287,19 @@
       "role": "Backend Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Backend Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Backend Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Node.js",
         "Express",
         "SQL",
-        "APIs"
+        "APIs",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2247,12 +2331,19 @@
       "role": "Frontend Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Frontend Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Frontend Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "React",
         "TypeScript",
         "Tailwind CSS",
-        "Vite"
+        "Vite",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2284,11 +2375,18 @@
       "role": "Full Stack Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Full Stack Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Full Stack Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Full Stack Dev",
         "API Integration",
-        "UI Components"
+        "UI Components",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2320,11 +2418,18 @@
       "role": "Database Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Database Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Database Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "SQL Tuning",
         "Database Migrations",
-        "Drizzle ORM"
+        "Drizzle ORM",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2355,11 +2460,18 @@
       "role": "AI Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous AI Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous AI Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Gemini SDK",
         "LLM Routing",
-        "Prompt Engineering"
+        "Prompt Engineering",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2389,11 +2501,18 @@
       "role": "QA Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous QA Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous QA Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Manual Testing",
         "Bug Regression",
-        "Test Cases"
+        "Test Cases",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "git",
@@ -2424,11 +2543,18 @@
       "role": "Automation QA",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Automation QA strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Automation QA strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Vitest",
         "Playwright",
-        "CI Testing"
+        "CI Testing",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "git",
@@ -2459,11 +2585,18 @@
       "role": "Code Reviewer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Code Reviewer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Code Reviewer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Static Analysis",
         "Code Guidelines",
-        "PR Review"
+        "PR Review",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "git",
@@ -2493,11 +2626,18 @@
       "role": "DevOps Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous DevOps Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous DevOps Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Docker",
         "Server Provisioning",
-        "Linux Systems"
+        "Linux Systems",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "terminal",
@@ -2527,11 +2667,18 @@
       "role": "Release Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Release Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Release Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Package Bundling",
         "Deploy Verification",
-        "Build Pipelines"
+        "Build Pipelines",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "git",
@@ -2562,11 +2709,18 @@
       "role": "Documentation Engineer",
       "department": "engineering",
       "reportsTo": "ruflo",
-      "jobDescription": "Fulfills autonomous Documentation Engineer strategies and workflows reporting to the Head of ENGINEERING.",
+      "jobDescription": "Fulfills autonomous Documentation Engineer strategies and workflows reporting to the Head of ENGINEERING.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Technical Writing",
         "API Docs",
-        "Markdown"
+        "Markdown",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -2596,11 +2750,18 @@
       "role": "Security Analyst",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Security Analyst strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Security Analyst strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Vulnerability Tracking",
         "Log Analysis",
-        "Threat Auditing"
+        "Threat Auditing",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -2630,11 +2791,18 @@
       "role": "Application Security Engineer",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Application Security Engineer strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Application Security Engineer strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "SAST Scan",
         "Dependency Audit",
-        "Secrets Scanning"
+        "Secrets Scanning",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -2665,11 +2833,18 @@
       "role": "Vulnerability Analyst",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Vulnerability Analyst strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Vulnerability Analyst strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "CVE Assessment",
         "System Auditing",
-        "NVD Feed"
+        "NVD Feed",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -2699,11 +2874,18 @@
       "role": "Dependency Auditor",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Dependency Auditor strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Dependency Auditor strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Package Validation",
         "License Scanning",
-        "Snyk Audit"
+        "Snyk Audit",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "dependency-auditor",
@@ -2733,11 +2915,18 @@
       "role": "Cloud Security Analyst",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Cloud Security Analyst strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Cloud Security Analyst strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Cloud Access Control",
         "IAM Auditing",
-        "Container Security"
+        "Container Security",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -2767,11 +2956,18 @@
       "role": "Incident Responder",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Incident Responder strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Incident Responder strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Log Forensics",
         "Incident Tracing",
-        "Root Cause Analysis"
+        "Root Cause Analysis",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "terminal"
@@ -2800,11 +2996,18 @@
       "role": "Compliance Analyst",
       "department": "security",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Compliance Analyst strategies and workflows reporting to the Head of SECURITY.",
+      "jobDescription": "Fulfills autonomous Compliance Analyst strategies and workflows reporting to the Head of SECURITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "GDPR Rules",
         "SOC2 Auditing",
-        "Policy Checks"
+        "Policy Checks",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner"
@@ -3579,11 +3782,18 @@
       "role": "Web Researcher",
       "department": "research",
       "reportsTo": "stanley",
-      "jobDescription": "Fulfills autonomous Web Researcher strategies and workflows reporting to the Head of RESEARCH.",
+      "jobDescription": "Fulfills autonomous Web Researcher strategies and workflows reporting to the Head of RESEARCH.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Technical Searching",
         "Data Extraction",
-        "Link Navigation"
+        "Link Navigation",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "web-search",
@@ -3614,11 +3824,18 @@
       "role": "OSINT Researcher",
       "department": "research",
       "reportsTo": "stanley",
-      "jobDescription": "Fulfills autonomous OSINT Researcher strategies and workflows reporting to the Head of RESEARCH.",
+      "jobDescription": "Fulfills autonomous OSINT Researcher strategies and workflows reporting to the Head of RESEARCH.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Github API Scans",
         "Open-Source Scraping",
-        "API Specs"
+        "API Specs",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "web-search",
@@ -3649,11 +3866,18 @@
       "role": "Competitor Analyst",
       "department": "research",
       "reportsTo": "stanley",
-      "jobDescription": "Fulfills autonomous Competitor Analyst strategies and workflows reporting to the Head of RESEARCH.",
+      "jobDescription": "Fulfills autonomous Competitor Analyst strategies and workflows reporting to the Head of RESEARCH.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Feature Mapping",
         "SaaS Pricing Research",
-        "Product Reviews"
+        "Product Reviews",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "web-search",
@@ -3683,11 +3907,18 @@
       "role": "Technology Researcher",
       "department": "research",
       "reportsTo": "stanley",
-      "jobDescription": "Fulfills autonomous Technology Researcher strategies and workflows reporting to the Head of RESEARCH.",
+      "jobDescription": "Fulfills autonomous Technology Researcher strategies and workflows reporting to the Head of RESEARCH.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Technical Documentation",
         "W3C Specs",
-        "Software Standards"
+        "Software Standards",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "web-search",
@@ -3717,11 +3948,18 @@
       "role": "Data Analyst",
       "department": "research",
       "reportsTo": "stanley",
-      "jobDescription": "Fulfills autonomous Data Analyst strategies and workflows reporting to the Head of RESEARCH.",
+      "jobDescription": "Fulfills autonomous Data Analyst strategies and workflows reporting to the Head of RESEARCH.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Dataset Extraction",
         "Excel Mapping",
-        "Structured JSON"
+        "Structured JSON",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "terminal",
@@ -3751,11 +3989,18 @@
       "role": "SRE",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Fulfills autonomous SRE strategies and workflows reporting to the Head of RELIABILITY.",
+      "jobDescription": "Fulfills autonomous SRE strategies and workflows reporting to the Head of RELIABILITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Site Reliability",
         "Garbage Collection Tracker",
-        "Auto-Healing"
+        "Auto-Healing",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "telemetry-monitor",
@@ -3785,11 +4030,18 @@
       "role": "Monitoring Agent",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Fulfills autonomous Monitoring Agent strategies and workflows reporting to the Head of RELIABILITY.",
+      "jobDescription": "Fulfills autonomous Monitoring Agent strategies and workflows reporting to the Head of RELIABILITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "CPU Heap Tracking",
         "Event Loop Latency",
-        "Telemetry Parsing"
+        "Telemetry Parsing",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "telemetry-monitor"
@@ -3818,11 +4070,18 @@
       "role": "CI/CD Agent",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Fulfills autonomous CI/CD Agent strategies and workflows reporting to the Head of RELIABILITY.",
+      "jobDescription": "Fulfills autonomous CI/CD Agent strategies and workflows reporting to the Head of RELIABILITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Vitest Runner",
         "Vite Production Build",
-        "Lint Scans"
+        "Lint Scans",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "terminal",
@@ -3852,11 +4111,18 @@
       "role": "Incident Agent",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Fulfills autonomous Incident Agent strategies and workflows reporting to the Head of RELIABILITY.",
+      "jobDescription": "Fulfills autonomous Incident Agent strategies and workflows reporting to the Head of RELIABILITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Healer Trigger",
         "Rollback Protocols",
-        "Requeuing Tasks"
+        "Requeuing Tasks",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "telemetry-monitor",
@@ -3886,11 +4152,18 @@
       "role": "Performance Engineer",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Fulfills autonomous Performance Engineer strategies and workflows reporting to the Head of RELIABILITY.",
+      "jobDescription": "Fulfills autonomous Performance Engineer strategies and workflows reporting to the Head of RELIABILITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Memory Profiling",
         "Load Balancing",
-        "Query Profiling"
+        "Query Profiling",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "telemetry-monitor",
@@ -3920,11 +4193,18 @@
       "role": "Infrastructure Engineer",
       "department": "reliability",
       "reportsTo": "toby",
-      "jobDescription": "Fulfills autonomous Infrastructure Engineer strategies and workflows reporting to the Head of RELIABILITY.",
+      "jobDescription": "Fulfills autonomous Infrastructure Engineer strategies and workflows reporting to the Head of RELIABILITY.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Container Management",
         "Disk Backups",
-        "Static Asset CDN"
+        "Static Asset CDN",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "database-backups",
@@ -3954,11 +4234,18 @@
       "role": "Security Analyst",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Security Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Security Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Vulnerability Tracking",
         "Log Analysis",
-        "Threat Auditing"
+        "Threat Auditing",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -3988,11 +4275,18 @@
       "role": "Application Security Engineer",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Application Security Engineer strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Application Security Engineer strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "SAST Scan",
         "Dependency Audit",
-        "Secrets Scanning"
+        "Secrets Scanning",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -4023,11 +4317,18 @@
       "role": "Vulnerability Analyst",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Vulnerability Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Vulnerability Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "CVE Assessment",
         "System Auditing",
-        "NVD Feed"
+        "NVD Feed",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -4057,11 +4358,18 @@
       "role": "Dependency Auditor",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Dependency Auditor strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Dependency Auditor strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Package Validation",
         "License Scanning",
-        "Snyk Audit"
+        "Snyk Audit",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "dependency-auditor",
@@ -4091,11 +4399,18 @@
       "role": "Cloud Security Analyst",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Cloud Security Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Cloud Security Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Cloud Access Control",
         "IAM Auditing",
-        "Container Security"
+        "Container Security",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner",
@@ -4125,11 +4440,18 @@
       "role": "Incident Responder",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Incident Responder strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Incident Responder strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Log Forensics",
         "Incident Tracing",
-        "Root Cause Analysis"
+        "Root Cause Analysis",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "terminal"
@@ -4158,11 +4480,18 @@
       "role": "Compliance Analyst",
       "department": "infrastructure",
       "reportsTo": "dwight",
-      "jobDescription": "Fulfills autonomous Compliance Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.",
+      "jobDescription": "Fulfills autonomous Compliance Analyst strategies and workflows reporting to the Head of INFRASTRUCTURE.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "GDPR Rules",
         "SOC2 Auditing",
-        "Policy Checks"
+        "Policy Checks",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "security-scanner"
@@ -4596,11 +4925,18 @@
       "role": "UX System Architect",
       "department": "product",
       "reportsTo": "kelly_product",
-      "jobDescription": "Fulfills autonomous UX System Architect strategies and workflows reporting to the Head of PRODUCT.",
+      "jobDescription": "Fulfills autonomous UX System Architect strategies and workflows reporting to the Head of PRODUCT.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "Design Systems",
         "UI Wireframing",
-        "User Flow Design"
+        "User Flow Design",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "filesystem",
@@ -4697,11 +5033,18 @@
       "role": "Technical Support Specialist",
       "department": "customer_success",
       "reportsTo": "erin_support",
-      "jobDescription": "Fulfills autonomous Technical Support Specialist strategies and workflows reporting to the Head of CUSTOMER_SUCCESS.",
+      "jobDescription": "Fulfills autonomous Technical Support Specialist strategies and workflows reporting to the Head of CUSTOMER_SUCCESS.\n\nENGINEERING EXECUTION PLAYBOOK\n- Inspect the repository, existing conventions, runtime, and dependency versions before choosing an implementation.\n- Prefer the project's established language and framework. For unfamiliar languages, verify syntax and APIs against repository examples and authoritative documentation; do not claim unsupported language coverage.\n- Convert the request into observable acceptance criteria, then choose data structures and algorithms that fit the input scale and state their time and space trade-offs.\n- Use classes and inheritance when they clarify domain behavior; prefer composition when it keeps responsibilities simpler. Apply encapsulation, polymorphism, SOLID principles, and patterns only where they solve a real design problem.\n- Make the smallest complete change, handle invalid input and failure paths, and preserve existing interfaces unless the task requires a migration.\n- Check security, permissions, privacy, concurrency, performance, accessibility, and compatibility where relevant. Never bypass repository safeguards or an agent's assigned permissions.\n- Verify changed behavior with focused checks available in the project, inspect the final diff, and report what ran, what changed, and any unresolved limitation. Never invent results or certifications.",
       "skills": [
         "API Troubleshooting",
         "Bug Replication",
-        "Knowledge Base"
+        "Knowledge Base",
+        "Cross-language engineering: adapt to the requested language ecosystem by inspecting repository conventions and authoritative documentation",
+        "Programming languages: TypeScript, JavaScript, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, Scala, R, Julia, MATLAB, SQL, Bash, PowerShell, HTML, CSS, Lua, Perl, Haskell, Elixir, Erlang, Clojure, F#, Objective-C, Visual Basic .NET, COBOL",
+        "Object-oriented programming: classes, objects, constructors, encapsulation, abstraction, inheritance, polymorphism, and composition",
+        "Data structures and algorithms: arrays, linked lists, stacks, queues, hash maps, trees, graphs, recursion, searching, and sorting",
+        "Problem solving: requirements decomposition, algorithm design, Big-O time and space analysis, edge-case analysis, and trade-off evaluation",
+        "Software design: SOLID principles, useful design patterns, modular architecture, API contracts, and maintainable abstractions",
+        "Software quality: debugging, root-cause analysis, automated tests, code review, secure coding, performance, and reliability"
       ],
       "tools": [
         "terminal",
@@ -7315,18 +7658,18 @@
       "id": "tsk-pam-01",
       "projectId": "prj-alpha",
       "missionId": "mis-01",
-      "title": "Agent Academy Curriculum & Inter-Office SOPs",
+      "title": "Agent Onboarding & Inter-Office SOPs",
       "description": "Maintain Scranton office SOPs, structure standardized onboarding workflows for newly provisioned agents, and conduct quarterly team pulse surveys.",
       "assignedTo": "pam",
       "status": "running",
       "progress": 70,
       "priority": "medium",
-      "output": "CSE Agent Academy Level 8 syllabus updated with autonomous tooling certification.",
-      "codeSnippet": "// Pam Beesly People Ops & Academy Standard\nexport function onboardAgent(agentProfile) {\n  return { certified: true, level: 8, sopChecklistCompleted: true };\n}",
+      "output": "Agent onboarding checklist and inter-office compliance handbook updated.",
+      "codeSnippet": "// Pam Beesly People Operations Standard\nexport function onboardAgent(agentProfile) {\n  return { onboardingChecklistCompleted: true, sopChecklistCompleted: true };\n}",
       "subtasks": [
         {
           "id": "st-p-1",
-          "title": "Update CSE Agent Academy Level 8 training syllabus",
+          "title": "Update standardized new-agent onboarding checklist",
           "completed": true,
           "assignedTo": "pam"
         },
@@ -7619,6 +7962,229 @@
     }
   ],
   "audits": [
+    {
+      "id": "aud-gw-1792657167232",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid, foreign, or unauthorized organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-10-22T08:19:27.236Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1792657167232-309"
+    },
+    {
+      "id": "aud-evt-1792657159260-54",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"ACCOUNT_PROVISIONED\" triggered: System Dispatch",
+      "inputHash": "eyJvcmdJZCI6Im9yZy1h",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:19:19.260Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792657159260"
+    },
+    {
+      "id": "aud-evt-1792657159248-618",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_EMAIL_RECEIVED\" triggered: System Dispatch",
+      "inputHash": "eyJvcmdJZCI6Im9yZy1h",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:19:19.248Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792657159248"
+    },
+    {
+      "id": "aud-gw-1792656221916",
+      "agentId": "pete",
+      "projectId": "prj-alpha",
+      "taskId": "gw-failure",
+      "tool": "github",
+      "action": "list_repositories",
+      "inputHash": "e30=",
+      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid, foreign, or unauthorized organization identifier: org-compromised-tenant-b",
+      "timestamp": "2026-10-22T08:03:41.920Z",
+      "riskLevel": "high",
+      "approvalRequired": false,
+      "executionId": "exec-1792656221916-2256"
+    },
+    {
+      "id": "aud-evt-1792656212834-169",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"ACCOUNT_PROVISIONED\" triggered: System Dispatch",
+      "inputHash": "eyJvcmdJZCI6Im9yZy1h",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:32.834Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656212834"
+    },
+    {
+      "id": "aud-evt-1792656212825-8",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:32.825Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656212825"
+    },
+    {
+      "id": "aud-evt-1792656212813-851",
+      "agentId": "unauthorized-intern",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:32.813Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656212813"
+    },
+    {
+      "id": "aud-evt-1792656212799-232",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_EMAIL_RECEIVED\" triggered: System Dispatch",
+      "inputHash": "eyJvcmdJZCI6Im9yZy1h",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:32.800Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656212800"
+    },
+    {
+      "id": "aud-evt-1792656184233-655",
+      "agentId": "chromiumnavigator",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.233Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184233"
+    },
+    {
+      "id": "aud-evt-1792656184226-657",
+      "agentId": "corecoder",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.226Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184226"
+    },
+    {
+      "id": "aud-evt-1792656184218-794",
+      "agentId": "toby",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.218Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184218"
+    },
+    {
+      "id": "aud-evt-1792656184187-759",
+      "agentId": "roy",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.187Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184187"
+    },
+    {
+      "id": "aud-evt-1792656184179-765",
+      "agentId": "pete-miller",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.179Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184179"
+    },
+    {
+      "id": "aud-evt-1792656184170-98",
+      "agentId": "pam",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.171Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184171"
+    },
+    {
+      "id": "aud-evt-1792656184163-40",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.163Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184163"
+    },
+    {
+      "id": "aud-evt-1792656184155-698",
+      "agentId": "dwight",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.155Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184155"
+    },
+    {
+      "id": "aud-evt-1792656184147-534",
+      "agentId": "michael",
+      "projectId": "prj-alpha",
+      "tool": "event_bus",
+      "action": "Event \"AGENT_IDENTITY_CREATED\" triggered: System Dispatch",
+      "inputHash": "eyJpZGVudGl0eUlkIjoi",
+      "result": "SUCCESS: Event propagated to active workforce.",
+      "timestamp": "2026-10-22T08:03:04.147Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "ex-evt-1792656184147"
+    },
     {
       "id": "aud-gw-1792571573589",
       "agentId": "pete",
@@ -14069,242 +14635,6 @@
       "riskLevel": "low",
       "approvalRequired": false,
       "executionId": "ex-chat-1788355445879"
-    },
-    {
-      "id": "aud-chat-1788355412078",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788355412069",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"build websit...\"",
-      "inputHash": "YnVpbGQgd2Vic2l0",
-      "result": "SUCCESS: Generated 11067 characters response. Token cost: $0.00022",
-      "timestamp": "2026-09-02T13:23:32.078Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788355412078"
-    },
-    {
-      "id": "aud-chat-1788354520348",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788354520338",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"start to buils a website related to shop, include only invoi...\"",
-      "inputHash": "c3RhcnQgdG8gYnVpbHMg",
-      "result": "SUCCESS: Generated 8974 characters response. Token cost: $0.00018",
-      "timestamp": "2026-09-02T13:08:40.348Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788354520348"
-    },
-    {
-      "id": "aud-chat-1788354485317",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788354485307",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Analyze the following fetched web resource \"README.md\":\n\n```...\"",
-      "inputHash": "QW5hbHl6ZSB0aGUgZm9s",
-      "result": "SUCCESS: Generated 6881 characters response. Token cost: $0.00014",
-      "timestamp": "2026-09-02T13:08:05.317Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788354485317"
-    },
-    {
-      "id": "aud-chat-1788352974707",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788352974693",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 8324 characters response. Token cost: $0.00017",
-      "timestamp": "2026-09-02T12:42:54.707Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788352974707"
-    },
-    {
-      "id": "aud-chat-1788352706422",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788352706412",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 5220 characters response. Token cost: $0.00011",
-      "timestamp": "2026-09-02T12:38:26.422Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788352706422"
-    },
-    {
-      "id": "aud-chat-1788335240529",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788335240520",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"hloo...\"",
-      "inputHash": "aGxvbw==",
-      "result": "SUCCESS: Generated 1971 characters response. Token cost: $0.00004",
-      "timestamp": "2026-09-02T07:47:20.529Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788335240529"
-    },
-    {
-      "id": "aud-gw-1788255301983",
-      "agentId": "pete",
-      "projectId": "prj-alpha",
-      "taskId": "gw-failure",
-      "tool": "github",
-      "action": "list_repositories",
-      "inputHash": "e30=",
-      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
-      "timestamp": "2026-09-01T09:35:01.991Z",
-      "riskLevel": "high",
-      "approvalRequired": false,
-      "executionId": "exec-1788255301983-3309"
-    },
-    {
-      "id": "aud-gw-1788255288886",
-      "agentId": "pete",
-      "projectId": "prj-alpha",
-      "taskId": "gw-failure",
-      "tool": "github",
-      "action": "list_repositories",
-      "inputHash": "e30=",
-      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
-      "timestamp": "2026-09-01T09:34:48.890Z",
-      "riskLevel": "high",
-      "approvalRequired": false,
-      "executionId": "exec-1788255288886-1287"
-    },
-    {
-      "id": "aud-gw-1788255273118",
-      "agentId": "pete",
-      "projectId": "prj-alpha",
-      "taskId": "gw-failure",
-      "tool": "github",
-      "action": "list_repositories",
-      "inputHash": "e30=",
-      "result": "CRITICAL EXCEPTION: Gateway execution halted: Authentication/Multi-Tenant Security Error: Invalid or missing organization identifier: org-compromised-tenant-b",
-      "timestamp": "2026-09-01T09:34:33.122Z",
-      "riskLevel": "high",
-      "approvalRequired": false,
-      "executionId": "exec-1788255273118-3375"
-    },
-    {
-      "id": "aud-chat-1788254735123",
-      "agentId": "emp-engineering-devops-engineer",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254735115",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"run the projects that are still pending...\"",
-      "inputHash": "cnVuIHRoZSBwcm9qZWN0",
-      "result": "SUCCESS: Generated 3883 characters response. Token cost: $0.00008",
-      "timestamp": "2026-09-01T09:25:35.123Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254735123"
-    },
-    {
-      "id": "aud-chat-1788254606706",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254606697",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"why you all are not doing you given tasks...\"",
-      "inputHash": "d2h5IHlvdSBhbGwgYXJl",
-      "result": "SUCCESS: Generated 3419 characters response. Token cost: $0.00007",
-      "timestamp": "2026-09-01T09:23:26.706Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254606706"
-    },
-    {
-      "id": "aud-chat-1788254464256",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254464248",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"make a software...\"",
-      "inputHash": "bWFrZSBhIHNvZnR3YXJl",
-      "result": "SUCCESS: Generated 7877 characters response. Token cost: $0.00016",
-      "timestamp": "2026-09-01T09:21:04.256Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254464256"
-    },
-    {
-      "id": "aud-chat-1788254258989",
-      "agentId": "ryan",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254258980",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 5225 characters response. Token cost: $0.00011",
-      "timestamp": "2026-09-01T09:17:38.989Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254258989"
-    },
-    {
-      "id": "aud-chat-1788171022962",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788171022953",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 5781 characters response. Token cost: $0.00012",
-      "timestamp": "2026-08-31T10:10:22.962Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788171022962"
-    },
-    {
-      "id": "aud-gw-1788169706997",
-      "agentId": "kevin",
-      "projectId": "prj-alpha",
-      "taskId": "gw-halt",
-      "tool": "postgresql",
-      "action": "execute_query",
-      "inputHash": "eyJzcWwiOiJTRUxFQ1Qg",
-      "result": "BLOCKED: High-risk action (HIGH) halted. Approval requested. ID: app-1788169706997-660",
-      "timestamp": "2026-08-31T09:48:26.997Z",
-      "riskLevel": "high",
-      "approvalRequired": true,
-      "executionId": "exec-1788169706997-1672"
-    },
-    {
-      "id": "aud-acc-1788169689784",
-      "agentId": "michael",
-      "tool": "accounts.update",
-      "action": "Synchronized third-party oauth integration: GitHub Enterprise -> NOT_CONNECTED",
-      "inputHash": "R2l0SHViIEVudGVycHJp",
-      "result": "SUCCESS: Connection mapped. Active scopes parsed.",
-      "timestamp": "2026-08-31T09:48:09.784Z",
-      "riskLevel": "high",
-      "approvalRequired": true,
-      "approvedBy": "michael",
-      "executionId": "ex-acc-1788169689784"
-    },
-    {
-      "id": "aud-acc-1788169685292",
-      "agentId": "michael",
-      "tool": "accounts.update",
-      "action": "Synchronized third-party oauth integration: Google Workspace -> CONNECTED",
-      "inputHash": "R29vZ2xlIFdvcmtzcGFj",
-      "result": "SUCCESS: Connection mapped. Active scopes parsed.",
-      "timestamp": "2026-08-31T09:48:05.293Z",
-      "riskLevel": "high",
-      "approvalRequired": true,
-      "approvedBy": "michael",
-      "executionId": "ex-acc-1788169685293"
     }
   ],
   "accounts": [
