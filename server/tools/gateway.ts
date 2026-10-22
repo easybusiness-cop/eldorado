@@ -3,6 +3,7 @@ import { mastraToolRegistry } from '../ai/mastra/tools/index.ts';
 import { composioToolGateway } from '../integrations/composio/tools.ts';
 import { riskEngine } from '../ai/runtime/risk-engine.ts';
 import { executionKernel } from "../core/execution/execution.kernel.ts";
+import { digitalIdentityService } from "../identity/digital-identity.service.ts";
 
 export class ToolAuditLogger {
   private static instance: ToolAuditLogger;
@@ -96,6 +97,9 @@ export class ToolGateway {
         executionTimeMs: 0,
       };
     }
+
+    // Ensure digital identity is allocated and active
+    digitalIdentityService.getOrCreateIdentity(req.organizationId, req.agentId);
 
     // 2. Risk Engine Assessment
     const assessment = await riskEngine.assessRisk(req.toolName, req.parameters, { agentId: req.agentId, orgId: req.organizationId });

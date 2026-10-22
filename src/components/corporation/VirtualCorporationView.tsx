@@ -50,6 +50,7 @@ import {
   InefficiencyCategory,
   RemediationResult,
 } from '../../../server/corporation/types.ts';
+import { getAvatarInitials, isLocalAvatar } from '../../utils/avatar.ts';
 
 type ActiveTab =
   | 'optimizer'
@@ -60,6 +61,7 @@ type ActiveTab =
   | 'projects'
   | 'discoveries'
   | 'workflows'
+  | 'incidents'
   | 'decisions'
   | 'failures'
   | 'governance';
@@ -120,6 +122,13 @@ export const VirtualCorporationView: React.FC = () => {
 
   // Workflows state
   const [workflows, setWorkflows] = useState<WorkflowInstance[]>([]);
+  const [creatingIncidentSimulation, setCreatingIncidentSimulation] = useState<boolean>(false);
+  const [incidentActionId, setIncidentActionId] = useState<string | null>(null);
+  const [incidentEvidence, setIncidentEvidence] = useState<Record<string, string>>({});
+  const [incidentApprovalNotes, setIncidentApprovalNotes] = useState<Record<string, string>>({});
+  const [incidentError, setIncidentError] = useState<string | null>(null);
+  const [workflowApprovalNotes, setWorkflowApprovalNotes] = useState<Record<string, string>>({});
+  const [workflowApprovalError, setWorkflowApprovalError] = useState<string | null>(null);
 
   // Decisions state
   const [decisions, setDecisions] = useState<DecisionRecord[]>([]);
@@ -360,13 +369,100 @@ export const VirtualCorporationView: React.FC = () => {
 
   const advanceWorkflow = async (workflowId: string) => {
     try {
+      setWorkflowApprovalError(null);
       const res = await fetch(`/api/corporation/workflows/${workflowId}/advance`, { method: 'POST' });
       const data = await res.json();
-      if (data.success) {
-        setWorkflows((prev) => prev.map((w) => (w.id === workflowId ? data.workflow : w)));
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not advance the workflow.');
       }
+      setWorkflows((prev) => prev.map((w) => (w.id === workflowId ? data.workflow : w)));
     } catch (err) {
-      console.error('Advance workflow error:', err);
+      setWorkflowApprovalError(err instanceof Error ? err.message : 'Could not advance the workflow.');
+    }
+  };
+
+  const decideWorkflowApproval = async (workflowId: string, decision: 'approved' | 'rejected') => {
+    const notes = workflowApprovalNotes[workflowId] || '';
+    try {
+      setWorkflowApprovalError(null);
+      const res = await fetch(`/api/corporation/workflows/${workflowId}/approval`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision, notes }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not record the workflow approval decision.');
+      }
+      setWorkflows((previous) => previous.map((workflow) => workflow.id === workflowId ? data.workflow : workflow));
+    } catch (err) {
+      setWorkflowApprovalError(err instanceof Error ? err.message : 'Could not record the workflow approval decision.');
+    }
+  };
+
+  const createIncidentSimulation = async () => {
+    try {
+      setCreatingIncidentSimulation(true);
+      setIncidentError(null);
+      const res = await fetch('/api/corporation/incidents/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmedSimulation: true }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not create the local incident simulation.');
+      }
+      setWorkflows((previous) => [data.incident, ...previous.filter((workflow) => workflow.id !== data.incident.id)]);
+    } catch (err) {
+      setIncidentError(err instanceof Error ? err.message : 'Could not create the local incident simulation.');
+    } finally {
+      setCreatingIncidentSimulation(false);
+    }
+  };
+
+  const completeIncidentWorkPacket = async (workflowId: string, stepId: string) => {
+    const evidence = incidentEvidence[workflowId] || '';
+    try {
+      setIncidentActionId(workflowId);
+      setIncidentError(null);
+      const res = await fetch(`/api/corporation/incidents/${workflowId}/steps/${stepId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ evidence }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not record incident work evidence.');
+      }
+      setWorkflows((previous) => previous.map((workflow) => workflow.id === workflowId ? data.incident : workflow));
+      setIncidentEvidence((previous) => ({ ...previous, [workflowId]: '' }));
+    } catch (err) {
+      setIncidentError(err instanceof Error ? err.message : 'Could not record incident work evidence.');
+    } finally {
+      setIncidentActionId(null);
+    }
+  };
+
+  const decideIncidentApproval = async (workflowId: string, decision: 'approved' | 'rejected') => {
+    const notes = incidentApprovalNotes[workflowId] || '';
+    try {
+      setIncidentActionId(workflowId);
+      setIncidentError(null);
+      const res = await fetch(`/api/corporation/incidents/${workflowId}/approval`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision, notes }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not record the incident approval decision.');
+      }
+      setWorkflows((previous) => previous.map((workflow) => workflow.id === workflowId ? data.incident : workflow));
+    } catch (err) {
+      setIncidentError(err instanceof Error ? err.message : 'Could not record the incident approval decision.');
+    } finally {
+      setIncidentActionId(null);
     }
   };
 
@@ -551,6 +647,18 @@ export const VirtualCorporationView: React.FC = () => {
         >
           <GitMerge className="w-3.5 h-3.5" />
           <span>Persistent Workflows</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('incidents')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all shrink-0 ${
+            activeTab === 'incidents'
+              ? 'bg-red-500/20 text-red-300 border border-red-500/40 shadow-sm'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+          }`}
+        >
+          <ShieldAlert className="w-3.5 h-3.5" />
+          <span>Incident Response</span>
         </button>
 
         <button
@@ -1379,11 +1487,20 @@ export const VirtualCorporationView: React.FC = () => {
                           : 'bg-[#121520] border-white/5 hover:border-white/20'
                       }`}
                     >
-                      <img
-                        src={emp.avatarUrl}
-                        alt={emp.displayName}
-                        className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
-                      />
+                      {isLocalAvatar(emp.avatarUrl) ? (
+                        <img
+                          src={emp.avatarUrl}
+                          alt={emp.displayName}
+                          className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
+                        />
+                      ) : (
+                        <div
+                          aria-label={`${emp.displayName} avatar`}
+                          className="w-10 h-10 rounded-lg border border-white/10 shrink-0 flex items-center justify-center bg-cyan-950 text-cyan-200 font-bold"
+                        >
+                          {getAvatarInitials(emp.displayName)}
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <h4 className="text-xs font-bold text-white truncate">{emp.displayName}</h4>
@@ -1413,11 +1530,20 @@ export const VirtualCorporationView: React.FC = () => {
                   {/* Top Dossier Header */}
                   <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={selectedEmployee.avatarUrl}
-                        alt={selectedEmployee.displayName}
-                        className="w-16 h-16 rounded-xl object-cover border border-cyan-500/40 shadow-lg shadow-cyan-950/50"
-                      />
+                      {isLocalAvatar(selectedEmployee.avatarUrl) ? (
+                        <img
+                          src={selectedEmployee.avatarUrl}
+                          alt={selectedEmployee.displayName}
+                          className="w-16 h-16 rounded-xl object-cover border border-cyan-500/40 shadow-lg shadow-cyan-950/50"
+                        />
+                      ) : (
+                        <div
+                          aria-label={`${selectedEmployee.displayName} avatar`}
+                          className="w-16 h-16 rounded-xl border border-cyan-500/40 shadow-lg shadow-cyan-950/50 flex items-center justify-center bg-cyan-950 text-cyan-200 text-xl font-bold"
+                        >
+                          {getAvatarInitials(selectedEmployee.displayName)}
+                        </div>
+                      )}
                       <div>
                         <div className="flex items-center gap-2">
                           <h2 className="text-lg font-bold text-white">{selectedEmployee.displayName}</h2>
@@ -1844,6 +1970,11 @@ export const VirtualCorporationView: React.FC = () => {
         {/* ============================================================== */}
         {activeTab === 'workflows' && (
           <div className="space-y-4 max-w-6xl mx-auto">
+            {workflowApprovalError && (
+              <div role="alert" className="rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-200">
+                {workflowApprovalError}
+              </div>
+            )}
             <div>
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <GitMerge className="w-4 h-4 text-cyan-400" />
@@ -1882,6 +2013,40 @@ export const VirtualCorporationView: React.FC = () => {
                     </div>
                   </div>
 
+                  {wf.status === 'waiting_approval' && wf.steps[wf.currentStepIndex] && (
+                    <div className="space-y-2 rounded-lg border border-amber-500/30 bg-amber-950/20 p-3">
+                      <p className="text-xs font-semibold text-amber-200">
+                        Human approval required: {wf.steps[wf.currentStepIndex].title}
+                      </p>
+                      <textarea
+                        value={workflowApprovalNotes[wf.id] || ''}
+                        onChange={(event) => setWorkflowApprovalNotes((previous) => ({ ...previous, [wf.id]: event.target.value }))}
+                        maxLength={2000}
+                        rows={2}
+                        placeholder="Enter at least 5 characters of approval rationale."
+                        className="w-full rounded-md border border-white/15 bg-black/30 p-2 text-sm text-white placeholder:text-zinc-500 focus:border-amber-400 focus:outline-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => decideWorkflowApproval(wf.id, 'approved')}
+                          disabled={(workflowApprovalNotes[wf.id] || '').trim().length < 5}
+                          className="rounded bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                        >
+                          Approve step
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => decideWorkflowApproval(wf.id, 'rejected')}
+                          disabled={(workflowApprovalNotes[wf.id] || '').trim().length < 5}
+                          className="rounded bg-red-800 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                        >
+                          Reject step
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Step-by-Step Flow */}
                   <div className="space-y-2">
                     {wf.steps.map((st, i) => (
@@ -1908,6 +2073,176 @@ export const VirtualCorporationView: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'incidents' && (
+          <div className="space-y-5 max-w-6xl mx-auto">
+            <section className="rounded-xl border border-red-500/30 bg-gradient-to-r from-red-950/40 via-[#161a29] to-amber-950/20 p-5">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-red-400" />
+                    Cross-Department Incident Response
+                  </h3>
+                  <p className="text-xs leading-relaxed text-zinc-200">
+                    Assigns evidence-based work packets to all 10 department leads and gates incident closure on an explicit human decision.
+                  </p>
+                  <p className="text-xs font-semibold text-amber-200">
+                    Local tabletop simulation only. No credentials are used, no external systems are contacted, and no containment or deployment action is executed.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={createIncidentSimulation}
+                  disabled={creatingIncidentSimulation}
+                  className="shrink-0 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+                >
+                  {creatingIncidentSimulation ? 'Assigning local work packets…' : 'Create synthetic incident drill'}
+                </button>
+              </div>
+            </section>
+
+            {incidentError && (
+              <div role="alert" className="rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-200">
+                {incidentError}
+              </div>
+            )}
+
+            {workflows.filter((workflow) => workflow.id.startsWith('sim-incident-')).length === 0 && (
+              <div className="rounded-xl border border-white/10 bg-[#121520] p-6 text-sm text-zinc-300">
+                No incident simulations have been created. Create a synthetic drill to assign scoped tasks across the departments.
+              </div>
+            )}
+
+            <div className="space-y-5">
+              {workflows
+                .filter((workflow) => workflow.id.startsWith('sim-incident-'))
+                .map((workflow) => {
+                  const currentStep = workflow.steps[workflow.currentStepIndex];
+                  const isBusy = incidentActionId === workflow.id;
+                  return (
+                    <article key={workflow.id} className="rounded-xl border border-white/10 bg-[#121520] p-5 shadow-lg space-y-4">
+                      <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h4 className="text-base font-bold text-white">{workflow.definitionName}</h4>
+                          <p className="mt-1 text-xs text-zinc-400">{workflow.description}</p>
+                          <p className="mt-2 text-[11px] font-mono text-zinc-500">ID: {workflow.id}</p>
+                        </div>
+                        <span className={`w-fit rounded-full border px-2.5 py-1 text-xs font-bold uppercase ${
+                          workflow.status === 'completed'
+                            ? 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300'
+                            : workflow.status === 'waiting_approval'
+                              ? 'border-amber-500/40 bg-amber-950/30 text-amber-200'
+                              : workflow.status === 'failed'
+                                ? 'border-red-500/40 bg-red-950/30 text-red-300'
+                                : 'border-cyan-500/40 bg-cyan-950/30 text-cyan-200'
+                        }`}>
+                          {workflow.status.replace('_', ' ')}
+                        </span>
+                      </header>
+
+                      {currentStep && workflow.status === 'running' && !currentStep.requiresHumanApproval && (
+                        <section className="rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-4 space-y-3">
+                          <div className="text-xs font-bold uppercase tracking-wide text-cyan-200">
+                            Current assignment: {currentStep.assigneeName} · {currentStep.assigneeRole}
+                          </div>
+                          <p className="text-sm text-zinc-200">{currentStep.taskDescription}</p>
+                          <label className="block space-y-1.5">
+                            <span className="text-xs font-medium text-zinc-300">Work evidence (required to advance)</span>
+                            <textarea
+                              value={incidentEvidence[workflow.id] || ''}
+                              onChange={(event) => setIncidentEvidence((previous) => ({ ...previous, [workflow.id]: event.target.value }))}
+                              maxLength={2000}
+                              rows={3}
+                              placeholder="Record what was checked, the evidence source, and any unknowns. Do not paste real secrets or personal data."
+                              className="w-full rounded-md border border-white/15 bg-black/30 p-3 text-sm text-white placeholder:text-zinc-500 focus:border-cyan-400 focus:outline-none"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => completeIncidentWorkPacket(workflow.id, currentStep.stepId)}
+                            disabled={isBusy || (incidentEvidence[workflow.id] || '').trim().length < 5}
+                            className="rounded-md bg-cyan-700 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-600 disabled:opacity-50"
+                          >
+                            {isBusy ? 'Recording evidence…' : 'Record work evidence & assign next department'}
+                          </button>
+                        </section>
+                      )}
+
+                      {currentStep && workflow.status === 'waiting_approval' && (
+                        <section className="rounded-lg border border-amber-500/40 bg-amber-950/20 p-4 space-y-3">
+                          <div className="text-xs font-bold uppercase tracking-wide text-amber-200">
+                            Human approval required · {currentStep.assigneeName} · {currentStep.assigneeRole}
+                          </div>
+                          <p className="text-sm text-zinc-200">{currentStep.taskDescription}</p>
+                          <label className="block space-y-1.5">
+                            <span className="text-xs font-medium text-zinc-300">Decision rationale (required)</span>
+                            <textarea
+                              value={incidentApprovalNotes[workflow.id] || ''}
+                              onChange={(event) => setIncidentApprovalNotes((previous) => ({ ...previous, [workflow.id]: event.target.value }))}
+                              maxLength={2000}
+                              rows={2}
+                              placeholder="Explain the decision. Approval closes only the local tabletop simulation."
+                              className="w-full rounded-md border border-white/15 bg-black/30 p-3 text-sm text-white placeholder:text-zinc-500 focus:border-amber-400 focus:outline-none"
+                            />
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => decideIncidentApproval(workflow.id, 'approved')}
+                              disabled={isBusy || (incidentApprovalNotes[workflow.id] || '').trim().length < 5}
+                              className="rounded-md bg-emerald-700 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-50"
+                            >
+                              Approve simulation disposition
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => decideIncidentApproval(workflow.id, 'rejected')}
+                              disabled={isBusy || (incidentApprovalNotes[workflow.id] || '').trim().length < 5}
+                              className="rounded-md bg-red-800 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                            >
+                              Reject simulation disposition
+                            </button>
+                          </div>
+                        </section>
+                      )}
+
+                      <div className="space-y-2">
+                        {workflow.steps.map((step, index) => (
+                          <div key={step.stepId} className={`rounded-lg border p-3 ${
+                            step.status === 'completed'
+                              ? 'border-emerald-500/30 bg-emerald-950/15'
+                              : step.status === 'running' || step.status === 'waiting_approval'
+                                ? 'border-cyan-500/40 bg-cyan-950/15'
+                                : 'border-white/10 bg-black/20'
+                          }`}>
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                              <div className="text-sm font-semibold text-white">{index + 1}. {step.title}</div>
+                              <span className="text-[10px] font-mono uppercase text-zinc-300">
+                                {step.status.replace('_', ' ')} · Assigned: {step.assigneeName} · {departments.find((department) => department.id === step.departmentId)?.name || step.departmentId}
+                              </span>
+                            </div>
+                            {step.acceptanceCriteria && (
+                              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-zinc-300">
+                                {step.acceptanceCriteria.map((criterion) => <li key={criterion}>{criterion}</li>)}
+                              </ul>
+                            )}
+                            {step.artifactPaths?.map((artifactPath) => (
+                              <div key={artifactPath} className="mt-2 text-[11px] font-mono text-cyan-300">Code artifact: {artifactPath}</div>
+                            ))}
+                            {step.outputResult?.evidenceSummary && (
+                              <p className="mt-2 break-words text-xs text-emerald-200">
+                                Recorded by {step.outputResult.recordedBy || 'unattributed'}: {step.outputResult.evidenceSummary} · SHA-256 {step.outputResult.evidenceSha256}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })}
             </div>
           </div>
         )}

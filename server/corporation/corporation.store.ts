@@ -18,8 +18,40 @@ import {
   FailureRecord,
   GovernanceAuditEntry,
 } from './types.ts';
+import {
+  ENGINEERING_AGENT_COMPETENCIES,
+  isEngineeringRelatedAgent,
+} from '../../src/constants/engineeringCompetencies.ts';
 
 const STORE_FILE_PATH = path.resolve(process.cwd(), 'virtual_corporation_db.json');
+
+export function applyCorporateEngineeringCompetencies(
+  employee: PersistentVirtualEmployee,
+): PersistentVirtualEmployee {
+  if (!isEngineeringRelatedAgent({
+    departmentId: employee.departmentId,
+    departmentName: employee.departmentName,
+    role: employee.roleTitle,
+  })) {
+    return employee;
+  }
+
+  const existingNames = new Set(employee.capabilities.map((capability) => capability.name.toLowerCase()));
+  const additions = ENGINEERING_AGENT_COMPETENCIES
+    .filter((name) => !existingNames.has(name.toLowerCase()))
+    .map((name) => ({
+      id: `cap-eng-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+      name,
+      category: 'engineering',
+      proficiencyScore: 88,
+      verifiedEvidence: 'Assigned as an engineering capability; execution evidence is tracked through completed work.',
+      certifiedTools: [],
+    }));
+
+  return additions.length > 0
+    ? { ...employee, capabilities: [...employee.capabilities, ...additions] }
+    : employee;
+}
 
 export class CorporationStore {
   private static instance: CorporationStore;
@@ -46,10 +78,26 @@ export class CorporationStore {
   private constructor() {
     this.company = this.getDefaultCompanyProfile();
     this.loadFromDisk();
-    if (this.divisions.size === 0) {
+    const needsBootstrap = this.divisions.size === 0;
+    if (needsBootstrap) {
       this.bootstrapDefaults();
+    }
+    const changed = this.enrichEngineeringEmployees();
+    if (needsBootstrap || changed) {
       this.saveToDisk();
     }
+  }
+
+  private enrichEngineeringEmployees(): boolean {
+    let changed = false;
+    for (const [employeeId, employee] of this.employees) {
+      const enriched = applyCorporateEngineeringCompetencies(employee);
+      if (enriched !== employee) {
+        this.employees.set(employeeId, enriched);
+        changed = true;
+      }
+    }
+    return changed;
   }
 
   public static getInstance(): CorporationStore {
@@ -88,7 +136,7 @@ export class CorporationStore {
         cto: 'Hank Tate (Technology & Systems)',
         ciso: 'Dwight K. Schrute (Security & Risk)',
         cfo: 'Angela Martin (Finance & Treasury)',
-        chro: 'Toby Flenderson (Workforce & Academy)',
+        chro: 'Toby Flenderson (Workforce & People Operations)',
       },
     };
   }
@@ -140,7 +188,7 @@ export class CorporationStore {
         id: 'div-admin',
         name: 'Finance, HR & People Operations',
         code: 'ADMIN',
-        description: 'Treasury, budget allocation, talent recruitment, agent academy training, and workforce operations.',
+        description: 'Treasury, budget allocation, talent recruitment, capability reviews, and workforce operations.',
         leaderId: 'emp-angela',
         leaderName: 'Angela Martin',
         departmentIds: ['dept-fin', 'dept-hr', 'dept-ops'],
@@ -281,7 +329,7 @@ export class CorporationStore {
       {
         id: 'dept-hr',
         divisionId: 'div-admin',
-        name: 'Human Resources & CSE Agent Academy',
+        name: 'Human Resources & People Operations',
         code: 'HR',
         description: 'Workforce capability certification, agent syllabus management, and conflict resolution.',
         headOfDepartmentId: 'emp-toby',
@@ -292,7 +340,7 @@ export class CorporationStore {
         headcount: 3,
         activeProjectsCount: 3,
         workloadPercent: 65,
-        teamIds: ['team-hr-academy'],
+        teamIds: ['team-hr-people-ops'],
         clearanceRequired: 70,
         keyCapabilities: ['workforce_planning', 'curriculum_design', 'performance_evaluation', 'compliance'],
       },
@@ -1054,6 +1102,7 @@ export class CorporationStore {
       this.isDirty = false;
     } catch (err) {
       console.error('[CorporationStore] Failed to save to disk:', err);
+      throw new Error('Failed to persist the corporation database.', { cause: err });
     }
   }
 

@@ -1,0 +1,183 @@
+- generic [ref=f4e3]:
+  - banner [ref=f4e4]:
+    - generic "Rufflo Autonomous Operating System - Return to Overview" [ref=f4e5] [cursor=pointer]:
+      - generic [ref=f4e6]: R
+      - generic [ref=f4e7]:
+        - generic [ref=f4e8]:
+          - generic [ref=f4e9]: RUFFLO OS
+          - generic [ref=f4e10]: v4.5
+        - generic [ref=f4e11]: Autonomous Fleet
+    - button "Search agents, missions, tools... ⌘K" [ref=f4e14] [cursor=pointer]:
+      - generic [ref=f4e18]: Search agents, missions, tools...
+      - generic [ref=f4e19]: ⌘K
+    - navigation [ref=f4e20]:
+      - button "Virtual Corp" [ref=f4e21] [cursor=pointer]
+      - button "Cloud IDE" [ref=f4e27] [cursor=pointer]
+      - button "Composio 3P" [ref=f4e32] [cursor=pointer]
+      - button "Chaos Lab" [ref=f4e36] [cursor=pointer]
+    - generic [ref=f4e40]:
+      - button "AUTO" [ref=f4e41] [cursor=pointer]
+      - button "Toggle Theme" [ref=f4e45] [cursor=pointer]
+      - button "Toggle Fullscreen" [ref=f4e48] [cursor=pointer]
+      - button "Michael G. Scott" [ref=f4e54] [cursor=pointer]
+      - button "Modules 28" [ref=f4e60] [cursor=pointer]:
+        - generic [ref=f4e65]: Modules
+        - generic [ref=f4e66]: "28"
+  - main [ref=f4e68]:
+    - complementary [ref=f4e69]:
+      - generic [ref=f4e70]:
+        - generic [ref=f4e71]: OPERATIONAL HUBS
+        - button "⚡ Command Center" [ref=f4e72] [cursor=pointer]:
+          - generic [ref=f4e73]: ⚡
+          - generic [ref=f4e74]: Command Center
+        - button "🏢 Virtual Corporation" [ref=f4e75] [cursor=pointer]:
+          - generic [ref=f4e76]: 🏢
+          - generic [ref=f4e77]: Virtual Corporation
+        - button "👥 Fleet Telemetry" [ref=f4e78] [cursor=pointer]:
+          - generic [ref=f4e79]: 👥
+          - generic [ref=f4e80]: Fleet Telemetry
+        - button "🌐 Company Network" [ref=f4e81] [cursor=pointer]:
+          - generic [ref=f4e82]: 🌐
+          - generic [ref=f4e83]: Company Network
+        - button "📋 Munderdiffl.in Agents" [ref=f4e84] [cursor=pointer]:
+          - generic [ref=f4e85]: 📋
+          - generic [ref=f4e86]: Munderdiffl.in Agents
+        - button "💬 Agent Communication" [ref=f4e87] [cursor=pointer]:
+          - generic [ref=f4e88]: 💬
+          - generic [ref=f4e89]: Agent Communication
+        - button "🎯 Skill Matrix & SOPs" [ref=f4e90] [cursor=pointer]:
+          - generic [ref=f4e91]: 🎯
+          - generic [ref=f4e92]: Skill Matrix & SOPs
+        - button "🧠 Knowledge Base & Radar" [ref=f4e93] [cursor=pointer]:
+          - generic [ref=f4e94]: 🧠
+          - generic [ref=f4e95]: Knowledge Base & Radar
+      - generic [ref=f4e96]:
+        - generic [ref=f4e97]: ENGINEERING SUITE
+        - button "💻 Software Builder Hub" [ref=f4e98] [cursor=pointer]:
+          - generic [ref=f4e99]: 💻
+          - generic [ref=f4e100]: Software Builder Hub
+        - button "</> Cloud IDE Workbench" [ref=f4e101] [cursor=pointer]:
+          - generic [ref=f4e102]: </>
+          - generic [ref=f4e103]: Cloud IDE Workbench
+        - button "⌥ GitHub Repositories" [ref=f4e104] [cursor=pointer]:
+          - generic [ref=f4e105]: ⌥
+          - generic [ref=f4e106]: GitHub Repositories
+        - button "↗ Deployments & Hotfixes" [ref=f4e107] [cursor=pointer]:
+          - generic [ref=f4e108]: ↗
+          - generic [ref=f4e109]: Deployments & Hotfixes
+        - button "_ Terminal & Profiler" [ref=f4e110] [cursor=pointer]:
+          - generic [ref=f4e111]: _
+          - generic [ref=f4e112]: Terminal & Profiler
+      - generic [ref=f4e113]:
+        - generic [ref=f4e114]: SYSTEM & INTEGRATIONS
+        - button "⚡ Integration Mesh" [ref=f4e115] [cursor=pointer]:
+          - generic [ref=f4e116]: ⚡
+          - generic [ref=f4e117]: Integration Mesh
+        - button "🔥 Chaos Crisis Lab" [ref=f4e118] [cursor=pointer]:
+          - generic [ref=f4e119]: 🔥
+          - generic [ref=f4e120]: Chaos Crisis Lab
+        - button "🌐 API Gateway Mesh" [ref=f4e121] [cursor=pointer]:
+          - generic [ref=f4e122]: 🌐
+          - generic [ref=f4e123]: API Gateway Mesh
+        - button "⚡ Composio 3P Tools" [ref=f4e124] [cursor=pointer]:
+          - generic [ref=f4e125]: ⚡
+          - generic [ref=f4e126]: Composio 3P Tools
+        - button "🗄 Supabase Postgres" [ref=f4e127] [cursor=pointer]:
+          - generic [ref=f4e128]: 🗄
+          - generic [ref=f4e129]: Supabase Postgres
+        - button "✈ Telegram Intelligence" [ref=f4e130] [cursor=pointer]:
+          - generic [ref=f4e131]: ✈
+          - generic [ref=f4e132]: Telegram Intelligence
+        - button "⚖ Load Balancer" [ref=f4e133] [cursor=pointer]:
+          - generic [ref=f4e134]: ⚖
+          - generic [ref=f4e135]: Load Balancer
+        - button "🎓 Agent Academy" [ref=f4e136] [cursor=pointer]:
+          - generic [ref=f4e137]: 🎓
+          - generic [ref=f4e138]: Agent Academy
+        - button "🚀 Meta-Evolution" [ref=f4e139] [cursor=pointer]:
+          - generic [ref=f4e140]: 🚀
+          - generic [ref=f4e141]: Meta-Evolution
+      - generic [ref=f4e142]:
+        - generic [ref=f4e143]: DEPARTMENTS
+        - button "⌘ Executive 0" [ref=f4e144] [cursor=pointer]:
+          - generic [ref=f4e145]: ⌘
+          - generic [ref=f4e146]: Executive
+          - generic [ref=f4e147]: "0"
+        - button "◈ Engineering 0" [ref=f4e148] [cursor=pointer]:
+          - generic [ref=f4e149]: ◈
+          - generic [ref=f4e150]: Engineering
+          - generic [ref=f4e151]: "0"
+        - button "✦ Security 0" [ref=f4e152] [cursor=pointer]:
+          - generic [ref=f4e153]: ✦
+          - generic [ref=f4e154]: Security
+          - generic [ref=f4e155]: "0"
+        - button "◇ Marketing 0" [ref=f4e156] [cursor=pointer]:
+          - generic [ref=f4e157]: ◇
+          - generic [ref=f4e158]: Marketing
+          - generic [ref=f4e159]: "0"
+        - button "◎ Operations 0" [ref=f4e160] [cursor=pointer]:
+          - generic [ref=f4e161]: ◎
+          - generic [ref=f4e162]: Operations
+          - generic [ref=f4e163]: "0"
+        - button "○ Finance 0" [ref=f4e164] [cursor=pointer]:
+          - generic [ref=f4e165]: ○
+          - generic [ref=f4e166]: Finance
+          - generic [ref=f4e167]: "0"
+        - button "△ Research 3" [ref=f4e168] [cursor=pointer]:
+          - generic [ref=f4e169]: △
+          - generic [ref=f4e170]: Research
+          - generic [ref=f4e171]: "3"
+      - generic [ref=f4e172]:
+        - generic [ref=f4e173]: SETTINGS & AUDIT
+        - button "≡ Governance & Logs" [ref=f4e174] [cursor=pointer]:
+          - generic [ref=f4e175]: ≡
+          - generic [ref=f4e176]: Governance & Logs
+        - button "⚙ System Preferences" [ref=f4e177] [cursor=pointer]:
+          - generic [ref=f4e178]: ⚙
+          - generic [ref=f4e179]: System Preferences
+    - generic [ref=f4e181]:
+      - generic [ref=f4e182]:
+        - generic [ref=f4e184]:
+          - generic [ref=f4e185]:
+            - generic [ref=f4e187]: RUFFLO OS
+            - generic [ref=f4e188]: /
+            - generic [ref=f4e189]: COMMAND
+            - generic [ref=f4e190]: ·
+            - generic [ref=f4e191]: 12 Agents Online
+          - heading "Rufflo Command Intelligence" [level=1] [ref=f4e192]
+          - paragraph [ref=f4e193]: Autonomous AI agents, workflows, knowledge base, microservices, and software operations.
+        - generic [ref=f4e194]:
+          - button "Console Panels" [ref=f4e195] [cursor=pointer]
+          - button "Scranton Branch" [ref=f4e196] [cursor=pointer]
+          - button "Knowledge Radar" [ref=f4e197] [cursor=pointer]
+          - button "Chaos Lab" [ref=f4e198] [cursor=pointer]
+          - button "+ New Mission" [ref=f4e199] [cursor=pointer]
+          - button "▶ Run Operation" [ref=f4e200] [cursor=pointer]:
+            - generic [ref=f4e201]: ▶
+            - generic [ref=f4e202]: Run Operation
+      - generic [ref=f4e203]:
+        - button "⚡ Command Center" [ref=f4e204] [cursor=pointer]:
+          - generic [ref=f4e205]: ⚡
+          - generic [ref=f4e206]: Command Center
+        - button "🏢 Virtual Corporation" [ref=f4e207] [cursor=pointer]:
+          - generic [ref=f4e208]: 🏢
+          - generic [ref=f4e209]: Virtual Corporation
+        - button "👥 Agent Fleet" [ref=f4e210] [cursor=pointer]:
+          - generic [ref=f4e211]: 👥
+          - generic [ref=f4e212]: Agent Fleet
+        - button "💻 Software Builder" [ref=f4e213] [cursor=pointer]:
+          - generic [ref=f4e214]: 💻
+          - generic [ref=f4e215]: Software Builder
+        - button "⚡ Integration Mesh" [ref=f4e216] [cursor=pointer]:
+          - generic [ref=f4e217]: ⚡
+          - generic [ref=f4e218]: Integration Mesh
+        - button "🔥 Chaos & SRE" [ref=f4e219] [cursor=pointer]:
+          - generic [ref=f4e220]: 🔥
+          - generic [ref=f4e221]: Chaos & SRE
+        - button "🌐 Company Network" [ref=f4e222] [cursor=pointer]:
+          - generic [ref=f4e223]: 🌐
+          - generic [ref=f4e224]: Company Network
+      - generic [ref=f4e225]: Loading intelligence...
+  - contentinfo [ref=f4e227]:
+    - generic [ref=f4e228]: RUFFLO CORE ONLINE
+    - generic [ref=f4e229]: v4.0.0 · Secure Runtime

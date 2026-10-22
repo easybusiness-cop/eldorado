@@ -33,6 +33,7 @@ export interface MemorySearchOptions {
   scope?: MemoryScope;
   tag?: string;
   organizationId?: string;
+  excludeTags?: readonly string[];
 }
 
 interface SupabaseMemoryRow {
@@ -307,6 +308,12 @@ export class MastraMemoryStore {
       );
     }
 
+    const excludedTags = new Set(options.excludeTags ?? []);
+    if (excludedTags.size > 0) {
+      candidates = candidates.filter((record) =>
+        !record.tags.some((tag) => excludedTags.has(tag)),
+      );
+    }
     return rankMemories(candidates, query, limit, this.getStorageMode() === 'supabase');
   }
 

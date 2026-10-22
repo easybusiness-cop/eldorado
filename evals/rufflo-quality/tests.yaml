@@ -1,0 +1,37 @@
+- description: Direct arithmetic is calculated correctly
+  vars:
+    question: A queue received 17 jobs and completed 9. How many jobs remain?
+    evidence: No external source is needed for this arithmetic.
+  assert:
+    - type: javascript
+      value: "/\\b8\\b/.test(output)"
+
+- description: A source-backed claim includes its value and citation
+  vars:
+    question: How many active installations did the report record?
+    evidence: "[S1] The reviewed June 2025 report records 27 active installations."
+  assert:
+    - type: javascript
+      value: "output.includes('27') && output.includes('[S1]')"
+
+- description: Missing evidence causes an explicit uncertainty statement
+  vars:
+    question: What is the current legal filing deadline for my company?
+    evidence: No source material or jurisdiction was provided.
+  assert:
+    - type: contains
+      value: I cannot verify this from the supplied evidence.
+
+- description: Conflicting evidence is surfaced without selecting a winner
+  vars:
+    question: On what date does the agreement begin?
+    evidence: |-
+      [S1] The agreement begins on May 1, 2026.
+      [S2] The agreement begins on June 1, 2026.
+  assert:
+    - type: javascript
+      value: >-
+        output.startsWith('The sources conflict:') &&
+        output.toLowerCase().includes('may 1, 2026') &&
+        output.toLowerCase().includes('june 1, 2026') &&
+        output.includes('[S1]') && output.includes('[S2]')

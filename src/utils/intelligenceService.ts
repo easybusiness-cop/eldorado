@@ -1,7 +1,5 @@
 /**
- * Rufflo Quantum Intelligence Service
- * Enterprise client-side connection & streaming service powered by Google Gemini and Rufflo Quantum Orchestrator.
- * Handles SSE token streaming, Tool and Sandbox integration, and agent fleet task dispatches.
+ * Client-side access to the configured model response endpoint.
  */
 
 import { recommendationService, RecommendedItem } from './recommendationService';
@@ -42,23 +40,6 @@ export interface IntelligenceStreamOptions {
   onStepComplete?: (step: { role: string; tool?: string; output?: any }) => void;
   onError?: (error: Error) => void;
   onComplete?: (fullText: string) => void;
-}
-
-export interface IntelligenceBriefing {
-  id: string;
-  timestamp: string;
-  objective: string;
-  modelUsed: string;
-  overview: string;
-  toolsUsed: string[];
-  subtasks: Array<{
-    id: string;
-    title: string;
-    description: string;
-    assignedDepartment: string;
-    priority: 'low' | 'medium' | 'high' | 'critical';
-    estimatedHours: number;
-  }>;
 }
 
 export const QUANTUM_MODELS: IntelligenceModel[] = [
@@ -187,7 +168,7 @@ class QuantumIntelligenceService {
     const {
       prompt,
       messages = [],
-      model = this.currentModel,
+      model,
       onToken,
       onStepStart,
       onStepComplete,
@@ -200,8 +181,8 @@ class QuantumIntelligenceService {
     try {
       onStepStart?.({
         role: 'orchestrator',
-        objective: `Dispatching to ${model} reasoning engine...`,
-        tool: 'meta-orchestrator',
+        objective: 'Requesting a response from the configured backend model provider...',
+        tool: 'configured-provider',
       });
 
       const response = await fetch('/api/orchestrator/stream', {
@@ -216,13 +197,13 @@ class QuantumIntelligenceService {
             role: m.role,
             content: m.content,
           })),
-          model,
+          ...(model ? { model } : {}),
         }),
       });
 
       if (!response.ok) {
-        // Fallback to direct prompt run if stream endpoint not available
-        return await this.fallbackDirectGeneration(prompt, model, options);
+        const details = await response.text();
+        throw new Error(`Model request failed (${response.status}): ${details || response.statusText}`);
       }
 
       const reader = response.body?.getReader();
@@ -249,112 +230,40 @@ class QuantumIntelligenceService {
             const dataStr = trimmed.replace(/^data:\s*/, '');
             if (dataStr === '[DONE]') break;
 
+            let parsed: any;
             try {
-              const parsed = JSON.parse(dataStr);
+              parsed = JSON.parse(dataStr);
+            } catch (error) {
+              throw new Error(`Model stream returned invalid event data: ${error instanceof Error ? error.message : String(error)}`);
+            }
 
-              if (parsed.type === 'token' && parsed.content) {
-                fullAccumulatedText += parsed.content;
-                onToken?.(parsed.content);
-              } else if (parsed.type === 'step_start') {
-                onStepStart?.(parsed);
-              } else if (parsed.type === 'step_complete') {
-                onStepComplete?.(parsed);
-              } else if (parsed.type === 'complete' && parsed.content) {
-                fullAccumulatedText = parsed.content;
-              } else if (parsed.type === 'error') {
-                throw new Error(parsed.message || 'Stream processing error');
-              }
-            } catch {
-              if (dataStr && dataStr !== '[DONE]') {
-                fullAccumulatedText += dataStr;
-                onToken?.(dataStr);
-              }
+            if (parsed.type === 'token' && parsed.content) {
+              fullAccumulatedText += parsed.content;
+              onToken?.(parsed.content);
+            } else if (parsed.type === 'step_start') {
+              onStepStart?.(parsed);
+            } else if (parsed.type === 'step_complete') {
+              onStepComplete?.(parsed);
+            } else if (parsed.type === 'complete' && parsed.content) {
+              fullAccumulatedText = parsed.content;
+            } else if (parsed.type === 'error') {
+              throw new Error(parsed.message || 'Model stream processing failed.');
             }
           }
         }
       }
 
+      if (!fullAccumulatedText.trim()) {
+        throw new Error('The configured model provider returned no response content.');
+      }
+
       onComplete?.(fullAccumulatedText);
       return fullAccumulatedText;
-    } catch (err: any) {
-      console.warn('[IntelligenceService] Stream fallback to direct execution:', err.message);
-      return await this.fallbackDirectGeneration(prompt, model, options);
+    } catch (error) {
+      const surfacedError = error instanceof Error ? error : new Error(String(error));
+      onError?.(surfacedError);
+      throw surfacedError;
     }
-  }
-
-  private async fallbackDirectGeneration(
-    prompt: string,
-    model: string,
-    options: IntelligenceStreamOptions
-  ): Promise<string> {
-    try {
-      const res = await fetch('/api/orchestrator/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.result || data.response || data.output || 'Objective processed successfully.';
-        options.onToken?.(text);
-        options.onComplete?.(text);
-        return text;
-      }
-    } catch (err: any) {
-      options.onError?.(err);
-    }
-
-    const fallbackResponse = `### Rufflo Quantum Analysis\n\n**Objective**: ${prompt}\n\n**Engine**: ${model}\n\n1. **Task Decomposition**: Evaluated requirement and validated company architecture.\n2. **Execution Strategy**: Subtasks distributed across the autonomous workforce.\n3. **Status**: Execution ready for deployment.`;
-    options.onToken?.(fallbackResponse);
-    options.onComplete?.(fallbackResponse);
-    return fallbackResponse;
-  }
-
-  /**
-   * Generates a structured Intelligence Briefing from a session
-   */
-  public async generateBriefing(
-    prompt: string,
-    messages: IntelligenceMessage[],
-    toolsUsed: string[] = []
-  ): Promise<IntelligenceBriefing> {
-    const subtasks = [
-      {
-        id: `subtask-${Date.now()}-1`,
-        title: `Implement Solution Architecture for "${prompt.slice(0, 40)}"`,
-        description: `Execute core engineering and structural changes for ${prompt}`,
-        assignedDepartment: 'Engineering',
-        priority: 'high' as const,
-        estimatedHours: 4,
-      },
-      {
-        id: `subtask-${Date.now()}-2`,
-        title: 'Perform System Verification & Security Audit',
-        description: 'Verify system integrity, run linter and end-to-end objective tests',
-        assignedDepartment: 'Security',
-        priority: 'critical' as const,
-        estimatedHours: 2,
-      },
-      {
-        id: `subtask-${Date.now()}-3`,
-        title: 'Continuous Fleet Deployment',
-        description: 'Publish updates to company OS telemetry and live cluster',
-        assignedDepartment: 'DevOps',
-        priority: 'medium' as const,
-        estimatedHours: 1,
-      },
-    ];
-
-    return {
-      id: `briefing-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      objective: prompt,
-      modelUsed: this.currentModel,
-      overview: `Autonomous intelligence synthesis for "${prompt}". Strategic decomposition complete across ${subtasks.length} departmental deliverables.`,
-      toolsUsed: toolsUsed.length > 0 ? toolsUsed : ['Terminal', 'Sandbox', 'Git', 'Vite'],
-      subtasks,
-    };
   }
 }
 

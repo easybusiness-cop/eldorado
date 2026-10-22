@@ -3,6 +3,7 @@ import { userProfilesStore } from "../telemetry/debugTelemetry.ts";
 import { callGeminiResilient } from "../ai/geminiService.ts";
 import { browserService } from "../tools/browser/browser.service.ts";
 import { autonomousNewsRadar } from "../agents/research/autonomous-news-radar.ts";
+import { autonomousAgentResearcher } from "../agents/capabilities/research/autonomous-agent-researcher.ts";
 
 export const webExplorerRouter = Router();
 
@@ -47,6 +48,104 @@ webExplorerRouter.post(["/browser/browse", "/web/browse-live"], async (req, res)
 
     const result = await browserService.browseTo(url);
     res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Per-Agent Individual Browser Routes
+webExplorerRouter.get("/browser/agents", async (_req, res) => {
+  try {
+    const sessions = browserService.listAllAgentSessions();
+    res.json({
+      success: true,
+      activeAgentSessions: sessions.length,
+      sessions,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+webExplorerRouter.get("/browser/agent/:agentId/status", async (req, res) => {
+  try {
+    const session = browserService.getAgentSession(req.params.agentId);
+    if (!session) {
+      return res.json({
+        success: true,
+        active: false,
+        agentId: req.params.agentId,
+        message: "No active browser context for this agent.",
+      });
+    }
+    res.json({ success: true, active: true, session });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+webExplorerRouter.post("/browser/agent/:agentId/browse", async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url || typeof url !== "string") {
+      return res.status(400).json({ success: false, error: "URL is required" });
+    }
+    const result = await browserService.browseAsAgent(req.params.agentId, url);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+webExplorerRouter.post("/browser/agent/:agentId/action", async (req, res) => {
+  try {
+    const { action, selector, value } = req.body;
+    if (action === "click" && selector) {
+      const result = await browserService.clickAsAgent(req.params.agentId, selector);
+      return res.json(result);
+    }
+    if (action === "type" && selector && value !== undefined) {
+      const result = await browserService.typeAsAgent(req.params.agentId, selector, value);
+      return res.json(result);
+    }
+    res.status(400).json({ success: false, error: "Invalid action or parameters" });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+webExplorerRouter.post("/browser/agent/:agentId/close", async (req, res) => {
+  try {
+    const closed = await browserService.closeAgentSession(req.params.agentId);
+    res.json({ success: true, closed, agentId: req.params.agentId });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Autonomous Multi-Step Agent Research Mission
+webExplorerRouter.post("/browser/agent/:agentId/research-mission", async (req, res) => {
+  try {
+    const { targetUrl, topic, extractCodeSnippets } = req.body;
+    if (!targetUrl || typeof targetUrl !== "string") {
+      return res.status(400).json({ success: false, error: "targetUrl is required" });
+    }
+    const result = await autonomousAgentResearcher.executeMission({
+      agentId: req.params.agentId,
+      targetUrl,
+      topic: topic || "Autonomous Web Research",
+      extractCodeSnippets,
+    });
+    res.json({ success: true, result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+webExplorerRouter.get("/browser/agent/:agentId/missions", async (req, res) => {
+  try {
+    const missions = autonomousAgentResearcher.getAgentMissions(req.params.agentId);
+    res.json({ success: true, count: missions.length, missions });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

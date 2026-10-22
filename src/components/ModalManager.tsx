@@ -19,7 +19,6 @@ const WebAccessModal = lazy(() => import('./WebAccessModal').then(({ WebAccessMo
 const RepoExplorerModal = lazy(() => import('./RepoExplorerModal').then(({ RepoExplorerModal }) => ({ default: RepoExplorerModal })));
 const ContinuousDebuggerModal = lazy(() => import('./ContinuousDebuggerModal').then(({ ContinuousDebuggerModal }) => ({ default: ContinuousDebuggerModal })));
 const SystemModulesModal = lazy(() => import('./SystemModulesModal').then(({ SystemModulesModal }) => ({ default: SystemModulesModal })));
-const CseAgentAcademyModal = lazy(() => import('./CseAgentAcademyModal').then(({ CseAgentAcademyModal }) => ({ default: CseAgentAcademyModal })));
 const CompanyDatabaseModal = lazy(() => import('./CompanyDatabaseModal').then(({ CompanyDatabaseModal }) => ({ default: CompanyDatabaseModal })));
 const ExecutiveAnalyticsModal = lazy(() => import('./ExecutiveAnalyticsModal').then(({ ExecutiveAnalyticsModal }) => ({ default: ExecutiveAnalyticsModal })));
 const GoogleWorkspaceHub = lazy(() => import('./GoogleWorkspaceHub').then(({ GoogleWorkspaceHub }) => ({ default: GoogleWorkspaceHub })));
@@ -41,6 +40,7 @@ const OpenWebUIModal = lazy(() => import('./OpenWebUIModal').then(({ OpenWebUIMo
 const ComposioHubModal = lazy(() => import('./ComposioHubModal').then(({ ComposioHubModal }) => ({ default: ComposioHubModal })));
 const ApiGatewayMicroservicesModal = lazy(() => import('./ApiGatewayMicroservicesModal').then(({ ApiGatewayMicroservicesModal }) => ({ default: ApiGatewayMicroservicesModal })));
 const CrisisSimulationModal = lazy(() => import('./CrisisSimulationModal').then(({ CrisisSimulationModal }) => ({ default: CrisisSimulationModal })));
+const AgentIntelligenceModal = lazy(() => import('./AgentIntelligenceModal').then(({ AgentIntelligenceModal }) => ({ default: AgentIntelligenceModal })));
 import { Zap } from 'lucide-react';
 
 function lazy<P extends object>(
@@ -58,6 +58,7 @@ function lazy<P extends object>(
 
 export interface ModalManagerState {
   isComposioHubOpen?: boolean;
+  isIntelligenceOpen?: boolean;
   isCrisisSimulationOpen?: boolean;
 
   isApiGatewayMicroservicesOpen?: boolean;
@@ -75,7 +76,6 @@ export interface ModalManagerState {
   isReposOpen: boolean;
   isDebuggerOpen: boolean;
   isSystemModulesOpen: boolean;
-  isAcademyOpen: boolean;
   isMasterEvolutionOpen: boolean;
   isCompanyDbOpen: boolean;
   isAnalyticsOpen: boolean;
@@ -187,7 +187,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onOpenDebugger={() => onOpen('isDebuggerOpen')}
         onOpenAdminOrchestrator={() => onOpen('isAdminOrchestratorOpen')}
         onOpenRepos={() => onOpen('isReposOpen')}
-        onOpenAcademy={() => onOpen('isAcademyOpen')}
         onOpenSystemModules={() => onOpen('isSystemModulesOpen')}
         onOpenPreferences={() => onOpen('isPreferencesOpen')}
         onOpenCall={(id) => {
@@ -305,15 +304,6 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         }}
       />
 
-      {state.isAcademyOpen && (
-        <CseAgentAcademyModal
-          agents={agents}
-          onUpdateAgent={onUpdateAgent}
-          onAddTask={onAddTask}
-          onClose={() => onClose('isAcademyOpen')}
-        />
-      )}
-
       <CompanyDatabaseModal
         isOpen={state.isCompanyDbOpen}
         onClose={() => onClose('isCompanyDbOpen')}
@@ -360,6 +350,15 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
       <MasterSelfEvolutionModal
         isOpen={state.isMasterEvolutionOpen}
         onClose={() => onClose('isMasterEvolutionOpen')}
+      />
+
+      <AgentIntelligenceModal
+        isOpen={Boolean(state.isIntelligenceOpen)}
+        onClose={() => onClose('isIntelligenceOpen')}
+        onOpenBrowser={() => {
+          onClose('isIntelligenceOpen');
+          onOpen('isWebOpen');
+        }}
       />
 
       <AdministratorOrchestratorModal

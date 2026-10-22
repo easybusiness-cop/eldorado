@@ -1,4 +1,10 @@
 export class MemoryPolicy {
+  public static readonly nonReusableMemoryTags = [
+    'model-response',
+    'execution-unverified',
+    'not-executed',
+  ] as const;
+
   public static sanitizeContent(content: string): string {
     let clean = content;
     

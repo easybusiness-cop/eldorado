@@ -1,4 +1,5 @@
 import { mastraMemoryStore, type MemoryRecord } from '../mastra/memory/index.ts';
+import { MemoryPolicy } from '../../memory/memory-policy.ts';
 
 export class MemoryAdapter {
   public static async getRelevantContext(
@@ -16,6 +17,7 @@ export class MemoryAdapter {
         scope: 'agent',
         limit: 5,
         organizationId,
+        excludeTags: MemoryPolicy.nonReusableMemoryTags,
       }),
       department
         ? mastraMemoryStore.searchMemories(searchQuery, {
@@ -23,12 +25,14 @@ export class MemoryAdapter {
             tag: department,
             limit: 10,
             organizationId,
+            excludeTags: MemoryPolicy.nonReusableMemoryTags,
           })
         : Promise.resolve([]),
       mastraMemoryStore.searchMemories(searchQuery, {
         scope: 'company',
         limit: 5,
         organizationId,
+        excludeTags: MemoryPolicy.nonReusableMemoryTags,
       }),
     ]);
 

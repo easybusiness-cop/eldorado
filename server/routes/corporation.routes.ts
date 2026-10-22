@@ -1,10 +1,18 @@
 import { Router, Request, Response } from 'express';
-import { corporationStore } from '../corporation/corporation.store.ts';
+import { applyCorporateEngineeringCompetencies, corporationStore } from '../corporation/corporation.store.ts';
 import { companyBrain } from '../corporation/company-brain.service.ts';
 import { workforceEngine } from '../corporation/workforce.engine.ts';
 import { collaborationFabric } from '../corporation/collaboration-fabric.service.ts';
 import { computerEnvironment } from '../corporation/computer-environment.service.ts';
 import { corporateOptimizer } from '../corporation/corporate-optimizer.service.ts';
+import { randomUUID } from 'node:crypto';
+import {
+  createIncidentResponseSimulation,
+  decideIncidentApproval,
+  IncidentWorkflowError,
+  recordIncidentStepEvidence,
+} from '../incidents/incident-response.ts';
+import { SecuritySecretService } from '../security/secrets.ts';
 import {
   Department,
   PersistentVirtualEmployee,
@@ -12,6 +20,7 @@ import {
   DecisionRecord,
   WorldDiscovery,
   LayeredKnowledgeItem,
+  WorkflowInstance,
 } from '../corporation/types.ts';
 
 const router = Router();
@@ -229,7 +238,8 @@ router.post('/employees', (req: Request, res: Response) => {
       updatedAt: new Date().toISOString(),
     };
 
-    corporationStore.employees.set(empId, newEmployee);
+    const enrichedEmployee = applyCorporateEngineeringCompetencies(newEmployee);
+    corporationStore.employees.set(empId, enrichedEmployee);
     dept.headcount += 1;
     corporationStore.company.headcountTotal += 1;
 
@@ -246,7 +256,7 @@ router.post('/employees', (req: Request, res: Response) => {
     });
 
     corporationStore.saveToDisk();
-    res.json({ success: true, employee: newEmployee });
+    res.json({ success: true, employee: enrichedEmployee });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -467,6 +477,167 @@ router.get('/workflows', (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/corporation/incidents
+ * Lists local incident simulations and their department work packets.
+ */
+router.get('/incidents', (_req: Request, res: Response) => {
+  const incidents = Array.from(corporationStore.workflows.values())
+    .filter((workflow) => workflow.id.startsWith('sim-incident-'))
+    .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+  res.json({ success: true, incidents });
+});
+
+/**
+ * POST /api/corporation/incidents/simulate
+ * Creates a fixed synthetic tabletop incident; this route never performs containment.
+ */
+router.post('/incidents/simulate', (req: Request, res: Response) => {
+  if (req.body?.confirmedSimulation !== true) {
+    return res.status(400).json({
+      success: false,
+      code: 'SIMULATION_CONFIRMATION_REQUIRED',
+      error: 'Set confirmedSimulation=true to create the local synthetic incident exercise.',
+    });
+  }
+
+  let incident: WorkflowInstance;
+  try {
+    incident = createIncidentResponseSimulation(
+      Array.from(corporationStore.departments.values()),
+      { id: `sim-incident-${randomUUID()}` },
+    );
+  } catch (error) {
+    if (error instanceof IncidentWorkflowError) {
+      return res.status(error.statusCode).json({ success: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+  const auditLogBeforeCreate = corporationStore.auditLog.slice();
+  corporationStore.workflows.set(incident.id, incident);
+
+  try {
+    corporationStore.recordAudit({
+      who: 'Local Operator',
+      what: `Created local incident simulation ${incident.id}`,
+      why: 'Operator-confirmed synthetic incident tabletop exercise',
+      withWhichTool: 'incident-response-simulation',
+      usingWhichAuthorization: 'local-development-operator',
+      withWhichInput: { simulation: true },
+      whatResulted: { workflowId: incident.id, assignedDepartments: incident.steps.length, externalActions: [] },
+      riskClassification: 'LOW',
+      status: 'allowed',
+    });
+  } catch (error) {
+    corporationStore.workflows.delete(incident.id);
+    corporationStore.auditLog = auditLogBeforeCreate;
+    throw error;
+  }
+
+  return res.status(201).json({
+    success: true,
+    simulation: true,
+    externalActions: [],
+    incident,
+  });
+});
+
+/**
+ * POST /api/corporation/incidents/:id/steps/:stepId/complete
+ * Requires work evidence and advances only the current local simulation packet.
+ */
+router.post('/incidents/:id/steps/:stepId/complete', (req: Request, res: Response) => {
+  const workflow = corporationStore.workflows.get(req.params.id);
+  if (!workflow) {
+    return res.status(404).json({ success: false, code: 'INCIDENT_NOT_FOUND', error: 'Incident simulation not found.' });
+  }
+
+  try {
+    const next = recordIncidentStepEvidence(workflow, req.params.stepId, req.body?.evidence);
+    const auditLogBeforeUpdate = corporationStore.auditLog.slice();
+    corporationStore.workflows.set(next.id, next);
+    try {
+      corporationStore.recordAudit({
+        who: 'Local Operator',
+        what: `Recorded evidence for incident ${next.id}`,
+        why: 'Operator recorded evidence for the current department work packet',
+        withWhichTool: 'incident-response-simulation',
+        usingWhichAuthorization: 'local-development-operator',
+        withWhichInput: { incidentId: next.id, stepId: req.params.stepId },
+        whatResulted: { stepStatus: next.steps[next.currentStepIndex - 1]?.status },
+        riskClassification: 'LOW',
+        status: 'allowed',
+      });
+    } catch (error) {
+      corporationStore.workflows.set(workflow.id, workflow);
+      corporationStore.auditLog = auditLogBeforeUpdate;
+      throw error;
+    }
+    return res.json({ success: true, incident: next, externalActions: [] });
+  } catch (error) {
+    if (error instanceof IncidentWorkflowError) {
+      return res.status(error.statusCode).json({ success: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+});
+
+/**
+ * POST /api/corporation/incidents/:id/approval
+ * A named human decision is required before the simulation can close.
+ */
+router.post('/incidents/:id/approval', (req: Request, res: Response) => {
+  const workflow = corporationStore.workflows.get(req.params.id);
+  if (!workflow) {
+    return res.status(404).json({ success: false, code: 'INCIDENT_NOT_FOUND', error: 'Incident simulation not found.' });
+  }
+
+  const decision = req.body?.decision;
+  if (decision !== 'approved' && decision !== 'rejected') {
+    return res.status(400).json({
+      success: false,
+      code: 'INCIDENT_DECISION_INVALID',
+      error: "decision must be either 'approved' or 'rejected'.",
+    });
+  }
+  if (typeof req.body?.notes !== 'string' || req.body.notes.trim().length < 5 || req.body.notes.length > 2_000) {
+    return res.status(400).json({
+      success: false,
+      code: 'INCIDENT_APPROVAL_NOTES_REQUIRED',
+      error: 'Provide 5 to 2,000 characters of decision rationale.',
+    });
+  }
+
+  try {
+    const next = decideIncidentApproval(workflow, decision, req.body.notes);
+    const auditLogBeforeUpdate = corporationStore.auditLog.slice();
+    corporationStore.workflows.set(next.id, next);
+    try {
+      corporationStore.recordAudit({
+        who: 'Local Operator',
+        what: `${decision === 'approved' ? 'Approved' : 'Rejected'} incident simulation ${next.id}`,
+        why: 'Explicit human incident-disposition decision',
+        withWhichTool: 'incident-response-simulation',
+        usingWhichAuthorization: 'local-development-operator',
+        withWhichInput: { incidentId: next.id, decision },
+        whatResulted: { workflowStatus: next.status, externalActions: [] },
+        riskClassification: 'LOW',
+        status: 'allowed',
+      });
+    } catch (error) {
+      corporationStore.workflows.set(workflow.id, workflow);
+      corporationStore.auditLog = auditLogBeforeUpdate;
+      throw error;
+    }
+    return res.json({ success: true, incident: next, externalActions: [] });
+  } catch (error) {
+    if (error instanceof IncidentWorkflowError) {
+      return res.status(error.statusCode).json({ success: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+});
+
+/**
  * POST /api/corporation/workflows/:id/advance
  * Advances or completes the next step in a persistent business process workflow
  */
@@ -477,35 +648,147 @@ router.post('/workflows/:id/advance', (req: Request, res: Response) => {
       return res.status(404).json({ success: false, error: 'Workflow instance not found.' });
     }
 
-    if (wf.currentStepIndex < wf.steps.length) {
-      const step = wf.steps[wf.currentStepIndex];
+    const updated = structuredClone(wf);
+    if (updated.currentStepIndex < updated.steps.length) {
+      const step = updated.steps[updated.currentStepIndex];
+      if (step.requiresHumanApproval || updated.status === 'waiting_approval') {
+        return res.status(409).json({
+          success: false,
+          code: 'WORKFLOW_APPROVAL_REQUIRED',
+          error: 'This workflow step requires an explicit human approval decision.',
+        });
+      }
       step.status = 'completed';
       step.outputResult = { completedBy: step.assigneeRole, timestamp: new Date().toISOString() };
-      wf.auditTrail.push({
+      updated.auditTrail.push({
         timestamp: new Date().toISOString(),
         event: `Step "${step.title}" completed by ${step.assigneeRole}`,
         actor: step.assigneeRole,
       });
 
-      wf.currentStepIndex += 1;
-      if (wf.currentStepIndex >= wf.steps.length) {
-        wf.status = 'completed';
-        wf.completedAt = new Date().toISOString();
-        wf.auditTrail.push({
+      updated.currentStepIndex += 1;
+      if (updated.currentStepIndex >= updated.steps.length) {
+        updated.status = 'completed';
+        updated.completedAt = new Date().toISOString();
+        updated.auditTrail.push({
           timestamp: new Date().toISOString(),
-          event: `Workflow "${wf.definitionName}" successfully completed all stages`,
+          event: `Workflow "${updated.definitionName}" successfully completed all stages`,
           actor: 'system',
         });
       } else {
-        wf.steps[wf.currentStepIndex].status = 'running';
+        const nextStep = updated.steps[updated.currentStepIndex];
+        if (nextStep.requiresHumanApproval) {
+          nextStep.status = 'waiting_approval';
+          updated.status = 'waiting_approval';
+        } else {
+          nextStep.status = 'running';
+          updated.status = 'running';
+        }
       }
     }
 
-    corporationStore.saveToDisk();
-    res.json({ success: true, workflow: wf });
+    const auditLogBeforeUpdate = corporationStore.auditLog.slice();
+    corporationStore.workflows.set(updated.id, updated);
+    try {
+      corporationStore.recordAudit({
+        who: 'Local Operator',
+        what: `Advanced workflow ${updated.id}`,
+        why: 'Operator advanced the current workflow step',
+        withWhichTool: 'workflow-advance',
+        usingWhichAuthorization: 'local-operator',
+        withWhichInput: { workflowId: updated.id },
+        whatResulted: { workflowStatus: updated.status, currentStepIndex: updated.currentStepIndex },
+        riskClassification: 'LOW',
+        status: 'allowed',
+      });
+    } catch (error) {
+      corporationStore.workflows.set(wf.id, wf);
+      corporationStore.auditLog = auditLogBeforeUpdate;
+      throw error;
+    }
+    res.json({ success: true, workflow: updated });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+/**
+ * POST /api/corporation/workflows/:id/approval
+ * Requires a separate human decision for workflow steps marked for approval.
+ */
+router.post('/workflows/:id/approval', (req: Request, res: Response) => {
+  const workflow = corporationStore.workflows.get(req.params.id);
+  if (!workflow) {
+    return res.status(404).json({ success: false, error: 'Workflow instance not found.' });
+  }
+
+  const decision = req.body?.decision;
+  const notes = req.body?.notes;
+  if (decision !== 'approved' && decision !== 'rejected') {
+    return res.status(400).json({ success: false, error: "decision must be either 'approved' or 'rejected'." });
+  }
+  if (typeof notes !== 'string' || notes.trim().length < 5 || notes.length > 2_000) {
+    return res.status(400).json({ success: false, error: 'Approval rationale must contain 5 to 2,000 characters.' });
+  }
+
+  const currentStep = workflow.steps[workflow.currentStepIndex];
+  if (workflow.status !== 'waiting_approval' || !currentStep?.requiresHumanApproval || currentStep.status !== 'waiting_approval') {
+    return res.status(409).json({
+      success: false,
+      code: 'WORKFLOW_APPROVAL_NOT_PENDING',
+      error: 'This workflow is not waiting for an explicit human approval decision.',
+    });
+  }
+
+  const originalWorkflow = workflow;
+  const originalAuditLog = corporationStore.auditLog.slice();
+  const updated = structuredClone(workflow);
+  const approvalStep = updated.steps[updated.currentStepIndex];
+  const timestamp = new Date().toISOString();
+  const safeNotes = SecuritySecretService.redact(notes.trim());
+  approvalStep.status = decision === 'approved' ? 'completed' : 'failed';
+  approvalStep.outputResult = { decision, notes: safeNotes, recordedAt: timestamp };
+  updated.auditTrail.push({
+    timestamp,
+    event: `Human ${decision} workflow step "${approvalStep.title}".`,
+    actor: 'operator',
+  });
+
+  if (decision === 'approved') {
+    updated.currentStepIndex += 1;
+    if (updated.currentStepIndex >= updated.steps.length) {
+      updated.status = 'completed';
+      updated.completedAt = timestamp;
+    } else {
+      const nextStep = updated.steps[updated.currentStepIndex];
+      nextStep.status = nextStep.requiresHumanApproval ? 'waiting_approval' : 'running';
+      updated.status = nextStep.requiresHumanApproval ? 'waiting_approval' : 'running';
+    }
+  } else {
+    updated.status = 'failed';
+    updated.completedAt = timestamp;
+  }
+
+  corporationStore.workflows.set(updated.id, updated);
+  try {
+    corporationStore.recordAudit({
+      who: 'Local Operator',
+      what: `${decision === 'approved' ? 'Approved' : 'Rejected'} workflow ${updated.id}`,
+      why: 'Explicit human approval decision',
+      withWhichTool: 'workflow-approval',
+      usingWhichAuthorization: 'local-operator',
+      withWhichInput: { workflowId: updated.id, decision },
+      whatResulted: { workflowStatus: updated.status },
+      riskClassification: 'LOW',
+      status: 'allowed',
+    });
+  } catch (error) {
+    corporationStore.workflows.set(originalWorkflow.id, originalWorkflow);
+    corporationStore.auditLog = originalAuditLog;
+    throw error;
+  }
+
+  return res.json({ success: true, workflow: updated });
 });
 
 /**

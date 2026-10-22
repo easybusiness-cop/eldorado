@@ -489,7 +489,7 @@ export const taskDispatchTool: MastraToolDefinition = {
   name: 'task_dispatch',
 
   description:
-    'Delegate a clearly defined task to a registered Rufflo agent and return the actual execution result.',
+    'Request a model response from a registered Rufflo agent. This does not verify task completion.',
 
   category: 'system',
 
@@ -539,6 +539,8 @@ export const taskDispatchTool: MastraToolDefinition = {
 
     return {
       success: result.success,
+      status: result.status,
+      completionVerified: false,
 
       delegatedBy: context.agentId,
 

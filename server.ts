@@ -1,7 +1,7 @@
+import "./server/load-env.ts";
 import express from "express";
 import http from "http";
 import path from "path";
-import dotenv from "dotenv";
 import { WebSocketServer, WebSocket } from "ws";
 import { createServer as createViteServer } from "vite";
 import helmet from "helmet";
@@ -37,14 +37,20 @@ import { composioRouter } from "./server/routes/composio.routes.ts";
 import { integrationRouter } from "./server/routes/integrations.ts";
 import departmentRoutes from "./server/routes/department.routes.ts";
 import corporationRouter from "./server/routes/corporation.routes.ts";
+import { polyglotRouter } from "./server/routes/polyglot.routes.ts";
+import { agentRouter } from "./server/routes/agents.ts";
+import { identityRouter } from "./server/routes/identity.routes.ts";
 
 import fs from "fs";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
 import { MasterMetaAgent } from "./server/agents/orchestration/master-meta-agent.ts";
 import { payloadScannerMiddleware } from "./server/security/payloadScanner.ts";
+import { inngestRouter } from "./server/routes/inngest.routes.ts";
+import { shutdownLangfuseTracing } from "./server/ai/observability/langfuse-tracing.ts";
 
-dotenv.config();
-
+// Load Vite's local development file for server-side Supabase JWT verification too.
+// Keep server-only credentials (for example SUPABASE_SERVICE_ROLE_KEY) in this
+// ignored file or the deployment environment; never prefix them with VITE_.
 const app = express();
 const distPath = path.join(process.cwd(), "dist");
 const indexPath = path.join(distPath, "index.html");
@@ -56,10 +62,11 @@ const engineering = new EngineeringDepartmentEngineer();
 const masterMeta = new MasterMetaAgent();
 
 // Weekly self-improvement cycle
-setInterval(async () => {
+const weeklyImprovementTimer = setInterval(async () => {
   console.log("🧠 Running Master Meta-Agent weekly improvement cycle...");
   await masterMeta.runWeeklyImprovementCycle().catch((e) => console.error("Weekly meta cycle error:", e));
 }, 7 * 24 * 60 * 60 * 1000);
+weeklyImprovementTimer.unref();
 
 app.set("trust proxy", 1);
 
@@ -90,6 +97,10 @@ app.use(
 app.get(["/api/health", "/healthz", "/health"], (req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
+
+// The Inngest adapter performs its own signed request validation. Mount it
+// before the normal user-auth middleware so the workflow service can invoke it.
+app.use("/api/inngest", inngestRouter);
 
 app.use("/api", payloadScannerMiddleware);
 app.use("/api", requireAuth);
@@ -154,6 +165,9 @@ app.use("/api/microservices", microservicesRouter);
 app.use("/api/composio", composioRouter);
 app.use("/api/integrations", integrationRouter);
 app.use("/api/corporation", corporationRouter);
+app.use("/api/polyglot", polyglotRouter);
+app.use("/api/agents", agentRouter);
+app.use("/api/identity", identityRouter);
 app.use("/api", chaosSimulationRouter);
 
 
@@ -232,6 +246,21 @@ async function startServer() {
   }
 
   const server = http.createServer(app);
+  let isShuttingDown = false;
+  const shutdown = () => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    clearInterval(weeklyImprovementTimer);
+    server.close((error) => {
+      if (error) console.error("[Rufflo Server] HTTP shutdown error:", error);
+      void shutdownLangfuseTracing().finally(() => {
+        if (error) process.exitCode = 1;
+      });
+    });
+  };
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
+
   const wss = new WebSocketServer({ noServer: true });
 
   server.on("upgrade", async (request, socket, head) => {

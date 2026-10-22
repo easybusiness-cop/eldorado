@@ -17,11 +17,13 @@ import {
   INITIAL_FLEET_TASKS,
 } from './constants/initialAgents.ts';
 import { soundFx, speakText } from './utils/speech.ts';
+import { getAvatarInitials, isLocalAvatar } from './utils/avatar.ts';
 import { TopNavigation } from './components/TopNavigation.tsx';
 import { FleetHealthMonitor, getAgentThroughputTier, formatTokenThroughput } from './components/FleetHealthMonitor.tsx';
 import type { ModalManagerState } from './components/ModalManager.tsx';
 import type { CascadeRunData } from './components/ExecutiveSummaryModal.tsx';
 import { generateExecutiveSummaryMarkdown } from './utils/markdownGenerator.ts';
+import { applyEngineeringCompetencies } from './constants/engineeringCompetencies.ts';
 const ModalManager = lazy(() => import('./components/ModalManager.tsx').then(({ ModalManager }) => ({ default: ModalManager })));
 const DepartmentHubView = lazy(() => import('./components/DepartmentHubView.tsx').then(({ DepartmentHubView }) => ({ default: DepartmentHubView })));
 const MunderdifflinDashboard = lazy(() => import('./components/MunderdifflinDashboard.tsx').then(({ MunderdifflinDashboard }) => ({ default: MunderdifflinDashboard })));
@@ -34,7 +36,6 @@ import { initializeSystemRuntime, sendAndApplySystemCode } from './utils/systemR
 import { Zap } from 'lucide-react';
 import {
   initializeAgentQuantumState,
-  runQuantumModelForTask,
   searchQuantumMemory,
 } from './utils/quantumEngine.ts';
 
@@ -148,6 +149,7 @@ export default function App() {
     isAdminOrchestratorOpen: false,
     isDynamicFeaturesOpen: false,
     isIdeOpen: false,
+    isIntelligenceOpen: false,
     isCallOpen: false,
     isWorkstationOpen: false,
     isAgentDetailOpen: false,
@@ -155,7 +157,6 @@ export default function App() {
     isReposOpen: false,
     isDebuggerOpen: false,
     isSystemModulesOpen: false,
-    isAcademyOpen: false,
     isMasterEvolutionOpen: false,
     isCompanyDbOpen: false,
     isAnalyticsOpen: false,
@@ -196,6 +197,7 @@ export default function App() {
       isAdminOrchestratorOpen: false,
       isDynamicFeaturesOpen: false,
       isIdeOpen: false,
+      isIntelligenceOpen: false,
       isCallOpen: false,
       isWorkstationOpen: false,
       isAgentDetailOpen: false,
@@ -203,7 +205,6 @@ export default function App() {
       isReposOpen: false,
       isDebuggerOpen: false,
       isSystemModulesOpen: false,
-      isAcademyOpen: false,
       isMasterEvolutionOpen: false,
       isCompanyDbOpen: false,
       isAnalyticsOpen: false,
@@ -245,7 +246,6 @@ export default function App() {
   const setIsReposOpen = createModalSetter('isReposOpen');
   const setIsDebuggerOpen = createModalSetter('isDebuggerOpen');
   const setIsSystemModulesOpen = createModalSetter('isSystemModulesOpen');
-  const setIsAcademyOpen = createModalSetter('isAcademyOpen');
   const setIsMasterEvolutionOpen = createModalSetter('isMasterEvolutionOpen');
   const setIsCompanyDbOpen = createModalSetter('isCompanyDbOpen');
   const setIsAnalyticsOpen = createModalSetter('isAnalyticsOpen');
@@ -325,7 +325,6 @@ export default function App() {
                     return {
                       ...initialAgent,
                       tokensProcessed: dbEmp.kpis.tokensProcessed,
-                      trainingRecord: dbEmp.trainingRecord || initialAgent.trainingRecord,
                       memory: dbEmp.memorySummary ? [dbEmp.memorySummary, ...initialAgent.memory.slice(1)] : initialAgent.memory,
                     };
                   } else {
@@ -363,6 +362,7 @@ export default function App() {
                       nickname: nickname,
                       role: dbEmp.role,
                       title: dbEmp.role,
+                      department: dbEmp.department,
                       avatar: avatar,
                       color: color,
                       deskPosition: { x: baseDeskX, y: baseDeskY, facing: 'south', zone },
@@ -374,10 +374,9 @@ export default function App() {
                       voicePitch: 1.0,
                       voiceRate: 1.0,
                       tokensProcessed: dbEmp.kpis.tokensProcessed || 0,
-                      trainingRecord: dbEmp.trainingRecord,
                     };
                   }
-                });
+                }).map(applyEngineeringCompetencies);
               });
             }
           }
@@ -633,30 +632,7 @@ export default function App() {
     };
     setLogs((prev) => prev.some(l => l.id === userLog.id) ? prev : [...prev, userLog]);
 
-    // 2b. Quantum-Inspired Superposition Multi-Path Evaluation
-    let quantumWinner: any = null;
-    try {
-      const qResult = await runQuantumModelForTask(selectedAgent, prompt, (intermediateState) => {
-        setAgents((prev) =>
-          prev.map((a) => (a.id === selectedAgentId ? { ...a, quantumState: intermediateState } : a))
-        );
-      });
-      quantumWinner = qResult.winningCandidate;
-
-      const qLog: AgentLog = {
-        id: `qnt-${Date.now()}`,
-        timestamp: new Date().toLocaleTimeString(),
-        level: 'info',
-        agentId: selectedAgent.id,
-        message: `[QUANTUM MODEL EVALUATION] Evaluated 4 architecture pathways in superposition (|00⟩, |01⟩, |10⟩, |11⟩). Grover oracle amplified probability on easiest build path: "${quantumWinner.strategy}" (Difficulty: ${quantumWinner.difficultyScore}/10). Collapsing wavefunction onto lean build.`,
-        codeSnippet: `// Quantum Search Decision Register |ψ⟩ -> |${quantumWinner.qubitState}⟩\n{\n  easiestBuildPath: "${quantumWinner.strategy}",\n  difficultyScore: "${quantumWinner.difficultyScore}/10",\n  whyEasiest: "${quantumWinner.whyEasiest || quantumWinner.description}",\n  speedupFactor: "${qResult.speedup}"\n}`,
-      };
-      setLogs((prev) => [...prev, qLog]);
-    } catch (qErr) {
-      console.warn("Quantum simulation non-fatal warning:", qErr);
-    }
-
-    // 2c. If chatting with CEO (Michael Scott), trigger the full Corporate Command Cascade Loop!
+    // 2b. If chatting with CEO (Michael Scott), trigger the Corporate Command Cascade.
     if (selectedAgent.id === 'michael') {
       try {
         const cascadeRes = await fetch('/api/autonomy/cascade/run', {
@@ -793,9 +769,7 @@ export default function App() {
           agentId: selectedAgent.id,
           agentName: selectedAgent.name,
           agentRole: selectedAgent.role,
-          prompt: quantumWinner 
-            ? `${prompt}\n[QUANTUM BUILD DIRECTIVE: Use the easiest identified pathway: "${quantumWinner.strategy}" (Difficulty: ${quantumWinner.difficultyScore}/10). Build it with minimal code bloat and zero superfluous complexity.]`
-            : prompt,
+          prompt,
           userPreferences: userProfile.preferences,
           userProfile: {
             username: userProfile.username,
@@ -807,61 +781,27 @@ export default function App() {
       });
 
       const data = await response.json();
-      const replyText = data.text || 'Directive completed.';
+      if (!response.ok || data.success === false) {
+        throw new Error(data.error || `Agent request failed with HTTP ${response.status}.`);
+      }
+      const replyText = data.text;
+      if (typeof replyText !== 'string' || !replyText.trim()) {
+        throw new Error('The model returned no response.');
+      }
 
       // Add agent reply log
       const agentLog: AgentLog = {
         id: `agt-${Date.now()}`,
         timestamp: new Date().toLocaleTimeString(),
-        level: 'success',
+        level: 'info',
         agentId: selectedAgent.id,
         message: replyText,
         codeSnippet: data.codeSnippet,
-        appliedToSystem: Boolean(data.codeSnippet),
+        appliedToSystem: false,
         systemModuleName: data.systemModule?.name || (data.codeSnippet ? `${selectedAgent.name} Auto-Module` : undefined),
       };
 
       setLogs((prev) => prev.some(l => l.id === agentLog.id) ? prev : [...prev, agentLog]);
-
-      // Auto-sync agent response & log to Telegram if agent has Telegram sync enabled
-      if (selectedAgent.telegramSyncEnabled) {
-        const chatId = selectedAgent.telegramChannelId || '-1001928374650';
-        fetch('/api/telegram/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chatId,
-            text: `🤖 [AUTO-SYNC LOG] ${selectedAgent.name}: ${replyText}`,
-            senderName: `${selectedAgent.name} (Agent)`,
-            agentId: selectedAgent.id,
-          }),
-        }).catch((tErr) => console.warn('Telegram auto-sync failed:', tErr));
-      }
-
-      // If code was generated, auto-apply to system codes and notify
-      if (data.codeSnippet) {
-        const modName = data.systemModule?.name || `${selectedAgent.name} Auto Patch`;
-        sendAndApplySystemCode(
-          data.codeSnippet,
-          modName,
-          selectedAgent.name,
-          'system_runtime',
-          { userProfile }
-        ).then((res) => {
-          if (res.success) {
-            setSystemModulesCount((c) => Math.max(c + 1, 1));
-          }
-        });
-
-        setAutoApplyToast({
-          show: true,
-          agentName: selectedAgent.name,
-          moduleName: modName,
-        });
-        setTimeout(() => {
-          setAutoApplyToast(null);
-        }, 6000);
-      }
 
       // Speak agent reply if voice TTS is enabled
       if (userProfile.preferences.voiceAutoSpeak) {
@@ -880,7 +820,6 @@ export default function App() {
             ? {
                 ...a,
                 status: 'idle',
-                tokensProcessed: a.tokensProcessed + 450,
                 speechBubble: {
                   text: replyText.slice(0, 45) + '...',
                   expiresAt: Date.now() + 10000,
@@ -891,26 +830,26 @@ export default function App() {
         )
       );
 
-      // Create completed task in list
+      // A chat response is not evidence that the requested work was executed.
       setTasks((prev) => [
         {
           id: `tsk-${Date.now()}`,
           title: prompt.slice(0, 40) + '...',
-          description: `Executed by ${selectedAgent.name}`,
+          description: `Model response from ${selectedAgent.name}; no task execution was verified.`,
           assignedTo: selectedAgent.id,
-          status: 'completed',
-          progress: 100,
+          status: 'blocked',
+          progress: 0,
           priority: 'medium',
           output: replyText,
           codeSnippet: data.codeSnippet,
           createdAt: Date.now(),
-          completedAt: Date.now(),
         },
         ...prev,
       ]);
 
       return {
         success: true,
+        taskExecuted: false,
         text: replyText,
         codeSnippet: data.codeSnippet,
       };
@@ -1105,15 +1044,16 @@ export default function App() {
 
   // Add newly provisioned agent to fleet & persist locally
   const handleAddAgent = (newAgent: Agent) => {
+    const competentAgent = applyEngineeringCompetencies(newAgent);
     const agentWithState = {
-      ...newAgent,
-      quantumState: newAgent.quantumState || initializeAgentQuantumState(newAgent),
+      ...competentAgent,
+      quantumState: competentAgent.quantumState || initializeAgentQuantumState(competentAgent),
     };
     setAgents((prev) => [agentWithState, ...prev]);
     try {
       const saved = localStorage.getItem('munderdiffl_custom_agents');
       const custom: Agent[] = saved ? JSON.parse(saved) : [];
-      custom.unshift(newAgent);
+      custom.unshift(agentWithState);
       localStorage.setItem('munderdiffl_custom_agents', JSON.stringify(custom));
     } catch (e) {}
 
@@ -1123,8 +1063,8 @@ export default function App() {
         id: `log-agent-${Date.now()}`,
         timestamp: new Date().toLocaleTimeString(),
         level: 'success',
-        agentId: newAgent.id,
-        message: `[Agent Commissioned] ${newAgent.name} (${newAgent.role}) provisioned with Authority Level ${newAgent.authorityLevel}. Added to Scranton Fleet roster.`,
+        agentId: competentAgent.id,
+        message: `[Agent Commissioned] ${competentAgent.name} (${competentAgent.role}) provisioned with Authority Level ${competentAgent.authorityLevel}. Added to Scranton Fleet roster.`,
       },
       ...prev,
     ]);
@@ -1187,7 +1127,6 @@ export default function App() {
         onOpenSystemModules={() => { closeAllModals(); openModal('isSystemModulesOpen'); }}
         onOpenDb={() => { closeAllModals(); openModal('isCompanyDbOpen'); }}
         onOpenAnalytics={() => { closeAllModals(); openModal('isAnalyticsOpen'); }}
-        onOpenAcademy={() => { closeAllModals(); openModal('isAcademyOpen'); }}
         onOpenMasterEvolution={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}
         onOpenWorkspace={() => { closeAllModals(); openModal('isWorkspaceOpen'); }}
         onOpenTelegram={() => { closeAllModals(); openModal('isTelegramOpen'); }}
@@ -1198,6 +1137,7 @@ export default function App() {
         onOpenOpenWebUI={() => { closeAllModals(); openModal('isOpenWebUiOpen'); }}
 
         onOpenCrisisSimulation={() => { closeAllModals(); openModal('isCrisisSimulationOpen'); }}
+        onOpenIntelligence={() => { closeAllModals(); openModal('isIntelligenceOpen'); }}
         onOpenPublicApiHub={() => { closeAllModals(); openModal('isPublicApiOpen'); }}
         onOpenMunderdifflinDashboard={() => { closeAllModals(); setDashboardInitialTab('roster_and_assign'); openModal('isMunderdifflinDashboardOpen'); }}
         onOpenAgentCommunication={() => { closeAllModals(); setDashboardInitialTab('communication'); openModal('isMunderdifflinDashboardOpen'); }}
@@ -1319,11 +1259,7 @@ export default function App() {
               <Icon>⚖</Icon>
               <span>Load Balancer</span>
             </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isAcademyOpen'); }}>
-              <Icon>🎓</Icon>
-              <span>Agent Academy</span>
-            </button>
-            <button className="nav-item" onClick={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}>
+<button className="nav-item" onClick={() => { closeAllModals(); openModal('isMasterEvolutionOpen'); }}>
               <Icon>🚀</Icon>
               <span>Meta-Evolution</span>
             </button>
@@ -1817,7 +1753,7 @@ export default function App() {
                             <span className="font-bold text-white text-xs flex items-center gap-1.5">
                               <span>⚡</span> Composio 3P SaaS Hub
                             </span>
-                            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">CONNECTED</span>
+                            <span className="text-[10px] text-zinc-300 font-mono bg-zinc-800 px-2 py-0.5 rounded border border-zinc-600">CHECK STATUS</span>
                           </div>
                           <p className="text-xs text-zinc-400">Slack, GitHub, Jira, Gmail, Stripe automated connectors.</p>
                           <button
@@ -1849,7 +1785,7 @@ export default function App() {
                             <span className="font-bold text-white text-xs flex items-center gap-1.5">
                               <span>🗄</span> Supabase PostgreSQL
                             </span>
-                            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">SYNCED</span>
+                            <span className="text-[10px] text-zinc-300 font-mono bg-zinc-800 px-2 py-0.5 rounded border border-zinc-600">CHECK STATUS</span>
                           </div>
                           <p className="text-xs text-zinc-400">Relational persistence for fleet tasks and audit ledgers.</p>
                           <button
@@ -2067,10 +2003,12 @@ export default function App() {
                           const ringColor = toRgba(pulseHex, 0.3 + tokenLoadFactor * 0.5);
 
                           return (
-                            <button
+                            <div
                               key={agent.id}
                               id={`agent-card-main-${agent.id}`}
                               className={`agent-card ${selectedAgent?.id === agent.id ? "selected" : ""} ${isWorking ? "processing-pulse" : ""}`}
+                              role="group"
+                              aria-label={`Agent card for ${agent.name}`}
                               style={{
                                 ['--pulse-duration' as any]: tier.pulseSpeed,
                                 ['--pulse-border-color' as any]: isWorking ? tier.color : undefined,
@@ -2128,7 +2066,7 @@ export default function App() {
                                   }}
                                   title={`${agent.name} • Token Processing Load: ${formattedTokens} tokens (${tier.label})`}
                                 >
-                                  {agent.avatar && agent.avatar.startsWith('http') ? (
+                                  {isLocalAvatar(agent.avatar) ? (
                                     <img
                                       src={agent.avatar}
                                       alt={agent.name}
@@ -2136,7 +2074,7 @@ export default function App() {
                                       referrerPolicy="no-referrer"
                                     />
                                   ) : (
-                                    agent.avatar || agent.name.charAt(0)
+                                    getAvatarInitials(agent.name)
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1.5">
@@ -2158,6 +2096,19 @@ export default function App() {
                               <div className="agent-info">
                                 <strong>{agent.name}</strong>
                                 <span>{agent.role}</span>
+                                <button
+                                  type="button"
+                                  className="mt-2 rounded border border-white/15 px-2 py-1 text-xs text-sky-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+                                  aria-label={`View ${agent.name} details`}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    closeAllModals();
+                                    setSelectedAgentId(agent.id);
+                                    openModal('isAgentDetailOpen');
+                                  }}
+                                >
+                                  View details
+                                </button>
                               </div>
                               <div className="agent-task">
                                 <small>CURRENT MISSION</small>
@@ -2227,7 +2178,7 @@ export default function App() {
                                 </span>
                                 <span>{formattedTokens}</span>
                               </div>
-                            </button>
+                            </div>
                           );
                         })}
                       </div>

@@ -302,24 +302,47 @@ systemTelemetryRouter.post("/state/sync", (req, res) => {
         if (!t.id) continue;
         const existing = companyDb.getTasks().find((x: any) => x.id === t.id);
         if (!existing) {
+          const importedStatus = t.status === "completed" ? "blocked" : (t.status || "queued");
           companyDb.addTask({
             id: t.id,
             projectId: t.projectId || "prj-alpha",
             title: t.title || "User Task",
             description: t.description || "",
             assignedTo: t.assignedTo || "michael",
-            status: t.status || "completed",
-            progress: t.progress || 100,
+            status: importedStatus,
+            progress: t.status === "completed" ? 0 : (Number(t.progress) || 0),
             priority: t.priority || "medium",
-            output: t.output || "",
+            output: t.status === "completed"
+              ? `Imported completion was not accepted because this sync payload has no server-verified task evidence.\n${t.output || ""}`
+              : t.output || "",
             codeSnippet: t.codeSnippet,
-            evidence: t.evidence || [],
+            evidence: [],
             subtasks: t.subtasks || [],
             createdAt: t.createdAt || Date.now(),
-            completedAt: t.completedAt || Date.now(),
           });
         } else if (existing.status !== t.status) {
-          companyDb.updateTaskStatus(t.id, t.status, t.progress || (t.status === 'completed' ? 100 : 50));
+          if (t.status === "completed") {
+            const verificationEvidence = existing.evidence?.find((e: { status: string }) => e.status === "VERIFIED");
+            if (verificationEvidence) {
+              companyDb.updateTaskStatus(
+                t.id,
+                "completed",
+                t.progress || 100,
+                t.output,
+                t.codeSnippet,
+                verificationEvidence,
+              );
+            } else {
+              companyDb.updateTaskStatus(
+                t.id,
+                "blocked",
+                t.progress || 50,
+                "Completion was rejected because no server-verified execution evidence exists.",
+              );
+            }
+          } else {
+            companyDb.updateTaskStatus(t.id, t.status, t.progress || 50, t.output, t.codeSnippet);
+          }
         }
       }
     }
@@ -328,8 +351,7 @@ systemTelemetryRouter.post("/state/sync", (req, res) => {
     if (Array.isArray(agents)) {
       for (const ag of agents) {
         if (ag.id && ag.tokens) {
-          const cost = (ag.tokens / 1000000) * 0.075;
-          companyDb.updateAgentKPIs(ag.id, ag.tokens, cost, 1);
+          companyDb.updateAgentKPIs(ag.id, ag.tokens, 0);
         }
       }
     }

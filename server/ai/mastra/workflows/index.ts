@@ -61,30 +61,6 @@ export class MastraWorkflowEngine {
     return Array.from(this.activeWorkflows.values());
   }
 
-  public advanceWorkflow(id: string, stepOutput?: any): StatefulWorkflow | undefined {
-    const wf = this.activeWorkflows.get(id);
-    if (!wf || wf.status === 'completed' || wf.status === 'failed') {
-      return wf;
-    }
-
-    const currentStep = wf.steps[wf.currentStepIndex];
-    if (currentStep) {
-      currentStep.status = 'completed';
-      currentStep.output = stepOutput;
-    }
-
-    if (wf.currentStepIndex + 1 < wf.steps.length) {
-      wf.currentStepIndex += 1;
-      const nextStep = wf.steps[wf.currentStepIndex];
-      nextStep.status = nextStep.requiresApproval ? 'awaiting_approval' : 'running';
-      wf.status = nextStep.requiresApproval ? 'paused' : 'running';
-    } else {
-      wf.status = 'completed';
-    }
-
-    wf.updatedAt = Date.now();
-    return wf;
-  }
 }
 
 export const mastraWorkflowEngine = MastraWorkflowEngine.getInstance();

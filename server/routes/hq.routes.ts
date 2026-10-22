@@ -632,6 +632,13 @@ hqRouter.post("/tasks/update-status", (req, res) => {
     if (!taskId || !status) {
       return res.status(400).json({ error: "taskId and status are required" });
     }
+    if (status === "completed") {
+      return res.status(409).json({
+        success: false,
+        code: "TASK_VERIFICATION_REQUIRED",
+        error: "Tasks can only be completed by an execution workflow that supplies verification evidence.",
+      });
+    }
 
     const updated = companyDb.updateTaskStatus(taskId, status, progress, output, codeSnippet);
     if (!updated) {
@@ -646,7 +653,7 @@ hqRouter.post("/tasks/update-status", (req, res) => {
       tool: "task.update_status",
       action: `Transitioned task "${updated.title}" status to ${status} (${progress}%)`,
       inputHash: Buffer.from(status).toString("base64").slice(0, 20),
-      result: `SUCCESS: Telemetry updated. Verification checks triggered.`,
+      result: `SUCCESS: Task status updated to ${status}. No completion verification was performed.`,
       timestamp: new Date().toISOString(),
       riskLevel: status === "completed" ? "medium" : "low",
       approvalRequired: false,

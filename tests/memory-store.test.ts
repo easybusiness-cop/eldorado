@@ -45,6 +45,35 @@ test('local memory persists, ranks relevant records, isolates organizations, and
       'org-beta',
     );
 
+    await mastraMemoryStore.saveMemory(
+      'backend-engineer',
+      'Verified convention: run memory tests after TypeScript changes.',
+      'agent',
+      ['verified'],
+      'org-alpha',
+    );
+    await mastraMemoryStore.saveMemory(
+      'engineering',
+      'Verified engineering guidance: run memory tests after TypeScript changes.',
+      'department',
+      ['engineering', 'verified'],
+      'org-alpha',
+    );
+    await mastraMemoryStore.saveMemory(
+      'backend-engineer',
+      'Unverified model response about memory tests after TypeScript changes.',
+      'agent',
+      ['model-response'],
+      'org-alpha',
+    );
+    await mastraMemoryStore.saveMemory(
+      'backend-engineer',
+      'Short-term model response about memory tests after TypeScript changes.',
+      'short_term',
+      ['model-response', 'not-executed'],
+      'org-alpha',
+    );
+
     const matches = await mastraMemoryStore.searchMemories('incident response', {
       agentId: 'dwight',
       scope: 'agent',
@@ -60,6 +89,24 @@ test('local memory persists, ranks relevant records, isolates organizations, and
       scope: 'agent',
       organizationId: 'org-gamma',
     })).length, 0);
+
+    const { MemoryAdapter } = await import('../server/ai/runtime/memory.adapter.ts');
+    const engineeringContext = await MemoryAdapter.getRelevantContext(
+      'backend-engineer',
+      'engineering',
+      'memory tests TypeScript',
+      'org-alpha',
+    );
+    assert.ok(engineeringContext.includes('Verified convention'));
+    assert.ok(engineeringContext.includes('Verified engineering guidance'));
+    assert.equal(engineeringContext.includes('Unverified model response'), false);
+    assert.equal(engineeringContext.includes('Short-term model response'), false);
+    assert.equal(await MemoryAdapter.getRelevantContext(
+      'backend-engineer',
+      'engineering',
+      'memory tests TypeScript',
+      'org-beta',
+    ), '');
 
     const persistedFile = await readFile(memoryFile, 'utf8');
     assert.ok(persistedFile.includes(privateMemory.id));

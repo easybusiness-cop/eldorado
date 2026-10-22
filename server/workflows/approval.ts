@@ -1,5 +1,3 @@
-import { mastraWorkflowEngine } from '../ai/mastra/workflows/index.ts';
-
 export interface ApprovalRequest {
   id: string;
   workflowId: string;
@@ -50,10 +48,6 @@ export class ApprovalWorkflowService {
     req.reviewedAt = Date.now();
     req.reviewedBy = reviewer;
     req.notes = notes;
-
-    if (decision === 'approved') {
-      mastraWorkflowEngine.advanceWorkflow(req.workflowId, { approvedBy: reviewer, notes });
-    }
 
     return req;
   }

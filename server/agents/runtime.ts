@@ -2,6 +2,7 @@ import { agentFleetRegistry } from "./registry.ts";
 import { mastra } from "../ai/mastra/index.ts";
 import { workingMemory } from "../memory/working-memory.ts";
 import { ruffloHarness } from "../harness/harness.ts";
+import { digitalIdentityService } from "../identity/digital-identity.service.ts";
 
 export interface AgentTask {
   id: string;
@@ -30,6 +31,8 @@ export class AgentRuntime {
     success: boolean;
     result: string;
     durationMs: number;
+    status: 'model_response';
+    completionVerified: false;
   }> {
     const startTime = Date.now();
 
@@ -47,6 +50,17 @@ export class AgentRuntime {
         `Agent "${agentId}" is not registered.`,
       );
     }
+
+    // Ensure agent has a persistent digital identity allocated
+    digitalIdentityService.getOrCreateIdentity(
+      task.organizationId,
+      agentId,
+      {
+        displayName: agent.name,
+        role: agent.role,
+        permissions: agent.permissions,
+      }
+    );
 
     /*
      * Every agent task enters the Rufflo Harness
@@ -123,15 +137,9 @@ export class AgentRuntime {
 
       const durationMs =
         Date.now() - startTime;
-
-      agentFleetRegistry.recordTaskCompletion(
-        agentId,
-        durationMs,
-      );
-
       agentFleetRegistry.updateStatus(
         agentId,
-        "completed",
+        "idle",
       );
 
       workingMemory.clearContext(
@@ -142,6 +150,8 @@ export class AgentRuntime {
         success: true,
         result: execution.result,
         durationMs,
+        status: 'model_response',
+        completionVerified: false,
       };
     } catch (error) {
       agentFleetRegistry.updateStatus(
