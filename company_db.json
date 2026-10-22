@@ -6346,7 +6346,7 @@
       "title": "B2B Client Acquisition Strategy",
       "description": "📢 Have Jim design a marketing funnel",
       "assignedTo": "jim",
-      "status": "failed",
+      "status": "completed",
       "progress": 100,
       "priority": "high",
       "subtasks": [
@@ -6359,18 +6359,27 @@
         {
           "id": "tsk-1788682988461-sub-2",
           "title": "Context synthesis & LLM execution",
-          "completed": false,
+          "completed": true,
           "assignedTo": "jim"
         },
         {
           "id": "tsk-1788682988461-sub-3",
           "title": "Logging metrics & auditing results",
-          "completed": false,
+          "completed": true,
           "assignedTo": "jim"
         }
       ],
       "createdAt": 1788682988461,
-      "output": "Execution Loop Error: Gemini API Client unavailable"
+      "output": "Recovered after the original Gemini API-unavailable failure. Completed a B2B acquisition funnel, 30-day pilot sequence, qualification criteria, message draft, and measurement scorecard. Campaign results and revenue claims are not invented.",
+      "completedAt": 1792699286949,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "docs/task-remediation/b2b-client-acquisition-strategy.md",
+          "timestamp": "2026-10-22T20:01:26.949Z",
+          "verificationId": "manual-recovery-tsk-1788682988461"
+        }
+      ]
     },
     {
       "id": "tsk-1788683759940",
@@ -6378,7 +6387,7 @@
       "title": "Financial Ledger & Compute Unit Economics",
       "description": "📊 Ask Kevin to check compute costs",
       "assignedTo": "kevin",
-      "status": "failed",
+      "status": "completed",
       "progress": 100,
       "priority": "high",
       "subtasks": [
@@ -6391,18 +6400,27 @@
         {
           "id": "tsk-1788683759940-sub-2",
           "title": "Context synthesis & LLM execution",
-          "completed": false,
+          "completed": true,
           "assignedTo": "kevin"
         },
         {
           "id": "tsk-1788683759940-sub-3",
           "title": "Logging metrics & auditing results",
-          "completed": false,
+          "completed": true,
           "assignedTo": "kevin"
         }
       ],
       "createdAt": 1788683759940,
-      "output": "Execution Loop Error: Gemini API Client unavailable"
+      "output": "Recovered after the original Gemini API-unavailable failure. Reconciled the saved KPI snapshot to 4,135,961 recorded tokens, $187.25 recorded estimated cost, and 1,061 KPI task completions. The report identifies missing period and invoice evidence; these figures are not represented as audited or monthly cash spend.",
+      "completedAt": 1792699286949,
+      "evidence": [
+        {
+          "status": "VERIFIED",
+          "source": "docs/task-remediation/compute-unit-economics.md",
+          "timestamp": "2026-10-22T20:01:26.949Z",
+          "verificationId": "manual-recovery-tsk-1788683759940"
+        }
+      ]
     },
     {
       "id": "test-exec-1788683879367",
@@ -6410,8 +6428,8 @@
       "title": "Verify database indexing and query latency optimization",
       "description": "Analyze slow query logs and configure compound indexes for student records",
       "assignedTo": "ruflo",
-      "status": "failed",
-      "progress": 100,
+      "status": "blocked",
+      "progress": 60,
       "priority": "medium",
       "subtasks": [
         {
@@ -6429,12 +6447,20 @@
         {
           "id": "test-exec-1788683879367-sub-3",
           "title": "Logging metrics & auditing results",
-          "completed": false,
+          "completed": true,
           "assignedTo": "ruflo"
         }
       ],
       "createdAt": 1788683879367,
-      "output": "Execution Loop Error: RepositoryEngineer failed: Development failed: Workspace contains no readable project files."
+      "output": "Blocked after repository and Supabase endpoint inspection. No student schema, representative slow query, query plan, or authorized database connection is available; the Supabase Data API returns 503 PGRST002 for schema-cache lookup. No speculative or unverified index was created. The attached review documents the safe read-only diagnostics and resume requirements.",
+      "evidence": [
+        {
+          "status": "BLOCKED",
+          "source": "docs/task-remediation/database-indexing-review.md",
+          "timestamp": "2026-10-22T20:01:26.949Z",
+          "verificationId": "blocked-review-test-exec-1788683879367"
+        }
+      ]
     },
     {
       "id": "test-exec-1788683902706",
@@ -7962,6 +7988,48 @@
     }
   ],
   "audits": [
+    {
+      "id": "aud-task-remediation-test-exec-1788683879367",
+      "agentId": "ruflo",
+      "projectId": "prj-alpha",
+      "taskId": "test-exec-1788683879367",
+      "tool": "task.remediation",
+      "action": "Blocked failed task \"Verify database indexing and query latency optimization\" with recovery evidence",
+      "inputHash": "dGVzdC1leGVjLTE3ODg2",
+      "result": "BLOCKED: Blocked after repository and Supabase endpoint inspection. No student schema, representative slow query, query plan, or authorized database connection is available; the Supabase Data API returns 503 PGRST002 for schema-cache lookup. No speculative or unverified index was created. The attached review documents the safe read-only diagnostics and resume requirements. Evidence: docs/task-remediation/database-indexing-review.md",
+      "timestamp": "2026-10-22T20:01:26.949Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "task-recovery-test-exec-1788683879367"
+    },
+    {
+      "id": "aud-task-remediation-tsk-1788683759940",
+      "agentId": "kevin",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788683759940",
+      "tool": "task.remediation",
+      "action": "Completed failed task \"Financial Ledger & Compute Unit Economics\" with recovery evidence",
+      "inputHash": "dHNrLTE3ODg2ODM3NTk5",
+      "result": "COMPLETED: Recovered after the original Gemini API-unavailable failure. Reconciled the saved KPI snapshot to 4,135,961 recorded tokens, $187.25 recorded estimated cost, and 1,061 KPI task completions. The report identifies missing period and invoice evidence; these figures are not represented as audited or monthly cash spend. Evidence: docs/task-remediation/compute-unit-economics.md",
+      "timestamp": "2026-10-22T20:01:26.949Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "task-recovery-tsk-1788683759940"
+    },
+    {
+      "id": "aud-task-remediation-tsk-1788682988461",
+      "agentId": "jim",
+      "projectId": "prj-alpha",
+      "taskId": "tsk-1788682988461",
+      "tool": "task.remediation",
+      "action": "Completed failed task \"B2B Client Acquisition Strategy\" with recovery evidence",
+      "inputHash": "dHNrLTE3ODg2ODI5ODg0",
+      "result": "COMPLETED: Recovered after the original Gemini API-unavailable failure. Completed a B2B acquisition funnel, 30-day pilot sequence, qualification criteria, message draft, and measurement scorecard. Campaign results and revenue claims are not invented. Evidence: docs/task-remediation/b2b-client-acquisition-strategy.md",
+      "timestamp": "2026-10-22T20:01:26.949Z",
+      "riskLevel": "low",
+      "approvalRequired": false,
+      "executionId": "task-recovery-tsk-1788682988461"
+    },
     {
       "id": "aud-evt-1792697773301-51",
       "agentId": "system",
@@ -14605,48 +14673,6 @@
       "riskLevel": "low",
       "approvalRequired": false,
       "executionId": "ex-chat-1788254606706"
-    },
-    {
-      "id": "aud-chat-1788254464256",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254464248",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"make a software...\"",
-      "inputHash": "bWFrZSBhIHNvZnR3YXJl",
-      "result": "SUCCESS: Generated 7877 characters response. Token cost: $0.00016",
-      "timestamp": "2026-09-01T09:21:04.256Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254464256"
-    },
-    {
-      "id": "aud-chat-1788254258989",
-      "agentId": "ryan",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788254258980",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 5225 characters response. Token cost: $0.00011",
-      "timestamp": "2026-09-01T09:17:38.989Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788254258989"
-    },
-    {
-      "id": "aud-chat-1788171022962",
-      "agentId": "michael",
-      "projectId": "prj-alpha",
-      "taskId": "tsk-1788171022953",
-      "tool": "agent.chat",
-      "action": "Processed user instruction: \"Call an all-hands hourly standup with the entire fleet. Summ...\"",
-      "inputHash": "Q2FsbCBhbiBhbGwtaGFu",
-      "result": "SUCCESS: Generated 5781 characters response. Token cost: $0.00012",
-      "timestamp": "2026-08-31T10:10:22.962Z",
-      "riskLevel": "low",
-      "approvalRequired": false,
-      "executionId": "ex-chat-1788171022962"
     }
   ],
   "accounts": [

@@ -2,7 +2,7 @@
 
 **Task:** `test-exec-1788683879367` — Verify database indexing and query latency optimization  
 **Owner:** Ruflo, Engineering  
-**Prepared:** 2026-10-21  
+**Updated:** 2026-10-23  
 **Disposition:** Blocked pending the student schema, workload, and database query-plan access.
 
 ## Findings
@@ -11,7 +11,8 @@
 - The repository’s Supabase migrations currently cover authentication/RBAC and agent memories. They do not create a student or student-records table.
 - Repository search finds classroom UI copy that mentions students, but no student data model or SQL access pattern to index.
 - No representative SQL statements, `EXPLAIN (ANALYZE, BUFFERS)` plans, row counts, or write-volume information were supplied.
-- The repository has no connected Supabase database tool in this session. No schema or production database was changed.
+- The configured Supabase publishable key cannot retrieve the OpenAPI schema; the current API responds `401` with “Secret API key required.” A zero-row read of the `students` relation responds `503 PGRST002` because PostgREST cannot load its schema cache. This does not establish that the relation exists or is absent.
+- The Supabase dashboard page is signed out. Running the generated read-only CLI diagnostics returned `AccessTokenRequiredError` before executing SQL. No Supabase CLI access token or authenticated SQL connection is configured for this session. No schema or production database was changed.
 
 ## Why no index was created
 
@@ -19,7 +20,7 @@ An index must match actual equality, range, join, and ordering predicates. Witho
 
 ## Safe next diagnostic steps
 
-Run these read-only checks in the authorized Supabase project after confirming the correct environment:
+Run the generated read-only checks in [database-indexing-commands.sql](./database-indexing-commands.sql) using [database-indexing-commands.md](./database-indexing-commands.md) after the Supabase project is accessible, its database/schema cache is healthy, and the environment is confirmed:
 
 ```sql
 -- Confirm whether any student-related table exists and inspect its row statistics.
@@ -46,4 +47,4 @@ After obtaining the actual query and schema, capture a non-production baseline w
 
 ## Inputs required to resume
 
-Provide the student table DDL, representative parameterized queries, slow-query samples with secrets and personal data removed, approximate row count/write rate, and an authorized non-production Supabase connection. Until those are available, the correct state is **blocked**, not “optimized.”
+Provide the student table DDL, representative parameterized queries, slow-query samples with secrets and personal data removed, approximate row count/write rate, and an authorized non-production Supabase SQL connection. The current Supabase Data API publishable key does not provide schema introspection, and the remote schema cache currently returns `PGRST002`. Until database access and workload evidence are available, the correct state is **blocked**, not “optimized.”
