@@ -314,7 +314,6 @@ export class MastraMemoryStore {
         !record.tags.some((tag) => excludedTags.has(tag)),
       );
     }
-
     return rankMemories(candidates, query, limit, this.getStorageMode() === 'supabase');
   }
 
