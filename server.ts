@@ -39,7 +39,7 @@ import departmentRoutes from "./server/routes/department.routes.ts";
 import corporationRouter from "./server/routes/corporation.routes.ts";
 import { polyglotRouter } from "./server/routes/polyglot.routes.ts";
 import { agentRouter } from "./server/routes/agents.ts";
-import { identityRouter } from "./server/routes/identity.routes.ts";
+import { identityRouter, identityOAuthCallbackRouter } from "./server/routes/identity.routes.ts";
 
 import fs from "fs";
 import { EngineeringDepartmentEngineer } from "./server/agents/engineering/engineering-department-engineer.ts";
@@ -101,6 +101,9 @@ app.get(["/api/health", "/healthz", "/health"], (req, res) => {
 // The Inngest adapter performs its own signed request validation. Mount it
 // before the normal user-auth middleware so the workflow service can invoke it.
 app.use("/api/inngest", inngestRouter);
+
+// Google Workspace's OAuth callback validates its single-use, server-stored state token.
+app.use("/api/identity", identityOAuthCallbackRouter);
 
 app.use("/api", payloadScannerMiddleware);
 app.use("/api", requireAuth);

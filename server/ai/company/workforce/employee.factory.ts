@@ -5,6 +5,7 @@ import { roleRegistry, RoleDefinition } from "./role.registry.ts";
 import { capabilityRegistry } from "./capability.registry.ts";
 import { capabilityEngine } from "../../../core/capabilities/capability.engine.ts";
 import type { DepartmentId } from "../../../../shared/types/index.ts";
+import { digitalIdentityService } from "../../../identity/digital-identity.service.ts";
 
 /**
  * Concrete dynamic class representing a dynamically spawned virtual employee.
@@ -43,11 +44,13 @@ export class EmployeeFactory {
   /**
    * Generates a fully configured dynamic virtual employee based on a role profile.
    */
-  public createEmployee(
+  public async createEmployee(
     roleId: string,
+    organizationId: string,
     customName?: string,
-    extraCapabilities: string[] = []
-  ): DynamicVirtualEmployee {
+    extraCapabilities: string[] = [],
+  ): Promise<DynamicVirtualEmployee> {
+    if (!organizationId?.trim()) throw new Error('organizationId is required to create an agent identity.');
     const roleDef = roleRegistry.getRole(roleId);
     if (!roleDef) {
       throw new Error(`Role "${roleId}" not found in RoleRegistry.`);
@@ -130,7 +133,12 @@ ${capabilityDetails}
 
     const employee = new DynamicVirtualEmployee(config, roleId, combinedCapabilities);
 
-    // Register inside the MastraAgentRegistry so it is execution-ready
+    await digitalIdentityService.getOrCreateIdentity(organizationId, employee.getId(), {
+      displayName: employee.getName(),
+      role: employee.config.role,
+    });
+
+    // Make the employee execution-ready only after permanent identity allocation succeeds.
     mastraAgentRegistry.registerAgent(employee);
 
     // Register profile inside the central CapabilityEngine

@@ -1,0 +1,8 @@
+FROM ghcr.io/openhands/agent-server:1.55.1-python
+
+ENV OH_CONVERSATION_RUNTIME=docker \
+    OH_CONVERSATION_IMAGE=ghcr.io/openhands/agent-server:1.55.1-python \
+    OH_CONVERSATION_CONTAINER_MEMORY=4g \
+    OH_CONVERSATION_CONTAINER_CPUS=2 \
+    OH_CONVERSATION_CONTAINER_PIDS_LIMIT=512 \
+    OH_ENABLE_BROWSER=0

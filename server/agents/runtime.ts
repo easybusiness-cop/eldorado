@@ -52,13 +52,12 @@ export class AgentRuntime {
     }
 
     // Ensure agent has a persistent digital identity allocated
-    digitalIdentityService.getOrCreateIdentity(
+    await digitalIdentityService.getOrCreateIdentity(
       task.organizationId,
       agentId,
       {
         displayName: agent.name,
         role: agent.role,
-        permissions: agent.permissions,
       }
     );
 

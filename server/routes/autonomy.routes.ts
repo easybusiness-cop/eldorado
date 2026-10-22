@@ -1,4 +1,5 @@
 import { Router } from "express";
+import type { AuthenticatedRequest } from "../security/auth.middleware.ts";
 import { AutonomousEngineer } from "../agents/autonomy/autonomous-engineer.ts";
 import { AgentTrainingUnavailableError, MasterTrainer } from "../training/master/master-trainer.ts";
 import { IngestionPipeline } from "../knowledge/ingestion/ingestion-pipeline.ts";
@@ -235,14 +236,16 @@ autonomyRouter.get("/autonomy/workforce/agents", (_req, res) => {
 });
 
 // POST /api/autonomy/workforce/spawn - Dynamically spawn a specialized employee
-autonomyRouter.post("/autonomy/workforce/spawn", (req, res) => {
+autonomyRouter.post("/autonomy/workforce/spawn", async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { roleId, customName, extraCapabilities } = req.body;
     if (!roleId) {
       return res.status(400).json({ success: false, error: "roleId is required" });
     }
 
-    const employee = employeeFactory.createEmployee(roleId, customName, extraCapabilities || []);
+    const employee = await employeeFactory.createEmployee(roleId, organizationId, customName, extraCapabilities || []);
     const profile = capabilityEngine.get(employee.getId());
 
     return res.json({
@@ -265,6 +268,8 @@ autonomyRouter.post("/autonomy/workforce/spawn", (req, res) => {
 // POST /api/autonomy/workforce/solve & /autonomy/workforce/solve - Matches the best employee (or spawns one)
 const solveHandler = async (req: any, res: any) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { taskDescription, requiredCapabilities, preferredDepartment } = req.body;
     if (!taskDescription || !requiredCapabilities || !Array.isArray(requiredCapabilities)) {
       return res.status(400).json({ success: false, error: "taskDescription and requiredCapabilities list are required" });
@@ -273,7 +278,8 @@ const solveHandler = async (req: any, res: any) => {
     const allocation = await workforceManager.selectEmployeeForTask(
       taskDescription,
       requiredCapabilities,
-      preferredDepartment
+      organizationId,
+      preferredDepartment,
     );
 
     return res.json({
@@ -297,6 +303,8 @@ autonomyRouter.post("/autonomy/workforce/solve", solveHandler);
 // POST /autonomy/workforce/distribute - Distribute a task across the workforce
 const distributeHandler = async (req: any, res: any) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { title, description, requiredCapabilities, preferredDepartment, priority, payload } = req.body;
     if (!title || !requiredCapabilities || !Array.isArray(requiredCapabilities)) {
       return res.status(400).json({ success: false, error: "title and requiredCapabilities list are required" });
@@ -309,6 +317,7 @@ const distributeHandler = async (req: any, res: any) => {
       preferredDepartment,
       priority,
       payload,
+      organizationId,
     });
 
     return res.json({ success: true, distribution });
@@ -347,18 +356,21 @@ autonomyRouter.post("/autonomy/workforce/verify", verifyHandler);
 autonomyRouter.post("/api/autonomy/workforce/verify", verifyHandler);
 
 // POST /autonomy/workforce/commission - Commission a specialized virtual employee on demand
-const commissionHandler = (req: any, res: any) => {
+const commissionHandler = async (req: any, res: any) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { taskDescription, requiredCapabilities, preferredDepartment, customName } = req.body;
     if (!requiredCapabilities || !Array.isArray(requiredCapabilities) || requiredCapabilities.length === 0) {
       return res.status(400).json({ success: false, error: "requiredCapabilities array is required" });
     }
 
-    const commissionedAgent = workforceManager.commissionSpecializedAgent(
+    const commissionedAgent = await workforceManager.commissionSpecializedAgent(
       taskDescription || "Custom specialized task",
       requiredCapabilities,
+      organizationId,
       preferredDepartment,
-      customName
+      customName,
     );
 
     const profile = capabilityEngine.get(commissionedAgent.getId());
@@ -542,8 +554,10 @@ autonomyRouter.post("/autonomy/knowledge/scan", async (_req, res) => {
 /* ====================================================================== */
 
 // POST /api/autonomy/cascade/run - Execute command down the corporate chain
-autonomyRouter.post("/autonomy/cascade/run", async (req, res) => {
+autonomyRouter.post("/autonomy/cascade/run", async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { command } = req.body;
     if (!command || typeof command !== "string" || command.trim().length < 3) {
       return res.status(400).json({
@@ -552,7 +566,7 @@ autonomyRouter.post("/autonomy/cascade/run", async (req, res) => {
       });
     }
 
-    const run = await corporateCascadeEngine.executeCommand(command.trim());
+    const run = await corporateCascadeEngine.executeCommand(command.trim(), undefined, organizationId);
     return res.json({
       success: true,
       run,
@@ -573,8 +587,10 @@ autonomyRouter.get("/autonomy/cascade/history", (_req, res) => {
 });
 
 // POST /api/autonomy/cascade/stream - Real-time SSE streaming of corporate hierarchy execution
-autonomyRouter.post("/autonomy/cascade/stream", async (req, res) => {
+autonomyRouter.post("/autonomy/cascade/stream", async (req: AuthenticatedRequest, res) => {
   try {
+    const organizationId = req.identity?.organizationId;
+    if (!organizationId) return res.status(401).json({ success: false, error: "Organization authentication is required." });
     const { command } = req.body;
     if (!command || typeof command !== "string" || command.trim().length < 3) {
       return res.status(400).json({
@@ -597,7 +613,7 @@ autonomyRouter.post("/autonomy/cascade/stream", async (req, res) => {
 
     const run = await corporateCascadeEngine.executeCommand(command.trim(), (evt) => {
       send(evt.type, evt.data);
-    });
+    }, organizationId);
 
     send("complete", {
       runId: run.id,

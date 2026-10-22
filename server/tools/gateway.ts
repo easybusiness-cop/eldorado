@@ -99,7 +99,7 @@ export class ToolGateway {
     }
 
     // Ensure digital identity is allocated and active
-    digitalIdentityService.getOrCreateIdentity(req.organizationId, req.agentId);
+    await digitalIdentityService.getOrCreateIdentity(req.organizationId, req.agentId);
 
     // 2. Risk Engine Assessment
     const assessment = await riskEngine.assessRisk(req.toolName, req.parameters, { agentId: req.agentId, orgId: req.organizationId });

@@ -1,6 +1,7 @@
-import { BrowserService } from "./browser.service.ts";
+import { browserService } from "./browser.service.ts";
 import { callGeminiResilient } from "../../ai/geminiService.ts";
 import { eventBus } from "../../events/eventBus.ts";
+import { digitalIdentityService } from "../../identity/digital-identity.service.ts";
 
 export interface BrowserUseStep {
   action: "navigate" | "click" | "type" | "scroll" | "extract" | "wait" | "finish";
@@ -25,8 +26,6 @@ export interface BrowserUseResult {
 }
 
 export class BrowserUseEngine {
-  private static browser = new BrowserService();
-
   /**
    * Evaluates an objective, plans browser-use steps inspired by the Python library,
    * executes them sequentially using the native BrowserService, and feeds back the trace.
@@ -34,8 +33,12 @@ export class BrowserUseEngine {
   public static async run(
     objective: string,
     initialUrl?: string,
-    agentId: string = "system"
+    agentId: string = "system",
+    organizationId: string = process.env.RUFFLO_SYSTEM_ORGANIZATION_ID?.trim() || "org-default",
   ): Promise<BrowserUseResult> {
+    if (!(await digitalIdentityService.hasPermission(organizationId, agentId, 'browser:persist'))) {
+      throw new Error('The agent must receive browser:persist approval before using its persistent browser workspace.');
+    }
     const trace: any[] = [];
     let currentUrl = initialUrl || "https://mastra.ai/docs";
     let stepNumber = 1;
@@ -44,16 +47,17 @@ export class BrowserUseEngine {
 
     eventBus.emitEvent("BROWSER_USE_STARTED", {
       agentId,
-      message: `Browser-Use automation engine activated for objective: "${objective}"`,
+      organizationId,
+      message: 'Browser-Use automation engine activated for an organization-scoped agent workspace.',
     });
 
     // 1. Initial Navigation
     try {
-      const initBrowse = await this.browser.browseTo(currentUrl);
+      const initBrowse = await browserService.browseAsAgent(agentId, currentUrl, organizationId);
       trace.push({
         stepNumber,
         action: "navigate",
-        detail: `Navigated to ${currentUrl}`,
+        detail: 'Navigated in the isolated browser workspace.',
         status: "success",
         extractedInfo: initBrowse.info,
         screenshot: initBrowse.screenshot,
@@ -63,7 +67,7 @@ export class BrowserUseEngine {
       trace.push({
         stepNumber,
         action: "navigate",
-        detail: `Failed initial navigation to ${currentUrl}`,
+        detail: 'Initial navigation could not be completed.',
         status: "failed",
         error: err.message,
       });
@@ -123,19 +127,20 @@ Format your decision strictly as a single JSON object. Do not include any other 
 
       eventBus.emitEvent("BROWSER_USE_STEP", {
         agentId,
-        message: `Browser-Use step planned: [${decidedStep.action.toUpperCase()}] ${decidedStep.reason}`,
-        step: decidedStep,
+        organizationId,
+        message: `Browser-Use step planned: [${decidedStep.action.toUpperCase()}]`,
+        step: { action: decidedStep.action },
       });
 
       // 3. Action Execution
       if (decidedStep.action === "navigate" && decidedStep.url) {
         currentUrl = decidedStep.url;
         try {
-          const browse = await this.browser.browseTo(currentUrl);
+          const browse = await browserService.browseAsAgent(agentId, currentUrl, organizationId);
           trace.push({
             stepNumber,
             action: "navigate",
-            detail: `Browsed to ${currentUrl} (${decidedStep.reason})`,
+            detail: 'Navigated in the isolated browser workspace.',
             status: "success",
             extractedInfo: browse.info,
             screenshot: browse.screenshot,
@@ -144,18 +149,18 @@ Format your decision strictly as a single JSON object. Do not include any other 
           trace.push({
             stepNumber,
             action: "navigate",
-            detail: `Failed browsing to ${currentUrl}`,
+            detail: 'Navigation could not be completed.',
             status: "failed",
             error: err.message,
           });
         }
       } else if (decidedStep.action === "click" && decidedStep.selector) {
         try {
-          const clickRes = await this.browser.click(decidedStep.selector);
+          const clickRes = await browserService.clickAsAgent(agentId, decidedStep.selector, organizationId);
           trace.push({
             stepNumber,
             action: "click",
-            detail: `Clicked element "${decidedStep.selector}" (${decidedStep.reason})`,
+            detail: 'Clicked an element in the isolated browser workspace.',
             status: clickRes.success ? "success" : "failed",
             result: clickRes,
           });
@@ -170,11 +175,11 @@ Format your decision strictly as a single JSON object. Do not include any other 
         }
       } else if (decidedStep.action === "type" && decidedStep.selector && decidedStep.value) {
         try {
-          const typeRes = await this.browser.type(decidedStep.selector, decidedStep.value);
+          const typeRes = await browserService.typeAsAgent(agentId, decidedStep.selector, decidedStep.value, organizationId);
           trace.push({
             stepNumber,
             action: "type",
-            detail: `Typed "${decidedStep.value}" into element "${decidedStep.selector}" (${decidedStep.reason})`,
+            detail: 'Submitted input in the isolated browser workspace.',
             status: typeRes.success ? "success" : "failed",
             result: typeRes,
           });
@@ -196,11 +201,11 @@ Format your decision strictly as a single JSON object. Do not include any other 
         });
       } else if (decidedStep.action === "extract") {
         try {
-          const extractRes = await this.browser.browseTo(currentUrl);
+          const extractRes = await browserService.browseAsAgent(agentId, currentUrl, organizationId);
           trace.push({
             stepNumber,
             action: "extract",
-            detail: `Extracted structure & text contents from ${currentUrl} (${decidedStep.reason})`,
+            detail: 'Extracted structure and text from the current page.',
             status: "success",
             extractedInfo: extractRes.info,
             screenshot: extractRes.screenshot,
@@ -209,7 +214,7 @@ Format your decision strictly as a single JSON object. Do not include any other 
           trace.push({
             stepNumber,
             action: "extract",
-            detail: `Failed content extraction from ${currentUrl}`,
+            detail: 'Content extraction could not be completed.',
             status: "failed",
             error: err.message,
           });
@@ -241,6 +246,7 @@ Format your decision strictly as a single JSON object. Do not include any other 
 
     eventBus.emitEvent("BROWSER_USE_COMPLETED", {
       agentId,
+      organizationId,
       message: `Browser-Use automation complete. Steps: ${trace.length}`,
     });
 
